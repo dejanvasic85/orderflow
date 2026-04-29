@@ -11,7 +11,7 @@ const isTest = process.env.VITEST === "true";
 
 const config = defineConfig({
   server: {
-    port: 3000,
+    port: 5050,
   },
   resolve: {
     tsconfigPaths: true,
