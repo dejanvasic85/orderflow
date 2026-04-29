@@ -69,14 +69,6 @@ Vite+ automatically detects and wraps the underlying package manager through `pa
 - Name event handlers with `handle` prefix (for example: `handleSubmit`)
 - Use accessible, semantic HTML and keyboard-friendly interactions by default
 
-## Frontend Design System Skill (Required)
-
-- For any frontend code changes (`.tsx`, `.css`, route/component UI edits), load and follow `frontend-design-system` skill at `.agents/skills/frontend-design-system/SKILL.md`.
-- Build and maintain styles through CSS variable tokens and Tailwind v4 utilities.
-- Use semantic/component tokens in classes; avoid introducing hardcoded color values in `className` strings when a token can represent the same intent.
-- Keep theme support to light/dark with auto/system resolution only.
-- Token-first approach is required before adopting UI primitive libraries such as Radix or Ariakit.
-
 ## Data, Config, and Validation
 
 - Centralize environment variable parsing/validation through Zod-based config modules
