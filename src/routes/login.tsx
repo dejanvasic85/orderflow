@@ -3,8 +3,8 @@ import { getSession } from "#/lib/authFunctions";
 
 export const Route = createFileRoute("/login")({
   beforeLoad: async () => {
-    const session = await getSession();
-    if (session) {
+    const user = await getSession();
+    if (user) {
       throw redirect({ to: "/dashboard" });
     }
   },
@@ -96,14 +96,12 @@ async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
   const email = (form.elements.namedItem("email") as HTMLInputElement).value;
   const password = (form.elements.namedItem("password") as HTMLInputElement).value;
 
-  const { authClient } = await import("#/lib/auth-client");
-  const { error } = await authClient.signIn.email({
-    email,
-    password,
-    callbackURL: "/dashboard",
-  });
+  const { supabase } = await import("#/lib/supabase");
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
     alert(error.message ?? "Sign in failed");
+  } else {
+    window.location.href = "/dashboard";
   }
 }
