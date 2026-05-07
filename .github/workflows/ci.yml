@@ -32,7 +32,7 @@ jobs:
         run: supabase db reset
 
       - name: Run unit tests
-        run: vp test run
+        run: vp test run --passWithNoTests
 
       - name: Install Playwright browsers
         run: vp exec playwright install --with-deps chromium
