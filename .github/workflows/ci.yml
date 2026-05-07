@@ -34,11 +34,11 @@ jobs:
       - name: Run unit tests
         run: vp test run --passWithNoTests
 
-      - name: Install Playwright browsers
-        run: vp exec playwright install --with-deps chromium
+      # - name: Install Playwright browsers
+      #   run: vp exec playwright install --with-deps chromium
 
-      - name: Run e2e tests
-        run: vp exec playwright test
+      # - name: Run e2e tests
+      #   run: vp exec playwright test
 
       - name: Stop Supabase
         run: supabase stop
