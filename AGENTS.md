@@ -74,6 +74,7 @@ Vite+ automatically detects and wraps the underlying package manager through `pa
 - Centralize environment variable parsing/validation through Zod-based config modules
 - Keep data access logic grouped by domain; avoid scattering query logic through UI layers
 - Use explicit mapping/transform steps where boundaries between external/internal shapes exist
+- **Environment variables are documented in `.env.example` only** — never list env vars in docs, README, or CLAUDE.md files
 
 ## Testing and Quality Gates
 
