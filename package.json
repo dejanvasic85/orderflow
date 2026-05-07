@@ -1,7 +1,7 @@
 {
   "name": "orderflow",
-  "private": true,
   "version": "0.0.1",
+  "private": true,
   "type": "module",
   "imports": {
     "#/*": "./src/*"
@@ -11,19 +11,16 @@
     "build": "vp build",
     "preview": "vp preview",
     "test": "vp test run",
+    "test:e2e": "playwright test",
     "deploy": "vp run build && vp exec wrangler deploy",
     "start": "node --import ./instrument.server.mjs dist/server/index.js",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
-    "db:push": "drizzle-kit push",
-    "db:pull": "drizzle-kit pull",
-    "db:studio": "drizzle-kit studio",
     "prepare": "vp config"
   },
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.26.0",
-    "@neondatabase/serverless": "^1.1.0",
     "@sentry/tanstackstart-react": "^10.42.0",
+    "@supabase/ssr": "0.10.2",
+    "@supabase/supabase-js": "2.105.3",
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/react-devtools": "latest",
     "@tanstack/react-form": "latest",
@@ -34,10 +31,7 @@
     "@tanstack/react-router-ssr-query": "latest",
     "@tanstack/react-start": "latest",
     "@tanstack/router-plugin": "^1.132.0",
-    "better-auth": "^1.5.3",
     "dotenv-cli": "^11.0.0",
-    "drizzle-kit": "^0.31.9",
-    "drizzle-orm": "^0.45.1",
     "lucide-react": "^0.577.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
@@ -45,6 +39,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@playwright/test": "1.59.1",
     "@tailwindcss/typography": "^0.5.16",
     "@tanstack/devtools-vite": "latest",
     "@testing-library/dom": "^10.4.1",
@@ -55,6 +50,7 @@
     "@vitejs/plugin-react": "^5.1.4",
     "dotenv": "^17.3.1",
     "jsdom": "^28.1.0",
+    "supabase": "2.98.2",
     "tsx": "^4.21.0",
     "typescript": "^6.0.2",
     "vite": "npm:@voidzero-dev/vite-plus-core@latest",

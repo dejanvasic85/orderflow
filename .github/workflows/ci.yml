@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version: "24"
+          cache: true
+
+      - name: Install dependencies
+        run: vp install
+
+      - name: Install Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Start Supabase
+        run: supabase start &>/dev/null
+
+      - name: Apply migrations and seed
+        run: supabase db reset
+
+      - name: Run unit tests
+        run: vp test run --passWithNoTests
+
+      # - name: Install Playwright browsers
+      #   run: vp exec playwright install --with-deps chromium
+
+      # - name: Run e2e tests
+      #   run: vp exec playwright test
+
+      - name: Stop Supabase
+        run: supabase stop

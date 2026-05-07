@@ -13,6 +13,9 @@ const config = defineConfig({
   server: {
     port: 5050,
   },
+  test: {
+    include: ["src/**/*.{test,spec}.{ts,tsx}"],
+  },
   resolve: {
     tsconfigPaths: true,
   },

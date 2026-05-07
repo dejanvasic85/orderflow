@@ -1,5 +1,5 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { authClient } from "#/lib/auth-client";
+import { supabase } from "#/lib/supabase";
 
 export const Route = createFileRoute("/_protected/dashboard")({
   component: DashboardPage,
@@ -16,13 +16,13 @@ function DashboardPage() {
           <div>
             <p className="island-kicker mb-1">Dashboard</p>
             <h1 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
-              Welcome, {user.name}
+              Welcome, {user.email}
             </h1>
           </div>
           <button
             className="button-ghost rounded-lg px-4 py-2 text-sm font-medium"
             onClick={async () => {
-              await authClient.signOut();
+              await supabase.auth.signOut();
               void router.navigate({ to: "/" });
             }}
           >
