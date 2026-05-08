@@ -11,7 +11,7 @@ const isTest = process.env.VITEST === "true";
 
 const config = defineConfig({
   server: {
-    port: 5050,
+    port: 3344,
   },
   test: {
     include: ["src/**/*.{test,spec}.{ts,tsx}"],
