@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 
 type ThemeMode = "light" | "dark" | "auto";
 
@@ -21,13 +22,6 @@ function applyThemeMode(mode: ThemeMode) {
 
   document.documentElement.classList.remove("light", "dark");
   document.documentElement.classList.add(resolved);
-
-  if (mode === "auto") {
-    document.documentElement.removeAttribute("data-theme");
-  } else {
-    document.documentElement.setAttribute("data-theme", mode);
-  }
-
   document.documentElement.style.colorScheme = resolved;
 }
 
@@ -67,14 +61,15 @@ export default function ThemeToggle() {
       : `Theme mode: ${mode}. Click to switch mode.`;
 
   return (
-    <button
+    <Button
       type="button"
+      variant="outline"
+      size="sm"
       onClick={toggleMode}
       aria-label={label}
       title={label}
-      className="chip-shell rounded-full px-3 py-1.5 text-sm font-semibold text-[var(--text-primary)] transition hover:-translate-y-0.5"
     >
       {mode === "auto" ? "Auto" : mode === "dark" ? "Dark" : "Light"}
-    </button>
+    </Button>
   );
 }

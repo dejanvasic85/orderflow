@@ -14,11 +14,11 @@ Replaces SMS/email ordering with a centralised order management system for a liq
 
 ## Roles
 
-| Role | What they can do |
-|------|-----------------|
-| **Admin** | Full access — users, accounts, products, templates, orders |
-| **Staff** | View all orders, update status (dispatch/cancel). Read-only otherwise |
-| **User** | Place/cancel orders and view history for their assigned accounts. A user assigned to multiple accounts acts as a sales rep |
+| Role      | What they can do                                                                                                           |
+| --------- | -------------------------------------------------------------------------------------------------------------------------- |
+| **Admin** | Full access — users, accounts, products, templates, orders                                                                 |
+| **Staff** | View all orders, update status (dispatch/cancel). Read-only otherwise                                                      |
+| **User**  | Place/cancel orders and view history for their assigned accounts. A user assigned to multiple accounts acts as a sales rep |
 
 ---
 
@@ -43,12 +43,12 @@ Replaces SMS/email ordering with a centralised order management system for a liq
 
 ## Phases
 
-| Phase | Scope | Timeline |
-|-------|-------|----------|
-| 1 — Core MVP | Auth, accounts, products (manual/CSV), templates, orders, email notifications, PWA | 2–3 weeks |
-| 2 — Polish | SMS notifications, notification prefs, account-specific pricing, bulk reassignment | 1–2 weeks |
-| 3 — MYOB Sync | Product + account sync from MYOB AccountRight API (or CSV fallback) | 1–2 weeks |
-| 4 — Reporting | TBD — quoted separately | — |
+| Phase         | Scope                                                                              | Timeline  |
+| ------------- | ---------------------------------------------------------------------------------- | --------- |
+| 1 — Core MVP  | Auth, accounts, products (manual/CSV), templates, orders, email notifications, PWA | 2–3 weeks |
+| 2 — Polish    | SMS notifications, notification prefs, account-specific pricing, bulk reassignment | 1–2 weeks |
+| 3 — MYOB Sync | Product + account sync from MYOB AccountRight API (or CSV fallback)                | 1–2 weeks |
+| 4 — Reporting | TBD — quoted separately                                                            | —         |
 
 ---
 
