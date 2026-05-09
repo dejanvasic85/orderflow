@@ -1,4 +1,4 @@
-import { company } from "#/lib/config";
+import { company } from "@/lib/config";
 
 export default function Footer() {
   const year = new Date().getFullYear();
