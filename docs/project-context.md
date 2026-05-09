@@ -1,5 +1,7 @@
 # Orderflow — Project Context
 
+Built for **Boutique Wines of the World Pty Ltd (BWW)** — a bespoke order management system.
+
 ## The Idea
 
 _Fill in your product vision here._
@@ -69,7 +71,7 @@ const { data, isLoading } = useQuery({
 ```bash
 supabase start       # start local Supabase (requires Docker)
 supabase db reset    # apply migrations + seed data
-vp dev               # start app on http://localhost:3000
+vp dev               # start app on http://localhost:3344
 ```
 
 ## MYOB Sync

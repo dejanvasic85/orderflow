@@ -1,4 +1,5 @@
 import { HeadContent, Scripts, createRootRouteWithContext } from "@tanstack/react-router";
+import { company } from "#/lib/config";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import Footer from "../components/Footer";
@@ -26,7 +27,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "Orderflow",
+        title: company.name,
       },
     ],
     links: [

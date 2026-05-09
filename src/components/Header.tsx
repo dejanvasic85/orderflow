@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import ThemeToggle from "./ThemeToggle";
+import { company } from "#/lib/config";
 
 export default function Header() {
   return (
@@ -11,7 +12,7 @@ export default function Header() {
             className="chip-shell inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm text-[var(--text-primary)] no-underline sm:px-4 sm:py-2"
           >
             <span className="h-2 w-2 rounded-full bg-[linear-gradient(90deg,var(--lagoon),var(--lagoon-deep))]" />
-            Orderflow
+            {company.shortName}
           </Link>
         </h2>
 

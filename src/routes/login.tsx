@@ -17,17 +17,14 @@ function LoginPage() {
       <div className="island-shell w-full max-w-sm rounded-2xl p-8">
         <div className="mb-8 text-center">
           <p className="island-kicker mb-2">Welcome back</p>
-          <h1 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
+          <h1
+            className="text-2xl font-bold"
+            style={{ color: "var(--text-primary)" }}
+          >
             Sign in to your account
           </h1>
         </div>
         <LoginForm />
-        <p className="mt-6 text-center text-sm" style={{ color: "var(--text-secondary)" }}>
-          Don't have an account?{" "}
-          <a href="/signup" className="font-medium">
-            Sign up
-          </a>
-        </p>
       </div>
     </main>
   );
@@ -94,7 +91,8 @@ async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
   e.preventDefault();
   const form = e.currentTarget;
   const email = (form.elements.namedItem("email") as HTMLInputElement).value;
-  const password = (form.elements.namedItem("password") as HTMLInputElement).value;
+  const password = (form.elements.namedItem("password") as HTMLInputElement)
+    .value;
 
   const { supabase } = await import("#/lib/supabase");
   const { error } = await supabase.auth.signInWithPassword({ email, password });
