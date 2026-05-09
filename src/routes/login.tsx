@@ -46,16 +46,8 @@ function LoginPage() {
           <p className="mb-8 text-4xl font-semibold leading-snug tracking-tight text-background">
             "Order management built for wholesale"
           </p>
-          <footer className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-background/20 text-sm font-bold text-background">
-              S
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-background">{company.name}</p>
-              <p className="text-xs text-background/60">
-                Wholesale order management · 400+ accounts
-              </p>
-            </div>
+          <footer>
+            <p className="text-sm font-semibold text-background">{company.name}</p>
           </footer>
         </blockquote>
       </div>
