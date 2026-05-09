@@ -73,7 +73,7 @@ Replaces SMS/email ordering with a centralised order management system for a liq
 
 ## Architecture
 
-```
+```text
 Cloudflare Pages    — serves TanStack Start app (SSR + static assets)
 Cloudflare Workers  — MYOB sync, webhooks, background tasks (deferred)
 Supabase            — Postgres, Auth, PostgREST, Storage

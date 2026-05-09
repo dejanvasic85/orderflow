@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { company } from "#/lib/config";
-import { Button } from "@/components/ui/button";
+import { Button } from "#/components/ui/button";
 
 export const Route = createFileRoute("/")({ component: App });
 
@@ -14,7 +14,7 @@ function App() {
         </p>
         <div className="flex flex-wrap items-center justify-center gap-3">
           <Button asChild size="lg">
-            <a href="/login">Login</a>
+            <Link to="/login">Login</Link>
           </Button>
         </div>
       </section>

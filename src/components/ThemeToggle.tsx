@@ -48,7 +48,7 @@ export default function ThemeToggle() {
     };
   }, [mode]);
 
-  function toggleMode() {
+  function handleToggleMode() {
     const nextMode: ThemeMode = mode === "light" ? "dark" : mode === "dark" ? "auto" : "light";
     setMode(nextMode);
     applyThemeMode(nextMode);
@@ -65,7 +65,7 @@ export default function ThemeToggle() {
       type="button"
       variant="outline"
       size="sm"
-      onClick={toggleMode}
+      onClick={handleToggleMode}
       aria-label={label}
       title={label}
     >
