@@ -15,7 +15,6 @@ It contains the product vision, tech stack, and data model decisions.
 - Server-side Supabase access: `createSupabaseServerClient()` from `src/lib/supabaseServer.ts` (used inside `createServerFn` handlers)
 - Browser-side Supabase access: `supabase` singleton from `src/lib/supabase.ts`
 - Domain queries go in `src/lib/queries/` grouped by entity (e.g. `orders.ts`, `products.ts`)
-- Frontend styles use CSS custom property tokens — see `src/styles.css` and `.agents/skills/frontend-design-system/SKILL.md`
 - Environment variables are documented in `.env.example` — never put env var lists in docs or README files
 
 ## Local development
