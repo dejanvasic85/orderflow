@@ -53,7 +53,7 @@ function LoginPage() {
             <div>
               <p className="text-sm font-semibold text-background">{company.name}</p>
               <p className="text-xs text-background/60">
-                Wholesale order management · 400+ accounts
+                Order management built for wholesale
               </p>
             </div>
           </footer>
