@@ -44,7 +44,7 @@ function LoginPage() {
       <div className="hidden flex-1 flex-col items-start justify-center bg-foreground px-16 py-20 lg:flex">
         <blockquote className="max-w-lg">
           <p className="mb-8 text-4xl font-semibold leading-snug tracking-tight text-background">
-            "The fastest way to go from SMS chaos to a system your whole team trusts."
+            "Order management built for wholesale"
           </p>
           <footer className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-background/20 text-sm font-bold text-background">
@@ -53,7 +53,7 @@ function LoginPage() {
             <div>
               <p className="text-sm font-semibold text-background">{company.name}</p>
               <p className="text-xs text-background/60">
-                Order management built for wholesale
+                Wholesale order management · 400+ accounts
               </p>
             </div>
           </footer>
