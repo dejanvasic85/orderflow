@@ -10,12 +10,11 @@ It contains the product vision, tech stack, and data model decisions.
 ## Key conventions
 
 - Use `vp` (Vite Plus) for all dev/build/test/lint workflows — not raw `pnpm` or `vite`
-- Path alias `#/*` maps to `./src/*` — prefer it over relative imports
+- Path alias `@/*` maps to `./src/*` — prefer it over relative imports
 - Auth is handled by Supabase Auth; use `getSession` / `ensureSession` from `src/lib/authFunctions.ts`
 - Server-side Supabase access: `createSupabaseServerClient()` from `src/lib/supabaseServer.ts` (used inside `createServerFn` handlers)
 - Browser-side Supabase access: `supabase` singleton from `src/lib/supabase.ts`
 - Domain queries go in `src/lib/queries/` grouped by entity (e.g. `orders.ts`, `products.ts`)
-- Frontend styles use CSS custom property tokens — see `src/styles.css` and `.agents/skills/frontend-design-system/SKILL.md`
 - Environment variables are documented in `.env.example` — never put env var lists in docs or README files
 
 ## Local development
@@ -135,5 +134,5 @@ Pre-commit hooks are configured through Vite+ staged checks; ensure any auto-fix
 - [ ] Run `vp install` after pulling remote changes and before starting work.
 - [ ] Run `vp check` and `vp test` before final handoff.
 - [ ] Run `vp build` when changes affect build/runtime boundaries.
-- [ ] Prefer alias imports (`#/*`, `@/*`) over long relative paths.
+- [ ] Prefer alias imports (`@/*`) over long relative paths.
 - [ ] Keep environment variables validated through Zod config.

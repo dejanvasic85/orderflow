@@ -1,5 +1,5 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { supabase } from "#/lib/supabase";
+import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/_protected/dashboard")({
   component: DashboardPage,
