@@ -1,8 +1,9 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { getSession } from "@/lib/authFunctions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { company } from "@/lib/config";
 
 export const Route = createFileRoute("/login")({
   beforeLoad: async () => {
@@ -16,13 +17,39 @@ export const Route = createFileRoute("/login")({
 
 function LoginPage() {
   return (
-    <main className="flex flex-1 flex-col items-center justify-center px-6">
-      <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-8 shadow-sm">
-        <div className="mb-8 text-center">
-          <h1 className="mb-1 text-2xl font-semibold tracking-tight">Sign in to your account</h1>
-          <p className="text-sm text-muted-foreground">Welcome back</p>
+    <main className="fixed inset-0 z-10 flex overflow-auto bg-background">
+      {/* Left panel */}
+      <div className="flex w-full flex-col justify-center px-8 py-12 lg:w-[42%] lg:px-16">
+        <div className="mb-12">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1.5 text-sm font-semibold text-foreground no-underline transition-colors hover:bg-muted"
+          >
+            <span className="h-2 w-2 rounded-full bg-foreground" />
+            {company.shortName}
+          </Link>
         </div>
-        <LoginForm />
+
+        <div className="mb-8 max-w-sm">
+          <h1 className="mb-2 text-3xl font-semibold tracking-tight">Sign in</h1>
+          <p className="text-muted-foreground">Welcome back to {company.name}</p>
+        </div>
+
+        <div className="w-full max-w-sm">
+          <LoginForm />
+        </div>
+      </div>
+
+      {/* Right panel — desktop only */}
+      <div className="hidden flex-1 flex-col items-start justify-center bg-foreground px-16 py-20 lg:flex">
+        <blockquote className="max-w-lg">
+          <p className="mb-8 text-4xl font-semibold leading-snug tracking-tight text-background">
+            "Order management built for wholesale"
+          </p>
+          <footer>
+            <p className="text-sm font-semibold text-background">{company.name}</p>
+          </footer>
+        </blockquote>
       </div>
     </main>
   );
