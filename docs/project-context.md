@@ -55,7 +55,7 @@ Replaces SMS/email ordering with a centralised order management system for a liq
 ## Data Model (entities only)
 
 - **users** — auth + role + notification prefs
-- **accounts** — business details, delivery address
+- **accounts** — business + contact details (delivery address TBD)
 - **account_users** — many-to-many join (user ↔ account)
 - **products** — name, description, image, qty per box, price (internal only)
 - **account_pricing** — per-account price overrides
@@ -68,6 +68,7 @@ Replaces SMS/email ordering with a centralised order management system for a liq
 ## Open Questions (unresolved)
 
 - MYOB access level — API credentials, DB access, or CSV export only?
+- Account delivery address — defer until needed by order placement, or always required?
 
 ---
 
