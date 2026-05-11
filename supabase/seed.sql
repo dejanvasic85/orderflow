@@ -31,3 +31,8 @@ INSERT INTO auth.identities (
   '{"sub":"00000000-0000-0000-0000-000000000001","email":"admin@bww.com.au"}',
   now(), now(), now()
 ) ON CONFLICT (id) DO NOTHING;
+
+-- Ensure the admin profile exists with role='admin' regardless of trigger ordering
+INSERT INTO public.users (id, name, role)
+VALUES ('00000000-0000-0000-0000-000000000001', 'Admin', 'admin')
+ON CONFLICT (id) DO UPDATE SET role = EXCLUDED.role, name = EXCLUDED.name;
