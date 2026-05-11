@@ -1,34 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
-import { z } from "zod";
 
 import { supabase } from "@/lib/supabase";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
 
-export type AccountRow = {
-  id: string;
-  name: string;
-  contact_name: string | null;
-  contact_email: string | null;
-  contact_phone: string | null;
-  active: boolean;
-  created_at: string;
-  updated_at: string;
-};
-
-const createAccountSchema = z.object({
-  name: z.string().min(1),
-  contact_name: z.string().nullable().optional(),
-  contact_email: z.email().nullable().optional(),
-  contact_phone: z.string().nullable().optional(),
-  active: z.boolean().optional(),
-});
-
-const updateAccountSchema = createAccountSchema.partial().extend({ id: z.uuid() });
-
-const assignSchema = z.object({
-  account_id: z.uuid(),
-  user_id: z.uuid(),
-});
+import { assignSchema, createAccountSchema, updateAccountSchema } from "./schema";
 
 // Browser — RLS: admin/staff see all; user sees assigned accounts only
 export async function listAccounts() {

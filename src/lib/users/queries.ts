@@ -1,28 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
-import { z } from "zod";
 
 import { supabase } from "@/lib/supabase";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
 
-export type UserRow = {
-  id: string;
-  name: string;
-  phone: string | null;
-  active: boolean;
-  role: "admin" | "staff" | "user";
-  notification_preferences: { email: boolean; sms: boolean };
-  created_at: string;
-  updated_at: string;
-};
-
-const updateUserSchema = z.object({
-  id: z.uuid(),
-  name: z.string().min(1).optional(),
-  phone: z.string().nullable().optional(),
-  active: z.boolean().optional(),
-  role: z.enum(["admin", "staff", "user"]).optional(),
-  notification_preferences: z.object({ email: z.boolean(), sms: z.boolean() }).optional(),
-});
+import { updateUserSchema } from "./schema";
 
 // Browser — RLS: admin/staff see all; user sees only self
 export async function listUsers() {
