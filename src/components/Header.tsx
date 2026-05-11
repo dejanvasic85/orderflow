@@ -28,6 +28,13 @@ export default function Header() {
           >
             Home
           </Link>
+          <Link
+            to="/users"
+            className="text-muted-foreground transition-colors hover:text-foreground [&.active]:text-foreground"
+            activeProps={{ className: "active" }}
+          >
+            Users
+          </Link>
         </div>
       </nav>
     </header>
