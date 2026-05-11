@@ -16,7 +16,7 @@ export type UserRow = {
 };
 
 const updateUserSchema = z.object({
-  id: z.string().uuid(),
+  id: z.uuid(),
   name: z.string().min(1).optional(),
   phone: z.string().nullable().optional(),
   active: z.boolean().optional(),

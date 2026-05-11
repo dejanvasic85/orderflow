@@ -18,16 +18,16 @@ export type AccountRow = {
 const createAccountSchema = z.object({
   name: z.string().min(1),
   contact_name: z.string().nullable().optional(),
-  contact_email: z.string().email().nullable().optional(),
+  contact_email: z.email().nullable().optional(),
   contact_phone: z.string().nullable().optional(),
   active: z.boolean().optional(),
 });
 
-const updateAccountSchema = createAccountSchema.partial().extend({ id: z.string().uuid() });
+const updateAccountSchema = createAccountSchema.partial().extend({ id: z.uuid() });
 
 const assignSchema = z.object({
-  account_id: z.string().uuid(),
-  user_id: z.string().uuid(),
+  account_id: z.uuid(),
+  user_id: z.uuid(),
 });
 
 // Browser — RLS: admin/staff see all; user sees assigned accounts only
