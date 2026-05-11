@@ -12,7 +12,7 @@
     "deploy": "vp run build && vp exec wrangler deploy",
     "start": "node --import ./instrument.server.mjs dist/server/index.js",
     "prepare": "vp config",
-    "gen:types": "supabase gen types typescript --local > src/lib/database.types.ts"
+    "db:gentypes": "supabase gen types typescript --local > src/lib/database.types.ts"
   },
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.26.0",
