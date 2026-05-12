@@ -5,7 +5,7 @@
   "automerge": false,
   "labels": ["dependencies"],
   "prConcurrentLimit": 5,
-  "prNotPendingHours": 1,
+  "minimumReleaseAge": "7 days",
   "lockFileMaintenance": {
     "enabled": true,
     "schedule": "after 10pm on sunday"
