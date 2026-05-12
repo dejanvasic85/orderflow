@@ -152,52 +152,22 @@ export function UserEditPanel({ user, onSave, onDiscard }: Props) {
         <Label>Notification preferences</Label>
 
         <div className="flex flex-col gap-3">
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Email</p>
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2">
-              <Checkbox
-                id="notif-email-order"
-                checked={notifEmail}
-                onCheckedChange={(v) => setNotifEmail(!!v)}
-              />
-              <Label htmlFor="notif-email-order" className="font-normal">
-                Order placement
-              </Label>
-            </div>
-            <div className="flex items-center gap-2">
-              <Checkbox
-                id="notif-email-status"
-                checked={notifEmail}
-                onCheckedChange={(v) => setNotifEmail(!!v)}
-              />
-              <Label htmlFor="notif-email-status" className="font-normal">
-                Order status changes
-              </Label>
-            </div>
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="notif-email"
+              checked={notifEmail}
+              onCheckedChange={(v) => setNotifEmail(!!v)}
+            />
+            <Label htmlFor="notif-email" className="font-normal">
+              Email notifications
+            </Label>
           </div>
 
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">SMS</p>
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2">
-              <Checkbox
-                id="notif-sms-order"
-                checked={notifSms}
-                onCheckedChange={(v) => setNotifSms(!!v)}
-              />
-              <Label htmlFor="notif-sms-order" className="font-normal">
-                Order placement
-              </Label>
-            </div>
-            <div className="flex items-center gap-2">
-              <Checkbox
-                id="notif-sms-status"
-                checked={notifSms}
-                onCheckedChange={(v) => setNotifSms(!!v)}
-              />
-              <Label htmlFor="notif-sms-status" className="font-normal">
-                Order status changes
-              </Label>
-            </div>
+          <div className="flex items-center gap-2">
+            <Checkbox id="notif-sms" checked={notifSms} onCheckedChange={(v) => setNotifSms(!!v)} />
+            <Label htmlFor="notif-sms" className="font-normal">
+              SMS notifications
+            </Label>
           </div>
         </div>
       </div>
