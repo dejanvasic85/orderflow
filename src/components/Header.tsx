@@ -11,7 +11,7 @@ export default function Header() {
             to="/"
             className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1.5 text-sm text-foreground no-underline transition-colors hover:bg-muted sm:px-4 sm:py-2"
           >
-            <span className="h-2 w-2 rounded-full bg-foreground" />
+            <span className="size-2 rounded-full bg-foreground" />
             {company.shortName}
           </Link>
         </h2>
