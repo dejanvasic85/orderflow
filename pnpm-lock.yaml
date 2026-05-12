@@ -13,13 +13,13 @@ importers:
   .:
     dependencies:
       '@cloudflare/vite-plugin':
-        specifier: ^1.26.0
+        specifier: 1.36.0
         version: 1.36.0(@voidzero-dev/vite-plus-core@0.1.20(@types/node@22.19.17)(esbuild@0.27.7)(jiti@2.7.0)(tsx@4.21.0)(typescript@6.0.3))(workerd@1.20260504.1)(wrangler@4.88.0)
       '@fontsource-variable/outfit':
-        specifier: ^5.2.8
+        specifier: 5.2.8
         version: 5.2.8
       '@sentry/tanstackstart-react':
-        specifier: ^10.42.0
+        specifier: 10.51.0
         version: 10.51.0(react@19.2.5)
       '@supabase/ssr':
         specifier: 0.10.2
@@ -28,7 +28,7 @@ importers:
         specifier: 2.105.3
         version: 2.105.3
       '@tailwindcss/vite':
-        specifier: ^4.1.18
+        specifier: 4.2.4
         version: 4.2.4(@voidzero-dev/vite-plus-core@0.1.20(@types/node@22.19.17)(esbuild@0.27.7)(jiti@2.7.0)(tsx@4.21.0)(typescript@6.0.3))
       '@tanstack/react-devtools':
         specifier: 0.10.2
@@ -58,83 +58,83 @@ importers:
         specifier: 1.167.32
         version: 1.167.32(@tanstack/react-router@1.169.1(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@voidzero-dev/vite-plus-core@0.1.20(@types/node@22.19.17)(esbuild@0.27.7)(jiti@2.7.0)(tsx@4.21.0)(typescript@6.0.3))
       class-variance-authority:
-        specifier: ^0.7.1
+        specifier: 0.7.1
         version: 0.7.1
       clsx:
-        specifier: ^2.1.1
+        specifier: 2.1.1
         version: 2.1.1
       dotenv-cli:
-        specifier: ^11.0.0
+        specifier: 11.0.0
         version: 11.0.0
       lucide-react:
-        specifier: ^0.577.0
+        specifier: 0.577.0
         version: 0.577.0(react@19.2.5)
       radix-ui:
-        specifier: ^1.4.3
+        specifier: 1.4.3
         version: 1.4.3(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       react:
-        specifier: ^19.2.0
+        specifier: 19.2.5
         version: 19.2.5
       react-dom:
-        specifier: ^19.2.0
+        specifier: 19.2.5
         version: 19.2.5(react@19.2.5)
       shadcn:
-        specifier: ^4.7.0
+        specifier: 4.7.0
         version: 4.7.0(@types/node@22.19.17)(typescript@6.0.3)
       tailwind-merge:
-        specifier: ^3.5.0
+        specifier: 3.5.0
         version: 3.5.0
       tailwindcss:
-        specifier: ^4.1.18
+        specifier: 4.2.4
         version: 4.2.4
       zod:
-        specifier: ^4.3.6
+        specifier: 4.4.3
         version: 4.4.3
     devDependencies:
       '@playwright/test':
         specifier: 1.59.1
         version: 1.59.1
       '@tailwindcss/typography':
-        specifier: ^0.5.16
+        specifier: 0.5.19
         version: 0.5.19(tailwindcss@4.2.4)
       '@tanstack/devtools-vite':
         specifier: 0.6.0
         version: 0.6.0(@voidzero-dev/vite-plus-core@0.1.20(@types/node@22.19.17)(esbuild@0.27.7)(jiti@2.7.0)(tsx@4.21.0)(typescript@6.0.3))
       '@testing-library/dom':
-        specifier: ^10.4.1
+        specifier: 10.4.1
         version: 10.4.1
       '@testing-library/react':
-        specifier: ^16.3.0
+        specifier: 16.3.2
         version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@types/node':
-        specifier: ^22.10.2
+        specifier: 22.19.17
         version: 22.19.17
       '@types/react':
-        specifier: ^19.2.0
+        specifier: 19.2.14
         version: 19.2.14
       '@types/react-dom':
-        specifier: ^19.2.0
+        specifier: 19.2.3
         version: 19.2.3(@types/react@19.2.14)
       '@vitejs/plugin-react':
-        specifier: ^5.1.4
+        specifier: 5.2.0
         version: 5.2.0(@voidzero-dev/vite-plus-core@0.1.20(@types/node@22.19.17)(esbuild@0.27.7)(jiti@2.7.0)(tsx@4.21.0)(typescript@6.0.3))
       dotenv:
-        specifier: ^17.3.1
+        specifier: 17.4.2
         version: 17.4.2
       jsdom:
-        specifier: ^28.1.0
+        specifier: 28.1.0
         version: 28.1.0(@noble/hashes@1.8.0)
       supabase:
         specifier: 2.98.2
         version: 2.98.2
       tsx:
-        specifier: ^4.21.0
+        specifier: 4.21.0
         version: 4.21.0
       tw-animate-css:
-        specifier: ^1.4.0
+        specifier: 1.4.0
         version: 1.4.0
       typescript:
-        specifier: ^6.0.2
+        specifier: 6.0.3
         version: 6.0.3
       vite:
         specifier: npm:@voidzero-dev/vite-plus-core@0.1.20
@@ -146,7 +146,7 @@ importers:
         specifier: npm:@voidzero-dev/vite-plus-test@0.1.20
         version: '@voidzero-dev/vite-plus-test@0.1.20(@opentelemetry/api@1.9.1)(@types/node@22.19.17)(@voidzero-dev/vite-plus-core@0.1.20(@types/node@22.19.17)(esbuild@0.27.7)(jiti@2.7.0)(tsx@4.21.0)(typescript@6.0.3))(esbuild@0.27.7)(jiti@2.7.0)(jsdom@28.1.0(@noble/hashes@1.8.0))(tsx@4.21.0)(typescript@6.0.3)'
       wrangler:
-        specifier: ^4.70.0
+        specifier: 4.88.0
         version: 4.88.0
 
 packages:
