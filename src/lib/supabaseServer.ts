@@ -11,7 +11,10 @@ export function createSupabaseServerClient() {
       cookies: {
         getAll: () => {
           const cookies = getCookies();
-          return Object.entries(cookies).map(([name, value]) => ({ name, value }));
+          return Object.entries(cookies).map(([name, value]) => ({
+            name,
+            value,
+          }));
         },
         setAll: (cookiesToSet) => {
           cookiesToSet.forEach(({ name, value, options }) => {
