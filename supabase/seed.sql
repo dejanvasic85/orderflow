@@ -1,5 +1,5 @@
 -- Seed data for local development.
--- Admin credentials: admin@bww.com.au / password123
+-- Admin credentials: admin@bwow.com.au / password123
 
 INSERT INTO auth.users (
   id, instance_id, aud, role,
@@ -11,7 +11,7 @@ INSERT INTO auth.users (
   '00000000-0000-0000-0000-000000000000',
   'authenticated',
   'authenticated',
-  'admin@bww.com.au',
+  'admin@bwow.com.au',
   crypt('password123', gen_salt('bf')),
   now(),
   '', '', '', '',
@@ -26,9 +26,9 @@ INSERT INTO auth.identities (
 ) VALUES (
   '00000000-0000-0000-0000-000000000001',
   '00000000-0000-0000-0000-000000000001',
-  'admin@bww.com.au',
+  'admin@bwow.com.au',
   'email',
-  '{"sub":"00000000-0000-0000-0000-000000000001","email":"admin@bww.com.au"}',
+  '{"sub":"00000000-0000-0000-0000-000000000001","email":"admin@bwow.com.au"}',
   now(), now(), now()
 ) ON CONFLICT (id) DO NOTHING;
 

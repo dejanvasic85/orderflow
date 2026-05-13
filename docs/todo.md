@@ -1,8 +1,9 @@
 TODO
 
-- [ ] Rename bww to bwow including admin email
+- [x] Rename bww to bwow including admin email
 - [ ] Layout components -> Update agents.md instructions and skills for UI development
 - [ ] Form library and validation - replace all the use state in the UserEditPanel
+- [ ] Filename and module convention - what do we do about shadcn installation etc?
 - [ ] Unit tests
 - [ ] Setup deployment to cloudflare
 - [ ] CI Pipeline with unit tests and branch deployments

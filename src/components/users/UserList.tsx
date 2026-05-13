@@ -20,7 +20,6 @@ type Props = {
   roleFilter: RoleFilter;
   onSelectUser: (user: MockUser) => void;
   onRoleFilterChange: (filter: RoleFilter) => void;
-  onNewUser: () => void;
 };
 
 const roleFilters: { label: string; value: RoleFilter }[] = [
@@ -42,19 +41,11 @@ export function UserList({
   roleFilter,
   onSelectUser,
   onRoleFilterChange,
-  onNewUser,
 }: Props) {
   const filtered = roleFilter === "all" ? users : users.filter((u) => u.role === roleFilter);
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Users</h1>
-        <Button size="sm" onClick={onNewUser}>
-          + New user
-        </Button>
-      </div>
-
       <div className="flex items-center gap-1.5">
         {roleFilters.map((f) => (
           <button
