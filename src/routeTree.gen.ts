@@ -12,8 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ProtectedRouteImport } from './routes/_protected'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ProtectedUsersRouteImport } from './routes/_protected/users'
-import { Route as ProtectedDashboardRouteImport } from './routes/_protected/dashboard'
+import { Route as ProtectedAppRouteImport } from './routes/_protected/_app'
+import { Route as ProtectedAppUsersRouteImport } from './routes/_protected/_app/users'
+import { Route as ProtectedAppDashboardRouteImport } from './routes/_protected/_app/dashboard'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -29,36 +30,41 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProtectedUsersRoute = ProtectedUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
+const ProtectedAppRoute = ProtectedAppRouteImport.update({
+  id: '/_app',
   getParentRoute: () => ProtectedRoute,
 } as any)
-const ProtectedDashboardRoute = ProtectedDashboardRouteImport.update({
+const ProtectedAppUsersRoute = ProtectedAppUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => ProtectedAppRoute,
+} as any)
+const ProtectedAppDashboardRoute = ProtectedAppDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
-  getParentRoute: () => ProtectedRoute,
+  getParentRoute: () => ProtectedAppRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/dashboard': typeof ProtectedDashboardRoute
-  '/users': typeof ProtectedUsersRoute
+  '/dashboard': typeof ProtectedAppDashboardRoute
+  '/users': typeof ProtectedAppUsersRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/dashboard': typeof ProtectedDashboardRoute
-  '/users': typeof ProtectedUsersRoute
+  '/dashboard': typeof ProtectedAppDashboardRoute
+  '/users': typeof ProtectedAppUsersRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_protected': typeof ProtectedRouteWithChildren
   '/login': typeof LoginRoute
-  '/_protected/dashboard': typeof ProtectedDashboardRoute
-  '/_protected/users': typeof ProtectedUsersRoute
+  '/_protected/_app': typeof ProtectedAppRouteWithChildren
+  '/_protected/_app/dashboard': typeof ProtectedAppDashboardRoute
+  '/_protected/_app/users': typeof ProtectedAppUsersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -70,8 +76,9 @@ export interface FileRouteTypes {
     | '/'
     | '/_protected'
     | '/login'
-    | '/_protected/dashboard'
-    | '/_protected/users'
+    | '/_protected/_app'
+    | '/_protected/_app/dashboard'
+    | '/_protected/_app/users'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -103,31 +110,50 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_protected/users': {
-      id: '/_protected/users'
-      path: '/users'
-      fullPath: '/users'
-      preLoaderRoute: typeof ProtectedUsersRouteImport
+    '/_protected/_app': {
+      id: '/_protected/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof ProtectedAppRouteImport
       parentRoute: typeof ProtectedRoute
     }
-    '/_protected/dashboard': {
-      id: '/_protected/dashboard'
+    '/_protected/_app/users': {
+      id: '/_protected/_app/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof ProtectedAppUsersRouteImport
+      parentRoute: typeof ProtectedAppRoute
+    }
+    '/_protected/_app/dashboard': {
+      id: '/_protected/_app/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
-      preLoaderRoute: typeof ProtectedDashboardRouteImport
-      parentRoute: typeof ProtectedRoute
+      preLoaderRoute: typeof ProtectedAppDashboardRouteImport
+      parentRoute: typeof ProtectedAppRoute
     }
   }
 }
 
+interface ProtectedAppRouteChildren {
+  ProtectedAppDashboardRoute: typeof ProtectedAppDashboardRoute
+  ProtectedAppUsersRoute: typeof ProtectedAppUsersRoute
+}
+
+const ProtectedAppRouteChildren: ProtectedAppRouteChildren = {
+  ProtectedAppDashboardRoute: ProtectedAppDashboardRoute,
+  ProtectedAppUsersRoute: ProtectedAppUsersRoute,
+}
+
+const ProtectedAppRouteWithChildren = ProtectedAppRoute._addFileChildren(
+  ProtectedAppRouteChildren,
+)
+
 interface ProtectedRouteChildren {
-  ProtectedDashboardRoute: typeof ProtectedDashboardRoute
-  ProtectedUsersRoute: typeof ProtectedUsersRoute
+  ProtectedAppRoute: typeof ProtectedAppRouteWithChildren
 }
 
 const ProtectedRouteChildren: ProtectedRouteChildren = {
-  ProtectedDashboardRoute: ProtectedDashboardRoute,
-  ProtectedUsersRoute: ProtectedUsersRoute,
+  ProtectedAppRoute: ProtectedAppRouteWithChildren,
 }
 
 const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(
