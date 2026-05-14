@@ -17,7 +17,7 @@ Replaces SMS/email ordering with a centralised order request management system f
 | Role      | What they can do                                                                                                                                                                        |
 | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Admin** | Full access — users, accounts, products, templates, order requests. Only admins can modify (remove items from) templates                                                                |
-| **Staff** | View all order requests, update status (dispatch/cancel). Read-only otherwise                                                                                                           |
+| **Staff** | View all order requests. Read-only otherwise                                                                                                                                            |
 | **User**  | Submit order requests and view history for their assigned accounts. Can browse catalog and add items to a request or template. A user assigned to multiple accounts acts as a sales rep |
 
 ---
@@ -26,7 +26,6 @@ Replaces SMS/email ordering with a centralised order request management system f
 
 - **Account** = a customer business (maps to "Customer" in MYOB)
 - **Template** = a per-account pre-configured product list; managed under Account settings. Users can add items; only admins can remove items or change the template.
-- **Order request** statuses: `Requested → Dispatched / Cancelled`
 - Order requests can be placed from a template plus optional custom entries, or individual catalog items
 - Admins can place order requests on behalf of accounts
 - Accounts have a delivery address and instructions (overridable per request)
@@ -35,7 +34,7 @@ Replaces SMS/email ordering with a centralised order request management system f
 
 ## Notifications
 
-- Triggered on: order request placed, status changed
+- Triggered on: order request placed
 - All users assigned to an account are notified when an order request is placed for that account
 - Channels: email (Phase 1), SMS (Phase 2)
 - Configurable per user
@@ -60,7 +59,7 @@ Replaces SMS/email ordering with a centralised order request management system f
 - **account_users** — many-to-many join (user ↔ account)
 - **products** — name, description, image, qty per box (no prices for now)
 - **templates** — one per account; contain product lines with suggested quantities
-- **order_requests** — linked to account + placed-by user; has status + optional note + delivery override
+- **order_requests** — linked to account + placed-by user; has optional note + delivery override
 - **order_request_items** — products on a request with boxes + extra bottle quantities
 
 ---
