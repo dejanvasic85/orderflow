@@ -56,7 +56,7 @@ export function UserEditPanel({ user, onSave, onDiscard }: Props) {
   }
 
   return (
-    <div className="flex flex-col gap-6 rounded-xl border border-border bg-card p-6">
+    <div className="flex flex-col gap-6 p-6">
       <div>
         <h2 className="text-base font-semibold">{user.name}</h2>
         <p className="text-sm text-muted-foreground">{user.email}</p>

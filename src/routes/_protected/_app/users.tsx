@@ -7,6 +7,8 @@ import { mockUsers, type MockUser } from "@/components/users/mockData";
 import { PageContent } from "@/components/layout/PageContent";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 export const Route = createFileRoute("/_protected/_app/users")({
   component: UsersPage,
@@ -20,6 +22,7 @@ function UsersPage() {
   const [roleFilter, setRoleFilter] = useState<RoleFilter>("all");
 
   const selectedUser = users.find((u) => u.id === selectedId) ?? null;
+  const isDesktop = useMediaQuery("(min-width: 640px)");
 
   function handleSelectUser(user: MockUser) {
     setSelectedId(user.id);
@@ -38,28 +41,29 @@ function UsersPage() {
     <>
       <PageHeader title="Users" actions={<Button onClick={() => {}}>+ New user</Button>} />
       <PageContent>
-        <div
-          className={
-            selectedUser ? "grid grid-cols-1 gap-8 lg:grid-cols-[1fr_380px]" : "grid grid-cols-1"
-          }
-        >
-          <UserList
-            users={users}
-            selectedId={selectedId}
-            roleFilter={roleFilter}
-            onSelectUser={handleSelectUser}
-            onRoleFilterChange={setRoleFilter}
-          />
+        <UserList
+          users={users}
+          selectedId={selectedId}
+          roleFilter={roleFilter}
+          onSelectUser={handleSelectUser}
+          onRoleFilterChange={setRoleFilter}
+        />
 
-          {selectedUser && (
-            <UserEditPanel
-              key={selectedUser.id}
-              user={selectedUser}
-              onSave={handleSave}
-              onDiscard={handleDiscard}
-            />
-          )}
-        </div>
+        <Sheet open={!!selectedUser} onOpenChange={(open) => !open && handleDiscard()}>
+          <SheetContent
+            side={isDesktop ? "right" : "bottom"}
+            className="overflow-y-auto p-0 sm:w-[600px] sm:max-w-[600px]"
+          >
+            {selectedUser && (
+              <UserEditPanel
+                key={selectedUser.id}
+                user={selectedUser}
+                onSave={handleSave}
+                onDiscard={handleDiscard}
+              />
+            )}
+          </SheetContent>
+        </Sheet>
       </PageContent>
     </>
   );
