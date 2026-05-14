@@ -1,5 +1,4 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
-import { ShoppingCartIcon, UsersIcon } from "lucide-react";
 
 import { supabase } from "@/lib/supabase";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -10,11 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-
-const navItems = [
-  { label: "Orders", to: "/dashboard", icon: ShoppingCartIcon },
-  { label: "Users", to: "/users", icon: UsersIcon },
-] as const;
+import { navItemsValue } from "@/lib/routes";
 
 function getInitials(email: string) {
   const parts = email.split("@")[0].split(/[._-]/);
@@ -40,7 +35,7 @@ export function MobileBottomNav({ email }: MobileBottomNavProps) {
   return (
     <nav className="fixed bottom-0 inset-x-0 z-40 md:hidden border-t bg-sidebar text-sidebar-foreground">
       <div className="flex items-center justify-around h-16 px-2">
-        {navItems.map(({ label, to, icon: Icon }) => {
+        {navItemsValue.map(({ label, to, icon: Icon }) => {
           const isActive = pathname === to;
           return (
             <Link

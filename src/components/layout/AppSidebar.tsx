@@ -1,5 +1,4 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
-import { ShoppingCartIcon, UsersIcon } from "lucide-react";
 
 import { supabase } from "@/lib/supabase";
 import { company } from "@/lib/config";
@@ -20,11 +19,7 @@ import {
   SidebarMenuItem,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-
-const navItems = [
-  { label: "Orders", to: "/dashboard", icon: ShoppingCartIcon },
-  { label: "Users", to: "/users", icon: UsersIcon },
-] as const;
+import { navItemsValue } from "@/lib/routes";
 
 // Future routes — uncomment when pages are created:
 // { label: "Accounts", to: "/accounts", icon: BuildingIcon },
@@ -69,7 +64,7 @@ export function AppSidebar({ email }: AppSidebarProps) {
 
       <SidebarContent className="px-2">
         <SidebarMenu>
-          {navItems.map(({ label, to, icon: Icon }) => (
+          {navItemsValue.map(({ label, to, icon: Icon }) => (
             <SidebarMenuItem key={to}>
               <SidebarMenuButton
                 asChild
