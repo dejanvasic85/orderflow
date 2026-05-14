@@ -8,7 +8,8 @@ TODO
 - [ ] Setup deployment to cloudflare
 - [ ] CI Pipeline with unit tests and branch deployments
 - [ ] Setup the admin user
-- [ ] Complete user management
+- [ ] Complete user management and connecting to database
+- [ ] Adding / inviting a new user. How should this work?
 - [ ] End to end tests
 - [ ] Account management
 - [ ] Setup domain name
