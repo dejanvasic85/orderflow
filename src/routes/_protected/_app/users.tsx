@@ -7,7 +7,13 @@ import { mockUsers, type MockUser } from "@/components/users/mockData";
 import { PageContent } from "@/components/layout/PageContent";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { useMediaQuery } from "@/hooks/use-media-query";
 
 export const Route = createFileRoute("/_protected/_app/users")({
@@ -54,6 +60,10 @@ function UsersPage() {
             side={isDesktop ? "right" : "bottom"}
             className="overflow-y-auto p-0 sm:w-[600px] sm:max-w-[600px]"
           >
+            <SheetHeader className="sr-only">
+              <SheetTitle>Edit user</SheetTitle>
+              <SheetDescription>Edit user details and settings</SheetDescription>
+            </SheetHeader>
             {selectedUser && (
               <UserEditPanel
                 key={selectedUser.id}
