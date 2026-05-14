@@ -20,12 +20,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { PanelLeftIcon } from "lucide-react";
 
-const SIDEBAR_COOKIE_NAME = "sidebar_state";
-const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
-const SIDEBAR_WIDTH = "16rem";
-const SIDEBAR_WIDTH_MOBILE = "18rem";
-const SIDEBAR_WIDTH_ICON = "3rem";
-const SIDEBAR_KEYBOARD_SHORTCUT = "b";
+const sidebarConfigValue = {
+  cookieName: "sidebar_state",
+  cookieMaxAge: 60 * 60 * 24 * 7,
+  width: "16rem",
+  widthMobile: "18rem",
+  widthIcon: "3rem",
+  keyboardShortcut: "b",
+} as const;
 
 type SidebarContextProps = {
   state: "expanded" | "collapsed";
@@ -78,7 +80,7 @@ function SidebarProvider({
       }
 
       // This sets the cookie to keep the sidebar state.
-      document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
+      document.cookie = `${sidebarConfigValue.cookieName}=${openState}; path=/; max-age=${sidebarConfigValue.cookieMaxAge}`;
     },
     [setOpenProp, open],
   );
@@ -91,7 +93,7 @@ function SidebarProvider({
   // Adds a keyboard shortcut to toggle the sidebar.
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === SIDEBAR_KEYBOARD_SHORTCUT && (event.metaKey || event.ctrlKey)) {
+      if (event.key === sidebarConfigValue.keyboardShortcut && (event.metaKey || event.ctrlKey)) {
         event.preventDefault();
         toggleSidebar();
       }
@@ -124,8 +126,8 @@ function SidebarProvider({
         data-slot="sidebar-wrapper"
         style={
           {
-            "--sidebar-width": SIDEBAR_WIDTH,
-            "--sidebar-width-icon": SIDEBAR_WIDTH_ICON,
+            "--sidebar-width": sidebarConfigValue.width,
+            "--sidebar-width-icon": sidebarConfigValue.widthIcon,
             ...style,
           } as React.CSSProperties
         }
@@ -182,7 +184,7 @@ function Sidebar({
           className="w-(--sidebar-width) bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
           style={
             {
-              "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
+              "--sidebar-width": sidebarConfigValue.widthMobile,
             } as React.CSSProperties
           }
           side={side}

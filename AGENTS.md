@@ -80,8 +80,10 @@ Vite+ automatically detects and wraps the underlying package manager through `pa
 - Prefer small, composable functions over large inline blocks
 - Prefer `switch` over long `if/else` chains when branching on a single discriminator
 - Avoid magic numbers/strings; introduce well-named constants
-- Use camelCase naming for constants (no SCREAMING_CASE)
-- Object constants should end with `Value` suffix (for example: `defaultConfigValue`)
+- Use camelCase naming for constants — never SCREAMING_CASE
+- Group related constants into a single `as const` object rather than many individual `const` declarations
+- Object constants should end with `Value` suffix (for example: `defaultConfigValue`, `sidebarConfigValue`)
+- Place shared constants in a `constants.ts` file co-located with the module that owns them; only extract to `src/lib/constants.ts` if used across multiple domains
 - Avoid unnecessary comments; add short comments only for non-obvious intent
 - Keep modules/components reasonably small; split when complexity grows
 
