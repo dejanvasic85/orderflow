@@ -2,6 +2,7 @@ import { Link, useRouter, useRouterState } from "@tanstack/react-router";
 import { ShoppingCartIcon, UsersIcon } from "lucide-react";
 
 import { supabase } from "@/lib/supabase";
+import { company } from "@/lib/config";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -52,16 +53,18 @@ export function AppSidebar({ email }: AppSidebarProps) {
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader className="px-2 py-2">
+      <SidebarHeader className="px-2 py-6">
         <div className="flex h-8 items-center justify-between px-2">
           <div className="flex flex-col gap-0.5 group-data-[collapsible=icon]:hidden">
             <span className="text-sm font-bold leading-none tracking-tight text-sidebar-foreground">
-              OrderFlow
+              {company.name}
             </span>
-            <span className="text-xs text-sidebar-foreground/60">Wholesale portal</span>
           </div>
           <SidebarTrigger className="-mr-1 text-sidebar-foreground/60 hover:text-sidebar-foreground" />
         </div>
+        <span className="px-2 text-xs text-sidebar-foreground/60 group-data-[collapsible=icon]:hidden">
+          Wholesale portal
+        </span>
       </SidebarHeader>
 
       <SidebarContent className="px-2">
