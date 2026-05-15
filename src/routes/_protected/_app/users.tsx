@@ -1,9 +1,5 @@
-import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-
-import { UserEditPanel } from "@/components/users/UserEditPanel";
-import { UserList } from "@/components/users/UserList";
-import { mockUsers, type MockUser } from "@/components/users/mockData";
+import { useState } from "react";
 import { PageContent } from "@/components/layout/PageContent";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -14,6 +10,9 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { mockUsers, type MockUser } from "@/components/users/mockData";
+import { UserEditPanel } from "@/components/users/UserEditPanel";
+import { UserList } from "@/components/users/UserList";
 import { useMediaQuery } from "@/hooks/use-media-query";
 
 export const Route = createFileRoute("/_protected/_app/users")({

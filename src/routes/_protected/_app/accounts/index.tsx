@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PageContent } from "@/components/layout/PageContent";
-import { PageHeader } from "@/components/layout/PageHeader";
 import { AccountCard } from "@/components/customer/AccountCard";
 import { mockCustomerAccounts } from "@/components/customer/mockData";
+import { PageContent } from "@/components/layout/PageContent";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 export const Route = createFileRoute("/_protected/_app/accounts/")({
   component: AccountsPage,

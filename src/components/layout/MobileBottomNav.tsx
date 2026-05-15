@@ -1,6 +1,4 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
-
-import { supabase } from "@/lib/supabase";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -8,8 +6,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
 import { navItemsValue } from "@/lib/routes";
+import { supabase } from "@/lib/supabase";
+import { cn } from "@/lib/utils";
 
 function getInitials(email: string) {
   const parts = email.split("@")[0].split(/[._-]/);

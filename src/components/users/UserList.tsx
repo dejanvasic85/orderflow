@@ -9,8 +9,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-import { UserStatusBadge } from "./UserStatusBadge";
 import type { MockUser } from "./mockData";
+import { UserStatusBadge } from "./UserStatusBadge";
 
 type RoleFilter = "all" | "admin" | "staff" | "user";
 

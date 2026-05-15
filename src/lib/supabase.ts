@@ -1,5 +1,4 @@
 import { createBrowserClient } from "@supabase/ssr";
-
 import type { Database } from "@/lib/database.types";
 
 export const supabase = createBrowserClient<Database>(

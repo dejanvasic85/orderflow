@@ -1,7 +1,4 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
-
-import { supabase } from "@/lib/supabase";
-import { company } from "@/lib/config";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -19,7 +16,9 @@ import {
   SidebarMenuItem,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { company } from "@/lib/config";
 import { navItemsValue } from "@/lib/routes";
+import { supabase } from "@/lib/supabase";
 
 // Future routes — uncomment when pages are created:
 // { label: "Accounts", to: "/accounts", icon: BuildingIcon },

@@ -1,5 +1,4 @@
 import { z } from "zod";
-
 import type { Database } from "@/lib/database.types";
 
 export type AccountRow = Database["public"]["Tables"]["accounts"]["Row"];
