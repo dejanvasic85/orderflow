@@ -1,8 +1,11 @@
-import { useState } from "react";
+import { useForm } from "@tanstack/react-form";
 import { XIcon } from "lucide-react";
+import { toast } from "sonner";
+import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -24,36 +27,50 @@ type Props = {
   onDiscard: () => void;
 };
 
+const userEditSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  role: z.enum(["admin", "staff", "user"]),
+  accounts: z.array(z.object({ id: z.string(), name: z.string() })),
+  notifications: z.object({ email: z.boolean(), sms: z.boolean() }),
+});
+
+type UserEditValues = z.infer<typeof userEditSchema>;
+
+function toFieldErrors(errors: unknown[]): { message?: string }[] {
+  return errors.map((e) => ({
+    message: typeof e === "string" ? e : (e as { message?: string })?.message,
+  }));
+}
+
 export function UserEditPanel({ user, onSave, onDiscard }: Props) {
-  const [firstName, setFirstName] = useState(() => user.name.split(" ")[0] ?? "");
-  const [lastName, setLastName] = useState(() => user.name.split(" ").slice(1).join(" "));
-  const [role, setRole] = useState<MockUser["role"]>(user.role);
-  const [accounts, setAccounts] = useState(user.accounts);
-  const [notifEmail, setNotifEmail] = useState(user.notification_preferences.email);
-  const [notifSms, setNotifSms] = useState(user.notification_preferences.sms);
-
-  const unassignedAccounts = mockAccounts.filter((a) => !accounts.some((ua) => ua.id === a.id));
-
-  function handleRemoveAccount(id: string) {
-    setAccounts((prev) => prev.filter((a) => a.id !== id));
-  }
-
-  function handleAddAccount(id: string) {
-    const account = mockAccounts.find((a) => a.id === id);
-    if (account) {
-      setAccounts((prev) => [...prev, account]);
-    }
-  }
-
-  function handleSave() {
-    onSave({
-      ...user,
-      name: [firstName, lastName].filter(Boolean).join(" "),
-      role,
-      accounts,
-      notification_preferences: { email: notifEmail, sms: notifSms },
-    });
-  }
+  const nameParts = user.name.split(" ");
+  const form = useForm({
+    defaultValues: {
+      firstName: nameParts[0] ?? "",
+      lastName: nameParts.slice(1).join(" "),
+      role: user.role,
+      accounts: user.accounts,
+      notifications: {
+        email: user.notification_preferences.email,
+        sms: user.notification_preferences.sms,
+      },
+    },
+    validators: { onSubmit: userEditSchema },
+    onSubmit: ({ value }) => {
+      onSave({
+        ...user,
+        name: [value.firstName, value.lastName].filter(Boolean).join(" "),
+        role: value.role,
+        accounts: value.accounts,
+        notification_preferences: {
+          email: value.notifications.email,
+          sms: value.notifications.sms,
+        },
+      });
+      toast.success("Changes saved");
+    },
+  });
 
   return (
     <div className="flex flex-col gap-6 p-6">
@@ -65,122 +82,194 @@ export function UserEditPanel({ user, onSave, onDiscard }: Props) {
       <Separator />
 
       {/* Basic fields */}
-      <div className="flex flex-col gap-4">
+      <form
+        className="flex flex-col gap-4"
+        onSubmit={(e) => {
+          e.preventDefault();
+          void form.handleSubmit();
+        }}
+      >
         <div className="grid grid-cols-2 gap-3">
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="first-name">First name</Label>
-            <Input
-              id="first-name"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-            />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="last-name">Last name</Label>
-            <Input id="last-name" value={lastName} onChange={(e) => setLastName(e.target.value)} />
-          </div>
+          <form.Field name="firstName">
+            {(field) => (
+              <Field>
+                <FieldLabel htmlFor="first-name">First name</FieldLabel>
+                <Input
+                  id="first-name"
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  onBlur={field.handleBlur}
+                />
+                <FieldError errors={toFieldErrors(field.state.meta.errors)} />
+              </Field>
+            )}
+          </form.Field>
+
+          <form.Field name="lastName">
+            {(field) => (
+              <Field>
+                <FieldLabel htmlFor="last-name">Last name</FieldLabel>
+                <Input
+                  id="last-name"
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  onBlur={field.handleBlur}
+                />
+                <FieldError errors={toFieldErrors(field.state.meta.errors)} />
+              </Field>
+            )}
+          </form.Field>
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="email">Email</Label>
+        <Field>
+          <FieldLabel htmlFor="email">Email</FieldLabel>
           <Input id="email" type="email" value={user.email} disabled />
-        </div>
+        </Field>
 
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="role">Role</Label>
-          <Select value={role} onValueChange={(v) => setRole(v as MockUser["role"])}>
-            <SelectTrigger id="role" className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectItem value="admin">Admin</SelectItem>
-                <SelectItem value="staff">Staff</SelectItem>
-                <SelectItem value="user">User</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
+        <form.Field name="role">
+          {(field) => (
+            <Field>
+              <FieldLabel htmlFor="role">Role</FieldLabel>
+              <Select
+                value={field.state.value}
+                onValueChange={(v) => field.handleChange(v as UserEditValues["role"])}
+              >
+                <SelectTrigger id="role" className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="admin">Admin</SelectItem>
+                    <SelectItem value="staff">Staff</SelectItem>
+                    <SelectItem value="user">User</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </Field>
+          )}
+        </form.Field>
 
-      <Separator />
+        <Separator />
 
-      {/* Assigned accounts */}
-      <div className="flex flex-col gap-3">
-        <Label>Assigned accounts</Label>
+        {/* Assigned accounts */}
+        <form.Field name="accounts">
+          {(field) => {
+            const unassigned = mockAccounts.filter(
+              (a) => !field.state.value.some((ua) => ua.id === a.id),
+            );
 
-        {accounts.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {accounts.map((account) => (
-              <Badge key={account.id} variant="secondary" className="gap-1.5 py-1 pl-2.5 pr-1.5">
-                {account.name}
-                <button
-                  type="button"
-                  aria-label={`Remove ${account.name}`}
-                  onClick={() => handleRemoveAccount(account.id)}
-                  className="flex items-center justify-center rounded-full transition-colors hover:text-foreground"
-                >
-                  <XIcon className="size-3" />
-                </button>
-              </Badge>
-            ))}
-          </div>
-        )}
+            function handleRemove(id: string) {
+              field.handleChange(field.state.value.filter((a) => a.id !== id));
+            }
 
-        {unassignedAccounts.length > 0 && (
-          <Select onValueChange={handleAddAccount}>
-            <SelectTrigger className="w-full text-muted-foreground">
-              <SelectValue placeholder="Add an account..." />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                {unassignedAccounts.map((a) => (
-                  <SelectItem key={a.id} value={a.id}>
-                    {a.name}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        )}
-      </div>
+            function handleAdd(id: string) {
+              const account = mockAccounts.find((a) => a.id === id);
+              if (account) {
+                field.handleChange([...field.state.value, account]);
+              }
+            }
 
-      <Separator />
+            return (
+              <div className="flex flex-col gap-3">
+                <Label>Assigned accounts</Label>
 
-      {/* Notification preferences */}
-      <div className="flex flex-col gap-3">
-        <Label>Notification preferences</Label>
+                {field.state.value.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {field.state.value.map((account) => (
+                      <Badge
+                        key={account.id}
+                        variant="secondary"
+                        className="gap-1.5 py-1 pl-2.5 pr-1.5"
+                      >
+                        {account.name}
+                        <button
+                          type="button"
+                          aria-label={`Remove ${account.name}`}
+                          onClick={() => handleRemove(account.id)}
+                          className="flex items-center justify-center rounded-full transition-colors hover:text-foreground"
+                        >
+                          <XIcon className="size-3" />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                )}
 
+                {unassigned.length > 0 && (
+                  <Select onValueChange={handleAdd}>
+                    <SelectTrigger className="w-full text-muted-foreground">
+                      <SelectValue placeholder="Add an account..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {unassigned.map((a) => (
+                          <SelectItem key={a.id} value={a.id}>
+                            {a.name}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                )}
+              </div>
+            );
+          }}
+        </form.Field>
+
+        <Separator />
+
+        {/* Notification preferences */}
         <div className="flex flex-col gap-3">
-          <div className="flex items-center gap-2">
-            <Checkbox
-              id="notif-email"
-              checked={notifEmail}
-              onCheckedChange={(v) => setNotifEmail(!!v)}
-            />
-            <Label htmlFor="notif-email" className="font-normal">
-              Email notifications
-            </Label>
-          </div>
+          <Label>Notification preferences</Label>
 
-          <div className="flex items-center gap-2">
-            <Checkbox id="notif-sms" checked={notifSms} onCheckedChange={(v) => setNotifSms(!!v)} />
-            <Label htmlFor="notif-sms" className="font-normal">
-              SMS notifications
-            </Label>
-          </div>
+          <form.Field name="notifications.email">
+            {(field) => (
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="notif-email"
+                  checked={field.state.value}
+                  onCheckedChange={(v) => field.handleChange(!!v)}
+                />
+                <Label htmlFor="notif-email" className="font-normal">
+                  Email notifications
+                </Label>
+              </div>
+            )}
+          </form.Field>
+
+          <form.Field name="notifications.sms">
+            {(field) => (
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="notif-sms"
+                  checked={field.state.value}
+                  onCheckedChange={(v) => field.handleChange(!!v)}
+                />
+                <Label htmlFor="notif-sms" className="font-normal">
+                  SMS notifications
+                </Label>
+              </div>
+            )}
+          </form.Field>
         </div>
-      </div>
 
-      <Separator />
+        <Separator />
 
-      {/* Actions */}
-      <div className="flex items-center gap-2">
-        <Button onClick={handleSave}>Save changes</Button>
-        <Button variant="ghost" onClick={onDiscard}>
-          Discard
-        </Button>
-      </div>
+        {/* Actions */}
+        <div className="flex items-center gap-2">
+          <Button type="submit">Save changes</Button>
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => {
+              form.reset();
+              onDiscard();
+            }}
+          >
+            Discard
+          </Button>
+        </div>
+      </form>
     </div>
   );
 }
