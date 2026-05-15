@@ -13,6 +13,9 @@ const config = defineConfig({
   },
   test: {
     include: ["src/**/*.{test,spec}.{ts,tsx}"],
+    environment: "jsdom",
+    globals: true,
+    setupFiles: ["./vitest.setup.ts"],
   },
   resolve: {
     tsconfigPaths: true,
