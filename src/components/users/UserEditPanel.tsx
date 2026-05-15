@@ -2,7 +2,7 @@ import { useForm } from "@tanstack/react-form";
 import { XIcon } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
-
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
@@ -17,7 +17,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
 import type { MockUser } from "./mockData";
 import { mockAccounts } from "./mockData";
 

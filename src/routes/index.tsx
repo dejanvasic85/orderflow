@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { company } from "@/lib/config";
-import { Button } from "@/components/ui/button";
 import Footer from "@/components/Footer";
+import { Button } from "@/components/ui/button";
+import { company } from "@/lib/config";
 
 export const Route = createFileRoute("/")({ component: App });
 

@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import ThemeToggle from "./ThemeToggle";
 import { company } from "@/lib/config";
+import ThemeToggle from "./ThemeToggle";
 
 export default function Header() {
   return (
