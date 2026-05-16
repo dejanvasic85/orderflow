@@ -17,19 +17,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import type { MockUser } from "./mockData";
-import { mockAccounts } from "./mockData";
+import { type User, type UserAccount, userRoles } from "@/lib/users/schema";
 
 type Props = {
-  user: MockUser;
-  onSave: (updated: MockUser) => void;
+  user: User;
+  availableAccounts: UserAccount[];
+  onSave: (updated: User) => void;
   onDiscard: () => void;
 };
 
 const userEditSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
-  role: z.enum(["admin", "staff", "user"]),
+  role: z.enum(userRoles),
   accounts: z.array(z.object({ id: z.string(), name: z.string() })),
   notifications: z.object({ email: z.boolean(), sms: z.boolean() }),
 });
@@ -42,7 +42,7 @@ function toFieldErrors(errors: unknown[]): { message?: string }[] {
   }));
 }
 
-export function UserEditPanel({ user, onSave, onDiscard }: Props) {
+export function UserEditPanel({ user, availableAccounts, onSave, onDiscard }: Props) {
   const nameParts = user.name.split(" ");
   const form = useForm({
     defaultValues: {
@@ -153,7 +153,7 @@ export function UserEditPanel({ user, onSave, onDiscard }: Props) {
         {/* Assigned accounts */}
         <form.Field name="accounts">
           {(field) => {
-            const unassigned = mockAccounts.filter(
+            const unassigned = availableAccounts.filter(
               (a) => !field.state.value.some((ua) => ua.id === a.id),
             );
 
@@ -162,7 +162,7 @@ export function UserEditPanel({ user, onSave, onDiscard }: Props) {
             }
 
             function handleAdd(id: string) {
-              const account = mockAccounts.find((a) => a.id === id);
+              const account = availableAccounts.find((a) => a.id === id);
               if (account) {
                 field.handleChange([...field.state.value, account]);
               }

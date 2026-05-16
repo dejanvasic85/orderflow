@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PageContent } from "@/components/layout/PageContent";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -10,30 +10,43 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { mockUsers, type MockUser } from "@/components/users/mockData";
 import { UserEditPanel } from "@/components/users/UserEditPanel";
-import { UserList } from "@/components/users/UserList";
+import { UserList, type RoleFilter } from "@/components/users/UserList";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { listAccounts } from "@/lib/accounts/queries";
+import { listUsers } from "@/lib/users/queries";
+import type { User, UserAccount } from "@/lib/users/schema";
 
 export const Route = createFileRoute("/_protected/_app/users")({
+  loader: async () => {
+    const [users, accounts] = await Promise.all([listUsers(), listAccounts()]);
+    const availableAccounts: UserAccount[] = accounts.map((a) => ({
+      id: a.id,
+      name: a.name,
+    }));
+    return { users, availableAccounts };
+  },
   component: UsersPage,
 });
 
-type RoleFilter = "all" | "admin" | "staff" | "user";
-
 function UsersPage() {
-  const [users, setUsers] = useState<MockUser[]>(mockUsers);
+  const { users: loadedUsers, availableAccounts } = Route.useLoaderData();
+  const [users, setUsers] = useState<User[]>(loadedUsers);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [roleFilter, setRoleFilter] = useState<RoleFilter>("all");
+
+  useEffect(() => {
+    setUsers(loadedUsers);
+  }, [loadedUsers]);
 
   const selectedUser = users.find((u) => u.id === selectedId) ?? null;
   const isDesktop = useMediaQuery("(min-width: 640px)");
 
-  function handleSelectUser(user: MockUser) {
+  function handleSelectUser(user: User) {
     setSelectedId(user.id);
   }
 
-  function handleSave(updated: MockUser) {
+  function handleSave(updated: User) {
     setUsers((prev) => prev.map((u) => (u.id === updated.id ? updated : u)));
     setSelectedId(null);
   }
@@ -67,6 +80,7 @@ function UsersPage() {
               <UserEditPanel
                 key={selectedUser.id}
                 user={selectedUser}
+                availableAccounts={availableAccounts}
                 onSave={handleSave}
                 onDiscard={handleDiscard}
               />
