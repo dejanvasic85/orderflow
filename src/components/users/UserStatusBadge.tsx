@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
-type UserStatus = "active" | "invite_pending";
+type UserStatus = "active" | "inactive";
 
 type Props = {
   status: UserStatus;
@@ -9,7 +9,7 @@ type Props = {
 
 const labelMap: Record<UserStatus, string> = {
   active: "Active",
-  invite_pending: "Invite pending",
+  inactive: "Inactive",
 };
 
 export function UserStatusBadge({ status }: Props) {
@@ -19,8 +19,7 @@ export function UserStatusBadge({ status }: Props) {
       className={cn(
         status === "active" &&
           "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
-        status === "invite_pending" &&
-          "border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-400",
+        status === "inactive" && "border-muted-foreground/30 bg-muted text-muted-foreground",
       )}
     >
       {labelMap[status]}

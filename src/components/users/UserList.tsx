@@ -8,32 +8,30 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { type User, type UserRole, userRoles } from "@/lib/users/schema";
 import { cn } from "@/lib/utils";
-import type { MockUser } from "./mockData";
 import { UserStatusBadge } from "./UserStatusBadge";
 
-type RoleFilter = "all" | "admin" | "staff" | "user";
+export type RoleFilter = "all" | UserRole;
 
 type Props = {
-  users: MockUser[];
+  users: User[];
   selectedId: string | null;
   roleFilter: RoleFilter;
-  onSelectUser: (user: MockUser) => void;
+  onSelectUser: (user: User) => void;
   onRoleFilterChange: (filter: RoleFilter) => void;
 };
 
-const roleFilters: { label: string; value: RoleFilter }[] = [
-  { label: "All roles", value: "all" },
-  { label: "Admin", value: "admin" },
-  { label: "Staff", value: "staff" },
-  { label: "User", value: "user" },
-];
-
-const roleLabelMap: Record<MockUser["role"], string> = {
+const roleLabelMap: Record<UserRole, string> = {
   admin: "Admin",
   staff: "Staff",
   user: "User",
 };
+
+const roleFilters: { label: string; value: RoleFilter }[] = [
+  { label: "All roles", value: "all" },
+  ...userRoles.map((role) => ({ label: roleLabelMap[role], value: role })),
+];
 
 export function UserList({
   users,
@@ -91,7 +89,7 @@ export function UserList({
                 {user.accounts.length > 0 ? user.accounts.length : "—"}
               </TableCell>
               <TableCell>
-                <UserStatusBadge status={user.status} />
+                <UserStatusBadge status={user.active ? "active" : "inactive"} />
               </TableCell>
               <TableCell>
                 <Button
