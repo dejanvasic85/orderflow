@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - feat/db-migration-in-production
 
 permissions:
   contents: read
