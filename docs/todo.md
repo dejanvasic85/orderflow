@@ -14,6 +14,9 @@ Infra and setup
 - [ ] Complete user management and connecting to database
 - [ ] End to end tests
 - [ ] Setup domain name
+- [ ] SMTP server for email notifications
+- [ ] Email templates
+- [ ] Logging and monitoring - including supabase and cloudflare. Could it all go to cloudflare logs?
 
 Features:
 
