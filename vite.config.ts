@@ -50,7 +50,10 @@ const config = defineConfig({
       order: "asc",
     },
   },
-  lint: { options: { typeAware: true, typeCheck: true } },
+  lint: {
+    ignorePatterns: ["src/lib/database.types.ts", "src/routeTree.gen.ts"],
+    options: { typeAware: true, typeCheck: true },
+  },
   plugins: [
     devtools(),
     !isTest && cloudflare({ viteEnvironment: { name: "ssr" } }),
