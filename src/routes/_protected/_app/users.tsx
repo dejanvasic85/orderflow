@@ -19,9 +19,8 @@ import type { User, UserAccount } from "@/lib/users/schema";
 
 export const Route = createFileRoute("/_protected/_app/users")({
   loader: async () => {
-    const [users, accountsRes] = await Promise.all([listUsers(), listAccounts()]);
-    if (accountsRes.error) throw new Error(accountsRes.error.message);
-    const availableAccounts: UserAccount[] = (accountsRes.data ?? []).map((a) => ({
+    const [users, accounts] = await Promise.all([listUsers(), listAccounts()]);
+    const availableAccounts: UserAccount[] = accounts.map((a) => ({
       id: a.id,
       name: a.name,
     }));

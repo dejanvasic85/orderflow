@@ -1,32 +1,43 @@
 import { createServerFn } from "@tanstack/react-start";
-import { supabase } from "@/lib/supabase";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import { assignSchema, createAccountSchema, updateAccountSchema } from "./schema";
 
-// Browser — RLS: admin/staff see all; user sees assigned accounts only
-export async function listAccounts() {
-  return supabase
+export const listAccounts = createServerFn({ method: "GET" }).handler(async () => {
+  const supabaseServer = createSupabaseServerClient();
+  const { data, error } = await supabaseServer
     .from("accounts")
     .select("id, name, contact_name, contact_email, contact_phone, active, created_at, updated_at")
     .order("name", { ascending: true });
-}
+  if (error) throw new Error(error.message);
+  return data ?? [];
+});
 
-// Browser
-export async function getAccount(id: string) {
-  return supabase
-    .from("accounts")
-    .select("id, name, contact_name, contact_email, contact_phone, active, created_at, updated_at")
-    .eq("id", id)
-    .single();
-}
+export const getAccount = createServerFn({ method: "GET" })
+  .inputValidator((id: string) => id)
+  .handler(async ({ data: id }) => {
+    const supabaseServer = createSupabaseServerClient();
+    const { data, error } = await supabaseServer
+      .from("accounts")
+      .select(
+        "id, name, contact_name, contact_email, contact_phone, active, created_at, updated_at",
+      )
+      .eq("id", id)
+      .single();
+    if (error) throw new Error(error.message);
+    return data;
+  });
 
-// Browser — joins users via FK; admin/staff only by RLS on account_users + users
-export async function listAccountUsers(accountId: string) {
-  return supabase
-    .from("account_users")
-    .select("user_id, created_at, users:users(id, name, role, active)")
-    .eq("account_id", accountId);
-}
+export const listAccountUsers = createServerFn({ method: "GET" })
+  .inputValidator((accountId: string) => accountId)
+  .handler(async ({ data: accountId }) => {
+    const supabaseServer = createSupabaseServerClient();
+    const { data, error } = await supabaseServer
+      .from("account_users")
+      .select("user_id, created_at, users:users(id, name, role, active)")
+      .eq("account_id", accountId);
+    if (error) throw new Error(error.message);
+    return data;
+  });
 
 // Server — admin-only via RLS
 export const createAccount = createServerFn({ method: "POST" })
