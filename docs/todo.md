@@ -8,6 +8,7 @@ Infra and setup
 - [x] Filename and module convention - what do we do about shadcn installation etc?
 - [x] Unit tests
 - [ ] Setup deployment to cloudflare
+- [ ] Github checks for branch protection
 - [ ] CI Pipeline with unit tests and branch deployments
 - [ ] Setup the admin user
 - [ ] Complete user management and connecting to database
