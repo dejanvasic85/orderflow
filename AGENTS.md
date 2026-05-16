@@ -111,12 +111,75 @@ Vite+ automatically detects and wraps the underlying package manager through `pa
 - Use explicit mapping/transform steps where boundaries between external/internal shapes exist
 - **Environment variables are documented in `.env.example` only** — never list env vars in docs, README, or CLAUDE.md files
 
+## Unit Tests
+
+Vitest runs through Vite+ (`vp test`). The runner is wired up with `jsdom`, `@testing-library/react`, and `@testing-library/jest-dom` matchers. `describe`/`it`/`test`/`expect` are globals — do not import them.
+
+### What to test
+
+- **Business logic** in `src/lib/` (queries, validators, mappers, utilities)
+- **Composed React components** that wire shadcn primitives together, handle forms, conditional rendering, or display derived data
+- **Custom hooks** with non-trivial behavior
+
+Do not unit-test shadcn primitives directly, trivial pass-through components, or framework code (TanStack Router/Query/Form internals).
+
+### File layout
+
+- Co-locate tests next to source: `OrderList.tsx` → `OrderList.test.tsx`
+- Use `*.test.ts` for logic, `*.test.tsx` for components
+- File naming follows the source file: PascalCase for component tests, camelCase for module tests
+
+### Style — keep tests simple and DAMP, not DRY
+
+Per _Software Engineering at Google_: **test code should contain no logic**. A test that needs reasoning to verify is a test that itself needs tests. Prefer obvious, repetitive, linear tests over clever ones.
+
+- **No conditionals, loops, or `try/catch` in tests.** If a branch matters, write two tests.
+- **No computed expected values.** Hard-code expected output as a literal — don't recompute it from the input in the test.
+- **Inline test data.** Avoid shared fixtures or factory helpers unless the duplication is genuinely painful; descriptiveness beats deduplication ("Descriptive And Meaningful Phrases" over Don't Repeat Yourself).
+- **One behavior per test.** A failing test name should pinpoint the broken behavior without reading the body.
+- **Arrange / Act / Assert** structure, with a blank line between phases when it aids readability.
+- **No abstraction over the system under test.** Call the real function or render the real component directly; avoid wrapper helpers that hide what's being tested.
+
+A good test reads top-to-bottom like a story; a reader should not have to scroll to a helper to know what's going on.
+
+### Testing-library conventions
+
+- Query by accessible role, label, or text — not by `data-testid` or CSS classes. Use `getByRole`, `getByLabelText`, `getByText`.
+- Use `userEvent` (not `fireEvent`) for interactions when we add it.
+- Use `findBy*` for async appearance; do not chain `waitFor` around `getBy*`.
+- Assert on rendered output the user sees, not on internal component state.
+
+### Coverage
+
+Coverage runs via `vp test --coverage` (v8 provider). The following are excluded from coverage and should not be unit-tested directly:
+
+- `src/components/ui/**` — shadcn primitives
+- `src/routeTree.gen.ts` — generated
+- `src/router.tsx` — app-wiring entrypoint
+- `src/integrations/**` — third-party integration glue
+- `src/lib/database.types.ts` — generated Supabase types
+
+If a folder is fundamentally not worth testing, exclude it in `vite.config.ts` rather than writing throwaway tests to lift a number.
+
+### Component design for testability
+
+Keep components free of plumbing. Components should accept callbacks (props) for side effects and not import `useRouter`, the Supabase client, or other infrastructure directly. The route or parent owns navigation, data fetching, and auth; the component renders UI and invokes the callbacks it was given. This makes tests trivial — pass a `vi.fn()` and assert on what the component called.
+
+### Mocking
+
+- Prefer real implementations over mocks. Mock only at integration boundaries (Supabase client, network, time, the router).
+- Mocks reset automatically between tests — `clearMocks: true` is set globally in `vite.config.ts`. Do not call `vi.clearAllMocks()` in `beforeEach`.
+- For module mocks, declare `vi.mock(...)` at the top of the file, then use `vi.mocked(importedFn)` inside each test to configure return values. This gives you full type safety on `mockResolvedValue` / `mockReturnValue` without casts.
+- Hoist shared setup (`userEvent.setup()`, common renders) into `beforeEach` rather than repeating it in each test.
+- For Supabase access, mock the function in `src/lib/queries/*` that the component calls — don't mock the Supabase client directly.
+
 ## Testing and Quality Gates
 
 At minimum before opening or updating a PR:
 
 1. `vp check`
-2. `vp build` for larger or riskier changes
+2. `vp test` if any source or test files changed
+3. `vp build` for larger or riskier changes
 
 Pre-commit hooks are configured through Vite+ staged checks; ensure any auto-fixes are included in commits.
 

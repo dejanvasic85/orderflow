@@ -13,6 +13,23 @@ const config = defineConfig({
   },
   test: {
     include: ["src/**/*.{test,spec}.{ts,tsx}"],
+    environment: "jsdom",
+    globals: true,
+    setupFiles: ["./vitest.setup.ts"],
+    clearMocks: true,
+    coverage: {
+      provider: "v8",
+      include: ["src/**/*.{ts,tsx}"],
+      exclude: [
+        "src/**/*.{test,spec}.{ts,tsx}",
+        "src/components/ui/**",
+        "src/routeTree.gen.ts",
+        "src/router.tsx",
+        "src/integrations/**",
+        "src/lib/database.types.ts",
+        "src/**/*.d.ts",
+      ],
+    },
   },
   resolve: {
     tsconfigPaths: true,
@@ -21,7 +38,7 @@ const config = defineConfig({
     "*": "vp check --fix",
   },
   fmt: {
-    ignorePatterns: ["src/routeTree.gen.ts"],
+    ignorePatterns: ["src/routeTree.gen.ts", "src/lib/database.types.ts"],
     sortImports: {
       groups: [
         ["type-builtin", "builtin"],
@@ -33,12 +50,15 @@ const config = defineConfig({
       order: "asc",
     },
   },
-  lint: { options: { typeAware: true, typeCheck: true } },
+  lint: {
+    ignorePatterns: ["src/lib/database.types.ts", "src/routeTree.gen.ts"],
+    options: { typeAware: true, typeCheck: true },
+  },
   plugins: [
     devtools(),
     !isTest && cloudflare({ viteEnvironment: { name: "ssr" } }),
     tailwindcss(),
-    tanstackStart(),
+    tanstackStart({ router: { routeFileIgnorePattern: "\\.(test|spec)\\.(ts|tsx)$" } }),
     viteReact(),
   ].filter(Boolean),
 });
