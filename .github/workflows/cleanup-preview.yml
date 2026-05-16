@@ -1,0 +1,42 @@
+name: Cleanup Preview
+
+on:
+  pull_request:
+    types:
+      - closed
+
+permissions:
+  contents: read
+
+jobs:
+  cleanup-preview:
+    name: Delete preview worker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Vite+
+        uses: voidzero-dev/setup-vp@v1
+        with:
+          cache: true
+
+      - name: Compute preview worker name
+        id: meta
+        env:
+          BRANCH_NAME: ${{ github.head_ref }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          branch_name="$BRANCH_NAME"
+          branch_slug=$(printf '%s' "$branch_name" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9-]+/-/g; s/^-+//; s/-+$//; s/-+/-/g')
+          branch_slug="${branch_slug:0:24}"
+          worker_name="orderflow-pr-${PR_NUMBER}-${branch_slug}"
+          worker_name="${worker_name:0:63}"
+          worker_name=$(printf '%s' "$worker_name" | sed -E 's/-+$//')
+          echo "worker_name=$worker_name" >> "$GITHUB_OUTPUT"
+
+      - name: Delete preview worker
+        run: vp dlx wrangler delete "${{ steps.meta.outputs.worker_name }}" --force
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

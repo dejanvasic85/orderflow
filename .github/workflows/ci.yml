@@ -1,51 +1,35 @@
 name: CI
 
 on:
-  push:
-    branches: [main]
   pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  verify:
+  validate:
+    name: Verify
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v6
 
-      - uses: voidzero-dev/setup-vp@v1
+      - name: Setup Vite+
+        uses: voidzero-dev/setup-vp@v1
         with:
-          node-version: "24"
           cache: true
 
       - name: Install dependencies
-        run: vp install
+        run: vp install --frozen-lockfile
 
-      # - name: Install Supabase CLI
-      #   uses: supabase/setup-cli@v1
-      #   with:
-      #     version: latest
-
-      # - name: Start Supabase
-      #   run: supabase start &>/dev/null
-
-      # - name: Apply migrations and seed
-      #   run: supabase db reset
-
-      - name: Lint, format, and typecheck
+      - name: Run checks
         run: vp check
 
-      - name: Run unit tests
-        run: vp test run --passWithNoTests
-
-      # - name: Install Playwright browsers
-      #   run: vp exec playwright install --with-deps chromium
-
-      # - name: Run e2e tests
-      #   run: vp exec playwright test
-
-      # - name: Stop Supabase
-      #   run: supabase stop
+      - name: Run tests
+        run: vp test --passWithNoTests
