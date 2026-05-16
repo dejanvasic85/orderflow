@@ -16,6 +16,19 @@ const config = defineConfig({
     environment: "jsdom",
     globals: true,
     setupFiles: ["./vitest.setup.ts"],
+    coverage: {
+      provider: "v8",
+      include: ["src/**/*.{ts,tsx}"],
+      exclude: [
+        "src/**/*.{test,spec}.{ts,tsx}",
+        "src/components/ui/**",
+        "src/routeTree.gen.ts",
+        "src/router.tsx",
+        "src/integrations/**",
+        "src/lib/database.types.ts",
+        "src/**/*.d.ts",
+      ],
+    },
   },
   resolve: {
     tsconfigPaths: true,
@@ -41,7 +54,7 @@ const config = defineConfig({
     devtools(),
     !isTest && cloudflare({ viteEnvironment: { name: "ssr" } }),
     tailwindcss(),
-    tanstackStart(),
+    tanstackStart({ router: { routeFileIgnorePattern: "\\.(test|spec)\\.(ts|tsx)$" } }),
     viteReact(),
   ].filter(Boolean),
 });

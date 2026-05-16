@@ -13,3 +13,4 @@ __unconfig*
 todos.json
 dev.db
 src/lib/database.types.ts
+coverage

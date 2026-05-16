@@ -35,6 +35,9 @@ jobs:
       - name: Apply migrations and seed
         run: supabase db reset
 
+      - name: Lint, format, and typecheck
+        run: vp check
+
       - name: Run unit tests
         run: vp test run --passWithNoTests
 
