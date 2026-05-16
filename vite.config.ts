@@ -38,7 +38,7 @@ const config = defineConfig({
     "*": "vp check --fix",
   },
   fmt: {
-    ignorePatterns: ["src/routeTree.gen.ts"],
+    ignorePatterns: ["src/routeTree.gen.ts", "src/lib/database.types.ts"],
     sortImports: {
       groups: [
         ["type-builtin", "builtin"],
