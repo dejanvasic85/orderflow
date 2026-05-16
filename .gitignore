@@ -1,4 +1,4 @@
-node_modules
+node_modules/
 .DS_Store
 dist
 dist-ssr
@@ -12,4 +12,6 @@ dist-ssr
 __unconfig*
 todos.json
 dev.db
-coverage
+coverage/
+test-results/
+playwright-report/
