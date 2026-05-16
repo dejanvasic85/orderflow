@@ -14,6 +14,7 @@ Infra and setup
 - [ ] End to end tests
 - [ ] Github checks for branch protection
 - [ ] Setup domain name
+- [ ] Register custom_access_token_hook in Supabase production dashboard (Authentication → Hooks) — function is deployed via migration but hook must be manually enabled in prod
 - [ ] SMTP server for email notifications
 - [ ] Email templates
 - [ ] Logging and monitoring - including supabase and cloudflare. Could it all go to cloudflare logs?

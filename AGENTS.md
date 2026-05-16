@@ -31,6 +31,16 @@ Copy `.env.example` to `.env.local` and fill in the values. After `supabase star
 
 Supabase Studio is at http://localhost:54323 — use it to inspect auth users and data.
 
+> **After every `supabase db reset`:** Kong loses its upstream connection to the auth container because the DB container restarts and gets a new IP. Always run:
+>
+> ```bash
+> docker restart supabase_kong_orderflow
+> ```
+>
+> Wait ~4 seconds before using the app or making auth requests.
+
+> **Email/password login requires `enable_signup = true`** in `[auth.email]` of `config.toml`. In CLI v2.98+, this also controls `GOTRUE_EXTERNAL_EMAIL_ENABLED` — if it's `false`, all email logins fail with `email_provider_disabled`. Changes to `config.toml` require `supabase stop && supabase start` to take effect.
+
 ## Running e2e tests
 
 ```bash
