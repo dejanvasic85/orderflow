@@ -161,11 +161,17 @@ Coverage runs via `vp test --coverage` (v8 provider). The following are excluded
 
 If a folder is fundamentally not worth testing, exclude it in `vite.config.ts` rather than writing throwaway tests to lift a number.
 
+### Component design for testability
+
+Keep components free of plumbing. Components should accept callbacks (props) for side effects and not import `useRouter`, the Supabase client, or other infrastructure directly. The route or parent owns navigation, data fetching, and auth; the component renders UI and invokes the callbacks it was given. This makes tests trivial — pass a `vi.fn()` and assert on what the component called.
+
 ### Mocking
 
-- Prefer real implementations over mocks. Mock only at integration boundaries (Supabase client, network, time).
+- Prefer real implementations over mocks. Mock only at integration boundaries (Supabase client, network, time, the router).
+- Mocks reset automatically between tests — `clearMocks: true` is set globally in `vite.config.ts`. Do not call `vi.clearAllMocks()` in `beforeEach`.
+- For module mocks, declare `vi.mock(...)` at the top of the file, then use `vi.mocked(importedFn)` inside each test to configure return values. This gives you full type safety on `mockResolvedValue` / `mockReturnValue` without casts.
+- Hoist shared setup (`userEvent.setup()`, common renders) into `beforeEach` rather than repeating it in each test.
 - For Supabase access, mock the function in `src/lib/queries/*` that the component calls — don't mock the Supabase client directly.
-- Use `vi.mock()` at the top of the file; reset with `vi.clearAllMocks()` in `beforeEach` when shared across tests.
 
 ## Testing and Quality Gates
 

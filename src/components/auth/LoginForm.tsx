@@ -1,5 +1,4 @@
 import { useForm } from "@tanstack/react-form";
-import { useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -11,8 +10,15 @@ const loginSchema = z.object({
   password: z.string().min(1, "Password is required"),
 });
 
-export function LoginForm() {
-  const router = useRouter();
+export type LoginValues = z.infer<typeof loginSchema>;
+
+export type LoginResult = { error?: string } | void;
+
+type LoginFormProps = {
+  onLogin: (values: LoginValues) => Promise<LoginResult>;
+};
+
+export function LoginForm({ onLogin }: LoginFormProps) {
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const form = useForm({
@@ -20,13 +26,10 @@ export function LoginForm() {
     validators: { onSubmit: loginSchema },
     onSubmit: async ({ value }) => {
       setSubmitError(null);
-      const { supabase } = await import("@/lib/supabase");
-      const { error } = await supabase.auth.signInWithPassword(value);
-      if (error) {
-        setSubmitError(error.message ?? "Sign in failed");
-        return;
+      const result = await onLogin(value);
+      if (result?.error) {
+        setSubmitError(result.error);
       }
-      await router.navigate({ to: "/dashboard" });
     },
   });
 

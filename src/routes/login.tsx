@@ -1,7 +1,8 @@
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
-import { LoginForm } from "@/components/auth/LoginForm";
+import { createFileRoute, Link, redirect, useRouter } from "@tanstack/react-router";
+import { LoginForm, type LoginValues } from "@/components/auth/LoginForm";
 import { getSession } from "@/lib/authFunctions";
 import { company } from "@/lib/config";
+import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/login")({
   beforeLoad: async () => {
@@ -14,6 +15,16 @@ export const Route = createFileRoute("/login")({
 });
 
 function LoginPage() {
+  const router = useRouter();
+
+  const handleLogin = async (values: LoginValues) => {
+    const { error } = await supabase.auth.signInWithPassword(values);
+    if (error) {
+      return { error: error.message ?? "Sign in failed" };
+    }
+    await router.navigate({ to: "/dashboard" });
+  };
+
   return (
     <main className="fixed inset-0 z-10 flex overflow-auto bg-background">
       {/* Left panel */}
@@ -34,7 +45,7 @@ function LoginPage() {
         </div>
 
         <div className="w-full max-w-sm">
-          <LoginForm />
+          <LoginForm onLogin={handleLogin} />
         </div>
       </div>
 
