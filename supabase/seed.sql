@@ -17,7 +17,7 @@ INSERT INTO auth.users (
   created_at, updated_at, raw_app_meta_data, raw_user_meta_data
 ) VALUES
   (
-    '00000000-0000-0000-0000-000000000001',
+    'a1b2c3d4-e5f6-4a7b-8c9d-000000000001',
     '00000000-0000-0000-0000-000000000000',
     'authenticated', 'authenticated',
     'admin@bwow.com.au',
@@ -27,7 +27,7 @@ INSERT INTO auth.users (
     '{"name":"Jane Doe"}'
   ),
   (
-    '00000000-0000-0000-0000-000000000002',
+    'a1b2c3d4-e5f6-4a7b-8c9d-000000000002',
     '00000000-0000-0000-0000-000000000000',
     'authenticated', 'authenticated',
     'sarah@bwow.com.au',
@@ -37,7 +37,7 @@ INSERT INTO auth.users (
     '{"name":"Sarah Mitchell"}'
   ),
   (
-    '00000000-0000-0000-0000-000000000003',
+    'a1b2c3d4-e5f6-4a7b-8c9d-000000000003',
     '00000000-0000-0000-0000-000000000000',
     'authenticated', 'authenticated',
     'tom@bwow.com.au',
@@ -47,7 +47,7 @@ INSERT INTO auth.users (
     '{"name":"Tom Reynolds"}'
   ),
   (
-    '00000000-0000-0000-0000-000000000004',
+    'a1b2c3d4-e5f6-4a7b-8c9d-000000000004',
     '00000000-0000-0000-0000-000000000000',
     'authenticated', 'authenticated',
     'priya@bwow.com.au',
@@ -57,7 +57,7 @@ INSERT INTO auth.users (
     '{"name":"Priya Nair"}'
   ),
   (
-    '00000000-0000-0000-0000-000000000005',
+    'a1b2c3d4-e5f6-4a7b-8c9d-000000000005',
     '00000000-0000-0000-0000-000000000000',
     'authenticated', 'authenticated',
     'marcus@bwow.com.au',
@@ -67,7 +67,7 @@ INSERT INTO auth.users (
     '{"name":"Marcus Bell"}'
   ),
   (
-    '00000000-0000-0000-0000-000000000006',
+    'a1b2c3d4-e5f6-4a7b-8c9d-000000000006',
     '00000000-0000-0000-0000-000000000000',
     'authenticated', 'authenticated',
     'olivia@bwow.com.au',
@@ -87,45 +87,45 @@ INSERT INTO auth.identities (
   created_at, updated_at, last_sign_in_at
 ) VALUES
   (
-    '00000000-0000-0000-0000-000000000001',
-    '00000000-0000-0000-0000-000000000001',
+    'a1b2c3d4-e5f6-4a7b-8c9d-000000000001',
+    'a1b2c3d4-e5f6-4a7b-8c9d-000000000001',
     'admin@bwow.com.au', 'email',
-    '{"sub":"00000000-0000-0000-0000-000000000001","email":"admin@bwow.com.au"}',
+    '{"sub":"a1b2c3d4-e5f6-4a7b-8c9d-000000000001","email":"admin@bwow.com.au"}',
     now(), now(), now()
   ),
   (
-    '00000000-0000-0000-0000-000000000002',
-    '00000000-0000-0000-0000-000000000002',
+    'a1b2c3d4-e5f6-4a7b-8c9d-000000000002',
+    'a1b2c3d4-e5f6-4a7b-8c9d-000000000002',
     'sarah@bwow.com.au', 'email',
-    '{"sub":"00000000-0000-0000-0000-000000000002","email":"sarah@bwow.com.au"}',
+    '{"sub":"a1b2c3d4-e5f6-4a7b-8c9d-000000000002","email":"sarah@bwow.com.au"}',
     now(), now(), now()
   ),
   (
-    '00000000-0000-0000-0000-000000000003',
-    '00000000-0000-0000-0000-000000000003',
+    'a1b2c3d4-e5f6-4a7b-8c9d-000000000003',
+    'a1b2c3d4-e5f6-4a7b-8c9d-000000000003',
     'tom@bwow.com.au', 'email',
-    '{"sub":"00000000-0000-0000-0000-000000000003","email":"tom@bwow.com.au"}',
+    '{"sub":"a1b2c3d4-e5f6-4a7b-8c9d-000000000003","email":"tom@bwow.com.au"}',
     now(), now(), now()
   ),
   (
-    '00000000-0000-0000-0000-000000000004',
-    '00000000-0000-0000-0000-000000000004',
+    'a1b2c3d4-e5f6-4a7b-8c9d-000000000004',
+    'a1b2c3d4-e5f6-4a7b-8c9d-000000000004',
     'priya@bwow.com.au', 'email',
-    '{"sub":"00000000-0000-0000-0000-000000000004","email":"priya@bwow.com.au"}',
+    '{"sub":"a1b2c3d4-e5f6-4a7b-8c9d-000000000004","email":"priya@bwow.com.au"}',
     now(), now(), now()
   ),
   (
-    '00000000-0000-0000-0000-000000000005',
-    '00000000-0000-0000-0000-000000000005',
+    'a1b2c3d4-e5f6-4a7b-8c9d-000000000005',
+    'a1b2c3d4-e5f6-4a7b-8c9d-000000000005',
     'marcus@bwow.com.au', 'email',
-    '{"sub":"00000000-0000-0000-0000-000000000005","email":"marcus@bwow.com.au"}',
+    '{"sub":"a1b2c3d4-e5f6-4a7b-8c9d-000000000005","email":"marcus@bwow.com.au"}',
     now(), now(), now()
   ),
   (
-    '00000000-0000-0000-0000-000000000006',
-    '00000000-0000-0000-0000-000000000006',
+    'a1b2c3d4-e5f6-4a7b-8c9d-000000000006',
+    'a1b2c3d4-e5f6-4a7b-8c9d-000000000006',
     'olivia@bwow.com.au', 'email',
-    '{"sub":"00000000-0000-0000-0000-000000000006","email":"olivia@bwow.com.au"}',
+    '{"sub":"a1b2c3d4-e5f6-4a7b-8c9d-000000000006","email":"olivia@bwow.com.au"}',
     now(), now(), now()
   )
 ON CONFLICT (id) DO NOTHING;
@@ -136,32 +136,32 @@ ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO public.users (id, name, role, notification_preferences) VALUES
   (
-    '00000000-0000-0000-0000-000000000001',
+    'a1b2c3d4-e5f6-4a7b-8c9d-000000000001',
     'Jane Doe', 'admin',
     '{"email": true, "sms": false}'
   ),
   (
-    '00000000-0000-0000-0000-000000000002',
+    'a1b2c3d4-e5f6-4a7b-8c9d-000000000002',
     'Sarah Mitchell', 'staff',
     '{"email": true, "sms": true}'
   ),
   (
-    '00000000-0000-0000-0000-000000000003',
+    'a1b2c3d4-e5f6-4a7b-8c9d-000000000003',
     'Tom Reynolds', 'user',
     '{"email": false, "sms": false}'
   ),
   (
-    '00000000-0000-0000-0000-000000000004',
+    'a1b2c3d4-e5f6-4a7b-8c9d-000000000004',
     'Priya Nair', 'user',
     '{"email": true, "sms": false}'
   ),
   (
-    '00000000-0000-0000-0000-000000000005',
+    'a1b2c3d4-e5f6-4a7b-8c9d-000000000005',
     'Marcus Bell', 'staff',
     '{"email": true, "sms": true}'
   ),
   (
-    '00000000-0000-0000-0000-000000000006',
+    'a1b2c3d4-e5f6-4a7b-8c9d-000000000006',
     'Olivia Chen', 'user',
     '{"email": false, "sms": false}'
   )
@@ -175,24 +175,24 @@ ON CONFLICT (id) DO UPDATE SET
 -- ============================================================
 
 INSERT INTO public.accounts (id, name) VALUES
-  ('00000000-0000-0000-0000-000000000a01', 'The Winery Bistro'),
-  ('00000000-0000-0000-0000-000000000a02', 'Cellar Door Co.'),
-  ('00000000-0000-0000-0000-000000000a03', 'Harvest Table'),
-  ('00000000-0000-0000-0000-000000000a04', 'Vine & Barrel'),
-  ('00000000-0000-0000-0000-000000000a05', 'The Cork Room')
+  ('b2c3d4e5-f6a7-4b8c-9d0e-000000000a01', 'The Winery Bistro'),
+  ('b2c3d4e5-f6a7-4b8c-9d0e-000000000a02', 'Cellar Door Co.'),
+  ('b2c3d4e5-f6a7-4b8c-9d0e-000000000a03', 'Harvest Table'),
+  ('b2c3d4e5-f6a7-4b8c-9d0e-000000000a04', 'Vine & Barrel'),
+  ('b2c3d4e5-f6a7-4b8c-9d0e-000000000a05', 'The Cork Room')
 ON CONFLICT (id) DO NOTHING;
 
 -- ============================================================
--- ACCOUNT ASSIGNMENTS (matching mock data)
+-- ACCOUNT ASSIGNMENTS
 -- Sarah Mitchell → The Winery Bistro, Cellar Door Co.
 -- Tom Reynolds   → Harvest Table
 -- Marcus Bell    → Vine & Barrel, The Cork Room
 -- ============================================================
 
 INSERT INTO public.account_users (account_id, user_id) VALUES
-  ('00000000-0000-0000-0000-000000000a01', '00000000-0000-0000-0000-000000000002'),
-  ('00000000-0000-0000-0000-000000000a02', '00000000-0000-0000-0000-000000000002'),
-  ('00000000-0000-0000-0000-000000000a03', '00000000-0000-0000-0000-000000000003'),
-  ('00000000-0000-0000-0000-000000000a04', '00000000-0000-0000-0000-000000000005'),
-  ('00000000-0000-0000-0000-000000000a05', '00000000-0000-0000-0000-000000000005')
+  ('b2c3d4e5-f6a7-4b8c-9d0e-000000000a01', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000002'),
+  ('b2c3d4e5-f6a7-4b8c-9d0e-000000000a02', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000002'),
+  ('b2c3d4e5-f6a7-4b8c-9d0e-000000000a03', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000003'),
+  ('b2c3d4e5-f6a7-4b8c-9d0e-000000000a04', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000005'),
+  ('b2c3d4e5-f6a7-4b8c-9d0e-000000000a05', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000005')
 ON CONFLICT DO NOTHING;

@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
+import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
-import { updateUserSchema, type User, type UserAccount } from "./schema";
+import { createUserSchema, updateUserSchema, type User, type UserAccount } from "./schema";
 
 const userListSelect = `
   id, name, email, phone, active, role, notification_preferences, created_at, updated_at,
@@ -87,4 +88,65 @@ export const updateUser = createServerFn({ method: "POST" })
       .single();
     if (error) throw new Error(error.message);
     return row;
+  });
+
+async function assertAdmin(supabase: ReturnType<typeof createSupabaseServerClient>) {
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+  if (error || !user) throw new Error("Unauthorized");
+  const { data: profile, error: profileError } = await supabase
+    .from("users")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+  if (profileError) throw new Error(profileError.message);
+  if (profile.role !== "admin") throw new Error("Forbidden");
+}
+
+// Server — admin invites a new user. Supabase sends the invite email; the DB trigger
+// (handle_new_auth_user) creates the public.users row, which we then patch with role/profile.
+export const inviteUser = createServerFn({ method: "POST" })
+  .inputValidator(createUserSchema)
+  .handler(async ({ data }): Promise<User> => {
+    const supabaseServer = createSupabaseServerClient();
+    await assertAdmin(supabaseServer);
+
+    const admin = createSupabaseAdminClient();
+    const { data: invited, error: inviteError } = await admin.auth.admin.inviteUserByEmail(
+      data.email,
+      { data: { name: data.name } },
+    );
+    if (inviteError) throw new Error(inviteError.message);
+    const newUserId = invited.user.id;
+
+    const { error: updateError } = await supabaseServer
+      .from("users")
+      .update({
+        name: data.name,
+        phone: data.phone ?? null,
+        role: data.role,
+        notification_preferences: data.notification_preferences,
+      })
+      .eq("id", newUserId);
+    if (updateError) throw new Error(updateError.message);
+
+    if (data.accountIds.length > 0) {
+      const { error: assignError } = await supabaseServer.from("account_users").insert(
+        data.accountIds.map((account_id) => ({
+          account_id,
+          user_id: newUserId,
+        })),
+      );
+      if (assignError) throw new Error(assignError.message);
+    }
+
+    const { data: row, error: fetchError } = await supabaseServer
+      .from("users_with_email")
+      .select(userListSelect)
+      .eq("id", newUserId)
+      .single();
+    if (fetchError) throw new Error(fetchError.message);
+    return mapUser(row);
   });
