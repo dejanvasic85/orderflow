@@ -1,3 +1,4 @@
+Connecting to db 5432
 export type Json =
   | string
   | number
@@ -148,6 +149,7 @@ export type Database = {
           created_at: string | null
           email: string | null
           id: string | null
+          invite_accepted_at: string | null
           name: string | null
           notification_preferences: Json | null
           phone: string | null
@@ -299,3 +301,4 @@ export const Constants = {
   },
 } as const
 
+<claude-code-hint v="1" type="plugin" value="supabase@claude-plugins-official" />

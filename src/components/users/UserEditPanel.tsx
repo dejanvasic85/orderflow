@@ -46,6 +46,7 @@ const blankUser: User = {
   email: "",
   phone: null,
   active: true,
+  invite_accepted_at: null,
   role: "user",
   notification_preferences: { email: true, sms: false },
   created_at: "",

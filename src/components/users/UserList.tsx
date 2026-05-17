@@ -89,7 +89,11 @@ export function UserList({
                 {user.accounts.length > 0 ? user.accounts.length : "—"}
               </TableCell>
               <TableCell>
-                <UserStatusBadge status={user.active ? "active" : "inactive"} />
+                <UserStatusBadge
+                  status={
+                    !user.active ? "inactive" : !user.invite_accepted_at ? "pending" : "active"
+                  }
+                />
               </TableCell>
               <TableCell>
                 <Button

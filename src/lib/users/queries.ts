@@ -4,7 +4,7 @@ import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import { createUserSchema, updateUserSchema, type User, type UserAccount } from "./schema";
 
 const userListSelect = `
-  id, name, email, phone, active, role, notification_preferences, created_at, updated_at,
+  id, name, email, phone, active, invite_accepted_at, role, notification_preferences, created_at, updated_at,
   account_users!user_id ( account:accounts ( id, name ) )
 ` as const;
 
@@ -27,6 +27,7 @@ type ListedRow = {
   email: string | null;
   phone: string | null;
   active: boolean | null;
+  invite_accepted_at: string | null;
   role: User["role"] | null;
   notification_preferences: unknown;
   created_at: string | null;
@@ -41,6 +42,7 @@ function mapUser(row: ListedRow): User {
     email: row.email ?? "",
     phone: row.phone,
     active: row.active ?? true,
+    invite_accepted_at: row.invite_accepted_at ?? null,
     role: row.role ?? "user",
     notification_preferences: parseNotificationPrefs(row.notification_preferences),
     created_at: row.created_at ?? "",
@@ -148,5 +150,5 @@ export const inviteUser = createServerFn({ method: "POST" })
       .eq("id", newUserId)
       .single();
     if (fetchError) throw new Error(fetchError.message);
-    return mapUser(row);
+    return mapUser(row as ListedRow);
   });

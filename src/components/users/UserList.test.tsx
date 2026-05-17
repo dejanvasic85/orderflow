@@ -9,6 +9,7 @@ const adminUser: User = {
   email: "alice@example.com",
   phone: null,
   active: true,
+  invite_accepted_at: "2024-01-02T00:00:00Z",
   role: "admin",
   notification_preferences: { email: true, sms: false },
   created_at: "2024-01-01T00:00:00Z",
@@ -22,8 +23,23 @@ const staffUser: User = {
   email: "bob@example.com",
   phone: null,
   active: false,
+  invite_accepted_at: "2024-01-02T00:00:00Z",
   role: "staff",
   notification_preferences: { email: false, sms: false },
+  created_at: "2024-01-01T00:00:00Z",
+  updated_at: "2024-01-01T00:00:00Z",
+  accounts: [],
+};
+
+const pendingUser: User = {
+  id: "3",
+  name: "Carol Pending",
+  email: "carol@example.com",
+  phone: null,
+  active: true,
+  invite_accepted_at: null,
+  role: "user",
+  notification_preferences: { email: true, sms: false },
   created_at: "2024-01-01T00:00:00Z",
   updated_at: "2024-01-01T00:00:00Z",
   accounts: [],
@@ -187,4 +203,18 @@ test("shows Inactive badge for inactive users", () => {
   );
 
   expect(screen.getByText("Inactive")).toBeInTheDocument();
+});
+
+test("shows Pending badge for active users who have not accepted their invite", () => {
+  render(
+    <UserList
+      users={[pendingUser]}
+      selectedId={null}
+      roleFilter="all"
+      onSelectUser={onSelectUser}
+      onRoleFilterChange={onRoleFilterChange}
+    />,
+  );
+
+  expect(screen.getByText("Pending")).toBeInTheDocument();
 });
