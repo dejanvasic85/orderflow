@@ -1,13 +1,10 @@
 import { createClient } from "@supabase/supabase-js";
+import { getServerConfig } from "@/lib/config";
 import type { Database } from "@/lib/database.types";
 
 export function createSupabaseAdminClient() {
-  const url = import.meta.env.VITE_SUPABASE_URL;
-  const secretKey = process.env.SUPABASE_SECRET_KEY;
-  if (!secretKey) {
-    throw new Error("SUPABASE_SECRET_KEY is not set");
-  }
-  return createClient<Database>(url, secretKey, {
+  const { VITE_SUPABASE_URL, SUPABASE_SECRET_KEY } = getServerConfig();
+  return createClient<Database>(VITE_SUPABASE_URL, SUPABASE_SECRET_KEY, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 }

@@ -19,15 +19,15 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { type User, type UserAccount, userRoles } from "@/lib/users/schema";
 
-type Mode = "edit" | "create";
-
-type Props = {
-  mode?: Mode;
-  user?: User;
+type BaseProps = {
   availableAccounts: UserAccount[];
   onSave: (updated: User) => void;
   onDiscard: () => void;
 };
+
+type Props =
+  | (BaseProps & { mode: "create"; user?: User })
+  | (BaseProps & { mode?: "edit"; user: User });
 
 const userEditSchema = z.object({
   email: z.email("Valid email is required"),
@@ -60,14 +60,11 @@ function toFieldErrors(errors: unknown[]): { message?: string }[] {
   }));
 }
 
-export function UserEditPanel({
-  mode = "edit",
-  user = blankUser,
-  availableAccounts,
-  onSave,
-  onDiscard,
-}: Props) {
+export function UserEditPanel(props: Props) {
+  const { availableAccounts, onSave, onDiscard } = props;
+  const mode = props.mode ?? "edit";
   const isCreate = mode === "create";
+  const user = props.user ?? blankUser;
   const nameParts = user.name.split(" ");
   const form = useForm({
     defaultValues: {
