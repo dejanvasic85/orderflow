@@ -1,9 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
+import { ensureSession } from "@/lib/authFunctions";
+import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
-import { updateUserSchema, type User, type UserAccount } from "./schema";
+import { createUserSchema, updateUserSchema, type User, type UserAccount } from "./schema";
 
 const userListSelect = `
-  id, name, email, phone, active, role, notification_preferences, created_at, updated_at,
+  id, name, email, phone, active, invite_accepted_at, role, notification_preferences, created_at, updated_at,
   account_users!user_id ( account:accounts ( id, name ) )
 ` as const;
 
@@ -26,6 +28,7 @@ type ListedRow = {
   email: string | null;
   phone: string | null;
   active: boolean | null;
+  invite_accepted_at: string | null;
   role: User["role"] | null;
   notification_preferences: unknown;
   created_at: string | null;
@@ -40,6 +43,7 @@ function mapUser(row: ListedRow): User {
     email: row.email ?? "",
     phone: row.phone,
     active: row.active ?? true,
+    invite_accepted_at: row.invite_accepted_at ?? null,
     role: row.role ?? "user",
     notification_preferences: parseNotificationPrefs(row.notification_preferences),
     created_at: row.created_at ?? "",
@@ -88,3 +92,94 @@ export const updateUser = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return row;
   });
+
+async function assertAdmin(supabase: ReturnType<typeof createSupabaseServerClient>) {
+  const sessionUser = await ensureSession();
+  const { data: profile, error: profileError } = await supabase
+    .from("users")
+    .select("role")
+    .eq("id", sessionUser.id)
+    .single();
+  if (profileError) {
+    console.error("Failed to fetch user profile for admin check:", profileError);
+    throw new Error("Unauthorized");
+  }
+  if (profile.role !== "admin") throw new Error("Forbidden");
+}
+
+// Server — admin invites a new user. Supabase sends the invite email; the DB trigger
+// (handle_new_auth_user) creates the public.users row, which we then patch with role/profile.
+export const inviteUser = createServerFn({ method: "POST" })
+  .inputValidator(createUserSchema)
+  .handler(async ({ data }): Promise<User> => {
+    const supabaseServer = createSupabaseServerClient();
+    await assertAdmin(supabaseServer);
+
+    const admin = createSupabaseAdminClient();
+    const { data: invited, error: inviteError } = await admin.auth.admin.inviteUserByEmail(
+      data.email,
+      { data: { name: data.name } },
+    );
+    if (inviteError) {
+      console.error("Failed to send invite:", inviteError);
+      throw new Error("Unable to send user invitation");
+    }
+    const newUserId = invited.user.id;
+
+    try {
+      const { error: updateError } = await supabaseServer
+        .from("users")
+        .update({
+          name: data.name,
+          phone: data.phone ?? null,
+          role: data.role,
+          notification_preferences: data.notification_preferences,
+        })
+        .eq("id", newUserId);
+      if (updateError) throw updateError;
+
+      if (data.accountIds.length > 0) {
+        const { error: assignError } = await supabaseServer.from("account_users").insert(
+          data.accountIds.map((account_id) => ({
+            account_id,
+            user_id: newUserId,
+          })),
+        );
+        if (assignError) throw assignError;
+      }
+    } catch (err) {
+      console.error("Post-invite DB update failed, rolling back auth user:", err);
+      await admin.auth.admin.deleteUser(newUserId);
+      throw new Error("Unable to complete user invitation");
+    }
+
+    const accounts: UserAccount[] =
+      data.accountIds.length > 0 ? await resolveAccountNames(supabaseServer, data.accountIds) : [];
+
+    const now = new Date().toISOString();
+    return {
+      id: newUserId,
+      name: data.name,
+      email: data.email,
+      phone: data.phone ?? null,
+      active: true,
+      invite_accepted_at: null,
+      role: data.role,
+      notification_preferences: data.notification_preferences,
+      created_at: now,
+      updated_at: now,
+      accounts,
+    };
+  });
+
+async function resolveAccountNames(
+  supabase: ReturnType<typeof createSupabaseServerClient>,
+  accountIds: string[],
+): Promise<UserAccount[]> {
+  const { data, error } = await supabase.from("accounts").select("id, name").in("id", accountIds);
+  if (error) {
+    console.error("Failed to resolve account names:", error);
+    return accountIds.map((id) => ({ id, name: id }));
+  }
+  return (data ?? []).map((a) => ({ id: a.id, name: a.name }));
+}

@@ -19,14 +19,18 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { type User, type UserAccount, userRoles } from "@/lib/users/schema";
 
-type Props = {
-  user: User;
+type BaseProps = {
   availableAccounts: UserAccount[];
   onSave: (updated: User) => void;
   onDiscard: () => void;
 };
 
+type Props =
+  | (BaseProps & { mode: "create"; user?: User })
+  | (BaseProps & { mode?: "edit"; user: User });
+
 const userEditSchema = z.object({
+  email: z.email("Valid email is required"),
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
   role: z.enum(userRoles),
@@ -36,16 +40,35 @@ const userEditSchema = z.object({
 
 type UserEditValues = z.infer<typeof userEditSchema>;
 
+const blankUser: User = {
+  id: "",
+  name: "",
+  email: "",
+  phone: null,
+  active: true,
+  invite_accepted_at: null,
+  role: "user",
+  notification_preferences: { email: true, sms: false },
+  created_at: "",
+  updated_at: "",
+  accounts: [],
+};
+
 function toFieldErrors(errors: unknown[]): { message?: string }[] {
   return errors.map((e) => ({
     message: typeof e === "string" ? e : (e as { message?: string })?.message,
   }));
 }
 
-export function UserEditPanel({ user, availableAccounts, onSave, onDiscard }: Props) {
+export function UserEditPanel(props: Props) {
+  const { availableAccounts, onSave, onDiscard } = props;
+  const mode = props.mode ?? "edit";
+  const isCreate = mode === "create";
+  const user = props.user ?? blankUser;
   const nameParts = user.name.split(" ");
   const form = useForm({
     defaultValues: {
+      email: user.email,
       firstName: nameParts[0] ?? "",
       lastName: nameParts.slice(1).join(" "),
       role: user.role,
@@ -59,6 +82,7 @@ export function UserEditPanel({ user, availableAccounts, onSave, onDiscard }: Pr
     onSubmit: ({ value }) => {
       onSave({
         ...user,
+        email: value.email,
         name: [value.firstName, value.lastName].filter(Boolean).join(" "),
         role: value.role,
         accounts: value.accounts,
@@ -67,15 +91,19 @@ export function UserEditPanel({ user, availableAccounts, onSave, onDiscard }: Pr
           sms: value.notifications.sms,
         },
       });
-      toast.success("Changes saved");
+      if (!isCreate) toast.success("Changes saved");
     },
   });
+
+  const headerTitle = isCreate ? "Invite new user" : user.name;
+  const headerSubtitle = isCreate ? "They'll receive an email to set their password" : user.email;
+  const submitLabel = isCreate ? "Send invite" : "Save changes";
 
   return (
     <div className="flex flex-col gap-6 p-6">
       <div>
-        <h2 className="text-base font-semibold">{user.name}</h2>
-        <p className="text-sm text-muted-foreground">{user.email}</p>
+        <h2 className="text-base font-semibold">{headerTitle}</h2>
+        <p className="text-sm text-muted-foreground">{headerSubtitle}</p>
       </div>
 
       <Separator />
@@ -120,10 +148,22 @@ export function UserEditPanel({ user, availableAccounts, onSave, onDiscard }: Pr
           </form.Field>
         </div>
 
-        <Field>
-          <FieldLabel htmlFor="email">Email</FieldLabel>
-          <Input id="email" type="email" value={user.email} disabled />
-        </Field>
+        <form.Field name="email">
+          {(field) => (
+            <Field>
+              <FieldLabel htmlFor="email">Email</FieldLabel>
+              <Input
+                id="email"
+                type="email"
+                value={field.state.value}
+                onChange={(e) => field.handleChange(e.target.value)}
+                onBlur={field.handleBlur}
+                disabled={!isCreate}
+              />
+              <FieldError errors={toFieldErrors(field.state.meta.errors)} />
+            </Field>
+          )}
+        </form.Field>
 
         <form.Field name="role">
           {(field) => (
@@ -256,7 +296,7 @@ export function UserEditPanel({ user, availableAccounts, onSave, onDiscard }: Pr
 
         {/* Actions */}
         <div className="flex items-center gap-2">
-          <Button type="submit">Save changes</Button>
+          <Button type="submit">{submitLabel}</Button>
           <Button
             type="button"
             variant="ghost"

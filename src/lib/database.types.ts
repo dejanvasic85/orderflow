@@ -148,6 +148,7 @@ export type Database = {
           created_at: string | null
           email: string | null
           id: string | null
+          invite_accepted_at: string | null
           name: string | null
           notification_preferences: Json | null
           phone: string | null
@@ -298,4 +299,3 @@ export const Constants = {
     },
   },
 } as const
-

@@ -16,6 +16,7 @@ export type User = {
   email: string;
   phone: string | null;
   active: boolean;
+  invite_accepted_at: string | null;
   role: UserRole;
   notification_preferences: { email: boolean; sms: boolean };
   created_at: string;
@@ -33,3 +34,14 @@ export const updateUserSchema = z.object({
 });
 
 export type UpdateUserInput = z.infer<typeof updateUserSchema>;
+
+export const createUserSchema = z.object({
+  email: z.email(),
+  name: z.string().min(1),
+  phone: z.string().nullable().optional(),
+  role: z.enum(userRoles),
+  notification_preferences: z.object({ email: z.boolean(), sms: z.boolean() }),
+  accountIds: z.array(z.uuid()),
+});
+
+export type CreateUserInput = z.infer<typeof createUserSchema>;

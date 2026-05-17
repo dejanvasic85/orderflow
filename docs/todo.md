@@ -11,16 +11,23 @@ Infra and setup
 - [x] CI Pipeline with unit tests and branch deployments
 - [x] Setup the admin user
 - [x] List the users by connecting to the API instead of mocks
-- [ ] End to end tests
-- [ ] Github checks for branch protection
-- [ ] Setup domain name
-- [ ] Register custom_access_token_hook in Supabase production dashboard (Authentication → Hooks) — function is deployed via migration but hook must be manually enabled in prod
-- [ ] SMTP server for email notifications
+- [x] End to end tests
+- [x] Github checks for branch protection
+- [ ] Setup domain name - orders.bwow.com.au (speak to Sam about access to this or should we get a new domain name?)
+- [ ] SMTP server for email notifications (AWS SES — configure in Supabase dashboard, verify `vasic.com.au` for DKIM as interim sender domain)
 - [ ] Email templates
 - [ ] Logging and monitoring - including supabase and cloudflare. Could it all go to cloudflare logs?
 
-Features:
+User management Features:
 
-- [ ] Adding / inviting a new user. How should this work?
+- [x] Adding / inviting a new user
+- [ ] Auth callback route (`/auth/callback`) to handle invite/recovery links — calls `exchangeCodeForSession` then redirects
+- [ ] "Set your password" screen for first-time invitees (post-callback landing)
+- [ ] Resend invite from user list (for users who never accepted)
+- [ ] Admins need ability to mark users as "inactive" to prevent login without deleting their data
+- [ ] Search users by email or name in the list. Simple textbox with a server side filter
+
+Account management features:
+
 - [ ] Account management
 - [ ] CSV Import
