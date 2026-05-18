@@ -36,3 +36,7 @@ Account management features:
 
 - [ ] Account management
 - [ ] CSV Import
+
+Code cleanup (later):
+
+- [ ] Hardcoded routes and api endpoints
