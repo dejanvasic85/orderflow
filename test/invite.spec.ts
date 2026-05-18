@@ -3,6 +3,12 @@ import { test, expect, type Page } from "@playwright/test";
 
 const mailpitUrl = "http://localhost:54324";
 
+type MailpitMessage = {
+  ID: string;
+  Subject: string;
+  To: { Address: string }[];
+};
+
 async function loginAsAdmin(page: Page) {
   await page.goto("/login");
   await page.waitForSelector("html[data-hydrated]");
@@ -17,11 +23,10 @@ async function getInviteLink(toEmail: string, timeoutMs = 10000): Promise<string
 
   while (Date.now() < deadline) {
     const res = await fetch(`${mailpitUrl}/api/v1/messages`);
-    const { messages } = await res.json();
+    const { messages } = (await res.json()) as { messages: MailpitMessage[] };
 
     const message = messages.find(
-      (m: { To: { Address: string }[]; Subject: string }) =>
-        m.To.some((t) => t.Address === toEmail) && m.Subject === "You have been invited",
+      (m) => m.To.some((t) => t.Address === toEmail) && m.Subject === "You have been invited",
     );
 
     if (message) {
@@ -48,7 +53,7 @@ test.describe("Accept invite", () => {
     await deleteAllMailpitMessages();
   });
 
-  test("admin invites user, user accepts and sets password", async ({ page, context }) => {
+  test("admin invites user, user accepts and sets password", async ({ page, browser }) => {
     const firstName = faker.person.firstName();
     const lastName = faker.person.lastName();
     const invitedEmail = faker.internet
@@ -68,27 +73,30 @@ test.describe("Accept invite", () => {
     await drawer.getByLabel("First name").fill(firstName);
     await drawer.getByLabel("Last name").fill(lastName);
     await drawer.getByRole("textbox", { name: "Email" }).fill(invitedEmail);
+    const sendInviteButton = drawer.getByRole("button", { name: "Send invite" });
+    await sendInviteButton.scrollIntoViewIfNeeded();
     await page.waitForTimeout(300);
-    await drawer.getByRole("button", { name: "Send invite" }).click();
+    await sendInviteButton.click();
 
-    // Step 2 — clear cookies to simulate a fresh unauthenticated session
-    await context.clearCookies();
+    await expect(page.getByText(`${firstName} ${lastName}`)).toBeVisible();
 
-    // Step 3 — get invite link from Mailpit and open in a fresh page
+    // Step 2 — open invite link in a fresh browser context (no shared cookies or storage)
     const inviteLink = await getInviteLink(invitedEmail);
-    const invitePage = await context.newPage();
+    const inviteContext = await browser.newContext();
+    const invitePage = await inviteContext.newPage();
     await invitePage.goto(inviteLink);
 
-    // Step 4 — should land on set-password after verifying
+    // Step 3 — should land on set-password after verifying
     await expect(invitePage.getByRole("heading", { name: "Set your password" })).toBeVisible({
       timeout: 10000,
     });
 
-    // Step 5 — set password and confirm navigation to dashboard
+    // Step 4 — set password and confirm navigation to dashboard
     await invitePage.getByLabel("Password", { exact: true }).fill("Welcome123!");
     await invitePage.getByLabel("Confirm password").fill("Welcome123!");
     await invitePage.getByRole("button", { name: "Set password" }).click();
 
     await invitePage.waitForURL("**/dashboard");
+    await inviteContext.close();
   });
 });

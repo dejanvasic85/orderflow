@@ -22,6 +22,9 @@ function AuthCallbackPage() {
 
   useEffect(() => {
     const hash = typeof window !== "undefined" ? window.location.hash : "";
+    if (hash) {
+      window.history.replaceState(null, "", window.location.pathname + window.location.search);
+    }
     const hashParams = new URLSearchParams(hash.slice(1));
     const effectiveType = type ?? hashParams.get("type");
 

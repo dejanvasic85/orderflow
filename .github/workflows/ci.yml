@@ -60,8 +60,11 @@ jobs:
 
       - name: Export Supabase env vars
         run: |
+          SUPABASE_JSON=$(supabase status --output json)
           echo "VITE_SUPABASE_URL=http://localhost:54321" >> $GITHUB_ENV
-          echo "VITE_SUPABASE_ANON_KEY=$(supabase status --output env | grep ANON_KEY | cut -d= -f2 | tr -d '\"')" >> $GITHUB_ENV
+          echo "VITE_SUPABASE_ANON_KEY=$(echo $SUPABASE_JSON | python3 -c "import sys,json; print(json.load(sys.stdin)['ANON_KEY'])")" >> $GITHUB_ENV
+          echo "SUPABASE_SECRET_KEY=$(echo $SUPABASE_JSON | python3 -c "import sys,json; print(json.load(sys.stdin)['SECRET_KEY'])")" >> $GITHUB_ENV
+          echo "SITE_URL=http://localhost:3344" >> $GITHUB_ENV
 
       - name: Install Playwright browsers
         run: vp exec playwright install --with-deps chromium

@@ -23,7 +23,7 @@ Infra and setup
 User management Features:
 
 - [x] Adding / inviting a new user
-- [x] Auth callback route (`/auth/callback`) to handle invite/recovery links — calls `exchangeCodeForSession` then redirects
+- [x] Auth callback route (`/auth/callback`) — handles invite/recovery links via shared verification logic (hash-token and code paths)
 - [x] "Set your password" screen for first-time invitees (post-callback landing)
 - [ ] Should not be able to invite users with the same email
 - [ ] Resend invite from user list (for users who never accepted)
