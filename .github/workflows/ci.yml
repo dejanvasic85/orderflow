@@ -49,8 +49,8 @@ jobs:
       - name: Install dependencies
         run: vp install --frozen-lockfile
 
-      - name: Install Supabase CLI
-        run: npm install -g supabase@2.98.2
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v2
 
       - name: Start Supabase
         run: supabase start
