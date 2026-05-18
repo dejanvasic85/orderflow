@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { ensureSession } from "@/lib/authFunctions";
+import { getServerConfig } from "@/lib/config";
 import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import { createUserSchema, updateUserSchema, type User, type UserAccount } from "./schema";
@@ -116,9 +117,10 @@ export const inviteUser = createServerFn({ method: "POST" })
     await assertAdmin(supabaseServer);
 
     const admin = createSupabaseAdminClient();
+    const { SITE_URL } = getServerConfig();
     const { data: invited, error: inviteError } = await admin.auth.admin.inviteUserByEmail(
       data.email,
-      { data: { name: data.name } },
+      { data: { name: data.name }, redirectTo: `${SITE_URL}/auth/callback` },
     );
     if (inviteError) {
       console.error("Failed to send invite:", inviteError);
