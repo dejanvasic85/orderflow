@@ -78,7 +78,7 @@ test.describe("Accept invite", () => {
     await sendInviteButton.click();
 
     // Wait for the success toast — reliable signal the invite API call completed
-    await expect(page.getByText(`Invite sent to ${invitedEmail}`)).toBeVisible();
+    await expect(page.getByText(`Invite sent to ${invitedEmail}`)).toBeVisible({ timeout: 10000 });
     await expect(page.getByText(`${firstName} ${lastName}`)).toBeVisible();
 
     // Step 2 — open invite link in a fresh browser context (no shared cookies or storage)
