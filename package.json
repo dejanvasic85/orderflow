@@ -45,6 +45,7 @@
     "zod": "4.4.3"
   },
   "devDependencies": {
+    "@faker-js/faker": "10.4.0",
     "@playwright/test": "1.59.1",
     "@tailwindcss/typography": "0.5.19",
     "@tanstack/devtools-vite": "0.6.0",
