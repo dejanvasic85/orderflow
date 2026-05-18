@@ -68,16 +68,17 @@ test.describe("Accept invite", () => {
 
     const drawer = page.getByRole("dialog");
     await expect(drawer).toBeVisible();
-    // Wait for the sheet slide-in animation (200ms) to complete before interacting
+    // Wait for the sheet slide-in animation to settle before interacting
     await page.waitForTimeout(300);
     await drawer.getByLabel("First name").fill(firstName);
     await drawer.getByLabel("Last name").fill(lastName);
     await drawer.getByRole("textbox", { name: "Email" }).fill(invitedEmail);
     const sendInviteButton = drawer.getByRole("button", { name: "Send invite" });
     await sendInviteButton.scrollIntoViewIfNeeded();
-    await page.waitForTimeout(300);
     await sendInviteButton.click();
 
+    // Wait for the success toast — reliable signal the invite API call completed
+    await expect(page.getByText(`Invite sent to ${invitedEmail}`)).toBeVisible();
     await expect(page.getByText(`${firstName} ${lastName}`)).toBeVisible();
 
     // Step 2 — open invite link in a fresh browser context (no shared cookies or storage)
