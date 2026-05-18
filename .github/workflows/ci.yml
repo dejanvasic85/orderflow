@@ -50,9 +50,7 @@ jobs:
         run: vp install --frozen-lockfile
 
       - name: Setup Supabase CLI
-        uses: supabase/setup-cli@v1
-        with:
-          version: latest
+        uses: supabase/setup-cli@v2
 
       - name: Start Supabase
         run: supabase start

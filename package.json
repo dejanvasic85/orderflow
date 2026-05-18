@@ -72,8 +72,13 @@
   "packageManager": "pnpm@10.33.0",
   "pnpm": {
     "onlyBuiltDependencies": [
+      "@sentry/cli",
       "esbuild",
-      "lightningcss"
+      "lightningcss",
+      "msw",
+      "sharp",
+      "supabase",
+      "workerd"
     ],
     "overrides": {
       "vite": "npm:@voidzero-dev/vite-plus-core@0.1.21",
