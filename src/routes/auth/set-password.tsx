@@ -1,16 +1,9 @@
-import { createFileRoute, Link, redirect, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { SetPasswordForm, type SetPasswordResult } from "@/components/auth/SetPasswordForm";
-import { getSession } from "@/lib/authFunctions";
 import { company } from "@/lib/config";
 import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/auth/set-password")({
-  beforeLoad: async () => {
-    const user = await getSession();
-    if (!user) {
-      throw redirect({ to: "/login" });
-    }
-  },
   component: SetPasswordPage,
 });
 

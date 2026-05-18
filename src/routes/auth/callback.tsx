@@ -20,19 +20,54 @@ function AuthCallbackPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const hash = typeof window !== "undefined" ? window.location.hash : "";
+    const hashParams = new URLSearchParams(hash.slice(1));
+    const hashType = hashParams.get("type");
+    const effectiveType = type ?? hashType;
+
+    if (hash && hashParams.get("access_token")) {
+      const accessToken = hashParams.get("access_token")!;
+      const refreshToken = hashParams.get("refresh_token") ?? "";
+
+      async function exchangeHashTokens() {
+        const [{ error: sessionError }] = await Promise.all([
+          supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          }),
+          new Promise((resolve) => setTimeout(resolve, 3000)),
+        ]);
+        if (sessionError) {
+          setError(sessionError.message);
+          return;
+        }
+        await navigate({
+          to: effectiveType === "invite" ? "/auth/set-password" : "/dashboard",
+        });
+      }
+
+      void exchangeHashTokens();
+      return;
+    }
+
     async function verify() {
       if (!code) {
         setError("Invalid or missing verification code. The link may have expired.");
         return;
       }
 
-      const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+      const [{ error: exchangeError }] = await Promise.all([
+        supabase.auth.exchangeCodeForSession(code),
+        new Promise((resolve) => setTimeout(resolve, 3000)),
+      ]);
       if (exchangeError) {
         setError(exchangeError.message);
         return;
       }
 
-      await navigate({ to: type === "invite" ? "/auth/set-password" : "/dashboard" });
+      await navigate({
+        to: effectiveType === "invite" ? "/auth/set-password" : "/dashboard",
+      });
     }
 
     void verify();
