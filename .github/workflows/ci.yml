@@ -49,21 +49,16 @@ jobs:
       - name: Install dependencies
         run: vp install --frozen-lockfile
 
-      - name: Setup Supabase CLI
-        uses: supabase/setup-cli@v1
-        with:
-          version: latest
-
       - name: Start Supabase
-        run: supabase start
+        run: vp exec supabase start
 
       - name: Reset database (migrations + seed)
-        run: supabase db reset --local
+        run: vp exec supabase db reset --local
 
       - name: Export Supabase env vars
         run: |
           echo "VITE_SUPABASE_URL=http://localhost:54321" >> $GITHUB_ENV
-          echo "VITE_SUPABASE_ANON_KEY=$(supabase status --output env | grep ANON_KEY | cut -d= -f2 | tr -d '\"')" >> $GITHUB_ENV
+          echo "VITE_SUPABASE_ANON_KEY=$(vp exec supabase status --output env | grep ANON_KEY | cut -d= -f2 | tr -d '\"')" >> $GITHUB_ENV
 
       - name: Install Playwright browsers
         run: vp exec playwright install --with-deps chromium
@@ -75,7 +70,7 @@ jobs:
 
       - name: Stop Supabase
         if: always()
-        run: supabase stop
+        run: vp exec supabase stop
 
       - name: Upload Playwright report
         if: always()

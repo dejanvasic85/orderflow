@@ -29,15 +29,10 @@ jobs:
       - name: Install dependencies
         run: vp install --frozen-lockfile
 
-      - name: Setup Supabase CLI
-        uses: supabase/setup-cli@v1
-        with:
-          version: 2.98.2
-
       - name: Apply database migrations
         run: |
-          supabase link --project-ref "$SUPABASE_PROJECT_ID"
-          supabase db push --linked
+          vp exec supabase link --project-ref "$SUPABASE_PROJECT_ID"
+          vp exec supabase db push --linked
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
