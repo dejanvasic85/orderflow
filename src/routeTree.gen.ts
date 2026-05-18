@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ProtectedRouteImport } from './routes/_protected'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthSetPasswordRouteImport } from './routes/auth/set-password'
+import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
 import { Route as ProtectedAppRouteImport } from './routes/_protected/_app'
 import { Route as ProtectedAppUsersRouteImport } from './routes/_protected/_app/users'
 import { Route as ProtectedAppDashboardRouteImport } from './routes/_protected/_app/dashboard'
@@ -31,6 +33,16 @@ const ProtectedRoute = ProtectedRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthSetPasswordRoute = AuthSetPasswordRouteImport.update({
+  id: '/auth/set-password',
+  path: '/auth/set-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProtectedAppRoute = ProtectedAppRouteImport.update({
@@ -68,6 +80,8 @@ const ProtectedAppAccountsAccountIdOrdersRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/auth/callback': typeof AuthCallbackRoute
+  '/auth/set-password': typeof AuthSetPasswordRoute
   '/accounts': typeof ProtectedAppAccountsRouteWithChildren
   '/dashboard': typeof ProtectedAppDashboardRoute
   '/users': typeof ProtectedAppUsersRoute
@@ -77,6 +91,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/auth/callback': typeof AuthCallbackRoute
+  '/auth/set-password': typeof AuthSetPasswordRoute
   '/dashboard': typeof ProtectedAppDashboardRoute
   '/users': typeof ProtectedAppUsersRoute
   '/accounts': typeof ProtectedAppAccountsIndexRoute
@@ -88,6 +104,8 @@ export interface FileRoutesById {
   '/_protected': typeof ProtectedRouteWithChildren
   '/login': typeof LoginRoute
   '/_protected/_app': typeof ProtectedAppRouteWithChildren
+  '/auth/callback': typeof AuthCallbackRoute
+  '/auth/set-password': typeof AuthSetPasswordRoute
   '/_protected/_app/accounts': typeof ProtectedAppAccountsRouteWithChildren
   '/_protected/_app/dashboard': typeof ProtectedAppDashboardRoute
   '/_protected/_app/users': typeof ProtectedAppUsersRoute
@@ -99,6 +117,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/auth/callback'
+    | '/auth/set-password'
     | '/accounts'
     | '/dashboard'
     | '/users'
@@ -108,6 +128,8 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/login'
+    | '/auth/callback'
+    | '/auth/set-password'
     | '/dashboard'
     | '/users'
     | '/accounts'
@@ -118,6 +140,8 @@ export interface FileRouteTypes {
     | '/_protected'
     | '/login'
     | '/_protected/_app'
+    | '/auth/callback'
+    | '/auth/set-password'
     | '/_protected/_app/accounts'
     | '/_protected/_app/dashboard'
     | '/_protected/_app/users'
@@ -129,6 +153,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ProtectedRoute: typeof ProtectedRouteWithChildren
   LoginRoute: typeof LoginRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
+  AuthSetPasswordRoute: typeof AuthSetPasswordRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -152,6 +178,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/set-password': {
+      id: '/auth/set-password'
+      path: '/auth/set-password'
+      fullPath: '/auth/set-password'
+      preLoaderRoute: typeof AuthSetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_protected/_app': {
@@ -245,6 +285,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ProtectedRoute: ProtectedRouteWithChildren,
   LoginRoute: LoginRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
+  AuthSetPasswordRoute: AuthSetPasswordRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

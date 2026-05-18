@@ -17,6 +17,8 @@ Infra and setup
 - [ ] SMTP server for email notifications (AWS SES — configure in Supabase dashboard, verify `vasic.com.au` for DKIM as interim sender domain)
 - [ ] Email templates
 - [ ] Logging and monitoring - including supabase and cloudflare. Could it all go to cloudflare logs?
+- [ ] Configure production domain in Supabase and set up environment variables for production deployment. Currently https://orderflow.team-manager.workers.dev
+- [ ] Configure production domain in Github Env Variables for production
 
 User management Features:
 
