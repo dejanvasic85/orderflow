@@ -234,6 +234,86 @@ test("create mode enables the email input", () => {
   expect(screen.getByLabelText("Email")).toBeEnabled();
 });
 
+test("pre-fills phone from user.phone", () => {
+  render(
+    <UserEditPanel
+      user={{ ...baseUser, phone: "0412345678" }}
+      availableAccounts={availableAccounts}
+      onSave={onSave}
+      onDiscard={onDiscard}
+    />,
+  );
+
+  expect(screen.getByLabelText("Mobile number")).toHaveValue("0412345678");
+});
+
+test("shows empty phone input when user has no phone", () => {
+  render(
+    <UserEditPanel
+      user={baseUser}
+      availableAccounts={availableAccounts}
+      onSave={onSave}
+      onDiscard={onDiscard}
+    />,
+  );
+
+  expect(screen.getByLabelText("Mobile number")).toHaveValue("");
+});
+
+test("shows validation error when phone is not a valid Australian mobile number", async () => {
+  render(
+    <UserEditPanel
+      user={baseUser}
+      availableAccounts={availableAccounts}
+      onSave={onSave}
+      onDiscard={onDiscard}
+    />,
+  );
+
+  await user.type(screen.getByLabelText("Mobile number"), "1234567890");
+  await user.click(screen.getByRole("button", { name: "Save changes" }));
+
+  expect(
+    await screen.findByText("Mobile number must be 10 digits starting with 04"),
+  ).toBeInTheDocument();
+  expect(onSave).not.toHaveBeenCalled();
+});
+
+test("passes phone as null to onSave when field is empty", async () => {
+  render(
+    <UserEditPanel
+      user={baseUser}
+      availableAccounts={availableAccounts}
+      onSave={onSave}
+      onDiscard={onDiscard}
+    />,
+  );
+
+  await user.click(screen.getByRole("button", { name: "Save changes" }));
+
+  await vi.waitFor(() => {
+    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ phone: null }));
+  });
+});
+
+test("passes valid Australian phone to onSave", async () => {
+  render(
+    <UserEditPanel
+      user={baseUser}
+      availableAccounts={availableAccounts}
+      onSave={onSave}
+      onDiscard={onDiscard}
+    />,
+  );
+
+  await user.type(screen.getByLabelText("Mobile number"), "0487654321");
+  await user.click(screen.getByRole("button", { name: "Save changes" }));
+
+  await vi.waitFor(() => {
+    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ phone: "0487654321" }));
+  });
+});
+
 test("create mode rejects submit when email is not a valid address", async () => {
   render(
     <UserEditPanel

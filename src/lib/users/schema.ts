@@ -24,10 +24,16 @@ export type User = {
   accounts: UserAccount[];
 };
 
+const auPhoneSchema = z
+  .string()
+  .regex(/^04\d{8}$/, "Mobile number must be 10 digits starting with 04")
+  .nullable()
+  .optional();
+
 export const updateUserSchema = z.object({
   id: z.uuid(),
   name: z.string().min(1).optional(),
-  phone: z.string().nullable().optional(),
+  phone: auPhoneSchema,
   active: z.boolean().optional(),
   role: z.enum(userRoles).optional(),
   notification_preferences: z.object({ email: z.boolean(), sms: z.boolean() }).optional(),
@@ -38,7 +44,7 @@ export type UpdateUserInput = z.infer<typeof updateUserSchema>;
 export const createUserSchema = z.object({
   email: z.email(),
   name: z.string().min(1),
-  phone: z.string().nullable().optional(),
+  phone: auPhoneSchema,
   role: z.enum(userRoles),
   notification_preferences: z.object({ email: z.boolean(), sms: z.boolean() }),
   accountIds: z.array(z.uuid()),

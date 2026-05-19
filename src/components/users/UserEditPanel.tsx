@@ -33,6 +33,12 @@ const userEditSchema = z.object({
   email: z.email("Valid email is required"),
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
+  phone: z
+    .string()
+    .refine(
+      (v) => v === "" || /^04\d{8}$/.test(v),
+      "Mobile number must be 10 digits starting with 04",
+    ),
   role: z.enum(userRoles),
   accounts: z.array(z.object({ id: z.string(), name: z.string() })),
   notifications: z.object({ email: z.boolean(), sms: z.boolean() }),
@@ -71,6 +77,7 @@ export function UserEditPanel(props: Props) {
       email: user.email,
       firstName: nameParts[0] ?? "",
       lastName: nameParts.slice(1).join(" "),
+      phone: user.phone ?? "",
       role: user.role,
       accounts: user.accounts,
       notifications: {
@@ -84,6 +91,7 @@ export function UserEditPanel(props: Props) {
         ...user,
         email: value.email,
         name: [value.firstName, value.lastName].filter(Boolean).join(" "),
+        phone: value.phone || null,
         role: value.role,
         accounts: value.accounts,
         notification_preferences: {
@@ -159,6 +167,23 @@ export function UserEditPanel(props: Props) {
                 onChange={(e) => field.handleChange(e.target.value)}
                 onBlur={field.handleBlur}
                 disabled={!isCreate}
+              />
+              <FieldError errors={toFieldErrors(field.state.meta.errors)} />
+            </Field>
+          )}
+        </form.Field>
+
+        <form.Field name="phone">
+          {(field) => (
+            <Field>
+              <FieldLabel htmlFor="phone">Mobile number</FieldLabel>
+              <Input
+                id="phone"
+                type="tel"
+                placeholder="04xxxxxxxx"
+                value={field.state.value}
+                onChange={(e) => field.handleChange(e.target.value)}
+                onBlur={field.handleBlur}
               />
               <FieldError errors={toFieldErrors(field.state.meta.errors)} />
             </Field>
