@@ -15,7 +15,7 @@ import { UserEditPanel } from "@/components/users/UserEditPanel";
 import { UserList, type RoleFilter } from "@/components/users/UserList";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { listAccounts } from "@/lib/accounts/queries";
-import { inviteUser, listUsers } from "@/lib/users/queries";
+import { checkEmailExists, inviteUser, listUsers } from "@/lib/users/queries";
 import type { User, UserAccount } from "@/lib/users/schema";
 
 export const Route = createFileRoute("/_protected/_app/users")({
@@ -127,6 +127,7 @@ function UsersPage() {
                 availableAccounts={availableAccounts}
                 onSave={handleInvite}
                 onDiscard={handleDiscard}
+                onCheckEmailExists={(email) => checkEmailExists({ data: email })}
               />
             )}
           </SheetContent>
