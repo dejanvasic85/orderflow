@@ -23,13 +23,21 @@ Infra and setup
 User management Features:
 
 - [x] Adding / inviting a new user
-- [ ] Auth callback route (`/auth/callback`) to handle invite/recovery links — calls `exchangeCodeForSession` then redirects
-- [ ] "Set your password" screen for first-time invitees (post-callback landing)
+- [x] Auth callback route (`/auth/callback`) — handles invite/recovery links via shared verification logic (hash-token and code paths)
+- [x] "Set your password" screen for first-time invitees (post-callback landing)
+- [ ] Should not be able to invite users with the same email
 - [ ] Resend invite from user list (for users who never accepted)
 - [ ] Admins need ability to mark users as "inactive" to prevent login without deleting their data
 - [ ] Search users by email or name in the list. Simple textbox with a server side filter
+- [ ] Ability to sort users
+- [ ] Paging?
+- [ ] Forgot password
 
 Account management features:
 
 - [ ] Account management
 - [ ] CSV Import
+
+Code cleanup (later):
+
+- [ ] Hardcoded routes and api endpoints
