@@ -114,6 +114,7 @@ export const checkEmailExists = createServerFn({ method: "GET" })
   .inputValidator((email: string) => email)
   .handler(async ({ data: email }): Promise<boolean> => {
     const supabaseServer = createSupabaseServerClient();
+    await assertAdmin(supabaseServer);
     const { data, error } = await supabaseServer
       .from("users_with_email")
       .select("id")

@@ -154,8 +154,12 @@ export function UserEditPanel(props: Props) {
           validators={{
             onSubmitAsync: async ({ value }) => {
               if (isCreate && onCheckEmailExists) {
-                const exists = await onCheckEmailExists(value);
-                if (exists) return "A user with this email already exists";
+                try {
+                  const exists = await onCheckEmailExists(value);
+                  if (exists) return "A user with this email already exists";
+                } catch {
+                  return "Unable to verify this email right now. Please try again.";
+                }
               }
             },
           }}

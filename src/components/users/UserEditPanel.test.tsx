@@ -301,6 +301,30 @@ test("create mode shows error and blocks submit when email already exists", asyn
   expect(onSave).not.toHaveBeenCalled();
 });
 
+test("create mode shows fallback error and blocks submit when email check throws", async () => {
+  const onCheckEmailExists = vi.fn().mockRejectedValue(new Error("network error"));
+
+  render(
+    <UserEditPanel
+      mode="create"
+      availableAccounts={availableAccounts}
+      onSave={onSave}
+      onDiscard={onDiscard}
+      onCheckEmailExists={onCheckEmailExists}
+    />,
+  );
+
+  await user.type(screen.getByLabelText("Email"), "new@example.com");
+  await user.type(screen.getByLabelText("First name"), "Bob");
+  await user.type(screen.getByLabelText("Last name"), "Jones");
+  await user.click(screen.getByRole("button", { name: "Send invite" }));
+
+  expect(
+    await screen.findByText("Unable to verify this email right now. Please try again."),
+  ).toBeInTheDocument();
+  expect(onSave).not.toHaveBeenCalled();
+});
+
 test("create mode does not show duplicate error when email is available", async () => {
   const onCheckEmailExists = vi.fn().mockResolvedValue(false);
 
