@@ -278,3 +278,49 @@ test("create mode submits with collected fields", async () => {
     );
   });
 });
+
+test("create mode shows error and blocks submit when email already exists", async () => {
+  const onCheckEmailExists = vi.fn().mockResolvedValue(true);
+
+  render(
+    <UserEditPanel
+      mode="create"
+      availableAccounts={availableAccounts}
+      onSave={onSave}
+      onDiscard={onDiscard}
+      onCheckEmailExists={onCheckEmailExists}
+    />,
+  );
+
+  await user.type(screen.getByLabelText("Email"), "existing@example.com");
+  await user.type(screen.getByLabelText("First name"), "Bob");
+  await user.type(screen.getByLabelText("Last name"), "Jones");
+  await user.click(screen.getByRole("button", { name: "Send invite" }));
+
+  expect(await screen.findByText("A user with this email already exists")).toBeInTheDocument();
+  expect(onSave).not.toHaveBeenCalled();
+});
+
+test("create mode does not show duplicate error when email is available", async () => {
+  const onCheckEmailExists = vi.fn().mockResolvedValue(false);
+
+  render(
+    <UserEditPanel
+      mode="create"
+      availableAccounts={availableAccounts}
+      onSave={onSave}
+      onDiscard={onDiscard}
+      onCheckEmailExists={onCheckEmailExists}
+    />,
+  );
+
+  await user.type(screen.getByLabelText("Email"), "new@example.com");
+  await user.type(screen.getByLabelText("First name"), "Bob");
+  await user.type(screen.getByLabelText("Last name"), "Jones");
+  await user.click(screen.getByRole("button", { name: "Send invite" }));
+
+  await vi.waitFor(() => {
+    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ email: "new@example.com" }));
+  });
+  expect(screen.queryByText("A user with this email already exists")).not.toBeInTheDocument();
+});

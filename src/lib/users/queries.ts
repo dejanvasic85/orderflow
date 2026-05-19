@@ -110,6 +110,19 @@ async function assertAdmin(supabase: ReturnType<typeof createSupabaseServerClien
 
 // Server — admin invites a new user. Supabase sends the invite email; the DB trigger
 // (handle_new_auth_user) creates the public.users row, which we then patch with role/profile.
+export const checkEmailExists = createServerFn({ method: "GET" })
+  .inputValidator((email: string) => email)
+  .handler(async ({ data: email }): Promise<boolean> => {
+    const supabaseServer = createSupabaseServerClient();
+    const { data, error } = await supabaseServer
+      .from("users_with_email")
+      .select("id")
+      .eq("email", email)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    return data !== null;
+  });
+
 export const inviteUser = createServerFn({ method: "POST" })
   .inputValidator(createUserSchema)
   .handler(async ({ data }): Promise<User> => {

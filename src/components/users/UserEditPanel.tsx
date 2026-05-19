@@ -23,6 +23,7 @@ type BaseProps = {
   availableAccounts: UserAccount[];
   onSave: (updated: User) => void;
   onDiscard: () => void;
+  onCheckEmailExists?: (email: string) => Promise<boolean>;
 };
 
 type Props =
@@ -61,7 +62,7 @@ function toFieldErrors(errors: unknown[]): { message?: string }[] {
 }
 
 export function UserEditPanel(props: Props) {
-  const { availableAccounts, onSave, onDiscard } = props;
+  const { availableAccounts, onSave, onDiscard, onCheckEmailExists } = props;
   const mode = props.mode ?? "edit";
   const isCreate = mode === "create";
   const user = props.user ?? blankUser;
@@ -148,7 +149,17 @@ export function UserEditPanel(props: Props) {
           </form.Field>
         </div>
 
-        <form.Field name="email">
+        <form.Field
+          name="email"
+          validators={{
+            onSubmitAsync: async ({ value }) => {
+              if (isCreate && onCheckEmailExists) {
+                const exists = await onCheckEmailExists(value);
+                if (exists) return "A user with this email already exists";
+              }
+            },
+          }}
+        >
           {(field) => (
             <Field>
               <FieldLabel htmlFor="email">Email</FieldLabel>
