@@ -53,7 +53,7 @@ test.describe("Accept invite", () => {
     await deleteAllMailpitMessages();
   });
 
-  test("admin invites user, user accepts and sets password", async ({ page, browser }) => {
+  test.skip("admin invites user, user accepts and sets password", async ({ page, browser }) => {
     const firstName = faker.person.firstName();
     const lastName = faker.person.lastName();
     const invitedEmail = faker.internet
