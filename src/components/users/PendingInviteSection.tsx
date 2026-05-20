@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
@@ -21,6 +21,10 @@ function formatInviteDate(iso: string): string {
 export function PendingInviteSection({ invitedAt, onResend }: Props) {
   const [displayedInvitedAt, setDisplayedInvitedAt] = useState(invitedAt);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setDisplayedInvitedAt(invitedAt);
+  }, [invitedAt]);
 
   async function handleResend() {
     setLoading(true);

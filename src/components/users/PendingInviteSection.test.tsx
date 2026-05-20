@@ -9,6 +9,9 @@ vi.mock("sonner");
 const fixedDate = "2026-05-20T09:00:00.000Z";
 
 describe("PendingInviteSection", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
   it("renders the invitation sent date", () => {
     render(<PendingInviteSection invitedAt={fixedDate} onResend={vi.fn()} />);
 
@@ -36,9 +39,10 @@ describe("PendingInviteSection", () => {
   });
 
   it("shows a success toast and updates the date on successful resend", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2027-01-15T12:00:00.000Z"));
     const user = userEvent.setup();
     const onResend = vi.fn().mockResolvedValue(undefined);
-    const beforeClick = new Date();
 
     render(<PendingInviteSection invitedAt={fixedDate} onResend={onResend} />);
 
@@ -49,15 +53,7 @@ describe("PendingInviteSection", () => {
     });
 
     expect(screen.getByRole("button", { name: /resend invitation/i })).toBeEnabled();
-
-    // The displayed date should have updated to approximately now
-    const afterClick = new Date();
-    const displayedText = screen.getByText(/Sent/i).textContent ?? "";
-    const displayedYear = afterClick.getFullYear().toString();
-    expect(displayedText).toContain(displayedYear);
-    // Ensure it no longer shows the original fixture year if different
-    expect(displayedText).not.toContain("2026-05-20T09:00");
-    void beforeClick;
+    expect(screen.getByText(/Sent/i).textContent).toContain("2027");
   });
 
   it("shows an error toast and keeps the original date when resend fails", async () => {

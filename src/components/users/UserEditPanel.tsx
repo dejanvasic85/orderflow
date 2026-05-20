@@ -17,8 +17,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { PendingInviteSection } from "@/components/users/PendingInviteSection";
 import { type User, type UserAccount, userRoles } from "@/lib/users/schema";
-import { PendingInviteSection } from "./PendingInviteSection";
 
 type BaseProps = {
   availableAccounts: UserAccount[];
