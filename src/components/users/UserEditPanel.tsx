@@ -18,12 +18,14 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { type User, type UserAccount, userRoles } from "@/lib/users/schema";
+import { PendingInviteSection } from "./PendingInviteSection";
 
 type BaseProps = {
   availableAccounts: UserAccount[];
   onSave: (updated: User) => void;
   onDiscard: () => void;
   onCheckEmailExists?: (email: string) => Promise<boolean>;
+  onResendInvite?: () => Promise<void>;
 };
 
 type Props =
@@ -54,6 +56,7 @@ const blankUser: User = {
   phone: null,
   active: true,
   invite_accepted_at: null,
+  invited_at: null,
   role: "user",
   notification_preferences: { email: true, sms: false },
   created_at: "",
@@ -68,7 +71,7 @@ function toFieldErrors(errors: unknown[]): { message?: string }[] {
 }
 
 export function UserEditPanel(props: Props) {
-  const { availableAccounts, onSave, onDiscard, onCheckEmailExists } = props;
+  const { availableAccounts, onSave, onDiscard, onCheckEmailExists, onResendInvite } = props;
   const mode = props.mode ?? "edit";
   const isCreate = mode === "create";
   const user = props.user ?? blankUser;
@@ -107,6 +110,7 @@ export function UserEditPanel(props: Props) {
   const headerTitle = isCreate ? "Invite new user" : user.name;
   const headerSubtitle = isCreate ? "They'll receive an email to set their password" : user.email;
   const submitLabel = isCreate ? "Send invite" : "Save changes";
+  const isPending = !isCreate && user.active && !user.invite_accepted_at;
 
   return (
     <div className="flex flex-col gap-6 p-6">
@@ -116,6 +120,13 @@ export function UserEditPanel(props: Props) {
       </div>
 
       <Separator />
+
+      {isPending && onResendInvite && user.invited_at && (
+        <>
+          <PendingInviteSection invitedAt={user.invited_at} onResend={onResendInvite} />
+          <Separator />
+        </>
+      )}
 
       {/* Basic fields */}
       <form
