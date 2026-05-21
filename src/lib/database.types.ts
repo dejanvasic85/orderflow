@@ -149,6 +149,7 @@ export type Database = {
           email: string | null
           id: string | null
           invite_accepted_at: string | null
+          invited_at: string | null
           name: string | null
           notification_preferences: Json | null
           phone: string | null

@@ -6,7 +6,7 @@ import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import { createUserSchema, updateUserSchema, type User, type UserAccount } from "./schema";
 
 const userListSelect = `
-  id, name, email, phone, active, invite_accepted_at, role, notification_preferences, created_at, updated_at,
+  id, name, email, phone, active, invite_accepted_at, invited_at, role, notification_preferences, created_at, updated_at,
   account_users!user_id ( account:accounts ( id, name ) )
 ` as const;
 
@@ -30,6 +30,7 @@ type ListedRow = {
   phone: string | null;
   active: boolean | null;
   invite_accepted_at: string | null;
+  invited_at: string | null;
   role: User["role"] | null;
   notification_preferences: unknown;
   created_at: string | null;
@@ -45,6 +46,7 @@ function mapUser(row: ListedRow): User {
     phone: row.phone,
     active: row.active ?? true,
     invite_accepted_at: row.invite_accepted_at ?? null,
+    invited_at: row.invited_at ?? null,
     role: row.role ?? "user",
     notification_preferences: parseNotificationPrefs(row.notification_preferences),
     created_at: row.created_at ?? "",
@@ -180,12 +182,39 @@ export const inviteUser = createServerFn({ method: "POST" })
       phone: data.phone ?? null,
       active: true,
       invite_accepted_at: null,
+      invited_at: now,
       role: data.role,
       notification_preferences: data.notification_preferences,
       created_at: now,
       updated_at: now,
       accounts,
     };
+  });
+
+export const resendInvite = createServerFn({ method: "POST" })
+  .inputValidator((id: string) => id)
+  .handler(async ({ data: id }): Promise<{ invitedAt: string }> => {
+    const supabaseServer = createSupabaseServerClient();
+    await assertAdmin(supabaseServer);
+
+    const { data: user, error } = await supabaseServer
+      .from("users_with_email")
+      .select("email")
+      .eq("id", id)
+      .single();
+    if (error || !user?.email) throw new Error("User not found");
+
+    const admin = createSupabaseAdminClient();
+    const { SITE_URL } = getServerConfig();
+    const { error: inviteError } = await admin.auth.admin.inviteUserByEmail(user.email, {
+      redirectTo: `${SITE_URL}/auth/callback`,
+    });
+    if (inviteError) {
+      console.error("Failed to resend invite:", inviteError);
+      throw new Error("Unable to resend invitation");
+    }
+
+    return { invitedAt: new Date().toISOString() };
   });
 
 async function resolveAccountNames(

@@ -15,7 +15,7 @@ import { UserEditPanel } from "@/components/users/UserEditPanel";
 import { UserList, type RoleFilter } from "@/components/users/UserList";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { listAccounts } from "@/lib/accounts/queries";
-import { checkEmailExists, inviteUser, listUsers } from "@/lib/users/queries";
+import { checkEmailExists, inviteUser, listUsers, resendInvite } from "@/lib/users/queries";
 import type { User, UserAccount } from "@/lib/users/schema";
 
 export const Route = createFileRoute("/_protected/_app/users")({
@@ -80,6 +80,11 @@ function UsersPage() {
     }
   }
 
+  async function handleResendInvite(userId: string) {
+    const { invitedAt } = await resendInvite({ data: userId });
+    setUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, invited_at: invitedAt } : u)));
+  }
+
   function handleDiscard() {
     setSelectedId(null);
     setCreating(false);
@@ -110,6 +115,7 @@ function UsersPage() {
                 availableAccounts={availableAccounts}
                 onSave={handleSave}
                 onDiscard={handleDiscard}
+                onResendInvite={() => handleResendInvite(selectedUser.id)}
               />
             )}
           </SheetContent>

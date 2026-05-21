@@ -12,6 +12,7 @@ const baseUser: User = {
   phone: null,
   active: true,
   invite_accepted_at: "2024-01-02T00:00:00Z",
+  invited_at: "2024-01-01T00:00:00Z",
   role: "staff",
   notification_preferences: { email: true, sms: false },
   created_at: "2024-01-01T00:00:00Z",
