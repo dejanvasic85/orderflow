@@ -71,6 +71,7 @@ function UsersPage() {
           role: updated.role,
           active: updated.active,
           notification_preferences: updated.notification_preferences,
+          accountIds: updated.accounts.map((a) => a.id),
         },
       });
       setUsers((prev) => prev.map((u) => (u.id === updated.id ? updated : u)));

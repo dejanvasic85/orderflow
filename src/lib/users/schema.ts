@@ -38,6 +38,7 @@ export const updateUserSchema = z.object({
   active: z.boolean().optional(),
   role: z.enum(userRoles).optional(),
   notification_preferences: z.object({ email: z.boolean(), sms: z.boolean() }).optional(),
+  accountIds: z.array(z.uuid()).optional(),
 });
 
 export type UpdateUserInput = z.infer<typeof updateUserSchema>;
