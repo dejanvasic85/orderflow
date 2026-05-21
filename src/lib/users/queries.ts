@@ -85,7 +85,12 @@ export const updateUser = createServerFn({ method: "POST" })
   .inputValidator(updateUserSchema)
   .handler(async ({ data }) => {
     const supabaseServer = createSupabaseServerClient();
-    const { id, ...patch } = data;
+    const { id, accountIds, ...patch } = data;
+
+    if ("active" in patch) {
+      await assertAdmin(supabaseServer);
+    }
+
     const { data: row, error } = await supabaseServer
       .from("users")
       .update(patch)
@@ -93,6 +98,34 @@ export const updateUser = createServerFn({ method: "POST" })
       .select()
       .single();
     if (error) throw new Error(error.message);
+
+    if ("active" in patch) {
+      const admin = createSupabaseAdminClient();
+      const { error: banError } = await admin.auth.admin.updateUserById(id, {
+        ban_duration: patch.active ? "none" : "876600h",
+      });
+      if (banError) {
+        console.error("Failed to sync auth ban status, rolling back active flag:", banError);
+        await supabaseServer.from("users").update({ active: !patch.active }).eq("id", id);
+        throw new Error("Failed to update user login access");
+      }
+    }
+
+    if (accountIds !== undefined) {
+      const { error: deleteError } = await supabaseServer
+        .from("account_users")
+        .delete()
+        .eq("user_id", id);
+      if (deleteError) throw new Error(deleteError.message);
+
+      if (accountIds.length > 0) {
+        const { error: insertError } = await supabaseServer
+          .from("account_users")
+          .insert(accountIds.map((account_id) => ({ account_id, user_id: id })));
+        if (insertError) throw new Error(insertError.message);
+      }
+    }
+
     return row;
   });
 

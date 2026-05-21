@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
 import { PendingInviteSection } from "@/components/users/PendingInviteSection";
 import { type User, type UserAccount, userRoles } from "@/lib/users/schema";
 
@@ -45,6 +46,7 @@ const userEditSchema = z.object({
   role: z.enum(userRoles),
   accounts: z.array(z.object({ id: z.string(), name: z.string() })),
   notifications: z.object({ email: z.boolean(), sms: z.boolean() }),
+  active: z.boolean(),
 });
 
 type UserEditValues = z.infer<typeof userEditSchema>;
@@ -88,6 +90,7 @@ export function UserEditPanel(props: Props) {
         email: user.notification_preferences.email,
         sms: user.notification_preferences.sms,
       },
+      active: user.active,
     },
     validators: { onSubmit: userEditSchema },
     onSubmit: ({ value }) => {
@@ -97,6 +100,7 @@ export function UserEditPanel(props: Props) {
         name: [value.firstName, value.lastName].filter(Boolean).join(" "),
         phone: value.phone || null,
         role: value.role,
+        active: value.active,
         accounts: value.accounts,
         notification_preferences: {
           email: value.notifications.email,
@@ -342,6 +346,35 @@ export function UserEditPanel(props: Props) {
             )}
           </form.Field>
         </div>
+
+        {!isCreate && (
+          <>
+            <Separator />
+
+            {/* Account access */}
+            <form.Field name="active">
+              {(field) => (
+                <div className="flex flex-col gap-3">
+                  <Label>Account access</Label>
+                  <div className="flex items-center gap-3">
+                    <Switch
+                      id="active"
+                      checked={field.state.value}
+                      onCheckedChange={(v) => field.handleChange(v)}
+                    />
+                    <Label htmlFor="active" className="font-normal">
+                      Active
+                    </Label>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Inactive users cannot log in. Their current session will remain active until it
+                    expires.
+                  </p>
+                </div>
+              )}
+            </form.Field>
+          </>
+        )}
 
         <Separator />
 
