@@ -15,7 +15,13 @@ import { UserEditPanel } from "@/components/users/UserEditPanel";
 import { UserList, type RoleFilter } from "@/components/users/UserList";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { listAccounts } from "@/lib/accounts/queries";
-import { checkEmailExists, inviteUser, listUsers, resendInvite } from "@/lib/users/queries";
+import {
+  checkEmailExists,
+  inviteUser,
+  listUsers,
+  resendInvite,
+  updateUser,
+} from "@/lib/users/queries";
 import type { User, UserAccount } from "@/lib/users/schema";
 
 export const Route = createFileRoute("/_protected/_app/users")({
@@ -55,9 +61,23 @@ function UsersPage() {
     setCreating(true);
   }
 
-  function handleSave(updated: User) {
-    setUsers((prev) => prev.map((u) => (u.id === updated.id ? updated : u)));
-    setSelectedId(null);
+  async function handleSave(updated: User) {
+    try {
+      await updateUser({
+        data: {
+          id: updated.id,
+          name: updated.name,
+          phone: updated.phone,
+          role: updated.role,
+          active: updated.active,
+          notification_preferences: updated.notification_preferences,
+        },
+      });
+      setUsers((prev) => prev.map((u) => (u.id === updated.id ? updated : u)));
+      setSelectedId(null);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to save changes");
+    }
   }
 
   async function handleInvite(draft: User) {

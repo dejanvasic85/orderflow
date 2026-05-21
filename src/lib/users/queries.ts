@@ -86,6 +86,11 @@ export const updateUser = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const supabaseServer = createSupabaseServerClient();
     const { id, ...patch } = data;
+
+    if ("active" in patch) {
+      await assertAdmin(supabaseServer);
+    }
+
     const { data: row, error } = await supabaseServer
       .from("users")
       .update(patch)
@@ -93,6 +98,15 @@ export const updateUser = createServerFn({ method: "POST" })
       .select()
       .single();
     if (error) throw new Error(error.message);
+
+    if ("active" in patch) {
+      const admin = createSupabaseAdminClient();
+      const { error: banError } = await admin.auth.admin.updateUserById(id, {
+        ban_duration: patch.active ? "none" : "876600h",
+      });
+      if (banError) console.error("Failed to sync auth ban status:", banError);
+    }
+
     return row;
   });
 
