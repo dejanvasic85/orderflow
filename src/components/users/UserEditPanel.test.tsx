@@ -429,3 +429,114 @@ test("create mode does not show duplicate error when email is available", async 
   });
   expect(screen.queryByText("A user with this email already exists")).not.toBeInTheDocument();
 });
+
+test("shows Account access section in edit mode", () => {
+  render(
+    <UserEditPanel
+      user={baseUser}
+      availableAccounts={availableAccounts}
+      onSave={onSave}
+      onDiscard={onDiscard}
+    />,
+  );
+
+  expect(screen.getByText("Account access")).toBeInTheDocument();
+  expect(
+    screen.getByText(
+      "Inactive users cannot log in. Their current session will remain active until it expires.",
+    ),
+  ).toBeInTheDocument();
+});
+
+test("Active switch is checked when user.active is true", () => {
+  render(
+    <UserEditPanel
+      user={{ ...baseUser, active: true }}
+      availableAccounts={availableAccounts}
+      onSave={onSave}
+      onDiscard={onDiscard}
+    />,
+  );
+
+  expect(screen.getByRole("switch", { name: "Active" })).toBeChecked();
+});
+
+test("Active switch is unchecked when user.active is false", () => {
+  render(
+    <UserEditPanel
+      user={{ ...baseUser, active: false }}
+      availableAccounts={availableAccounts}
+      onSave={onSave}
+      onDiscard={onDiscard}
+    />,
+  );
+
+  expect(screen.getByRole("switch", { name: "Active" })).not.toBeChecked();
+});
+
+test("does not show Account access section in create mode", () => {
+  render(
+    <UserEditPanel
+      mode="create"
+      availableAccounts={availableAccounts}
+      onSave={onSave}
+      onDiscard={onDiscard}
+    />,
+  );
+
+  expect(screen.queryByText("Account access")).not.toBeInTheDocument();
+  expect(screen.queryByRole("switch", { name: "Active" })).not.toBeInTheDocument();
+});
+
+test("calls onSave with active: false when switch is toggled off", async () => {
+  render(
+    <UserEditPanel
+      user={{ ...baseUser, active: true }}
+      availableAccounts={availableAccounts}
+      onSave={onSave}
+      onDiscard={onDiscard}
+    />,
+  );
+
+  await user.click(screen.getByRole("switch", { name: "Active" }));
+  await user.click(screen.getByRole("button", { name: "Save changes" }));
+
+  await vi.waitFor(() => {
+    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ active: false }));
+  });
+});
+
+test("calls onSave with active: true when switch is toggled on", async () => {
+  render(
+    <UserEditPanel
+      user={{ ...baseUser, active: false }}
+      availableAccounts={availableAccounts}
+      onSave={onSave}
+      onDiscard={onDiscard}
+    />,
+  );
+
+  await user.click(screen.getByRole("switch", { name: "Active" }));
+  await user.click(screen.getByRole("button", { name: "Save changes" }));
+
+  await vi.waitFor(() => {
+    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ active: true }));
+  });
+});
+
+test("calls onSave with active: true when switch is not changed", async () => {
+  render(
+    <UserEditPanel
+      user={{ ...baseUser, active: true }}
+      availableAccounts={availableAccounts}
+      onSave={onSave}
+      onDiscard={onDiscard}
+    />,
+  );
+
+  await user.click(screen.getByRole("button", { name: "Save changes" }));
+
+  await vi.waitFor(() => {
+    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ active: true }));
+  });
+});
