@@ -20,6 +20,7 @@ type Props = {
   roleFilter: RoleFilter;
   onSelectUser: (user: User) => void;
   onRoleFilterChange: (filter: RoleFilter) => void;
+  onResendInvite?: (user: User) => void;
 };
 
 const roleLabelMap: Record<UserRole, string> = {
@@ -39,6 +40,7 @@ export function UserList({
   roleFilter,
   onSelectUser,
   onRoleFilterChange,
+  onResendInvite,
 }: Props) {
   const filtered = roleFilter === "all" ? users : users.filter((u) => u.role === roleFilter);
 
@@ -96,16 +98,30 @@ export function UserList({
                 />
               </TableCell>
               <TableCell>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onSelectUser(user);
-                  }}
-                >
-                  Edit
-                </Button>
+                <div className="flex items-center gap-1">
+                  {user.active && !user.invite_accepted_at && onResendInvite && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onResendInvite(user);
+                      }}
+                    >
+                      Resend invite
+                    </Button>
+                  )}
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSelectUser(user);
+                    }}
+                  >
+                    Edit
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           ))}

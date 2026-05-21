@@ -218,3 +218,57 @@ test("shows Pending badge for active users who have not accepted their invite", 
 
   expect(screen.getByText("Pending")).toBeInTheDocument();
 });
+
+test("shows Resend invite button for pending users when onResendInvite is provided", () => {
+  const onResendInvite = vi.fn();
+
+  render(
+    <UserList
+      users={[pendingUser]}
+      selectedId={null}
+      roleFilter="all"
+      onSelectUser={onSelectUser}
+      onRoleFilterChange={onRoleFilterChange}
+      onResendInvite={onResendInvite}
+    />,
+  );
+
+  expect(screen.getByRole("button", { name: "Resend invite" })).toBeInTheDocument();
+});
+
+test("does not show Resend invite button for active users who accepted their invite", () => {
+  const onResendInvite = vi.fn();
+
+  render(
+    <UserList
+      users={[adminUser]}
+      selectedId={null}
+      roleFilter="all"
+      onSelectUser={onSelectUser}
+      onRoleFilterChange={onRoleFilterChange}
+      onResendInvite={onResendInvite}
+    />,
+  );
+
+  expect(screen.queryByRole("button", { name: "Resend invite" })).not.toBeInTheDocument();
+});
+
+test("calls onResendInvite with the user when Resend invite button is clicked", async () => {
+  const onResendInvite = vi.fn();
+
+  render(
+    <UserList
+      users={[pendingUser]}
+      selectedId={null}
+      roleFilter="all"
+      onSelectUser={onSelectUser}
+      onRoleFilterChange={onRoleFilterChange}
+      onResendInvite={onResendInvite}
+    />,
+  );
+
+  await user.click(screen.getByRole("button", { name: "Resend invite" }));
+
+  expect(onResendInvite).toHaveBeenCalledWith(pendingUser);
+  expect(onSelectUser).not.toHaveBeenCalled();
+});

@@ -15,7 +15,7 @@ import { UserEditPanel } from "@/components/users/UserEditPanel";
 import { UserList, type RoleFilter } from "@/components/users/UserList";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { listAccounts } from "@/lib/accounts/queries";
-import { checkEmailExists, inviteUser, listUsers } from "@/lib/users/queries";
+import { checkEmailExists, inviteUser, listUsers, resendInvite } from "@/lib/users/queries";
 import type { User, UserAccount } from "@/lib/users/schema";
 
 export const Route = createFileRoute("/_protected/_app/users")({
@@ -80,6 +80,15 @@ function UsersPage() {
     }
   }
 
+  async function handleResendInvite(user: User) {
+    try {
+      await resendInvite({ data: user.id });
+      toast.success(`Invite resent to ${user.email}`);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to resend invite");
+    }
+  }
+
   function handleDiscard() {
     setSelectedId(null);
     setCreating(false);
@@ -95,6 +104,7 @@ function UsersPage() {
           roleFilter={roleFilter}
           onSelectUser={handleSelectUser}
           onRoleFilterChange={setRoleFilter}
+          onResendInvite={handleResendInvite}
         />
 
         <Sheet open={!!selectedUser} onOpenChange={(open) => !open && handleDiscard()}>

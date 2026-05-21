@@ -124,11 +124,41 @@ export const checkEmailExists = createServerFn({ method: "GET" })
     return data !== null;
   });
 
+export const resendInvite = createServerFn({ method: "POST" })
+  .inputValidator((userId: string) => userId)
+  .handler(async ({ data: userId }): Promise<void> => {
+    const supabaseServer = createSupabaseServerClient();
+    await assertAdmin(supabaseServer);
+
+    const { data: userData, error } = await supabaseServer
+      .from("users_with_email")
+      .select("email, invite_accepted_at")
+      .eq("id", userId)
+      .single();
+    if (error) throw new Error(error.message);
+    if (!userData.email) throw new Error("User email not found");
+    if (userData.invite_accepted_at) throw new Error("User has already accepted their invite");
+
+    const admin = createSupabaseAdminClient();
+    const { SITE_URL } = getServerConfig();
+    const { error: inviteError } = await admin.auth.admin.inviteUserByEmail(userData.email, {
+      redirectTo: `${SITE_URL}/auth/callback`,
+    });
+    if (inviteError) throw new Error("Unable to resend invite");
+  });
+
 export const inviteUser = createServerFn({ method: "POST" })
   .inputValidator(createUserSchema)
   .handler(async ({ data }): Promise<User> => {
     const supabaseServer = createSupabaseServerClient();
     await assertAdmin(supabaseServer);
+
+    const { data: existing } = await supabaseServer
+      .from("users_with_email")
+      .select("id")
+      .eq("email", data.email)
+      .maybeSingle();
+    if (existing) throw new Error("A user with this email already exists");
 
     const admin = createSupabaseAdminClient();
     const { SITE_URL } = getServerConfig();
