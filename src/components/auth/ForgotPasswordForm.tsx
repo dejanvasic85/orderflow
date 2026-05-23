@@ -1,33 +1,29 @@
 import { useForm } from "@tanstack/react-form";
-import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
-const loginSchema = z.object({
+const forgotPasswordSchema = z.object({
   email: z.string().email("Invalid email address"),
-  password: z.string().min(1, "Password is required"),
 });
 
-export type LoginValues = z.infer<typeof loginSchema>;
+export type ForgotPasswordResult = { error?: string } | void;
 
-export type LoginResult = { error?: string } | void;
-
-type LoginFormProps = {
-  onLogin: (values: LoginValues) => Promise<LoginResult>;
+type ForgotPasswordFormProps = {
+  onSubmit: (email: string) => Promise<ForgotPasswordResult>;
 };
 
-export function LoginForm({ onLogin }: LoginFormProps) {
+export function ForgotPasswordForm({ onSubmit }: ForgotPasswordFormProps) {
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const form = useForm({
-    defaultValues: { email: "", password: "" },
-    validators: { onSubmit: loginSchema },
+    defaultValues: { email: "" },
+    validators: { onSubmit: forgotPasswordSchema },
     onSubmit: async ({ value }) => {
       setSubmitError(null);
-      const result = await onLogin(value);
+      const result = await onSubmit(value.email);
       if (result?.error) {
         setSubmitError(result.error);
       }
@@ -60,38 +56,12 @@ export function LoginForm({ onLogin }: LoginFormProps) {
         )}
       </form.Field>
 
-      <form.Field name="password">
-        {(field) => (
-          <Field>
-            <div className="flex items-center justify-between">
-              <FieldLabel htmlFor={field.name}>Password</FieldLabel>
-              <Link
-                to="/forgot-password"
-                className="text-sm text-muted-foreground underline-offset-4 hover:underline"
-              >
-                Forgot password?
-              </Link>
-            </div>
-            <Input
-              id={field.name}
-              type="password"
-              autoComplete="current-password"
-              placeholder="••••••••"
-              value={field.state.value}
-              onChange={(e) => field.handleChange(e.target.value)}
-              onBlur={field.handleBlur}
-            />
-            <FieldError errors={field.state.meta.errors} />
-          </Field>
-        )}
-      </form.Field>
-
       {submitError && <FieldError errors={[{ message: submitError }]} />}
 
       <form.Subscribe selector={(s) => s.isSubmitting}>
         {(isSubmitting) => (
           <Button type="submit" className="mt-1 w-full" disabled={isSubmitting}>
-            {isSubmitting ? "Signing in…" : "Sign in"}
+            {isSubmitting ? "Sending…" : "Send reset link"}
           </Button>
         )}
       </form.Subscribe>

@@ -1,33 +1,35 @@
 import { useForm } from "@tanstack/react-form";
-import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
-const loginSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(1, "Password is required"),
-});
+const resetPasswordSchema = z
+  .object({
+    password: z.string().min(6, "Password must be at least 6 characters"),
+    confirmPassword: z.string().min(1, "Please confirm your password"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
-export type LoginValues = z.infer<typeof loginSchema>;
+export type ResetPasswordResult = { error?: string } | void;
 
-export type LoginResult = { error?: string } | void;
-
-type LoginFormProps = {
-  onLogin: (values: LoginValues) => Promise<LoginResult>;
+type ResetPasswordFormProps = {
+  onReset: (password: string) => Promise<ResetPasswordResult>;
 };
 
-export function LoginForm({ onLogin }: LoginFormProps) {
+export function ResetPasswordForm({ onReset }: ResetPasswordFormProps) {
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const form = useForm({
-    defaultValues: { email: "", password: "" },
-    validators: { onSubmit: loginSchema },
+    defaultValues: { password: "", confirmPassword: "" },
+    validators: { onSubmit: resetPasswordSchema },
     onSubmit: async ({ value }) => {
       setSubmitError(null);
-      const result = await onLogin(value);
+      const result = await onReset(value.password);
       if (result?.error) {
         setSubmitError(result.error);
       }
@@ -42,15 +44,15 @@ export function LoginForm({ onLogin }: LoginFormProps) {
         void form.handleSubmit();
       }}
     >
-      <form.Field name="email">
+      <form.Field name="password">
         {(field) => (
           <Field>
-            <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+            <FieldLabel htmlFor={field.name}>New password</FieldLabel>
             <Input
               id={field.name}
-              type="email"
-              autoComplete="email"
-              placeholder="you@example.com"
+              type="password"
+              autoComplete="new-password"
+              placeholder="••••••••"
               value={field.state.value}
               onChange={(e) => field.handleChange(e.target.value)}
               onBlur={field.handleBlur}
@@ -60,22 +62,14 @@ export function LoginForm({ onLogin }: LoginFormProps) {
         )}
       </form.Field>
 
-      <form.Field name="password">
+      <form.Field name="confirmPassword">
         {(field) => (
           <Field>
-            <div className="flex items-center justify-between">
-              <FieldLabel htmlFor={field.name}>Password</FieldLabel>
-              <Link
-                to="/forgot-password"
-                className="text-sm text-muted-foreground underline-offset-4 hover:underline"
-              >
-                Forgot password?
-              </Link>
-            </div>
+            <FieldLabel htmlFor={field.name}>Confirm new password</FieldLabel>
             <Input
               id={field.name}
               type="password"
-              autoComplete="current-password"
+              autoComplete="new-password"
               placeholder="••••••••"
               value={field.state.value}
               onChange={(e) => field.handleChange(e.target.value)}
@@ -91,7 +85,7 @@ export function LoginForm({ onLogin }: LoginFormProps) {
       <form.Subscribe selector={(s) => s.isSubmitting}>
         {(isSubmitting) => (
           <Button type="submit" className="mt-1 w-full" disabled={isSubmitting}>
-            {isSubmitting ? "Signing in…" : "Sign in"}
+            {isSubmitting ? "Resetting password…" : "Reset password"}
           </Button>
         )}
       </form.Subscribe>
