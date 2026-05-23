@@ -11,6 +11,9 @@
       }
     },
     "oxfmt": {
+      "binary": {
+        "path": "./node_modules/.bin/oxfmt"
+      },
       "initialization_options": {
         "settings": {
           "configPath": "./vite.config.ts",

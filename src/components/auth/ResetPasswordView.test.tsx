@@ -10,7 +10,10 @@ import { ResetPasswordView } from "@/components/auth/ResetPasswordView";
 
 function renderWithRouter(ui: React.ReactNode) {
   const rootRoute = createRootRoute({ component: () => ui });
-  const router = createRouter({ routeTree: rootRoute, history: createMemoryHistory() });
+  const router = createRouter({
+    routeTree: rootRoute,
+    history: createMemoryHistory(),
+  });
   return render(<RouterProvider router={router} />);
 }
 

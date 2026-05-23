@@ -16,10 +16,12 @@ export const Route = createFileRoute("/auth/reset-password")({
     type: search.type ?? "",
   }),
   loader: async ({ deps }) => {
-    if (!deps.token_hash || !deps.type) {
+    if (!deps.token_hash || !deps.type || deps.type !== "recovery") {
       return { valid: false as const, error: "Invalid or missing reset link." };
     }
-    return verifyResetToken({ data: { token_hash: deps.token_hash, type: deps.type } });
+    return verifyResetToken({
+      data: { token_hash: deps.token_hash, type: deps.type },
+    });
   },
   component: ResetPasswordPage,
 });

@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
 
-type VerifyInput = { token_hash: string; type: string };
+type VerifyInput = { token_hash: string; type: "recovery" };
 
 export const verifyResetToken = createServerFn({ method: "GET" })
   .inputValidator((data: VerifyInput) => data)
@@ -9,7 +9,7 @@ export const verifyResetToken = createServerFn({ method: "GET" })
     const supabase = createSupabaseServerClient();
     const { error } = await supabase.auth.verifyOtp({
       token_hash: data.token_hash,
-      type: data.type as "recovery",
+      type: data.type,
     });
 
     if (!error) {

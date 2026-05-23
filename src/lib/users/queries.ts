@@ -169,7 +169,10 @@ export const inviteUser = createServerFn({ method: "POST" })
     const { SITE_URL } = getServerConfig();
     const { data: invited, error: inviteError } = await admin.auth.admin.inviteUserByEmail(
       data.email,
-      { data: { name: data.name }, redirectTo: `${SITE_URL}/auth/callback` },
+      {
+        data: { name: data.name },
+        redirectTo: `${SITE_URL}/auth/callback`,
+      },
     );
     if (inviteError) {
       console.error("Failed to send invite:", inviteError);
