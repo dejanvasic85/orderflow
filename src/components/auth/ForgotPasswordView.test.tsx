@@ -10,7 +10,10 @@ import { ForgotPasswordView } from "@/components/auth/ForgotPasswordView";
 
 function renderWithRouter(ui: React.ReactNode) {
   const rootRoute = createRootRoute({ component: () => ui });
-  const router = createRouter({ routeTree: rootRoute, history: createMemoryHistory() });
+  const router = createRouter({
+    routeTree: rootRoute,
+    history: createMemoryHistory(),
+  });
   return render(<RouterProvider router={router} />);
 }
 
@@ -23,7 +26,7 @@ test("renders the form initially", async () => {
 
 test("shows success message after form is submitted without error", async () => {
   const user = userEvent.setup();
-  const onSubmit = vi.fn().mockResolvedValue(undefined);
+  const onSubmit = vi.fn().mockResolvedValue({ status: "success" });
   renderWithRouter(<ForgotPasswordView onSubmit={onSubmit} />);
 
   await user.type(await screen.findByLabelText("Email"), "alice@example.com");
@@ -35,7 +38,7 @@ test("shows success message after form is submitted without error", async () => 
 
 test("stays on form when onSubmit returns an error", async () => {
   const user = userEvent.setup();
-  const onSubmit = vi.fn().mockResolvedValue({ error: "Rate limit exceeded" });
+  const onSubmit = vi.fn().mockResolvedValue({ status: "failed", error: "Rate limit exceeded" });
   renderWithRouter(<ForgotPasswordView onSubmit={onSubmit} />);
 
   await user.type(await screen.findByLabelText("Email"), "alice@example.com");

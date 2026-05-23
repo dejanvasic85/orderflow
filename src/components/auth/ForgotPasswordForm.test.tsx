@@ -30,7 +30,7 @@ test("shows validation error when submitting empty email", async () => {
 });
 
 test("calls onSubmit with email on valid submit", async () => {
-  onSubmit.mockResolvedValue(undefined);
+  onSubmit.mockResolvedValue({ status: "success" });
   render(<ForgotPasswordForm onSubmit={onSubmit} />);
 
   await user.type(screen.getByLabelText("Email"), "alice@example.com");
@@ -42,7 +42,7 @@ test("calls onSubmit with email on valid submit", async () => {
 });
 
 test("shows error returned from onSubmit", async () => {
-  onSubmit.mockResolvedValue({ error: "Too many requests" });
+  onSubmit.mockResolvedValue({ status: "failed", error: "Too many requests" });
   render(<ForgotPasswordForm onSubmit={onSubmit} />);
 
   await user.type(screen.getByLabelText("Email"), "alice@example.com");

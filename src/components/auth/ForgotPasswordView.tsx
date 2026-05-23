@@ -15,7 +15,7 @@ export function ForgotPasswordView({ onSubmit }: Props) {
 
   const handleSubmit = async (email: string): Promise<ForgotPasswordResult> => {
     const result = await onSubmit(email);
-    if (!result?.error) {
+    if (result.status === "success") {
       setSubmitted(true);
     }
     return result;
