@@ -38,10 +38,16 @@ jobs:
   e2e:
     name: E2E Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
+    container:
+      image: mcr.microsoft.com/playwright:v1.59.1-noble
+      options: --user root --network host -v /var/run/docker.sock:/var/run/docker.sock
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+
+      - name: Install Docker CLI
+        run: apt-get update -qq && apt-get install -y -qq docker.io
 
       - name: Setup Vite+
         uses: voidzero-dev/setup-vp@v1
@@ -68,19 +74,11 @@ jobs:
           echo "SUPABASE_SECRET_KEY=$(echo $SUPABASE_JSON | python3 -c "import sys,json; print(json.load(sys.stdin)['SERVICE_ROLE_KEY'])")" >> $GITHUB_ENV
           echo "SITE_URL=http://localhost:3344" >> $GITHUB_ENV
 
-      - name: Cache Playwright browsers
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ hashFiles('**/pnpm-lock.yaml') }}
-
-      - name: Install Playwright browsers
-        run: vp exec playwright install --with-deps chromium
-
       - name: Run e2e tests
         run: vp exec playwright test
         env:
           CI: true
+          HOME: /root
 
       - name: Stop Supabase
         if: always()
