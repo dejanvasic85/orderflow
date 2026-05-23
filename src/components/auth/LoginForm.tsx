@@ -65,12 +65,6 @@ export function LoginForm({ onLogin }: LoginFormProps) {
           <Field>
             <div className="flex items-center justify-between">
               <FieldLabel htmlFor={field.name}>Password</FieldLabel>
-              <Link
-                to="/forgot-password"
-                className="text-sm text-muted-foreground underline-offset-4 hover:underline"
-              >
-                Forgot password?
-              </Link>
             </div>
             <Input
               id={field.name}
@@ -82,6 +76,14 @@ export function LoginForm({ onLogin }: LoginFormProps) {
               onBlur={field.handleBlur}
             />
             <FieldError errors={field.state.meta.errors} />
+            <div>
+              <Link
+                to="/forgot-password"
+                className="text-sm text-muted-foreground underline-offset-4 hover:underline"
+              >
+                Forgot password?
+              </Link>
+            </div>
           </Field>
         )}
       </form.Field>
