@@ -25,5 +25,6 @@ export default defineConfig({
     command: "vp dev",
     url: "http://localhost:3344",
     reuseExistingServer: !process.env.CI,
+    timeout: 120000,
   },
 });

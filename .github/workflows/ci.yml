@@ -38,7 +38,7 @@ jobs:
   e2e:
     name: E2E Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -67,6 +67,12 @@ jobs:
           echo "VITE_SUPABASE_ANON_KEY=$(echo $SUPABASE_JSON | python3 -c "import sys,json; print(json.load(sys.stdin)['ANON_KEY'])")" >> $GITHUB_ENV
           echo "SUPABASE_SECRET_KEY=$(echo $SUPABASE_JSON | python3 -c "import sys,json; print(json.load(sys.stdin)['SERVICE_ROLE_KEY'])")" >> $GITHUB_ENV
           echo "SITE_URL=http://localhost:3344" >> $GITHUB_ENV
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ hashFiles('**/pnpm-lock.yaml') }}
 
       - name: Install Playwright browsers
         run: vp exec playwright install --with-deps chromium
