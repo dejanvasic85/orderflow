@@ -17,6 +17,7 @@ jobs:
     name: Deploy to prod
     runs-on: ubuntu-latest
     environment: production
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v6
