@@ -38,6 +38,7 @@ jobs:
   e2e:
     name: E2E Tests
     runs-on: ubuntu-latest
+    container: mcr.microsoft.com/playwright:1.59.1
     timeout-minutes: 10
     steps:
       - name: Checkout
@@ -50,17 +51,6 @@ jobs:
 
       - name: Install dependencies
         run: vp install --frozen-lockfile
-
-      - name: Cache Playwright browsers
-        id: playwright-cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-chromium-1.59.1
-
-      - name: Install Playwright browser
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: vp exec playwright install chromium
 
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v2
