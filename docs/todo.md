@@ -34,7 +34,8 @@ User management Features:
 - [x] Should not be able to invite users with the same email
 - [x] Resend invite from user list (for users who never accepted)
 - [x] Admins need ability to mark users as "inactive" to prevent login without deleting their data
-- [ ] Forgot password
+- [x] Forgot password
+- [ ] Change password while logged in
 - [ ] Search users by email or name in the list. Simple textbox with a server side filter
 - [ ] Ability to sort users
 - [ ] Paging
