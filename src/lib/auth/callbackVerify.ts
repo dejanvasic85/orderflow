@@ -2,7 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 const minDelay = () => new Promise((resolve) => setTimeout(resolve, 3000));
 
-type RedirectPath = "/dashboard" | "/auth/set-password" | "/auth/reset-password";
+type RedirectPath = "/dashboard" | "/auth/set-password";
 
 type VerifyParams = {
   supabase: SupabaseClient;
@@ -53,8 +53,6 @@ function resolveRedirectPath(type: string | null | undefined): RedirectPath {
   switch (type) {
     case "invite":
       return "/auth/set-password";
-    case "recovery":
-      return "/auth/reset-password";
     default:
       return "/dashboard";
   }

@@ -54,7 +54,7 @@ test("exchanges hash access_token and returns dashboard path for unknown type", 
   expect(result).toEqual({ status: "navigate", path: "/dashboard" });
 });
 
-test("exchanges hash access_token and returns reset-password path for recovery type", async () => {
+test("exchanges hash access_token and returns dashboard path for recovery type", async () => {
   const { supabase } = makeSupabase();
 
   const promise = verifyCallback({
@@ -67,7 +67,7 @@ test("exchanges hash access_token and returns reset-password path for recovery t
   await vi.runAllTimersAsync();
   const result = await promise;
 
-  expect(result).toEqual({ status: "navigate", path: "/auth/reset-password" });
+  expect(result).toEqual({ status: "navigate", path: "/dashboard" });
 });
 
 test("returns error status when setSession fails", async () => {
@@ -122,7 +122,7 @@ test("exchanges code for session and returns dashboard path for unknown type", a
   expect(result).toEqual({ status: "navigate", path: "/dashboard" });
 });
 
-test("exchanges code for session and returns reset-password path for recovery type", async () => {
+test("exchanges code for session and returns dashboard path for recovery type", async () => {
   const { supabase, exchangeCodeForSession } = makeSupabase();
 
   const promise = verifyCallback({
@@ -136,7 +136,7 @@ test("exchanges code for session and returns reset-password path for recovery ty
   const result = await promise;
 
   expect(exchangeCodeForSession).toHaveBeenCalledWith("pkce-code-abc");
-  expect(result).toEqual({ status: "navigate", path: "/auth/reset-password" });
+  expect(result).toEqual({ status: "navigate", path: "/dashboard" });
 });
 
 test("returns error status when exchangeCodeForSession fails", async () => {
