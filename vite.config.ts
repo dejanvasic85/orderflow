@@ -39,6 +39,7 @@ const config = defineConfig({
   },
   fmt: {
     ignorePatterns: ["src/routeTree.gen.ts", "src/lib/database.types.ts"],
+    printWidth: 100,
     sortImports: {
       groups: [
         ["type-builtin", "builtin"],

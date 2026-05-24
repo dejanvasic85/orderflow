@@ -21,6 +21,7 @@ jobs:
   deploy-preview:
     name: Deploy preview worker
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     environment: preview
     steps:
       - name: Checkout

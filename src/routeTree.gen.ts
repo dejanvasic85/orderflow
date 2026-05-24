@@ -10,9 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ProtectedRouteImport } from './routes/_protected'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthSetPasswordRouteImport } from './routes/auth/set-password'
+import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
 import { Route as ProtectedAppRouteImport } from './routes/_protected/_app'
 import { Route as ProtectedAppUsersRouteImport } from './routes/_protected/_app/users'
@@ -24,6 +26,11 @@ import { Route as ProtectedAppAccountsAccountIdOrdersRouteImport } from './route
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProtectedRoute = ProtectedRouteImport.update({
@@ -38,6 +45,11 @@ const IndexRoute = IndexRouteImport.update({
 const AuthSetPasswordRoute = AuthSetPasswordRouteImport.update({
   id: '/auth/set-password',
   path: '/auth/set-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
+  id: '/auth/reset-password',
+  path: '/auth/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
@@ -79,8 +91,10 @@ const ProtectedAppAccountsAccountIdOrdersRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/set-password': typeof AuthSetPasswordRoute
   '/accounts': typeof ProtectedAppAccountsRouteWithChildren
   '/dashboard': typeof ProtectedAppDashboardRoute
@@ -90,8 +104,10 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/set-password': typeof AuthSetPasswordRoute
   '/dashboard': typeof ProtectedAppDashboardRoute
   '/users': typeof ProtectedAppUsersRoute
@@ -102,9 +118,11 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_protected': typeof ProtectedRouteWithChildren
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/_protected/_app': typeof ProtectedAppRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/set-password': typeof AuthSetPasswordRoute
   '/_protected/_app/accounts': typeof ProtectedAppAccountsRouteWithChildren
   '/_protected/_app/dashboard': typeof ProtectedAppDashboardRoute
@@ -116,8 +134,10 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/forgot-password'
     | '/login'
     | '/auth/callback'
+    | '/auth/reset-password'
     | '/auth/set-password'
     | '/accounts'
     | '/dashboard'
@@ -127,8 +147,10 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/forgot-password'
     | '/login'
     | '/auth/callback'
+    | '/auth/reset-password'
     | '/auth/set-password'
     | '/dashboard'
     | '/users'
@@ -138,9 +160,11 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_protected'
+    | '/forgot-password'
     | '/login'
     | '/_protected/_app'
     | '/auth/callback'
+    | '/auth/reset-password'
     | '/auth/set-password'
     | '/_protected/_app/accounts'
     | '/_protected/_app/dashboard'
@@ -152,8 +176,10 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ProtectedRoute: typeof ProtectedRouteWithChildren
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
+  AuthResetPasswordRoute: typeof AuthResetPasswordRoute
   AuthSetPasswordRoute: typeof AuthSetPasswordRoute
 }
 
@@ -164,6 +190,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_protected': {
@@ -185,6 +218,13 @@ declare module '@tanstack/react-router' {
       path: '/auth/set-password'
       fullPath: '/auth/set-password'
       preLoaderRoute: typeof AuthSetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/reset-password': {
+      id: '/auth/reset-password'
+      path: '/auth/reset-password'
+      fullPath: '/auth/reset-password'
+      preLoaderRoute: typeof AuthResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/callback': {
@@ -284,8 +324,10 @@ const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ProtectedRoute: ProtectedRouteWithChildren,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
   AuthCallbackRoute: AuthCallbackRoute,
+  AuthResetPasswordRoute: AuthResetPasswordRoute,
   AuthSetPasswordRoute: AuthSetPasswordRoute,
 }
 export const routeTree = rootRouteImport
