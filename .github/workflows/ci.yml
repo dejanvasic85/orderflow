@@ -39,9 +39,15 @@ jobs:
     name: E2E Tests
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    container:
+      image: mcr.microsoft.com/playwright:v1.59.1-noble
+      options: --user root --network host -v /var/run/docker.sock:/var/run/docker.sock
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+
+      - name: Install Docker CLI
+        run: apt-get update -qq && apt-get install -y -qq docker.io
 
       - name: Setup Vite+
         uses: voidzero-dev/setup-vp@v1
@@ -50,17 +56,6 @@ jobs:
 
       - name: Install dependencies
         run: vp install --frozen-lockfile
-
-      - name: Cache Playwright browsers
-        uses: actions/cache@v4
-        id: playwright-cache
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-1.59.1-chromium
-
-      - name: Install Playwright browsers
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: vp exec playwright install chromium
 
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v2
@@ -83,6 +78,7 @@ jobs:
         run: vp exec playwright test
         env:
           CI: true
+          HOME: /root
 
       - name: Stop Supabase
         if: always()
