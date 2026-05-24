@@ -17,7 +17,7 @@ export const Route = createFileRoute("/forgot-password")({
 function ForgotPasswordPage() {
   const handleSubmit = async (email: string): Promise<ForgotPasswordResult> => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/reset-password`,
+      redirectTo: `${window.location.origin}/auth/callback`,
     });
     if (error) {
       // TODO: log the error

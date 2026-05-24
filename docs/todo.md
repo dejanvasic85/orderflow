@@ -13,13 +13,18 @@ Infra and setup
 - [x] List the users by connecting to the API instead of mocks
 - [x] End to end tests
 - [x] Github checks for branch protection
+- [ ] Cleaner architecture that allows for adding a mobile application
+- [ ] Server functions and lib functions seem to be mixed - resetPassword is a server function but callbackVerify is a regular function
+- [ ] Playwright tests will need our custom container with supabase
+
+Productionising
+
 - [ ] Setup domain name - orders.bwow.com.au (speak to Sam about access to this or should we get a new domain name?)
 - [ ] SMTP server for email notifications (AWS SES — configure in Supabase dashboard, verify `vasic.com.au` for DKIM as interim sender domain)
 - [ ] Email templates
 - [ ] Logging and monitoring - including supabase and cloudflare. Could it all go to cloudflare logs?
 - [ ] Configure production domain in Supabase and set up environment variables for production deployment. Currently https://orderflow.team-manager.workers.dev
 - [ ] Configure production domain in Github Env Variables for production
-- [ ] Playwright tests will need our custom container with supabase
 
 User management Features:
 
@@ -29,16 +34,16 @@ User management Features:
 - [x] Should not be able to invite users with the same email
 - [x] Resend invite from user list (for users who never accepted)
 - [x] Admins need ability to mark users as "inactive" to prevent login without deleting their data
+- [ ] Forgot password
 - [ ] Search users by email or name in the list. Simple textbox with a server side filter
 - [ ] Ability to sort users
-- [ ] Paging?
-- [ ] Forgot password
+- [ ] Paging
 
 Account management features:
 
 - [ ] Account management
 - [ ] CSV Import
 
-Code cleanup (later):
+Code cleanup - later:
 
 - [ ] Hardcoded routes and api endpoints
