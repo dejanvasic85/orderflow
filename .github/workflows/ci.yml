@@ -38,8 +38,8 @@ jobs:
   e2e:
     name: E2E Tests
     runs-on: ubuntu-latest
-    container: mcr.microsoft.com/playwright:v1.60.0-noble
     timeout-minutes: 10
+    if: false
     steps:
       - name: Checkout
         uses: actions/checkout@v6

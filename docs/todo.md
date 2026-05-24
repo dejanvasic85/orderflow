@@ -19,6 +19,7 @@ Infra and setup
 - [ ] Logging and monitoring - including supabase and cloudflare. Could it all go to cloudflare logs?
 - [ ] Configure production domain in Supabase and set up environment variables for production deployment. Currently https://orderflow.team-manager.workers.dev
 - [ ] Configure production domain in Github Env Variables for production
+- [ ] Playwright tests will need our custom container with supabase
 
 User management Features:
 
