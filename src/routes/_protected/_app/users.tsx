@@ -63,7 +63,7 @@ function UsersPage() {
   }
 
   async function handleSave(updated: User) {
-    const result = asResult<User>(
+    const result = asResult<void>(
       await updateUser({
         data: {
           id: updated.id,

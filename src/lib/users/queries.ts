@@ -92,7 +92,7 @@ export const updateUser = createServerFn({ method: "POST", strict: { output: fal
       await assertAdmin(supabaseServer);
     }
 
-    const { data: row, error } = await supabaseServer
+    const { error } = await supabaseServer
       .from("users")
       .update(patch)
       .eq("id", id)
@@ -127,7 +127,7 @@ export const updateUser = createServerFn({ method: "POST", strict: { output: fal
       }
     }
 
-    return ok(row as unknown as User);
+    return ok();
   });
 
 async function assertAdmin(supabase: ReturnType<typeof createSupabaseServerClient>) {
