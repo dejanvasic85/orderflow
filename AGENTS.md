@@ -87,6 +87,7 @@ Vite+ automatically detects and wraps the underlying package manager through `pa
 ## Code Style
 
 - Keep code DRY; extract repeated logic into named functions/constants
+- Prefer to use Result over throwing errors
 - Prefer small, composable functions over large inline blocks
 - Prefer `switch` over long `if/else` chains when branching on a single discriminator
 - Avoid magic numbers/strings; introduce well-named constants

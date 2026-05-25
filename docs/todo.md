@@ -23,8 +23,7 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Feature | Must | Resend invite from user list
 - [x] Feature | Must | Mark users as "inactive" to prevent login without deleting data
 - [x] Feature | Must | Forgot password
-- [ ] Quality | Must | Improve the error handling to use Result system - investigate neverthrow
-- [ ] Quality | Must | Question architecture direction and whether we are heading in the right direction - https://claude.ai/code/session_01FuB3evNxHRJvTYkVDEod2n
+- [x] Quality | Must | Improve the error handling to use Result system - investigate neverthrow
 - [ ] Quality | Must | Structure of server functions and loaders. Where should they live? We have inconsistency including testing.
 - [ ] Infra | Must | Migration for `products`, `order_requests`, `order_request_items`
 - [ ] Infra | Must | Seed data — sample product catalog in `supabase/seed.sql`
@@ -61,3 +60,4 @@ Priorities: `Must` · `Should` · `Nice`
 - [ ] Feature | Must | Change password while logged in
 - [ ] Feature | Nice | Homepage dashboard — reporting / summary tiles (Phase 4, quoted separately)
 - [ ] Cleanup | Nice | Remove hardcoded routes and API endpoints
+- [ ] Quality | Nice | Question architecture direction and whether we are heading in the right direction - https://claude.ai/code/session_01FuB3evNxHRJvTYkVDEod2n
