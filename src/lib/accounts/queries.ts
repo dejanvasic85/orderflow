@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { err, fromSupabaseError, ok } from "@/lib/result";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import { assignSchema, createAccountSchema, updateAccountSchema } from "./schema";
 
@@ -40,7 +41,7 @@ export const listAccountUsers = createServerFn({ method: "GET" })
   });
 
 // Server — admin-only via RLS
-export const createAccount = createServerFn({ method: "POST" })
+export const createAccount = createServerFn({ method: "POST", strict: { output: false } })
   .inputValidator(createAccountSchema)
   .handler(async ({ data }) => {
     const supabaseServer = createSupabaseServerClient();
@@ -49,12 +50,12 @@ export const createAccount = createServerFn({ method: "POST" })
       .insert(data)
       .select()
       .single();
-    if (error) throw new Error(error.message);
-    return row;
+    if (error) return err(fromSupabaseError(error));
+    return ok(row);
   });
 
 // Server — admin-only via RLS
-export const updateAccount = createServerFn({ method: "POST" })
+export const updateAccount = createServerFn({ method: "POST", strict: { output: false } })
   .inputValidator(updateAccountSchema)
   .handler(async ({ data }) => {
     const supabaseServer = createSupabaseServerClient();
@@ -65,22 +66,22 @@ export const updateAccount = createServerFn({ method: "POST" })
       .eq("id", id)
       .select()
       .single();
-    if (error) throw new Error(error.message);
-    return row;
+    if (error) return err(fromSupabaseError(error));
+    return ok(row);
   });
 
 // Server — admin-only via RLS
-export const assignUserToAccount = createServerFn({ method: "POST" })
+export const assignUserToAccount = createServerFn({ method: "POST", strict: { output: false } })
   .inputValidator(assignSchema)
   .handler(async ({ data }) => {
     const supabaseServer = createSupabaseServerClient();
     const { error } = await supabaseServer.from("account_users").insert(data);
-    if (error) throw new Error(error.message);
-    return { ok: true };
+    if (error) return err(fromSupabaseError(error));
+    return ok(null);
   });
 
 // Server — admin-only via RLS
-export const unassignUserFromAccount = createServerFn({ method: "POST" })
+export const unassignUserFromAccount = createServerFn({ method: "POST", strict: { output: false } })
   .inputValidator(assignSchema)
   .handler(async ({ data }) => {
     const supabaseServer = createSupabaseServerClient();
@@ -89,6 +90,6 @@ export const unassignUserFromAccount = createServerFn({ method: "POST" })
       .delete()
       .eq("account_id", data.account_id)
       .eq("user_id", data.user_id);
-    if (error) throw new Error(error.message);
-    return { ok: true };
+    if (error) return err(fromSupabaseError(error));
+    return ok(null);
   });

@@ -4,6 +4,7 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import type { Result } from "@/lib/result";
 
 const setPasswordSchema = z
   .object({
@@ -15,7 +16,7 @@ const setPasswordSchema = z
     path: ["confirmPassword"],
   });
 
-export type SetPasswordResult = { error?: string } | void;
+export type SetPasswordResult = Result<null, { message: string }>;
 
 type SetPasswordFormProps = {
   onSetPassword: (password: string) => Promise<SetPasswordResult>;
@@ -30,8 +31,8 @@ export function SetPasswordForm({ onSetPassword }: SetPasswordFormProps) {
     onSubmit: async ({ value }) => {
       setSubmitError(null);
       const result = await onSetPassword(value.password);
-      if (result?.error) {
-        setSubmitError(result.error);
+      if (!result.ok) {
+        setSubmitError(result.error.message);
       }
     },
   });

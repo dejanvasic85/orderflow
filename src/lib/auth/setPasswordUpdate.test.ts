@@ -17,7 +17,7 @@ test("updates password and navigates on success", async () => {
 
   expect(updateUser).toHaveBeenCalledWith({ password: "newpass123" });
   expect(navigate).toHaveBeenCalled();
-  expect(result).toBeUndefined();
+  expect(result).toEqual({ ok: true, value: null });
 });
 
 test("returns error and does not navigate when updateUser fails", async () => {
@@ -29,6 +29,6 @@ test("returns error and does not navigate when updateUser fails", async () => {
 
   const result = await updatePassword({ supabase, password: "newpass123", navigate });
 
-  expect(result).toEqual({ error: "Auth session missing" });
+  expect(result).toEqual({ ok: false, error: { message: "Auth session missing" } });
   expect(navigate).not.toHaveBeenCalled();
 });

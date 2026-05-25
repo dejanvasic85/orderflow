@@ -35,7 +35,7 @@ test("exchanges hash access_token and returns set-password path for invite type"
     access_token: "tok123",
     refresh_token: "ref456",
   });
-  expect(result).toEqual({ status: "navigate", path: "/auth/set-password" });
+  expect(result).toEqual({ ok: true, value: { path: "/auth/set-password" } });
 });
 
 test("exchanges hash access_token and returns dashboard path for unknown type", async () => {
@@ -51,7 +51,7 @@ test("exchanges hash access_token and returns dashboard path for unknown type", 
   await vi.runAllTimersAsync();
   const result = await promise;
 
-  expect(result).toEqual({ status: "navigate", path: "/dashboard" });
+  expect(result).toEqual({ ok: true, value: { path: "/dashboard" } });
 });
 
 test("exchanges hash access_token and returns dashboard path for recovery type", async () => {
@@ -67,7 +67,7 @@ test("exchanges hash access_token and returns dashboard path for recovery type",
   await vi.runAllTimersAsync();
   const result = await promise;
 
-  expect(result).toEqual({ status: "navigate", path: "/dashboard" });
+  expect(result).toEqual({ ok: true, value: { path: "/dashboard" } });
 });
 
 test("returns error status when setSession fails", async () => {
@@ -86,7 +86,10 @@ test("returns error status when setSession fails", async () => {
   await vi.runAllTimersAsync();
   const result = await promise;
 
-  expect(result).toEqual({ status: "error" });
+  expect(result).toEqual({
+    ok: false,
+    error: expect.objectContaining({ message: expect.any(String) }),
+  });
 });
 
 test("exchanges code for session and returns set-password path for invite type", async () => {
@@ -103,7 +106,7 @@ test("exchanges code for session and returns set-password path for invite type",
   const result = await promise;
 
   expect(exchangeCodeForSession).toHaveBeenCalledWith("pkce-code-abc");
-  expect(result).toEqual({ status: "navigate", path: "/auth/set-password" });
+  expect(result).toEqual({ ok: true, value: { path: "/auth/set-password" } });
 });
 
 test("exchanges code for session and returns dashboard path for unknown type", async () => {
@@ -119,7 +122,7 @@ test("exchanges code for session and returns dashboard path for unknown type", a
   await vi.runAllTimersAsync();
   const result = await promise;
 
-  expect(result).toEqual({ status: "navigate", path: "/dashboard" });
+  expect(result).toEqual({ ok: true, value: { path: "/dashboard" } });
 });
 
 test("exchanges code for session and returns dashboard path for recovery type", async () => {
@@ -136,7 +139,7 @@ test("exchanges code for session and returns dashboard path for recovery type", 
   const result = await promise;
 
   expect(exchangeCodeForSession).toHaveBeenCalledWith("pkce-code-abc");
-  expect(result).toEqual({ status: "navigate", path: "/dashboard" });
+  expect(result).toEqual({ ok: true, value: { path: "/dashboard" } });
 });
 
 test("returns error status when exchangeCodeForSession fails", async () => {
@@ -155,7 +158,10 @@ test("returns error status when exchangeCodeForSession fails", async () => {
   await vi.runAllTimersAsync();
   const result = await promise;
 
-  expect(result).toEqual({ status: "error" });
+  expect(result).toEqual({
+    ok: false,
+    error: expect.objectContaining({ message: expect.any(String) }),
+  });
 });
 
 test("returns error status when no code and no hash token", async () => {
@@ -171,5 +177,8 @@ test("returns error status when no code and no hash token", async () => {
   await vi.runAllTimersAsync();
   const result = await promise;
 
-  expect(result).toEqual({ status: "error" });
+  expect(result).toEqual({
+    ok: false,
+    error: expect.objectContaining({ message: expect.any(String) }),
+  });
 });

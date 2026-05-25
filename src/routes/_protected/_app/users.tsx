@@ -15,6 +15,7 @@ import { UserEditPanel } from "@/components/users/UserEditPanel";
 import { UserList, type RoleFilter } from "@/components/users/UserList";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { listAccounts } from "@/lib/accounts/queries";
+import { asResult } from "@/lib/result";
 import {
   checkEmailExists,
   inviteUser,
@@ -62,7 +63,7 @@ function UsersPage() {
   }
 
   async function handleSave(updated: User) {
-    try {
+    const result = asResult<User>(
       await updateUser({
         data: {
           id: updated.id,
@@ -73,17 +74,19 @@ function UsersPage() {
           notification_preferences: updated.notification_preferences,
           accountIds: updated.accounts.map((a) => a.id),
         },
-      });
-      setUsers((prev) => prev.map((u) => (u.id === updated.id ? updated : u)));
-      setSelectedId(null);
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to save changes");
+      }),
+    );
+    if (!result.ok) {
+      toast.error(result.error.message);
+      return;
     }
+    setUsers((prev) => prev.map((u) => (u.id === updated.id ? updated : u)));
+    setSelectedId(null);
   }
 
   async function handleInvite(draft: User) {
-    try {
-      const created = await inviteUser({
+    const result = asResult<User>(
+      await inviteUser({
         data: {
           email: draft.email,
           name: draft.name,
@@ -92,18 +95,26 @@ function UsersPage() {
           notification_preferences: draft.notification_preferences,
           accountIds: draft.accounts.map((a) => a.id),
         },
-      });
-      setUsers((prev) => [created, ...prev]);
-      setCreating(false);
-      toast.success(`Invite sent to ${created.email}`);
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to invite user");
+      }),
+    );
+    if (!result.ok) {
+      toast.error(result.error.message);
+      return;
     }
+    setUsers((prev) => [result.value, ...prev]);
+    setCreating(false);
+    toast.success(`Invite sent to ${result.value.email}`);
   }
 
   async function handleResendInvite(userId: string) {
-    const { invitedAt } = await resendInvite({ data: userId });
-    setUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, invited_at: invitedAt } : u)));
+    const result = asResult<{ invitedAt: string }>(await resendInvite({ data: userId }));
+    if (!result.ok) {
+      toast.error(result.error.message);
+      return;
+    }
+    setUsers((prev) =>
+      prev.map((u) => (u.id === userId ? { ...u, invited_at: result.value.invitedAt } : u)),
+    );
   }
 
   function handleDiscard() {

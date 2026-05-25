@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { err, ok, type Result } from "@/lib/result";
 
 const minDelay = () => new Promise((resolve) => setTimeout(resolve, 3000));
 
@@ -11,7 +12,7 @@ type VerifyParams = {
   effectiveType: string | null | undefined;
 };
 
-export type VerifyResult = { status: "error" } | { status: "navigate"; path: RedirectPath };
+export type VerifyResult = Result<{ path: RedirectPath }, { message: string }>;
 
 export async function verifyCallback({
   supabase,
@@ -30,23 +31,23 @@ export async function verifyCallback({
     ]);
     if (error) {
       console.error("An error occurred setting the session in supabase", error);
-      return { status: "error" };
+      return err({ message: error.message });
     }
-    return { status: "navigate", path: resolveRedirectPath(effectiveType) };
+    return ok({ path: resolveRedirectPath(effectiveType) });
   }
 
   if (!code) {
     console.error("Invalid or missing verification code. The link may have expired.");
-    return { status: "error" };
+    return err({ message: "Invalid or missing verification code. The link may have expired." });
   }
 
   const [{ error }] = await Promise.all([supabase.auth.exchangeCodeForSession(code), minDelay()]);
   if (error) {
     console.error("Failed to exchange code for session", error);
-    return { status: "error" };
+    return err({ message: error.message });
   }
 
-  return { status: "navigate", path: resolveRedirectPath(effectiveType) };
+  return ok({ path: resolveRedirectPath(effectiveType) });
 }
 
 function resolveRedirectPath(type: string | null | undefined): RedirectPath {

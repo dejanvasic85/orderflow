@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { SetPasswordResult } from "@/components/auth/SetPasswordForm";
+import { err, ok } from "@/lib/result";
 
 type UpdatePasswordParams = {
   supabase: SupabaseClient;
@@ -14,7 +15,8 @@ export async function updatePassword({
 }: UpdatePasswordParams): Promise<SetPasswordResult> {
   const { error } = await supabase.auth.updateUser({ password });
   if (error) {
-    return { error: error.message };
+    return err({ message: error.message });
   }
   await navigate();
+  return ok(null);
 }
