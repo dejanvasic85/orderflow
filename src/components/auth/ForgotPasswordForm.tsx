@@ -4,12 +4,13 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import type { Result } from "@/lib/result";
 
 const forgotPasswordSchema = z.object({
   email: z.email("Invalid email address"),
 });
 
-export type ForgotPasswordResult = { status: "failed"; error: string } | { status: "success" };
+export type ForgotPasswordResult = Result<void, { message: string }>;
 
 type ForgotPasswordFormProps = {
   onSubmit: (email: string) => Promise<ForgotPasswordResult>;
@@ -24,8 +25,8 @@ export function ForgotPasswordForm({ onSubmit }: ForgotPasswordFormProps) {
     onSubmit: async ({ value }) => {
       setSubmitError(null);
       const result = await onSubmit(value.email);
-      if (result.status === "failed") {
-        setSubmitError(result.error);
+      if (!result.ok) {
+        setSubmitError(result.error.message);
       }
     },
   });

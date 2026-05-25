@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { ensureSession } from "@/lib/authFunctions";
 import { getServerConfig } from "@/lib/config";
+import { err, ok } from "@/lib/result";
 import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import { createUserSchema, updateUserSchema, type User, type UserAccount } from "./schema";
@@ -81,7 +82,7 @@ export const getUser = createServerFn({ method: "GET" })
   });
 
 // Server — RLS enforces admin-only role changes; regular users blocked from escalation by DB policy
-export const updateUser = createServerFn({ method: "POST" })
+export const updateUser = createServerFn({ method: "POST", strict: { output: false } })
   .inputValidator(updateUserSchema)
   .handler(async ({ data }) => {
     const supabaseServer = createSupabaseServerClient();
@@ -91,13 +92,13 @@ export const updateUser = createServerFn({ method: "POST" })
       await assertAdmin(supabaseServer);
     }
 
-    const { data: row, error } = await supabaseServer
+    const { error } = await supabaseServer
       .from("users")
       .update(patch)
       .eq("id", id)
       .select()
       .single();
-    if (error) throw new Error(error.message);
+    if (error) return err({ message: error.message });
 
     if ("active" in patch) {
       const admin = createSupabaseAdminClient();
@@ -107,7 +108,7 @@ export const updateUser = createServerFn({ method: "POST" })
       if (banError) {
         console.error("Failed to sync auth ban status, rolling back active flag:", banError);
         await supabaseServer.from("users").update({ active: !patch.active }).eq("id", id);
-        throw new Error("Failed to update user login access");
+        return err({ message: "Failed to update user login access" });
       }
     }
 
@@ -116,17 +117,17 @@ export const updateUser = createServerFn({ method: "POST" })
         .from("account_users")
         .delete()
         .eq("user_id", id);
-      if (deleteError) throw new Error(deleteError.message);
+      if (deleteError) return err({ message: deleteError.message });
 
       if (accountIds.length > 0) {
         const { error: insertError } = await supabaseServer
           .from("account_users")
           .insert(accountIds.map((account_id) => ({ account_id, user_id: id })));
-        if (insertError) throw new Error(insertError.message);
+        if (insertError) return err({ message: insertError.message });
       }
     }
 
-    return row;
+    return ok();
   });
 
 async function assertAdmin(supabase: ReturnType<typeof createSupabaseServerClient>) {
@@ -159,9 +160,9 @@ export const checkEmailExists = createServerFn({ method: "GET" })
     return data !== null;
   });
 
-export const inviteUser = createServerFn({ method: "POST" })
+export const inviteUser = createServerFn({ method: "POST", strict: { output: false } })
   .inputValidator(createUserSchema)
-  .handler(async ({ data }): Promise<User> => {
+  .handler(async ({ data }) => {
     const supabaseServer = createSupabaseServerClient();
     await assertAdmin(supabaseServer);
 
@@ -176,42 +177,48 @@ export const inviteUser = createServerFn({ method: "POST" })
     );
     if (inviteError) {
       console.error("Failed to send invite:", inviteError);
-      throw new Error("Unable to send user invitation");
+      return err({ message: "Unable to send user invitation" });
     }
     const newUserId = invited.user.id;
 
-    try {
-      const { error: updateError } = await supabaseServer
-        .from("users")
-        .update({
-          name: data.name,
-          phone: data.phone ?? null,
-          role: data.role,
-          notification_preferences: data.notification_preferences,
-        })
-        .eq("id", newUserId);
-      if (updateError) throw updateError;
+    const { error: updateError } = await supabaseServer
+      .from("users")
+      .update({
+        name: data.name,
+        phone: data.phone ?? null,
+        role: data.role,
+        notification_preferences: data.notification_preferences,
+      })
+      .eq("id", newUserId);
 
-      if (data.accountIds.length > 0) {
-        const { error: assignError } = await supabaseServer.from("account_users").insert(
-          data.accountIds.map((account_id) => ({
-            account_id,
-            user_id: newUserId,
-          })),
-        );
-        if (assignError) throw assignError;
-      }
-    } catch (err) {
-      console.error("Post-invite DB update failed, rolling back auth user:", err);
+    if (updateError) {
+      console.error("Post-invite DB update failed, rolling back auth user:", updateError);
       await admin.auth.admin.deleteUser(newUserId);
-      throw new Error("Unable to complete user invitation");
+      return err({ message: "Unable to complete user invitation" });
+    }
+
+    if (data.accountIds.length > 0) {
+      const { error: assignError } = await supabaseServer.from("account_users").insert(
+        data.accountIds.map((account_id) => ({
+          account_id,
+          user_id: newUserId,
+        })),
+      );
+      if (assignError) {
+        console.error(
+          "Post-invite account assignment failed, rolling back auth user:",
+          assignError,
+        );
+        await admin.auth.admin.deleteUser(newUserId);
+        return err({ message: "Unable to complete user invitation" });
+      }
     }
 
     const accounts: UserAccount[] =
       data.accountIds.length > 0 ? await resolveAccountNames(supabaseServer, data.accountIds) : [];
 
     const now = new Date().toISOString();
-    return {
+    return ok({
       id: newUserId,
       name: data.name,
       email: data.email,
@@ -224,12 +231,12 @@ export const inviteUser = createServerFn({ method: "POST" })
       created_at: now,
       updated_at: now,
       accounts,
-    };
+    });
   });
 
-export const resendInvite = createServerFn({ method: "POST" })
+export const resendInvite = createServerFn({ method: "POST", strict: { output: false } })
   .inputValidator((id: string) => id)
-  .handler(async ({ data: id }): Promise<{ invitedAt: string }> => {
+  .handler(async ({ data: id }) => {
     const supabaseServer = createSupabaseServerClient();
     await assertAdmin(supabaseServer);
 
@@ -238,7 +245,7 @@ export const resendInvite = createServerFn({ method: "POST" })
       .select("email")
       .eq("id", id)
       .single();
-    if (error || !user?.email) throw new Error("User not found");
+    if (error || !user?.email) return err({ message: "User not found" });
 
     const admin = createSupabaseAdminClient();
     const { SITE_URL } = getServerConfig();
@@ -247,10 +254,10 @@ export const resendInvite = createServerFn({ method: "POST" })
     });
     if (inviteError) {
       console.error("Failed to resend invite:", inviteError);
-      throw new Error("Unable to resend invitation");
+      return err({ message: "Unable to resend invitation" });
     }
 
-    return { invitedAt: new Date().toISOString() };
+    return ok({ invitedAt: new Date().toISOString() });
   });
 
 async function resolveAccountNames(

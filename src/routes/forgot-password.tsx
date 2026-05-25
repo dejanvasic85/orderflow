@@ -1,7 +1,7 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import type { ForgotPasswordResult } from "@/components/auth/ForgotPasswordForm";
 import { ForgotPasswordView } from "@/components/auth/ForgotPasswordView";
 import { getSession } from "@/lib/authFunctions";
+import { err, ok } from "@/lib/result";
 import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/forgot-password")({
@@ -15,16 +15,13 @@ export const Route = createFileRoute("/forgot-password")({
 });
 
 function ForgotPasswordPage() {
-  const handleSubmit = async (email: string): Promise<ForgotPasswordResult> => {
+  const handleSubmit = async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email);
     if (error) {
       console.log("Supabase error sending reset email", error);
-      return Promise.resolve({
-        status: "failed",
-        error: "We encountered an error processing this request. Please try again.",
-      });
+      return err({ message: "We encountered an error processing this request. Please try again." });
     }
-    return Promise.resolve({ status: "success" });
+    return ok();
   };
 
   return <ForgotPasswordView onSubmit={handleSubmit} />;

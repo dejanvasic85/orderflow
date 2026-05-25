@@ -40,7 +40,7 @@ test("shows validation error when passwords do not match", async () => {
 });
 
 test("calls onSetPassword with the password value on valid submit", async () => {
-  onSetPassword.mockResolvedValue(undefined);
+  onSetPassword.mockResolvedValue({ ok: true, value: undefined } as SetPasswordResult);
   render(<SetPasswordForm onSetPassword={onSetPassword} />);
 
   await user.type(screen.getByLabelText("Password"), "mysecret");
@@ -53,7 +53,7 @@ test("calls onSetPassword with the password value on valid submit", async () => 
 });
 
 test("shows the error returned from onSetPassword", async () => {
-  onSetPassword.mockResolvedValue({ error: "Password is too weak" });
+  onSetPassword.mockResolvedValue({ ok: false, error: { message: "Password is too weak" } });
   render(<SetPasswordForm onSetPassword={onSetPassword} />);
 
   await user.type(screen.getByLabelText("Password"), "mysecret");

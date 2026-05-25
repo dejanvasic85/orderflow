@@ -31,12 +31,12 @@ function AuthCallbackPage() {
     const startVerification = async () => {
       const result = await verifyCallback({ supabase, code, hash, effectiveType });
 
-      if (result.status === "error") {
+      if (!result.ok) {
         setError("Your link is invalid or has expired. Please request a new one.");
         return;
       }
 
-      await navigate({ to: result.path });
+      await navigate({ to: result.value.path });
     };
 
     void startVerification();
