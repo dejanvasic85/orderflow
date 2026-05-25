@@ -28,14 +28,18 @@ function AuthCallbackPage() {
     const hashParams = new URLSearchParams(hash.slice(1));
     const effectiveType = type ?? hashParams.get("type");
 
-    void verifyCallback({
-      supabase,
-      code,
-      hash,
-      effectiveType,
-      navigate: (to) => navigate({ to: to as "/" }),
-      setError,
-    });
+    const startVerification = async () => {
+      const result = await verifyCallback({ supabase, code, hash, effectiveType });
+
+      if (result.status === "error") {
+        setError("Your link is invalid or has expired. Please request a new one.");
+        return;
+      }
+
+      await navigate({ to: result.path });
+    };
+
+    void startVerification();
   }, [code, type, navigate]);
 
   return <AuthCallbackView error={error} />;
