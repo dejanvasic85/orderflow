@@ -7,11 +7,13 @@ export const verifyResetToken = createServerFn({ method: "GET" })
   .inputValidator((data: VerifyInput) => data)
   .handler(async ({ data }) => {
     const supabase = createSupabaseServerClient();
+    console.log("Verify reset token", data);
     const { error } = await supabase.auth.verifyOtp({
       token_hash: data.token_hash,
       type: data.type,
     });
 
+    console.log("Error!!", error);
     if (!error) {
       return { valid: true as const };
     }

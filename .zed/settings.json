@@ -12,7 +12,8 @@
     },
     "oxfmt": {
       "binary": {
-        "path": "./node_modules/.bin/oxfmt"
+        "path": "./node_modules/.bin/oxfmt",
+        "arguments": ["lsp"]
       },
       "initialization_options": {
         "settings": {

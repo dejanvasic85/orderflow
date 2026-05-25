@@ -2,23 +2,23 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 const minDelay = () => new Promise((resolve) => setTimeout(resolve, 3000));
 
+type RedirectPath = "/dashboard" | "/auth/set-password";
+
 type VerifyParams = {
   supabase: SupabaseClient;
   code: string | undefined;
   hash: string;
   effectiveType: string | null | undefined;
-  navigate: (to: string) => Promise<void>;
-  setError: (msg: string) => void;
 };
+
+export type VerifyResult = { status: "error" } | { status: "navigate"; path: RedirectPath };
 
 export async function verifyCallback({
   supabase,
   code,
   hash,
   effectiveType,
-  navigate,
-  setError,
-}: VerifyParams): Promise<void> {
+}: VerifyParams): Promise<VerifyResult> {
   const hashParams = new URLSearchParams(hash.slice(1));
   const accessToken = hashParams.get("access_token");
   const refreshToken = hashParams.get("refresh_token") ?? "";
@@ -29,22 +29,31 @@ export async function verifyCallback({
       minDelay(),
     ]);
     if (error) {
-      setError(error.message);
-      return;
+      console.error("An error occurred setting the session in supabase", error);
+      return { status: "error" };
     }
-    await navigate(effectiveType === "invite" ? "/auth/set-password" : "/dashboard");
-    return;
+    return { status: "navigate", path: resolveRedirectPath(effectiveType) };
   }
 
   if (!code) {
-    setError("Invalid or missing verification code. The link may have expired.");
-    return;
+    console.error("Invalid or missing verification code. The link may have expired.");
+    return { status: "error" };
   }
 
   const [{ error }] = await Promise.all([supabase.auth.exchangeCodeForSession(code), minDelay()]);
   if (error) {
-    setError(error.message);
-    return;
+    console.error("Failed to exchange code for session", error);
+    return { status: "error" };
   }
-  await navigate(effectiveType === "invite" ? "/auth/set-password" : "/dashboard");
+
+  return { status: "navigate", path: resolveRedirectPath(effectiveType) };
+}
+
+function resolveRedirectPath(type: string | null | undefined): RedirectPath {
+  switch (type) {
+    case "invite":
+      return "/auth/set-password";
+    default:
+      return "/dashboard";
+  }
 }
