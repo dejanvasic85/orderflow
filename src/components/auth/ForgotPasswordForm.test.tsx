@@ -30,7 +30,7 @@ test("shows validation error when submitting empty email", async () => {
 });
 
 test("calls onSubmit with email on valid submit", async () => {
-  onSubmit.mockResolvedValue({ ok: true, value: null });
+  onSubmit.mockResolvedValue({ ok: true, value: undefined } as ForgotPasswordResult);
   render(<ForgotPasswordForm onSubmit={onSubmit} />);
 
   await user.type(screen.getByLabelText("Email"), "alice@example.com");

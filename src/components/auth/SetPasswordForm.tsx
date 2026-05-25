@@ -16,7 +16,7 @@ const setPasswordSchema = z
     path: ["confirmPassword"],
   });
 
-export type SetPasswordResult = Result<null, { message: string }>;
+export type SetPasswordResult = Result<void, { message: string }>;
 
 type SetPasswordFormProps = {
   onSetPassword: (password: string) => Promise<SetPasswordResult>;

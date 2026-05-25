@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { err, fromSupabaseError, ok } from "@/lib/result";
+import { err, ok } from "@/lib/result";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import { assignSchema, createAccountSchema, updateAccountSchema } from "./schema";
 
@@ -50,7 +50,7 @@ export const createAccount = createServerFn({ method: "POST", strict: { output: 
       .insert(data)
       .select()
       .single();
-    if (error) return err(fromSupabaseError(error));
+    if (error) return err({ message: error.message });
     return ok(row);
   });
 
@@ -66,7 +66,7 @@ export const updateAccount = createServerFn({ method: "POST", strict: { output: 
       .eq("id", id)
       .select()
       .single();
-    if (error) return err(fromSupabaseError(error));
+    if (error) return err({ message: error.message });
     return ok(row);
   });
 
@@ -76,8 +76,8 @@ export const assignUserToAccount = createServerFn({ method: "POST", strict: { ou
   .handler(async ({ data }) => {
     const supabaseServer = createSupabaseServerClient();
     const { error } = await supabaseServer.from("account_users").insert(data);
-    if (error) return err(fromSupabaseError(error));
-    return ok(null);
+    if (error) return err({ message: error.message });
+    return ok();
   });
 
 // Server — admin-only via RLS
@@ -90,6 +90,6 @@ export const unassignUserFromAccount = createServerFn({ method: "POST", strict: 
       .delete()
       .eq("account_id", data.account_id)
       .eq("user_id", data.user_id);
-    if (error) return err(fromSupabaseError(error));
-    return ok(null);
+    if (error) return err({ message: error.message });
+    return ok();
   });

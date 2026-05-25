@@ -21,7 +21,7 @@ function ForgotPasswordPage() {
       console.log("Supabase error sending reset email", error);
       return err({ message: "We encountered an error processing this request. Please try again." });
     }
-    return ok(null);
+    return ok();
   };
 
   return <ForgotPasswordView onSubmit={handleSubmit} />;

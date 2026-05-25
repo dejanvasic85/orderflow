@@ -18,5 +18,5 @@ export async function updatePassword({
     return err({ message: error.message });
   }
   await navigate();
-  return ok(null);
+  return ok();
 }

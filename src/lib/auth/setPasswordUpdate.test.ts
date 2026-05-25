@@ -17,7 +17,7 @@ test("updates password and navigates on success", async () => {
 
   expect(updateUser).toHaveBeenCalledWith({ password: "newpass123" });
   expect(navigate).toHaveBeenCalled();
-  expect(result).toEqual({ ok: true, value: null });
+  expect(result).toMatchObject({ ok: true });
 });
 
 test("returns error and does not navigate when updateUser fails", async () => {

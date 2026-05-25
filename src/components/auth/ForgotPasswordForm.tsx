@@ -10,7 +10,7 @@ const forgotPasswordSchema = z.object({
   email: z.email("Invalid email address"),
 });
 
-export type ForgotPasswordResult = Result<null, { message: string }>;
+export type ForgotPasswordResult = Result<void, { message: string }>;
 
 type ForgotPasswordFormProps = {
   onSubmit: (email: string) => Promise<ForgotPasswordResult>;

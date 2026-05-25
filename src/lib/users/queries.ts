@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { ensureSession } from "@/lib/authFunctions";
 import { getServerConfig } from "@/lib/config";
-import { err, fromSupabaseError, ok } from "@/lib/result";
+import { err, ok } from "@/lib/result";
 import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import { createUserSchema, updateUserSchema, type User, type UserAccount } from "./schema";
@@ -98,7 +98,7 @@ export const updateUser = createServerFn({ method: "POST", strict: { output: fal
       .eq("id", id)
       .select()
       .single();
-    if (error) return err(fromSupabaseError(error));
+    if (error) return err({ message: error.message });
 
     if ("active" in patch) {
       const admin = createSupabaseAdminClient();
@@ -108,7 +108,7 @@ export const updateUser = createServerFn({ method: "POST", strict: { output: fal
       if (banError) {
         console.error("Failed to sync auth ban status, rolling back active flag:", banError);
         await supabaseServer.from("users").update({ active: !patch.active }).eq("id", id);
-        return err({ kind: "unknown", message: "Failed to update user login access" });
+        return err({ message: "Failed to update user login access" });
       }
     }
 
@@ -117,13 +117,13 @@ export const updateUser = createServerFn({ method: "POST", strict: { output: fal
         .from("account_users")
         .delete()
         .eq("user_id", id);
-      if (deleteError) return err(fromSupabaseError(deleteError));
+      if (deleteError) return err({ message: deleteError.message });
 
       if (accountIds.length > 0) {
         const { error: insertError } = await supabaseServer
           .from("account_users")
           .insert(accountIds.map((account_id) => ({ account_id, user_id: id })));
-        if (insertError) return err(fromSupabaseError(insertError));
+        if (insertError) return err({ message: insertError.message });
       }
     }
 
@@ -177,7 +177,7 @@ export const inviteUser = createServerFn({ method: "POST", strict: { output: fal
     );
     if (inviteError) {
       console.error("Failed to send invite:", inviteError);
-      return err({ kind: "unknown", message: "Unable to send user invitation" });
+      return err({ message: "Unable to send user invitation" });
     }
     const newUserId = invited.user.id;
 
@@ -194,7 +194,7 @@ export const inviteUser = createServerFn({ method: "POST", strict: { output: fal
     if (updateError) {
       console.error("Post-invite DB update failed, rolling back auth user:", updateError);
       await admin.auth.admin.deleteUser(newUserId);
-      return err({ kind: "unknown", message: "Unable to complete user invitation" });
+      return err({ message: "Unable to complete user invitation" });
     }
 
     if (data.accountIds.length > 0) {
@@ -210,7 +210,7 @@ export const inviteUser = createServerFn({ method: "POST", strict: { output: fal
           assignError,
         );
         await admin.auth.admin.deleteUser(newUserId);
-        return err({ kind: "unknown", message: "Unable to complete user invitation" });
+        return err({ message: "Unable to complete user invitation" });
       }
     }
 
@@ -245,7 +245,7 @@ export const resendInvite = createServerFn({ method: "POST", strict: { output: f
       .select("email")
       .eq("id", id)
       .single();
-    if (error || !user?.email) return err({ kind: "not_found", message: "User not found" });
+    if (error || !user?.email) return err({ message: "User not found" });
 
     const admin = createSupabaseAdminClient();
     const { SITE_URL } = getServerConfig();
@@ -254,7 +254,7 @@ export const resendInvite = createServerFn({ method: "POST", strict: { output: f
     });
     if (inviteError) {
       console.error("Failed to resend invite:", inviteError);
-      return err({ kind: "unknown", message: "Unable to resend invitation" });
+      return err({ message: "Unable to resend invitation" });
     }
 
     return ok({ invitedAt: new Date().toISOString() });

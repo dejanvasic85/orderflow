@@ -40,7 +40,7 @@ test("shows validation error when passwords do not match", async () => {
 });
 
 test("calls onSetPassword with the password value on valid submit", async () => {
-  onSetPassword.mockResolvedValue({ ok: true, value: null });
+  onSetPassword.mockResolvedValue({ ok: true, value: undefined } as SetPasswordResult);
   render(<SetPasswordForm onSetPassword={onSetPassword} />);
 
   await user.type(screen.getByLabelText("Password"), "mysecret");

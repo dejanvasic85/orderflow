@@ -6,6 +6,7 @@ import {
 } from "@tanstack/react-router";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { type ForgotPasswordResult } from "@/components/auth/ForgotPasswordForm";
 import { ForgotPasswordView } from "@/components/auth/ForgotPasswordView";
 
 function renderWithRouter(ui: React.ReactNode) {
@@ -26,7 +27,7 @@ test("renders the form initially", async () => {
 
 test("shows success message after form is submitted without error", async () => {
   const user = userEvent.setup();
-  const onSubmit = vi.fn().mockResolvedValue({ ok: true, value: null });
+  const onSubmit = vi.fn().mockResolvedValue({ ok: true } as ForgotPasswordResult);
   renderWithRouter(<ForgotPasswordView onSubmit={onSubmit} />);
 
   await user.type(await screen.findByLabelText("Email"), "alice@example.com");
