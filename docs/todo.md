@@ -1,50 +1,63 @@
 # Todo list
 
-Infra and setup
+Format: `[status] Category | Priority | Description`
 
-- [x] Rename bww to bwow including admin email
-- [x] Layout components -> Update agents.md instructions and skills for UI development
-- [x] Form library and validation - replace all the use state in the UserEditPanel
-- [x] Filename and module convention - what do we do about shadcn installation etc?
-- [x] Unit tests
-- [x] Setup deployment to cloudflare
-- [x] CI Pipeline with unit tests and branch deployments
-- [x] Setup the admin user
-- [x] List the users by connecting to the API instead of mocks
-- [x] End to end tests
-- [x] Github checks for branch protection
-- [ ] Cleaner architecture that allows for adding a mobile application
-- [ ] Server functions and lib functions seem to be mixed - resetPassword is a server function but callbackVerify is a regular function
-- [ ] Playwright tests will need our custom container with supabase
+Categories: `Productionising` · `Feature` · `Infra` · `Quality` · `Cleanup`
+Priorities: `Must` · `Should` · `Nice`
 
-Productionising
-
-- [ ] Setup domain name - orders.bwow.com.au (speak to Sam about access to this or should we get a new domain name?)
-- [ ] SMTP server for email notifications (AWS SES — configure in Supabase dashboard, verify `vasic.com.au` for DKIM as interim sender domain)
-- [ ] Email templates
-- [ ] Logging and monitoring - including supabase and cloudflare. Could it all go to cloudflare logs?
-- [ ] Configure production domain in Supabase and set up environment variables for production deployment. Currently https://orderflow.team-manager.workers.dev
-- [ ] Configure production domain in Github Env Variables for production
-
-User management Features:
-
-- [x] Adding / inviting a new user
-- [x] Auth callback route (`/auth/callback`) — handles invite/recovery links via shared verification logic (hash-token and code paths)
-- [x] "Set your password" screen for first-time invitees (post-callback landing)
-- [x] Should not be able to invite users with the same email
-- [x] Resend invite from user list (for users who never accepted)
-- [x] Admins need ability to mark users as "inactive" to prevent login without deleting their data
-- [x] Forgot password
-- [ ] Change password while logged in
-- [ ] Search users by email or name in the list. Simple textbox with a server side filter
-- [ ] Ability to sort users
-- [ ] Paging
-
-Account management features:
-
-- [ ] Account management
-- [ ] CSV Import
-
-Code cleanup - later:
-
-- [ ] Hardcoded routes and api endpoints
+- [x] Infra | Must | Rename bww to bwow including admin email
+- [x] Infra | Must | Layout components — update agents.md instructions and skills for UI development
+- [x] Infra | Must | Form library and validation — replace all useState in UserEditPanel
+- [x] Infra | Must | Filename and module convention (incl. shadcn installation)
+- [x] Quality | Must | Unit tests
+- [x] Productionising | Must | Setup deployment to Cloudflare
+- [x] Quality | Must | CI pipeline with unit tests and branch deployments
+- [x] Feature | Must | Setup the admin user
+- [x] Feature | Must | List users by connecting to the API instead of mocks
+- [x] Quality | Should | End-to-end tests
+- [x] Quality | Must | GitHub checks for branch protection
+- [x] Feature | Must | Adding / inviting a new user
+- [x] Feature | Must | Auth callback route (`/auth/callback`) — invite/recovery via hash-token and code paths
+- [x] Feature | Must | "Set your password" screen for first-time invitees
+- [x] Feature | Must | Block inviting users with the same email
+- [x] Feature | Must | Resend invite from user list
+- [x] Feature | Must | Mark users as "inactive" to prevent login without deleting data
+- [x] Feature | Must | Forgot password
+- [ ] Quality | Must | Improve the error handling to use Result system - investigate neverthrow
+- [ ] Quality | Must | Question architecture direction and whether we are heading in the right direction - https://claude.ai/code/session_01FuB3evNxHRJvTYkVDEod2n
+- [ ] Quality | Must | Structure of server functions and loaders. Where should they live? We have inconsistency including testing.
+- [ ] Infra | Must | Migration for `products`, `order_requests`, `order_request_items`
+- [ ] Infra | Must | Seed data — sample product catalog in `supabase/seed.sql`
+- [ ] Infra | Must | Supabase Storage bucket for product images + upload UI (sort out sourcing wine/beer/liquor images for dev seed)
+- [ ] Infra | Must | RLS policies — users see only their assigned accounts; staff read-only across all order requests
+- [ ] Infra | Must | `src/lib/products/` query layer (mirror `accounts/`, `users/`)
+- [ ] Feature | Must | Real product catalog browse — replace mock data on account orders page
+- [ ] Feature | Must | Order draft state — add items with box + extra bottle quantities
+- [ ] Feature | Must | Submit order request — server function + RLS scoped to assigned accounts
+- [ ] Feature | Must | Order history view — replace mock data with real submitted orders
+- [ ] Feature | Must | Wire existing "New Order" button to the order flow
+- [ ] Quality | Must | Playwright tests improved and working locally
+- [ ] Quality | Must | Playwright custom container with Supabase so it is working properly in the pipeline
+- [ ] Feature | Must | PWA — manifest, service worker, install prompt, offline app shell
+- [ ] Feature | Must | Notification preferences UI — users edit their own email/SMS preferences
+- [ ] Feature | Must | Staff role surface — read-only view of all order requests
+- [ ] Productionising | Must | Set up production domain (orders.bwow.com.au) — confirm access with Sam or register new
+- [ ] Productionising | Must | SMTP server (AWS SES) for email notifications — configure in Supabase, verify `vasic.com.au` for DKIM as interim sender
+- [ ] Productionising | Must | Email templates
+- [ ] Productionising | Must | Configure production domain in Supabase (currently https://orderflow.team-manager.workers.dev)
+- [ ] Productionising | Must | Configure production env vars in GitHub
+- [ ] Feature | Must | Templates — per-account product list; users can add, only admins can remove
+- [ ] Feature | Must | Admin places order request on behalf of an account
+- [ ] Feature | Must | Per-request delivery override (note + address)
+- [ ] Feature | Must | Email notification on order placed
+- [ ] Feature | Must | SMS notifications (Phase 2)
+- [ ] Feature | Must | MYOB CSV export — orders out of our system into MYOB
+- [ ] Feature | Must | Account management UX — full CRUD, assigning users, delivery address editing
+- [ ] Productionising | Must | Logging and monitoring (Supabase + Cloudflare — consider unifying in Cloudflare logs)
+- [ ] Feature | Must| Search users by email or name (server-side filter)
+- [ ] Feature | Must| Sort users in admin list
+- [ ] Feature | Must | Paging on users list
+- [ ] Feature | Must | CSV import for products and accounts (incl. MYOB import back into our system)
+- [ ] Feature | Must | Change password while logged in
+- [ ] Feature | Nice | Homepage dashboard — reporting / summary tiles (Phase 4, quoted separately)
+- [ ] Cleanup | Nice | Remove hardcoded routes and API endpoints
