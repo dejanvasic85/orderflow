@@ -4,6 +4,7 @@ import {
   fetchAccount,
   fetchAccountUsers,
   fetchAccounts,
+  fetchAccountsForCurrentUser,
   insertAccount,
   insertAccountUser,
   patchAccount,
@@ -13,6 +14,11 @@ import { assignSchema, createAccountSchema, updateAccountSchema } from "./schema
 export const listAccounts = createServerFn({ method: "GET", strict: { output: false } }).handler(
   fetchAccounts,
 );
+
+export const listAccountsForCurrentUser = createServerFn({
+  method: "GET",
+  strict: { output: false },
+}).handler(fetchAccountsForCurrentUser);
 
 export const getAccount = createServerFn({ method: "GET", strict: { output: false } })
   .inputValidator((id: string) => id)

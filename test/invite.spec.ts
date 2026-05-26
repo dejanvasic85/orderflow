@@ -1,5 +1,6 @@
 import { faker } from "@faker-js/faker";
-import { test, expect, type Page } from "@playwright/test";
+import { test, expect } from "@playwright/test";
+import { login } from "./flows";
 
 const mailpitUrl = "http://localhost:54324";
 
@@ -8,15 +9,6 @@ type MailpitMessage = {
   Subject: string;
   To: { Address: string }[];
 };
-
-async function loginAsAdmin(page: Page) {
-  await page.goto("/login");
-  await page.waitForSelector("html[data-hydrated]");
-  await page.getByLabel("Email").fill("admin@bwow.com.au");
-  await page.getByLabel("Password").fill("password123");
-  await page.getByRole("button", { name: /sign in/i }).click();
-  await page.waitForURL("**/dashboard");
-}
 
 async function getInviteLink(toEmail: string, timeoutMs = 10000): Promise<string> {
   const deadline = Date.now() + timeoutMs;
@@ -53,7 +45,7 @@ test.describe("Accept invite", () => {
     await deleteAllMailpitMessages();
   });
 
-  test.skip("admin invites user, user accepts and sets password", async ({ page, browser }) => {
+  test("admin invites user, user accepts and sets password", async ({ page, browser }) => {
     const firstName = faker.person.firstName();
     const lastName = faker.person.lastName();
     const invitedEmail = faker.internet
@@ -61,7 +53,7 @@ test.describe("Accept invite", () => {
       .toLowerCase();
 
     // Step 1 — login as admin and send invite
-    await loginAsAdmin(page);
+    await login(page, { user: "admin" });
     await page.goto("/users");
     await page.waitForSelector("html[data-hydrated]");
     await page.getByRole("button", { name: "+ New user" }).click();

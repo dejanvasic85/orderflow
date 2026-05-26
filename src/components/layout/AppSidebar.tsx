@@ -1,4 +1,4 @@
-import { Link, useRouter, useRouterState } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -17,8 +17,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { company } from "@/lib/config";
-import { navItemsValue } from "@/lib/routes";
-import { supabase } from "@/lib/supabase";
+import { adminNavItemsValue } from "@/lib/routes";
 
 // Future routes — uncomment when pages are created:
 // { label: "Accounts", to: "/accounts", icon: BuildingIcon },
@@ -26,6 +25,7 @@ import { supabase } from "@/lib/supabase";
 
 type AppSidebarProps = {
   email: string;
+  onSignOut: () => void;
 };
 
 function getInitials(email: string) {
@@ -36,14 +36,8 @@ function getInitials(email: string) {
     .join("");
 }
 
-export function AppSidebar({ email }: AppSidebarProps) {
-  const router = useRouter();
+export function AppSidebar({ email, onSignOut }: AppSidebarProps) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-
-  async function handleSignOut() {
-    await supabase.auth.signOut();
-    void router.navigate({ to: "/" });
-  }
 
   return (
     <Sidebar collapsible="icon">
@@ -63,7 +57,7 @@ export function AppSidebar({ email }: AppSidebarProps) {
 
       <SidebarContent className="px-2">
         <SidebarMenu>
-          {navItemsValue.map(({ label, to, icon: Icon }) => (
+          {adminNavItemsValue.map(({ label, to, icon: Icon }) => (
             <SidebarMenuItem key={to}>
               <SidebarMenuButton
                 asChild
@@ -98,7 +92,7 @@ export function AppSidebar({ email }: AppSidebarProps) {
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent side="top" align="start" className="w-56">
-                <DropdownMenuItem onClick={handleSignOut}>Sign out</DropdownMenuItem>
+                <DropdownMenuItem onClick={onSignOut}>Sign out</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </SidebarMenuItem>
