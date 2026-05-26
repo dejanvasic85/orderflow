@@ -5,8 +5,8 @@ import { listAccountsForCurrentUser } from "@/lib/accounts/accounts.functions";
 export const Route = createFileRoute("/_protected/_account")({
   loader: async () => {
     const result = await listAccountsForCurrentUser();
-    const accounts = result.ok ? result.value : [];
-    return { hasMultipleAccounts: accounts.length > 1 };
+    if (!result.ok) throw new Error(result.error.message);
+    return { hasMultipleAccounts: result.value.length > 1 };
   },
   component: AccountLayout,
 });

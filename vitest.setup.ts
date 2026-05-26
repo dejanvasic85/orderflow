@@ -9,6 +9,19 @@ global.ResizeObserver = class ResizeObserver {
   disconnect() {}
 };
 
+// jsdom does not implement matchMedia; stub it for shadcn Sidebar and similar components
+Object.defineProperty(window, "matchMedia", {
+  writable: true,
+  value: vi.fn().mockReturnValue({
+    matches: false,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  }),
+});
+
 afterEach(() => {
   cleanup();
 });

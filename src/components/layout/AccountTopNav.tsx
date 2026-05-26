@@ -1,4 +1,4 @@
-import { Link, useRouter, useRouterState } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -8,7 +8,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { company } from "@/lib/config";
-import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 
 function getInitials(email: string) {
@@ -29,6 +28,7 @@ type AccountTopNavProps = {
   accountId: string;
   hasMultipleAccounts: boolean;
   navLinks: NavLink[];
+  onSignOut: () => void;
 };
 
 export function AccountTopNav({
@@ -36,14 +36,9 @@ export function AccountTopNav({
   accountId: _accountId,
   hasMultipleAccounts,
   navLinks,
+  onSignOut,
 }: AccountTopNavProps) {
-  const router = useRouter();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-
-  async function handleSignOut() {
-    await supabase.auth.signOut();
-    void router.navigate({ to: "/" });
-  }
 
   return (
     <header className="sticky top-0 z-40 hidden md:flex border-b bg-background">
@@ -72,7 +67,11 @@ export function AccountTopNav({
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-2 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <button
+              type="button"
+              aria-label="Open account menu"
+              className="flex items-center gap-2 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
               <Avatar className="size-8">
                 <AvatarFallback className="text-xs">{getInitials(email)}</AvatarFallback>
               </Avatar>
@@ -87,7 +86,7 @@ export function AccountTopNav({
                 <DropdownMenuSeparator />
               </>
             )}
-            <DropdownMenuItem onClick={handleSignOut}>Sign out</DropdownMenuItem>
+            <DropdownMenuItem onClick={onSignOut}>Sign out</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

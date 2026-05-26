@@ -23,8 +23,19 @@ function LoginPage() {
       return { error: error.message ?? "Sign in failed" };
     }
     const token = data.session?.access_token ?? "";
-    const payload = token ? JSON.parse(atob(token.split(".")[1])) : {};
-    const to = payload.user_role === "user" ? "/accounts" : "/dashboard";
+    let userRole: string | undefined;
+    if (token) {
+      try {
+        const base64Url = token.split(".")[1] ?? "";
+        const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+        const padded = base64.padEnd(Math.ceil(base64.length / 4) * 4, "=");
+        const payload = JSON.parse(atob(padded)) as { user_role?: string };
+        userRole = payload.user_role;
+      } catch {
+        userRole = undefined;
+      }
+    }
+    const to = userRole === "user" ? "/accounts" : "/dashboard";
     await router.navigate({ to });
   };
 
