@@ -1,6 +1,6 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { ForgotPasswordView } from "@/components/auth/ForgotPasswordView";
-import { getSession } from "@/lib/authFunctions";
+import { getSession } from "@/lib/auth/auth.functions";
 import { err, ok } from "@/lib/result";
 import { supabase } from "@/lib/supabase";
 

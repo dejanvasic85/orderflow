@@ -14,25 +14,29 @@ import {
 import { UserEditPanel } from "@/components/users/UserEditPanel";
 import { UserList, type RoleFilter } from "@/components/users/UserList";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import { listAccounts } from "@/lib/accounts/queries";
+import { listAccounts } from "@/lib/accounts/accounts.functions";
 import { asResult } from "@/lib/result";
+import type { User, UserAccount } from "@/lib/users/schema";
 import {
   checkEmailExists,
   inviteUser,
   listUsers,
   resendInvite,
   updateUser,
-} from "@/lib/users/queries";
-import type { User, UserAccount } from "@/lib/users/schema";
+} from "@/lib/users/users.functions";
 
 export const Route = createFileRoute("/_protected/_app/users")({
   loader: async () => {
-    const [users, accounts] = await Promise.all([listUsers(), listAccounts()]);
-    const availableAccounts: UserAccount[] = accounts.map((a) => ({
+    const [usersResult, accountsResult] = await Promise.all([listUsers(), listAccounts()]);
+    const users = asResult<User[]>(usersResult);
+    const accounts = asResult<{ id: string; name: string }[]>(accountsResult);
+    if (!users.ok) throw new Error(users.error.message);
+    if (!accounts.ok) throw new Error(accounts.error.message);
+    const availableAccounts: UserAccount[] = accounts.value.map((a) => ({
       id: a.id,
       name: a.name,
     }));
-    return { users, availableAccounts };
+    return { users: users.value, availableAccounts };
   },
   component: UsersPage,
 });
@@ -165,7 +169,11 @@ function UsersPage() {
                 availableAccounts={availableAccounts}
                 onSave={handleInvite}
                 onDiscard={handleDiscard}
-                onCheckEmailExists={(email) => checkEmailExists({ data: email })}
+                onCheckEmailExists={async (email) => {
+                  const result = asResult<boolean>(await checkEmailExists({ data: email }));
+                  if (!result.ok) throw new Error(result.error.message);
+                  return result.value;
+                }}
               />
             )}
           </SheetContent>

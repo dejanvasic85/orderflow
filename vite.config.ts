@@ -59,7 +59,10 @@ const config = defineConfig({
     devtools(),
     !isTest && cloudflare({ viteEnvironment: { name: "ssr" } }),
     tailwindcss(),
-    tanstackStart({ router: { routeFileIgnorePattern: "\\.(test|spec)\\.(ts|tsx)$" } }),
+    tanstackStart({
+      router: { routeFileIgnorePattern: "\\.(test|spec)\\.(ts|tsx)$" },
+      importProtection: { mockAccess: "off" },
+    }),
     viteReact(),
   ].filter(Boolean),
 });

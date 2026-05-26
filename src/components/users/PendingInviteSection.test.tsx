@@ -36,6 +36,9 @@ describe("PendingInviteSection", () => {
     expect(screen.getByRole("button", { name: /sending/i })).toBeDisabled();
 
     resolve!();
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: /resend invitation/i })).toBeEnabled(),
+    );
   });
 
   it("shows a success toast and updates the date on successful resend", async () => {

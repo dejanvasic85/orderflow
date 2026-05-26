@@ -11,10 +11,15 @@ It contains the product vision, tech stack, and data model decisions.
 
 - Use `vp` (Vite Plus) for all dev/build/test/lint workflows — not raw `pnpm` or `vite`
 - Path alias `@/*` maps to `./src/*` — prefer it over relative imports
-- Auth is handled by Supabase Auth; use `getSession` / `ensureSession` from `src/lib/authFunctions.ts`
-- Server-side Supabase access: `createSupabaseServerClient()` from `src/lib/supabaseServer.ts` (used inside `createServerFn` handlers)
+- Auth is handled by Supabase Auth; use `getSession` / `ensureSession` from `src/lib/auth/auth.functions.ts`
+- Server-side Supabase access: `createSupabaseServerClient()` from `src/lib/supabaseServer.ts` (used inside `.server.ts` helpers)
 - Browser-side Supabase access: `supabase` singleton from `src/lib/supabase.ts`
-- Domain queries go in `src/lib/queries/` grouped by entity (e.g. `orders.ts`, `products.ts`)
+- **Server-side code layout** (TanStack Start file-naming convention):
+  - `src/lib/<entity>/<entity>.functions.ts` — `createServerFn` wrappers, safe to import from routes and components
+  - `src/lib/<entity>/<entity>.server.ts` — server-only helpers (Supabase queries, admin checks, mappers); never import these from client code
+  - `src/lib/<entity>/schema.ts` — Zod schemas and types; client-safe
+  - Do **not** define `createServerFn` calls inside route files; always extract to `<entity>.functions.ts`
+  - Test files for `.server.ts` helpers must use plain `.test.ts` suffix (not `.server.test.ts`) to avoid the TanStack import-protection plugin stubbing them out in jsdom
 - Environment variables are documented in `.env.example` — never put env var lists in docs or README files
 
 ## Local development
@@ -87,6 +92,7 @@ Vite+ automatically detects and wraps the underlying package manager through `pa
 ## Code Style
 
 - Keep code DRY; extract repeated logic into named functions/constants
+- Prefer to use Result over throwing errors
 - Prefer small, composable functions over large inline blocks
 - Prefer `switch` over long `if/else` chains when branching on a single discriminator
 - Avoid magic numbers/strings; introduce well-named constants
@@ -127,7 +133,8 @@ Vitest runs through Vite+ (`vp test`). The runner is wired up with `jsdom`, `@te
 
 ### What to test
 
-- **Business logic** in `src/lib/` (queries, validators, mappers, utilities)
+- **Server functions** in `src/lib/<entity>/<entity>.server.ts` — test these directly by mocking `createSupabaseServerClient`. Every exported helper should have coverage. Name test files `<entity>.test.ts` (not `<entity>.server.test.ts` — see layout note above).
+- **Business logic** in `src/lib/` (validators, mappers, utilities)
 - **Composed React components** that wire shadcn primitives together, handle forms, conditional rendering, or display derived data
 - **Custom hooks** with non-trivial behavior
 
