@@ -1,6 +1,7 @@
 import { createFileRoute, Link, redirect, useRouter } from "@tanstack/react-router";
 import { LoginForm, type LoginValues } from "@/components/auth/LoginForm";
 import { getSession } from "@/lib/auth/auth.functions";
+import { getPostLoginRedirect } from "@/lib/auth/userRedirect";
 import { company } from "@/lib/config";
 import { supabase } from "@/lib/supabase";
 
@@ -8,7 +9,7 @@ export const Route = createFileRoute("/login")({
   beforeLoad: async () => {
     const user = await getSession();
     if (user) {
-      throw redirect({ to: user.user_role === "user" ? "/accounts" : "/dashboard" });
+      throw redirect({ to: getPostLoginRedirect(user.user_role) });
     }
   },
   component: LoginPage,
@@ -35,7 +36,7 @@ function LoginPage() {
         userRole = undefined;
       }
     }
-    const to = userRole === "user" ? "/accounts" : "/dashboard";
+    const to = getPostLoginRedirect(userRole);
     await router.navigate({ to });
   };
 

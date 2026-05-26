@@ -1,6 +1,7 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { ForgotPasswordView } from "@/components/auth/ForgotPasswordView";
 import { getSession } from "@/lib/auth/auth.functions";
+import { getPostLoginRedirect } from "@/lib/auth/userRedirect";
 import { err, ok } from "@/lib/result";
 import { supabase } from "@/lib/supabase";
 
@@ -8,7 +9,7 @@ export const Route = createFileRoute("/forgot-password")({
   beforeLoad: async () => {
     const user = await getSession();
     if (user) {
-      throw redirect({ to: "/dashboard" });
+      throw redirect({ to: getPostLoginRedirect(user.user_role) });
     }
   },
   component: ForgotPasswordPage,

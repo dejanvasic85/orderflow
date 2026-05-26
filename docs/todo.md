@@ -48,6 +48,8 @@ Priorities: `Must` · `Should` · `Nice`
 - [ ] Productionising | Must | Email templates
 - [ ] Productionising | Must | Configure production domain in Supabase (currently https://orderflow.team-manager.workers.dev)
 - [ ] Productionising | Must | Configure production env vars in GitHub
+- [ ] Bug | Must | Admins and staff users can have accounts assigned - should they?
+- [ ] Feature | Must | Invite for staff and admin should work seamlessly - at the moment only users have been tested!
 - [ ] Feature | Must | Templates — per-account product list; users can add, only admins can remove
 - [ ] Feature | Must | Admin places order request on behalf of an account
 - [ ] Feature | Must | Per-request delivery override (note + address)

@@ -3,7 +3,7 @@ import { login } from "./flows";
 
 test.describe("Account selection", () => {
   test.beforeEach(async ({ page }) => {
-    await login(page, { user: "sarah" });
+    await login(page, { user: "tom" });
   });
 
   test("navigating to accounts from selection page", async ({ page }) => {
@@ -13,6 +13,7 @@ test.describe("Account selection", () => {
     await expect(page.getByText(/which account are you ordering for/i)).toBeVisible();
     await expect(page.getByRole("button", { name: "The Winery Bistro" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Cellar Door Co." })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Vine & Barrel" })).toBeVisible();
 
     await page.getByRole("button", { name: "The Winery Bistro" }).click();
     await page.waitForURL("**/accounts/**");

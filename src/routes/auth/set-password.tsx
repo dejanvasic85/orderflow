@@ -13,7 +13,7 @@ function SetPasswordPage() {
   const handleSetPassword = async (password: string): Promise<SetPasswordResult> => {
     const result = await setPassword({ data: { password } });
     if (result.ok) {
-      await navigate({ to: "/dashboard" });
+      await navigate({ to: "/manage/dashboard" });
     }
     return result;
   };

@@ -4,11 +4,10 @@ type UserPreset = "admin" | "sarah" | "tom" | "marcus" | "priya" | "olivia";
 
 const adminUsers: UserPreset[] = ["admin", "sarah", "marcus"];
 
-type LoginOptions = { user: UserPreset; redirectUrl?: string };
+type LoginOptions = { user: UserPreset };
 
-export async function login(page: Page, { user, redirectUrl }: LoginOptions) {
-  const defaultRedirect = adminUsers.includes(user) ? "**/dashboard" : "**/accounts/**";
-  const targetUrl = redirectUrl ?? defaultRedirect;
+export async function login(page: Page, { user }: LoginOptions) {
+  const targetUrl = adminUsers.includes(user) ? "**/dashboard" : "**/accounts**";
   const credentials = { email: `${user}@bwow.com.au`, password: "password123" };
 
   await page.goto("/login");

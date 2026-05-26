@@ -54,7 +54,7 @@ test.describe("Accept invite", () => {
 
     // Step 1 — login as admin and send invite
     await login(page, { user: "admin" });
-    await page.goto("/users");
+    await page.goto("/manage/users");
     await page.waitForSelector("html[data-hydrated]");
     await page.getByRole("button", { name: "+ New user" }).click();
 

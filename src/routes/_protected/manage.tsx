@@ -2,7 +2,7 @@ import { Outlet, createFileRoute, redirect, useRouter } from "@tanstack/react-ro
 import { AdminShell } from "@/components/layout/AdminShell";
 import { supabase } from "@/lib/supabase";
 
-export const Route = createFileRoute("/_protected/_admin")({
+export const Route = createFileRoute("/_protected/manage")({
   beforeLoad: ({ context }) => {
     const user = context.user as unknown as { user_role?: string };
     if (user.user_role !== "admin" && user.user_role !== "staff") {

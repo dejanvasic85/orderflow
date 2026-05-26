@@ -1,6 +1,5 @@
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
-import { ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { AccountSelectionView } from "@/components/accounts/AccountSelectionView";
 import { Skeleton } from "@/components/ui/skeleton";
 import { listAccountsForCurrentUser } from "@/lib/accounts/accounts.functions";
 import { supabase } from "@/lib/supabase";
@@ -11,7 +10,10 @@ export const Route = createFileRoute("/_protected/accounts/")({
     if (!result.ok) return { accounts: [] };
     const accounts = result.value;
     if (accounts.length === 1) {
-      throw redirect({ to: "/accounts/$accountId", params: { accountId: accounts[0].id } });
+      throw redirect({
+        to: "/accounts/$accountId",
+        params: { accountId: accounts[0].id },
+      });
     }
     return { accounts };
   },
@@ -46,45 +48,15 @@ function AccountSelectionPage() {
     void navigate({ to: "/" });
   }
 
+  function handleSelectAccount(accountId: string) {
+    void navigate({ to: "/accounts/$accountId", params: { accountId } });
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
-      <div className="flex w-full max-w-sm flex-col gap-6">
-        <div className="flex flex-col gap-1">
-          <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
-            Select an account
-          </p>
-          <p className="text-base">Which account are you ordering for?</p>
-        </div>
-
-        {accounts.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            No accounts assigned. Contact your administrator.
-          </p>
-        ) : (
-          <div className="flex flex-col gap-2">
-            {accounts.map((account) => (
-              <Button
-                key={account.id}
-                variant="outline"
-                className="h-12 w-full justify-between px-4"
-                onClick={() =>
-                  navigate({ to: "/accounts/$accountId", params: { accountId: account.id } })
-                }
-              >
-                <span className="font-medium">{account.name}</span>
-                <ChevronRight className="size-4 text-muted-foreground" />
-              </Button>
-            ))}
-          </div>
-        )}
-
-        <button
-          onClick={handleSignOut}
-          className="text-sm text-muted-foreground underline-offset-4 hover:underline self-center"
-        >
-          Sign out
-        </button>
-      </div>
-    </div>
+    <AccountSelectionView
+      accounts={accounts}
+      onSelectAccount={handleSelectAccount}
+      onSignOut={handleSignOut}
+    />
   );
 }
