@@ -5,10 +5,12 @@ import type { ProductRow } from "@/lib/products/schema";
 export type TemplateRow = Database["public"]["Tables"]["templates"]["Row"];
 export type TemplateItemRow = Database["public"]["Tables"]["template_items"]["Row"];
 
+export type TemplateItem = TemplateItemRow & {
+  products: Pick<ProductRow, "id" | "name" | "qty_per_box">;
+};
+
 export type TemplateWithItems = TemplateRow & {
-  template_items: Array<
-    TemplateItemRow & { products: Pick<ProductRow, "id" | "name" | "qty_per_box"> }
-  >;
+  template_items: Array<TemplateItem>;
 };
 
 export const createTemplateSchema = z.object({

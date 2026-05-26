@@ -31,7 +31,7 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Infra | Must | RLS policies — users see only their assigned accounts; staff read-only across all order requests
 - [x] Infra | Must | `src/lib/products/` query layer (mirror `accounts/`, `users/`)
 - [x] Feature | Must | User homepage — account selection for users with multiple accounts
-- [ ] Feature | Must | Submit order request from homepage — server function + RLS scoped to assigned accounts
+- [x] Feature | Must | Submit order request — server function + RLS scoped to assigned accounts
 - [ ] Feature | Must | Real product catalog browse — replace mock data on account orders page
 - [ ] Feature | Must | Order draft state — add items with box + extra bottle quantities
 - [ ] Feature | Must | Order history view — replace mock data with real submitted orders
