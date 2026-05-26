@@ -26,8 +26,8 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Quality | Must | Improve the error handling to use Result system - investigate neverthrow
 - [x] Quality | Must | Structure of server functions and loaders. Where should they live? We have inconsistency including testing.
 - [x] Infra | Must | Migration for `products`, `order_requests`, `order_request_items`
-- [ ] Infra | Must | Seed data — sample product catalog in `supabase/seed.sql`
-- [ ] Infra | Must | Supabase Storage bucket for product images + upload UI (sort out sourcing wine/beer/liquor images for dev seed)
+- [x] Infra | Must | Seed data — sample product catalog in `supabase/seed.sql`
+- [x] Infra | Must | Supabase Storage bucket for product images + upload UI (sort out sourcing wine/beer/liquor images for dev seed)
 - [ ] Infra | Must | RLS policies — users see only their assigned accounts; staff read-only across all order requests
 - [ ] Infra | Must | `src/lib/products/` query layer (mirror `accounts/`, `users/`)
 - [ ] Feature | Must | Real product catalog browse — replace mock data on account orders page
