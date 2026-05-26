@@ -24,22 +24,24 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Feature | Must | Mark users as "inactive" to prevent login without deleting data
 - [x] Feature | Must | Forgot password
 - [x] Quality | Must | Improve the error handling to use Result system - investigate neverthrow
-- [ ] Quality | Must | Structure of server functions and loaders. Where should they live? We have inconsistency including testing.
-- [ ] Infra | Must | Migration for `products`, `order_requests`, `order_request_items`
-- [ ] Infra | Must | Seed data — sample product catalog in `supabase/seed.sql`
-- [ ] Infra | Must | Supabase Storage bucket for product images + upload UI (sort out sourcing wine/beer/liquor images for dev seed)
-- [ ] Infra | Must | RLS policies — users see only their assigned accounts; staff read-only across all order requests
-- [ ] Infra | Must | `src/lib/products/` query layer (mirror `accounts/`, `users/`)
+- [x] Quality | Must | Structure of server functions and loaders. Where should they live? We have inconsistency including testing.
+- [x] Infra | Must | Migration for `products`, `order_requests`, `order_request_items`
+- [x] Infra | Must | Seed data — sample product catalog in `supabase/seed.sql`
+- [x] Infra | Must | Supabase Storage bucket for product images + upload UI (sort out sourcing wine/beer/liquor images for dev seed)
+- [x] Infra | Must | RLS policies — users see only their assigned accounts; staff read-only across all order requests
+- [x] Infra | Must | `src/lib/products/` query layer (mirror `accounts/`, `users/`)
 - [ ] Feature | Must | Real product catalog browse — replace mock data on account orders page
 - [ ] Feature | Must | Order draft state — add items with box + extra bottle quantities
 - [ ] Feature | Must | Submit order request — server function + RLS scoped to assigned accounts
 - [ ] Feature | Must | Order history view — replace mock data with real submitted orders
 - [ ] Feature | Must | Wire existing "New Order" button to the order flow
+- [ ] Quality | Must | Unit testing the server functions
 - [ ] Quality | Must | Playwright tests improved and working locally
 - [ ] Quality | Must | Playwright custom container with Supabase so it is working properly in the pipeline
 - [ ] Feature | Must | PWA — manifest, service worker, install prompt, offline app shell
 - [ ] Feature | Must | Notification preferences UI — users edit their own email/SMS preferences
 - [ ] Feature | Must | Staff role surface — read-only view of all order requests
+- [ ] Productionising | Must | Fix the publicly available view users_with_email - see email for warning from supabase
 - [ ] Productionising | Must | Set up production domain (orders.bwow.com.au) — confirm access with Sam or register new
 - [ ] Productionising | Must | SMTP server (AWS SES) for email notifications — configure in Supabase, verify `vasic.com.au` for DKIM as interim sender
 - [ ] Productionising | Must | Email templates
