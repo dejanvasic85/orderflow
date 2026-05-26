@@ -1,15 +1,19 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, Package, Plus } from "lucide-react";
+import { AlertCircle, ArrowLeft, Package, Plus } from "lucide-react";
+import { useState } from "react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
+import type { CreateOrderRequestInput } from "@/lib/orderRequests/schema";
 import type { TemplateItem, TemplateWithItems } from "@/lib/templates/schema";
 
 type NewOrderFormProps = {
   accountId: string;
   accountName: string;
   template: TemplateWithItems | null;
+  onSubmit: (data: CreateOrderRequestInput) => Promise<void>;
 };
 
 type OrderItemCardProps = {
@@ -66,8 +70,38 @@ function TemplateItemsList({ template }: { template: TemplateWithItems }) {
   );
 }
 
-export function NewOrderForm({ accountId, accountName, template }: NewOrderFormProps) {
+export function NewOrderForm({ accountId, accountName, template, onSubmit }: NewOrderFormProps) {
   const hasItems = template && template.template_items.length > 0;
+  const [note, setNote] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit() {
+    const items =
+      template?.template_items.map((item) => ({
+        product_id: item.product_id,
+        boxes: item.box_count,
+        extra_bottles: item.bottle_count,
+      })) ?? [];
+
+    if (items.length === 0) return;
+
+    setSubmitting(true);
+    setError(null);
+
+    try {
+      await onSubmit({
+        account_id: accountId,
+        template_id: template?.id ?? null,
+        note: note || null,
+        items,
+      });
+    } catch {
+      setError("Something went wrong submitting your order. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-6 sm:px-6">
@@ -97,12 +131,31 @@ export function NewOrderForm({ accountId, accountName, template }: NewOrderFormP
           <label className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
             Note (optional)
           </label>
-          <Textarea placeholder="Any special instructions..." rows={3} className="resize-none" />
+          <Textarea
+            placeholder="Any special instructions..."
+            rows={3}
+            className="resize-none"
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+          />
         </div>
 
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircle />
+            <AlertTitle>Order failed</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
         <div className="flex sm:justify-end">
-          <Button size="lg" className="w-full sm:w-auto sm:min-w-40 sm:px-8">
-            Submit order
+          <Button
+            size="lg"
+            className="w-full sm:w-auto sm:min-w-40 sm:px-8"
+            disabled={!hasItems || submitting}
+            onClick={handleSubmit}
+          >
+            {submitting ? "Submitting…" : "Submit order"}
           </Button>
         </div>
       </div>

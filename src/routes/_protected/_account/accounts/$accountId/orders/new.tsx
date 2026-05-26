@@ -1,6 +1,8 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
 import { NewOrderForm } from "@/components/orderRequests/NewOrderForm";
 import { getAccount } from "@/lib/accounts/accounts.functions";
+import { createOrderRequest } from "@/lib/orderRequests/orderRequests.functions";
+import type { CreateOrderRequestInput } from "@/lib/orderRequests/schema";
 import type { TemplateWithItems } from "@/lib/templates/schema";
 import { getTemplateForAccount } from "@/lib/templates/templates.functions";
 
@@ -10,9 +12,7 @@ export const Route = createFileRoute("/_protected/_account/accounts/$accountId/o
     if (!accountResult.ok) throw new Error(accountResult.error.message);
     if (!accountResult.value) throw notFound();
 
-    const templateResult = await getTemplateForAccount({
-      data: params.accountId,
-    });
+    const templateResult = await getTemplateForAccount({ data: params.accountId });
     if (!templateResult.ok) throw new Error(templateResult.error.message);
 
     return {
@@ -26,6 +26,23 @@ export const Route = createFileRoute("/_protected/_account/accounts/$accountId/o
 function NewOrderPage() {
   const { account, template } = Route.useLoaderData();
   const { accountId } = Route.useParams();
+  const navigate = useNavigate();
 
-  return <NewOrderForm accountId={accountId} accountName={account.name} template={template} />;
+  async function handleSubmit(data: CreateOrderRequestInput) {
+    const result = await createOrderRequest({ data });
+    if (!result.ok) throw new Error(result.error.message);
+    void navigate({
+      to: "/accounts/$accountId/orders/$orderId/success",
+      params: { accountId, orderId: result.value.id },
+    });
+  }
+
+  return (
+    <NewOrderForm
+      accountId={accountId}
+      accountName={account.name}
+      template={template}
+      onSubmit={handleSubmit}
+    />
+  );
 }
