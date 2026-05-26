@@ -8,7 +8,7 @@ export const Route = createFileRoute("/forgot-password")({
   beforeLoad: async () => {
     const user = await getSession();
     if (user) {
-      throw redirect({ to: "/dashboard" });
+      throw redirect({ to: "/manage/dashboard" });
     }
   },
   component: ForgotPasswordPage,

@@ -8,7 +8,7 @@ export const Route = createFileRoute("/login")({
   beforeLoad: async () => {
     const user = await getSession();
     if (user) {
-      throw redirect({ to: user.user_role === "user" ? "/accounts" : "/dashboard" });
+      throw redirect({ to: user.user_role === "user" ? "/accounts" : "/manage/dashboard" });
     }
   },
   component: LoginPage,
@@ -35,7 +35,7 @@ function LoginPage() {
         userRole = undefined;
       }
     }
-    const to = userRole === "user" ? "/accounts" : "/dashboard";
+    const to = userRole === "user" ? "/accounts" : "/manage/dashboard";
     await router.navigate({ to });
   };
 

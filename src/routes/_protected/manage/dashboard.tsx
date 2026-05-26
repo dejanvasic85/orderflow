@@ -3,7 +3,7 @@ import { PageContent } from "@/components/layout/PageContent";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { company } from "@/lib/config";
 
-export const Route = createFileRoute("/_protected/_admin/dashboard")({
+export const Route = createFileRoute("/_protected/manage/dashboard")({
   component: DashboardPage,
 });
 

@@ -17,11 +17,12 @@ import { Route as AuthSetPasswordRouteImport } from './routes/auth/set-password'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
 import { Route as AuthConfirmRouteImport } from './routes/auth/confirm'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
-import { Route as ProtectedAdminRouteImport } from './routes/_protected/_admin'
+import { Route as ProtectedManageRouteImport } from './routes/_protected/manage'
 import { Route as ProtectedAccountRouteImport } from './routes/_protected/_account'
 import { Route as ProtectedAccountsIndexRouteImport } from './routes/_protected/accounts/index'
-import { Route as ProtectedAdminUsersRouteImport } from './routes/_protected/_admin/users'
-import { Route as ProtectedAdminDashboardRouteImport } from './routes/_protected/_admin/dashboard'
+import { Route as ProtectedManageUsersRouteImport } from './routes/_protected/manage/users'
+import { Route as ProtectedManageOrdersRouteImport } from './routes/_protected/manage/orders'
+import { Route as ProtectedManageDashboardRouteImport } from './routes/_protected/manage/dashboard'
 import { Route as ProtectedAccountAccountsRouteImport } from './routes/_protected/_account/accounts'
 import { Route as ProtectedAccountAccountsAccountIdIndexRouteImport } from './routes/_protected/_account/accounts/$accountId/index'
 
@@ -64,8 +65,9 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProtectedAdminRoute = ProtectedAdminRouteImport.update({
-  id: '/_admin',
+const ProtectedManageRoute = ProtectedManageRouteImport.update({
+  id: '/manage',
+  path: '/manage',
   getParentRoute: () => ProtectedRoute,
 } as any)
 const ProtectedAccountRoute = ProtectedAccountRouteImport.update({
@@ -77,16 +79,22 @@ const ProtectedAccountsIndexRoute = ProtectedAccountsIndexRouteImport.update({
   path: '/accounts/',
   getParentRoute: () => ProtectedRoute,
 } as any)
-const ProtectedAdminUsersRoute = ProtectedAdminUsersRouteImport.update({
+const ProtectedManageUsersRoute = ProtectedManageUsersRouteImport.update({
   id: '/users',
   path: '/users',
-  getParentRoute: () => ProtectedAdminRoute,
+  getParentRoute: () => ProtectedManageRoute,
 } as any)
-const ProtectedAdminDashboardRoute = ProtectedAdminDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => ProtectedAdminRoute,
+const ProtectedManageOrdersRoute = ProtectedManageOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => ProtectedManageRoute,
 } as any)
+const ProtectedManageDashboardRoute =
+  ProtectedManageDashboardRouteImport.update({
+    id: '/dashboard',
+    path: '/dashboard',
+    getParentRoute: () => ProtectedManageRoute,
+  } as any)
 const ProtectedAccountAccountsRoute =
   ProtectedAccountAccountsRouteImport.update({
     id: '/accounts',
@@ -104,13 +112,15 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/manage': typeof ProtectedManageRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/confirm': typeof AuthConfirmRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/set-password': typeof AuthSetPasswordRoute
   '/accounts': typeof ProtectedAccountAccountsRouteWithChildren
-  '/dashboard': typeof ProtectedAdminDashboardRoute
-  '/users': typeof ProtectedAdminUsersRoute
+  '/manage/dashboard': typeof ProtectedManageDashboardRoute
+  '/manage/orders': typeof ProtectedManageOrdersRoute
+  '/manage/users': typeof ProtectedManageUsersRoute
   '/accounts/': typeof ProtectedAccountsIndexRoute
   '/accounts/$accountId/': typeof ProtectedAccountAccountsAccountIdIndexRoute
 }
@@ -118,13 +128,15 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/manage': typeof ProtectedManageRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/confirm': typeof AuthConfirmRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/set-password': typeof AuthSetPasswordRoute
   '/accounts': typeof ProtectedAccountsIndexRoute
-  '/dashboard': typeof ProtectedAdminDashboardRoute
-  '/users': typeof ProtectedAdminUsersRoute
+  '/manage/dashboard': typeof ProtectedManageDashboardRoute
+  '/manage/orders': typeof ProtectedManageOrdersRoute
+  '/manage/users': typeof ProtectedManageUsersRoute
   '/accounts/$accountId': typeof ProtectedAccountAccountsAccountIdIndexRoute
 }
 export interface FileRoutesById {
@@ -134,14 +146,15 @@ export interface FileRoutesById {
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/_protected/_account': typeof ProtectedAccountRouteWithChildren
-  '/_protected/_admin': typeof ProtectedAdminRouteWithChildren
+  '/_protected/manage': typeof ProtectedManageRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/confirm': typeof AuthConfirmRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/set-password': typeof AuthSetPasswordRoute
   '/_protected/_account/accounts': typeof ProtectedAccountAccountsRouteWithChildren
-  '/_protected/_admin/dashboard': typeof ProtectedAdminDashboardRoute
-  '/_protected/_admin/users': typeof ProtectedAdminUsersRoute
+  '/_protected/manage/dashboard': typeof ProtectedManageDashboardRoute
+  '/_protected/manage/orders': typeof ProtectedManageOrdersRoute
+  '/_protected/manage/users': typeof ProtectedManageUsersRoute
   '/_protected/accounts/': typeof ProtectedAccountsIndexRoute
   '/_protected/_account/accounts/$accountId/': typeof ProtectedAccountAccountsAccountIdIndexRoute
 }
@@ -151,13 +164,15 @@ export interface FileRouteTypes {
     | '/'
     | '/forgot-password'
     | '/login'
+    | '/manage'
     | '/auth/callback'
     | '/auth/confirm'
     | '/auth/reset-password'
     | '/auth/set-password'
     | '/accounts'
-    | '/dashboard'
-    | '/users'
+    | '/manage/dashboard'
+    | '/manage/orders'
+    | '/manage/users'
     | '/accounts/'
     | '/accounts/$accountId/'
   fileRoutesByTo: FileRoutesByTo
@@ -165,13 +180,15 @@ export interface FileRouteTypes {
     | '/'
     | '/forgot-password'
     | '/login'
+    | '/manage'
     | '/auth/callback'
     | '/auth/confirm'
     | '/auth/reset-password'
     | '/auth/set-password'
     | '/accounts'
-    | '/dashboard'
-    | '/users'
+    | '/manage/dashboard'
+    | '/manage/orders'
+    | '/manage/users'
     | '/accounts/$accountId'
   id:
     | '__root__'
@@ -180,14 +197,15 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/login'
     | '/_protected/_account'
-    | '/_protected/_admin'
+    | '/_protected/manage'
     | '/auth/callback'
     | '/auth/confirm'
     | '/auth/reset-password'
     | '/auth/set-password'
     | '/_protected/_account/accounts'
-    | '/_protected/_admin/dashboard'
-    | '/_protected/_admin/users'
+    | '/_protected/manage/dashboard'
+    | '/_protected/manage/orders'
+    | '/_protected/manage/users'
     | '/_protected/accounts/'
     | '/_protected/_account/accounts/$accountId/'
   fileRoutesById: FileRoutesById
@@ -261,11 +279,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_protected/_admin': {
-      id: '/_protected/_admin'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof ProtectedAdminRouteImport
+    '/_protected/manage': {
+      id: '/_protected/manage'
+      path: '/manage'
+      fullPath: '/manage'
+      preLoaderRoute: typeof ProtectedManageRouteImport
       parentRoute: typeof ProtectedRoute
     }
     '/_protected/_account': {
@@ -282,19 +300,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedAccountsIndexRouteImport
       parentRoute: typeof ProtectedRoute
     }
-    '/_protected/_admin/users': {
-      id: '/_protected/_admin/users'
+    '/_protected/manage/users': {
+      id: '/_protected/manage/users'
       path: '/users'
-      fullPath: '/users'
-      preLoaderRoute: typeof ProtectedAdminUsersRouteImport
-      parentRoute: typeof ProtectedAdminRoute
+      fullPath: '/manage/users'
+      preLoaderRoute: typeof ProtectedManageUsersRouteImport
+      parentRoute: typeof ProtectedManageRoute
     }
-    '/_protected/_admin/dashboard': {
-      id: '/_protected/_admin/dashboard'
+    '/_protected/manage/orders': {
+      id: '/_protected/manage/orders'
+      path: '/orders'
+      fullPath: '/manage/orders'
+      preLoaderRoute: typeof ProtectedManageOrdersRouteImport
+      parentRoute: typeof ProtectedManageRoute
+    }
+    '/_protected/manage/dashboard': {
+      id: '/_protected/manage/dashboard'
       path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof ProtectedAdminDashboardRouteImport
-      parentRoute: typeof ProtectedAdminRoute
+      fullPath: '/manage/dashboard'
+      preLoaderRoute: typeof ProtectedManageDashboardRouteImport
+      parentRoute: typeof ProtectedManageRoute
     }
     '/_protected/_account/accounts': {
       id: '/_protected/_account/accounts'
@@ -339,29 +364,31 @@ const ProtectedAccountRouteChildren: ProtectedAccountRouteChildren = {
 const ProtectedAccountRouteWithChildren =
   ProtectedAccountRoute._addFileChildren(ProtectedAccountRouteChildren)
 
-interface ProtectedAdminRouteChildren {
-  ProtectedAdminDashboardRoute: typeof ProtectedAdminDashboardRoute
-  ProtectedAdminUsersRoute: typeof ProtectedAdminUsersRoute
+interface ProtectedManageRouteChildren {
+  ProtectedManageDashboardRoute: typeof ProtectedManageDashboardRoute
+  ProtectedManageOrdersRoute: typeof ProtectedManageOrdersRoute
+  ProtectedManageUsersRoute: typeof ProtectedManageUsersRoute
 }
 
-const ProtectedAdminRouteChildren: ProtectedAdminRouteChildren = {
-  ProtectedAdminDashboardRoute: ProtectedAdminDashboardRoute,
-  ProtectedAdminUsersRoute: ProtectedAdminUsersRoute,
+const ProtectedManageRouteChildren: ProtectedManageRouteChildren = {
+  ProtectedManageDashboardRoute: ProtectedManageDashboardRoute,
+  ProtectedManageOrdersRoute: ProtectedManageOrdersRoute,
+  ProtectedManageUsersRoute: ProtectedManageUsersRoute,
 }
 
-const ProtectedAdminRouteWithChildren = ProtectedAdminRoute._addFileChildren(
-  ProtectedAdminRouteChildren,
+const ProtectedManageRouteWithChildren = ProtectedManageRoute._addFileChildren(
+  ProtectedManageRouteChildren,
 )
 
 interface ProtectedRouteChildren {
   ProtectedAccountRoute: typeof ProtectedAccountRouteWithChildren
-  ProtectedAdminRoute: typeof ProtectedAdminRouteWithChildren
+  ProtectedManageRoute: typeof ProtectedManageRouteWithChildren
   ProtectedAccountsIndexRoute: typeof ProtectedAccountsIndexRoute
 }
 
 const ProtectedRouteChildren: ProtectedRouteChildren = {
   ProtectedAccountRoute: ProtectedAccountRouteWithChildren,
-  ProtectedAdminRoute: ProtectedAdminRouteWithChildren,
+  ProtectedManageRoute: ProtectedManageRouteWithChildren,
   ProtectedAccountsIndexRoute: ProtectedAccountsIndexRoute,
 }
 
