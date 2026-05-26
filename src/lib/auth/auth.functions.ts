@@ -5,6 +5,7 @@ import {
   verifyOtpToken,
   verifyResetTokenFromOtp,
 } from "./auth.server";
+import { updatePassword } from "./setPassword.server";
 
 export const getSession = createServerFn({ method: "GET" }).handler(fetchSession);
 
@@ -17,3 +18,7 @@ export const verifyResetToken = createServerFn({ method: "GET" })
 export const verifyOtp = createServerFn({ method: "GET" })
   .inputValidator((data: { token_hash: string; type: string; next: string }) => data)
   .handler(async ({ data }) => verifyOtpToken(data.token_hash, data.type, data.next));
+
+export const setPassword = createServerFn({ method: "POST" })
+  .inputValidator((data: { password: string }) => data)
+  .handler(async ({ data }) => updatePassword(data.password));

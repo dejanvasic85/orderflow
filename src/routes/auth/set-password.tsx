@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import type { SetPasswordResult } from "@/components/auth/SetPasswordForm";
 import { SetPasswordView } from "@/components/auth/SetPasswordView";
-import { updatePassword } from "@/lib/auth/setPassword.server";
-import { supabase } from "@/lib/supabase";
+import { setPassword } from "@/lib/auth/auth.functions";
 
 export const Route = createFileRoute("/auth/set-password")({
   component: SetPasswordPage,
@@ -10,12 +10,13 @@ export const Route = createFileRoute("/auth/set-password")({
 function SetPasswordPage() {
   const navigate = useNavigate();
 
-  const handleSetPassword = (password: string) =>
-    updatePassword({
-      supabase,
-      password,
-      navigate: () => navigate({ to: "/dashboard" }),
-    });
+  const handleSetPassword = async (password: string): Promise<SetPasswordResult> => {
+    const result = await setPassword({ data: { password } });
+    if (result.ok) {
+      await navigate({ to: "/dashboard" });
+    }
+    return result;
+  };
 
   return <SetPasswordView onSetPassword={handleSetPassword} />;
 }
