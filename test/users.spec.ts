@@ -1,17 +1,9 @@
 import { test, expect } from "@playwright/test";
-
-async function loginAsAdmin(page: import("@playwright/test").Page) {
-  await page.goto("/login");
-  await page.waitForSelector("html[data-hydrated]");
-  await page.getByLabel("Email").fill("admin@bwow.com.au");
-  await page.getByLabel("Password").fill("password123");
-  await page.getByRole("button", { name: /sign in/i }).click();
-  await page.waitForURL("**/dashboard");
-}
+import { login } from "./flows";
 
 test.describe("Users page", () => {
   test.beforeEach(async ({ page }) => {
-    await loginAsAdmin(page);
+    await login(page, { user: "admin" });
   });
 
   test("admin can view users list and open user details in drawer", async ({ page }) => {
