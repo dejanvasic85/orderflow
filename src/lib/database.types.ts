@@ -160,9 +160,8 @@ export type Database = {
           account_id: string
           created_at: string
           delivery_address: string | null
-          delivery_note: string | null
+          delivery_instructions: string | null
           id: string
-          note: string | null
           order_number: number
           placed_by: string
           status: string
@@ -173,9 +172,8 @@ export type Database = {
           account_id: string
           created_at?: string
           delivery_address?: string | null
-          delivery_note?: string | null
+          delivery_instructions?: string | null
           id?: string
-          note?: string | null
           order_number?: number
           placed_by: string
           status?: string
@@ -186,9 +184,8 @@ export type Database = {
           account_id?: string
           created_at?: string
           delivery_address?: string | null
-          delivery_note?: string | null
+          delivery_instructions?: string | null
           id?: string
-          note?: string | null
           order_number?: number
           placed_by?: string
           status?: string
@@ -560,4 +557,3 @@ export const Constants = {
     },
   },
 } as const
-

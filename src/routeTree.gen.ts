@@ -25,6 +25,8 @@ import { Route as ProtectedManageOrdersRouteImport } from './routes/_protected/m
 import { Route as ProtectedManageDashboardRouteImport } from './routes/_protected/manage/dashboard'
 import { Route as ProtectedAccountAccountsRouteImport } from './routes/_protected/_account/accounts'
 import { Route as ProtectedAccountAccountsAccountIdIndexRouteImport } from './routes/_protected/_account/accounts/$accountId/index'
+import { Route as ProtectedAccountAccountsAccountIdOrdersNewRouteImport } from './routes/_protected/_account/accounts/$accountId/orders/new'
+import { Route as ProtectedAccountAccountsAccountIdOrdersOrderIdSuccessRouteImport } from './routes/_protected/_account/accounts/$accountId/orders/$orderId/success'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -107,6 +109,18 @@ const ProtectedAccountAccountsAccountIdIndexRoute =
     path: '/$accountId/',
     getParentRoute: () => ProtectedAccountAccountsRoute,
   } as any)
+const ProtectedAccountAccountsAccountIdOrdersNewRoute =
+  ProtectedAccountAccountsAccountIdOrdersNewRouteImport.update({
+    id: '/$accountId/orders/new',
+    path: '/$accountId/orders/new',
+    getParentRoute: () => ProtectedAccountAccountsRoute,
+  } as any)
+const ProtectedAccountAccountsAccountIdOrdersOrderIdSuccessRoute =
+  ProtectedAccountAccountsAccountIdOrdersOrderIdSuccessRouteImport.update({
+    id: '/$accountId/orders/$orderId/success',
+    path: '/$accountId/orders/$orderId/success',
+    getParentRoute: () => ProtectedAccountAccountsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -123,6 +137,8 @@ export interface FileRoutesByFullPath {
   '/manage/users': typeof ProtectedManageUsersRoute
   '/accounts/': typeof ProtectedAccountsIndexRoute
   '/accounts/$accountId/': typeof ProtectedAccountAccountsAccountIdIndexRoute
+  '/accounts/$accountId/orders/new': typeof ProtectedAccountAccountsAccountIdOrdersNewRoute
+  '/accounts/$accountId/orders/$orderId/success': typeof ProtectedAccountAccountsAccountIdOrdersOrderIdSuccessRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -138,6 +154,8 @@ export interface FileRoutesByTo {
   '/manage/orders': typeof ProtectedManageOrdersRoute
   '/manage/users': typeof ProtectedManageUsersRoute
   '/accounts/$accountId': typeof ProtectedAccountAccountsAccountIdIndexRoute
+  '/accounts/$accountId/orders/new': typeof ProtectedAccountAccountsAccountIdOrdersNewRoute
+  '/accounts/$accountId/orders/$orderId/success': typeof ProtectedAccountAccountsAccountIdOrdersOrderIdSuccessRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -157,6 +175,8 @@ export interface FileRoutesById {
   '/_protected/manage/users': typeof ProtectedManageUsersRoute
   '/_protected/accounts/': typeof ProtectedAccountsIndexRoute
   '/_protected/_account/accounts/$accountId/': typeof ProtectedAccountAccountsAccountIdIndexRoute
+  '/_protected/_account/accounts/$accountId/orders/new': typeof ProtectedAccountAccountsAccountIdOrdersNewRoute
+  '/_protected/_account/accounts/$accountId/orders/$orderId/success': typeof ProtectedAccountAccountsAccountIdOrdersOrderIdSuccessRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -175,6 +195,8 @@ export interface FileRouteTypes {
     | '/manage/users'
     | '/accounts/'
     | '/accounts/$accountId/'
+    | '/accounts/$accountId/orders/new'
+    | '/accounts/$accountId/orders/$orderId/success'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -190,6 +212,8 @@ export interface FileRouteTypes {
     | '/manage/orders'
     | '/manage/users'
     | '/accounts/$accountId'
+    | '/accounts/$accountId/orders/new'
+    | '/accounts/$accountId/orders/$orderId/success'
   id:
     | '__root__'
     | '/'
@@ -208,6 +232,8 @@ export interface FileRouteTypes {
     | '/_protected/manage/users'
     | '/_protected/accounts/'
     | '/_protected/_account/accounts/$accountId/'
+    | '/_protected/_account/accounts/$accountId/orders/new'
+    | '/_protected/_account/accounts/$accountId/orders/$orderId/success'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -335,17 +361,37 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedAccountAccountsAccountIdIndexRouteImport
       parentRoute: typeof ProtectedAccountAccountsRoute
     }
+    '/_protected/_account/accounts/$accountId/orders/new': {
+      id: '/_protected/_account/accounts/$accountId/orders/new'
+      path: '/$accountId/orders/new'
+      fullPath: '/accounts/$accountId/orders/new'
+      preLoaderRoute: typeof ProtectedAccountAccountsAccountIdOrdersNewRouteImport
+      parentRoute: typeof ProtectedAccountAccountsRoute
+    }
+    '/_protected/_account/accounts/$accountId/orders/$orderId/success': {
+      id: '/_protected/_account/accounts/$accountId/orders/$orderId/success'
+      path: '/$accountId/orders/$orderId/success'
+      fullPath: '/accounts/$accountId/orders/$orderId/success'
+      preLoaderRoute: typeof ProtectedAccountAccountsAccountIdOrdersOrderIdSuccessRouteImport
+      parentRoute: typeof ProtectedAccountAccountsRoute
+    }
   }
 }
 
 interface ProtectedAccountAccountsRouteChildren {
   ProtectedAccountAccountsAccountIdIndexRoute: typeof ProtectedAccountAccountsAccountIdIndexRoute
+  ProtectedAccountAccountsAccountIdOrdersNewRoute: typeof ProtectedAccountAccountsAccountIdOrdersNewRoute
+  ProtectedAccountAccountsAccountIdOrdersOrderIdSuccessRoute: typeof ProtectedAccountAccountsAccountIdOrdersOrderIdSuccessRoute
 }
 
 const ProtectedAccountAccountsRouteChildren: ProtectedAccountAccountsRouteChildren =
   {
     ProtectedAccountAccountsAccountIdIndexRoute:
       ProtectedAccountAccountsAccountIdIndexRoute,
+    ProtectedAccountAccountsAccountIdOrdersNewRoute:
+      ProtectedAccountAccountsAccountIdOrdersNewRoute,
+    ProtectedAccountAccountsAccountIdOrdersOrderIdSuccessRoute:
+      ProtectedAccountAccountsAccountIdOrdersOrderIdSuccessRoute,
   }
 
 const ProtectedAccountAccountsRouteWithChildren =

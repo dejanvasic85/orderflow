@@ -120,6 +120,19 @@ Vite+ automatically detects and wraps the underlying package manager through `pa
 - Name event handlers with `handle` prefix (for example: `handleSubmit`)
 - Use accessible, semantic HTML and keyboard-friendly interactions by default
 
+### Component vs Route responsibilities
+
+Routes are glue — they own navigation and server function calls only. Everything else belongs in the component:
+
+| Belongs in **component**                     | Belongs in **route**                    |
+| -------------------------------------------- | --------------------------------------- |
+| UI state (`submitting`, `error`)             | `useNavigate()` calls                   |
+| Input mapping (form fields → server payload) | `createServerFn` calls                  |
+| Conditional rendering, form logic            | Loader data fetching                    |
+| `onSubmit` prop receives the mapped payload  | Passes loader data + callbacks as props |
+
+The `onSubmit` callback a route passes to a component should accept an already-mapped, submission-ready payload — not raw form state. This keeps the component self-contained and independently testable: render it with props, interact with it, assert on what `onSubmit` was called with.
+
 ## Data, Config, and Validation
 
 - Centralize environment variable parsing/validation through Zod-based config modules

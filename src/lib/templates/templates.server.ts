@@ -4,7 +4,7 @@ import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import type { addTemplateItemSchema, createTemplateSchema, updateTemplateSchema } from "./schema";
 
 const templateWithItemsSelect =
-  "id, account_id, name, created_by, created_at, updated_at, template_items(id, product_id, suggested_boxes, suggested_bottles, created_by, created_at, products(id, name, qty_per_box))" as const;
+  "id, account_id, name, created_by, created_at, updated_at, template_items(id, product_id, box_count, bottle_count, created_by, created_at, products(id, name, qty_per_box))" as const;
 
 export async function fetchTemplateForAccount(accountId: string) {
   const supabase = createSupabaseServerClient();

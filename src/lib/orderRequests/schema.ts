@@ -22,9 +22,8 @@ export const orderRequestItemInputSchema = z.object({
 export const createOrderRequestSchema = z.object({
   account_id: z.uuid(),
   template_id: z.uuid().nullable().optional(),
-  note: z.string().nullable().optional(),
   delivery_address: z.string().nullable().optional(),
-  delivery_note: z.string().nullable().optional(),
+  delivery_instructions: z.string().nullable().optional(),
   items: z.array(orderRequestItemInputSchema).min(1),
 });
 
