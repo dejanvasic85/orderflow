@@ -12,8 +12,8 @@ export async function fetchAccounts() {
     .from("accounts")
     .select(accountSelect)
     .order("name", { ascending: true });
-  if (error) throw new Error(error.message);
-  return data ?? [];
+  if (error) return err({ message: error.message });
+  return ok(data ?? []);
 }
 
 export async function fetchAccount(id: string) {
@@ -23,8 +23,8 @@ export async function fetchAccount(id: string) {
     .select(accountSelect)
     .eq("id", id)
     .single();
-  if (error) throw new Error(error.message);
-  return data;
+  if (error) return err({ message: error.message });
+  return ok(data);
 }
 
 export async function fetchAccountUsers(accountId: string) {
@@ -33,8 +33,8 @@ export async function fetchAccountUsers(accountId: string) {
     .from("account_users")
     .select("user_id, created_at, users:users(id, name, role, active)")
     .eq("account_id", accountId);
-  if (error) throw new Error(error.message);
-  return data;
+  if (error) return err({ message: error.message });
+  return ok(data ?? []);
 }
 
 export async function insertAccount(data: z.infer<typeof createAccountSchema>) {

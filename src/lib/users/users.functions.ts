@@ -10,9 +10,11 @@ import {
   sendInvite,
 } from "./users.server";
 
-export const listUsers = createServerFn({ method: "GET" }).handler(fetchUsers);
+export const listUsers = createServerFn({ method: "GET", strict: { output: false } }).handler(
+  fetchUsers,
+);
 
-export const getUser = createServerFn({ method: "GET" })
+export const getUser = createServerFn({ method: "GET", strict: { output: false } })
   .inputValidator((id: string) => id)
   .handler(async ({ data: id }) => fetchUser(id));
 
@@ -20,7 +22,7 @@ export const updateUser = createServerFn({ method: "POST", strict: { output: fal
   .inputValidator(updateUserSchema)
   .handler(async ({ data }) => patchUser(data));
 
-export const checkEmailExists = createServerFn({ method: "GET" })
+export const checkEmailExists = createServerFn({ method: "GET", strict: { output: false } })
   .inputValidator((email: string) => email)
   .handler(async ({ data: email }) => checkEmail(email));
 

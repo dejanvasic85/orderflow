@@ -10,13 +10,15 @@ import {
 } from "./accounts.server";
 import { assignSchema, createAccountSchema, updateAccountSchema } from "./schema";
 
-export const listAccounts = createServerFn({ method: "GET" }).handler(fetchAccounts);
+export const listAccounts = createServerFn({ method: "GET", strict: { output: false } }).handler(
+  fetchAccounts,
+);
 
-export const getAccount = createServerFn({ method: "GET" })
+export const getAccount = createServerFn({ method: "GET", strict: { output: false } })
   .inputValidator((id: string) => id)
   .handler(async ({ data: id }) => fetchAccount(id));
 
-export const listAccountUsers = createServerFn({ method: "GET" })
+export const listAccountUsers = createServerFn({ method: "GET", strict: { output: false } })
   .inputValidator((accountId: string) => accountId)
   .handler(async ({ data: accountId }) => fetchAccountUsers(accountId));
 

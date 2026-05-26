@@ -82,14 +82,14 @@ export async function resolveAccountNames(
   return (data ?? []).map((a) => ({ id: a.id, name: a.name }));
 }
 
-export async function fetchUsers(): Promise<User[]> {
+export async function fetchUsers() {
   const supabaseServer = createSupabaseServerClient();
   const { data, error } = await supabaseServer
     .from("users_with_email")
     .select(userListSelect)
     .order("name", { ascending: true });
-  if (error) throw new Error(error.message);
-  return (data as ListedRow[] | null)?.map(mapUser) ?? [];
+  if (error) return err({ message: error.message });
+  return ok((data as ListedRow[] | null)?.map(mapUser) ?? []);
 }
 
 export async function fetchUser(id: string) {
@@ -99,8 +99,8 @@ export async function fetchUser(id: string) {
     .select("id, name, phone, active, role, notification_preferences, created_at, updated_at")
     .eq("id", id)
     .single();
-  if (error) throw new Error(error.message);
-  return data;
+  if (error) return err({ message: error.message });
+  return ok(data);
 }
 
 export async function patchUser(data: {
@@ -155,7 +155,7 @@ export async function patchUser(data: {
   return ok();
 }
 
-export async function checkEmail(email: string): Promise<boolean> {
+export async function checkEmail(email: string) {
   const supabaseServer = createSupabaseServerClient();
   await assertAdmin(supabaseServer);
   const { data, error } = await supabaseServer
@@ -163,8 +163,8 @@ export async function checkEmail(email: string): Promise<boolean> {
     .select("id")
     .eq("email", email)
     .maybeSingle();
-  if (error) throw new Error(error.message);
-  return data !== null;
+  if (error) return err({ message: error.message });
+  return ok(data !== null);
 }
 
 export async function sendInvite(data: {
