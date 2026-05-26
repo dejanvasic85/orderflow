@@ -1,6 +1,7 @@
-import { Outlet, createFileRoute, useRouterState } from "@tanstack/react-router";
+import { Outlet, createFileRoute, useRouter, useRouterState } from "@tanstack/react-router";
 import { AccountShell } from "@/components/layout/AccountShell";
 import { listAccountsForCurrentUser } from "@/lib/accounts/accounts.functions";
+import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/_protected/_account")({
   loader: async () => {
@@ -14,6 +15,7 @@ export const Route = createFileRoute("/_protected/_account")({
 function AccountLayout() {
   const { user } = Route.useRouteContext();
   const { hasMultipleAccounts } = Route.useLoaderData();
+  const router = useRouter();
   const accountId = useRouterState({
     select: (s) => {
       const match = s.matches.find((m) => (m.params as Record<string, string>).accountId);
@@ -21,11 +23,17 @@ function AccountLayout() {
     },
   });
 
+  async function handleSignOut() {
+    await supabase.auth.signOut();
+    void router.navigate({ to: "/" });
+  }
+
   return (
     <AccountShell
       email={user.email ?? ""}
       accountId={accountId}
       hasMultipleAccounts={hasMultipleAccounts}
+      onSignOut={handleSignOut}
     >
       <Outlet />
     </AccountShell>
