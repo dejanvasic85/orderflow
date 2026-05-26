@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import { AuthCallbackView } from "@/components/auth/AuthCallbackView";
-import { verifyCallback } from "@/lib/auth/callbackVerify";
+import { verifyCallback } from "@/lib/auth/callback.server";
 import { supabase } from "@/lib/supabase";
 
 const callbackSearchSchema = z.object({

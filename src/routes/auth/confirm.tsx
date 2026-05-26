@@ -1,31 +1,12 @@
-import { type EmailOtpType } from "@supabase/supabase-js";
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { createSupabaseServerClient } from "@/lib/supabaseServer";
+import { verifyOtp } from "@/lib/auth/auth.functions";
 
 const confirmSearchSchema = z.object({
   token_hash: z.string().optional(),
   type: z.string().optional(),
   next: z.string().optional(),
 });
-
-const verifyOtp = createServerFn({ method: "GET" })
-  .inputValidator((data: { token_hash: string; type: string; next: string }) => data)
-  .handler(async ({ data }) => {
-    const supabase = createSupabaseServerClient();
-    const { error } = await supabase.auth.verifyOtp({
-      token_hash: data.token_hash,
-      type: data.type as EmailOtpType,
-    });
-
-    if (error) {
-      console.error("Failed to verify OTP", error);
-      return { success: false as const };
-    }
-
-    return { success: true as const, next: data.next };
-  });
 
 export const Route = createFileRoute("/auth/confirm")({
   validateSearch: confirmSearchSchema,

@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { SetPasswordView } from "@/components/auth/SetPasswordView";
-import { updatePassword } from "@/lib/auth/setPasswordUpdate";
+import { updatePassword } from "@/lib/auth/setPassword.server";
 import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/auth/set-password")({

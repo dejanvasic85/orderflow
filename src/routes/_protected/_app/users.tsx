@@ -14,16 +14,16 @@ import {
 import { UserEditPanel } from "@/components/users/UserEditPanel";
 import { UserList, type RoleFilter } from "@/components/users/UserList";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import { listAccounts } from "@/lib/accounts/queries";
+import { listAccounts } from "@/lib/accounts/accounts.functions";
 import { asResult } from "@/lib/result";
+import type { User, UserAccount } from "@/lib/users/schema";
 import {
   checkEmailExists,
   inviteUser,
   listUsers,
   resendInvite,
   updateUser,
-} from "@/lib/users/queries";
-import type { User, UserAccount } from "@/lib/users/schema";
+} from "@/lib/users/users.functions";
 
 export const Route = createFileRoute("/_protected/_app/users")({
   loader: async () => {

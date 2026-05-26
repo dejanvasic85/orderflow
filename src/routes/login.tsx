@@ -1,6 +1,6 @@
 import { createFileRoute, Link, redirect, useRouter } from "@tanstack/react-router";
 import { LoginForm, type LoginValues } from "@/components/auth/LoginForm";
-import { getSession } from "@/lib/authFunctions";
+import { getSession } from "@/lib/auth/auth.functions";
 import { company } from "@/lib/config";
 import { supabase } from "@/lib/supabase";
 
