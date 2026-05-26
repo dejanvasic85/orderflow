@@ -24,8 +24,8 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Feature | Must | Mark users as "inactive" to prevent login without deleting data
 - [x] Feature | Must | Forgot password
 - [x] Quality | Must | Improve the error handling to use Result system - investigate neverthrow
-- [ ] Quality | Must | Structure of server functions and loaders. Where should they live? We have inconsistency including testing.
-- [ ] Infra | Must | Migration for `products`, `order_requests`, `order_request_items`
+- [x] Quality | Must | Structure of server functions and loaders. Where should they live? We have inconsistency including testing.
+- [x] Infra | Must | Migration for `products`, `order_requests`, `order_request_items`
 - [ ] Infra | Must | Seed data — sample product catalog in `supabase/seed.sql`
 - [ ] Infra | Must | Supabase Storage bucket for product images + upload UI (sort out sourcing wine/beer/liquor images for dev seed)
 - [ ] Infra | Must | RLS policies — users see only their assigned accounts; staff read-only across all order requests
@@ -40,6 +40,7 @@ Priorities: `Must` · `Should` · `Nice`
 - [ ] Feature | Must | PWA — manifest, service worker, install prompt, offline app shell
 - [ ] Feature | Must | Notification preferences UI — users edit their own email/SMS preferences
 - [ ] Feature | Must | Staff role surface — read-only view of all order requests
+- [ ] Productionising | Must | Fix the publicly available view users_with_email - see email for warning from supabase
 - [ ] Productionising | Must | Set up production domain (orders.bwow.com.au) — confirm access with Sam or register new
 - [ ] Productionising | Must | SMTP server (AWS SES) for email notifications — configure in Supabase, verify `vasic.com.au` for DKIM as interim sender
 - [ ] Productionising | Must | Email templates
