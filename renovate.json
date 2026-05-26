@@ -1,27 +1,38 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended", ":timezone(Australia/Melbourne)", ":renovatePrefix"],
-  "schedule": "before 5am every weekday",
-  "automerge": false,
+  "extends": [
+    ":rebaseStalePrs",
+    ":renovatePrefix",
+    ":semanticCommits",
+    ":timezone(Australia/Melbourne)",
+    ":dependencyDashboard",
+    ":pinDependencies",
+    ":pinDevDependencies",
+    "group:allNonMajor"
+  ],
+  "automerge": true,
+  "commitMessageAction": "",
   "labels": ["dependencies"],
-  "prConcurrentLimit": 5,
-  "minimumReleaseAge": "7 days",
+  "prConcurrentLimit": 3,
+  "prNotPendingHours": 1,
+  "semanticCommitScope": "",
+  "semanticCommitType": "deps",
   "lockFileMaintenance": {
     "enabled": true,
-    "schedule": "after 10pm on sunday"
+    "automerge": true,
+    "recreateWhen": "always",
+    "rebaseStalePrs": true,
+    "schedule": ["before 4am on monday"],
+    "prBodyDefinitions": {
+      "Change": "All locks refreshed"
+    }
   },
   "packageRules": [
-    {
-      "description": "Automerge patch and minor updates",
-      "matchUpdateTypes": ["minor", "patch"],
-      "automerge": true
-    },
     {
       "description": "Node and types - LTS versions only",
       "matchPackageNames": ["node", "@types/node"],
       "groupName": "node and types",
-      "matchManagers": ["volta", "npm"],
-      "allowedVersions": "/^(20|22|24|26|28|30|32|34|36|38|40)\\./\n    }\n  ]\n}"
+      "allowedVersions": "/^(20|22|24|26|28|30|32|34|36|38|40)\\./"
     }
   ]
 }
