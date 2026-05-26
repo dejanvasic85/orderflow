@@ -1,12 +1,13 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
+import type { LucideIcon } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { navItemsValue } from "@/lib/routes";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 
@@ -18,11 +19,23 @@ function getInitials(email: string) {
     .join("");
 }
 
-type MobileBottomNavProps = {
-  email: string;
+type NavItem = {
+  label: string;
+  to: string;
+  icon: LucideIcon;
 };
 
-export function MobileBottomNav({ email }: MobileBottomNavProps) {
+type MobileBottomNavProps = {
+  email: string;
+  navItems: readonly NavItem[];
+  hasMultipleAccounts?: boolean;
+};
+
+export function MobileBottomNav({
+  email,
+  navItems,
+  hasMultipleAccounts = false,
+}: MobileBottomNavProps) {
   const router = useRouter();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
@@ -34,7 +47,7 @@ export function MobileBottomNav({ email }: MobileBottomNavProps) {
   return (
     <nav className="fixed bottom-0 inset-x-0 z-40 md:hidden border-t bg-sidebar text-sidebar-foreground">
       <div className="flex items-center justify-around h-16 px-2">
-        {navItemsValue.map(({ label, to, icon: Icon }) => {
+        {navItems.map(({ label, to, icon: Icon }) => {
           const isActive = pathname === to;
           return (
             <Link
@@ -65,6 +78,14 @@ export function MobileBottomNav({ email }: MobileBottomNavProps) {
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent side="top" align="end" className="w-48 mb-1">
+            {hasMultipleAccounts && (
+              <>
+                <DropdownMenuItem asChild>
+                  <Link to="/accounts">Change account</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+              </>
+            )}
             <DropdownMenuItem onClick={handleSignOut}>Sign out</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

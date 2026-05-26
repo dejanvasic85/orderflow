@@ -3,8 +3,9 @@ import { ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { listAccountsForCurrentUser } from "@/lib/accounts/accounts.functions";
+import { supabase } from "@/lib/supabase";
 
-export const Route = createFileRoute("/_protected/_app/accounts/")({
+export const Route = createFileRoute("/_protected/accounts/")({
   loader: async () => {
     const result = await listAccountsForCurrentUser();
     if (!result.ok) return { accounts: [] };
@@ -40,6 +41,11 @@ function AccountSelectionPage() {
   const { accounts } = Route.useLoaderData();
   const navigate = useNavigate();
 
+  async function handleSignOut() {
+    await supabase.auth.signOut();
+    void navigate({ to: "/" });
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center px-4">
       <div className="flex w-full max-w-sm flex-col gap-6">
@@ -71,6 +77,13 @@ function AccountSelectionPage() {
             ))}
           </div>
         )}
+
+        <button
+          onClick={handleSignOut}
+          className="text-sm text-muted-foreground underline-offset-4 hover:underline self-center"
+        >
+          Sign out
+        </button>
       </div>
     </div>
   );

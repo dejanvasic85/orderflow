@@ -3,7 +3,7 @@ import { PageContent } from "@/components/layout/PageContent";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { getAccount } from "@/lib/accounts/accounts.functions";
 
-export const Route = createFileRoute("/_protected/_app/accounts/$accountId/")({
+export const Route = createFileRoute("/_protected/_account/accounts/$accountId/")({
   loader: async ({ params }) => {
     const result = await getAccount({ data: params.accountId });
     if (!result.ok || !result.value) throw notFound();
@@ -20,7 +20,6 @@ function AccountPage() {
       <PageHeader title={account.name} />
       <PageContent>
         <p className="text-muted-foreground">Welcome to BWOW.</p>
-        <p>Account name: {account.name}</p>
       </PageContent>
     </>
   );

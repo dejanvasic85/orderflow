@@ -17,7 +17,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { company } from "@/lib/config";
-import { navItemsValue } from "@/lib/routes";
+import { adminNavItemsValue } from "@/lib/routes";
 import { supabase } from "@/lib/supabase";
 
 // Future routes — uncomment when pages are created:
@@ -63,7 +63,7 @@ export function AppSidebar({ email }: AppSidebarProps) {
 
       <SidebarContent className="px-2">
         <SidebarMenu>
-          {navItemsValue.map(({ label, to, icon: Icon }) => (
+          {adminNavItemsValue.map(({ label, to, icon: Icon }) => (
             <SidebarMenuItem key={to}>
               <SidebarMenuButton
                 asChild

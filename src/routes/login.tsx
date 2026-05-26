@@ -8,7 +8,7 @@ export const Route = createFileRoute("/login")({
   beforeLoad: async () => {
     const user = await getSession();
     if (user) {
-      throw redirect({ to: "/dashboard" });
+      throw redirect({ to: user.user_role === "user" ? "/accounts" : "/dashboard" });
     }
   },
   component: LoginPage,
@@ -18,11 +18,14 @@ function LoginPage() {
   const router = useRouter();
 
   const handleLogin = async (values: LoginValues) => {
-    const { error } = await supabase.auth.signInWithPassword(values);
+    const { data, error } = await supabase.auth.signInWithPassword(values);
     if (error) {
       return { error: error.message ?? "Sign in failed" };
     }
-    await router.navigate({ to: "/dashboard" });
+    const token = data.session?.access_token ?? "";
+    const payload = token ? JSON.parse(atob(token.split(".")[1])) : {};
+    const to = payload.user_role === "user" ? "/accounts" : "/dashboard";
+    await router.navigate({ to });
   };
 
   return (

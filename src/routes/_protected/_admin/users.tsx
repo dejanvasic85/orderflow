@@ -25,7 +25,7 @@ import {
   updateUser,
 } from "@/lib/users/users.functions";
 
-export const Route = createFileRoute("/_protected/_app/users")({
+export const Route = createFileRoute("/_protected/_admin/users")({
   loader: async () => {
     const [usersResult, accountsResult] = await Promise.all([listUsers(), listAccounts()]);
     const users = asResult<User[]>(usersResult);

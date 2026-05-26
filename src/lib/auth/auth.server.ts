@@ -6,7 +6,24 @@ export async function fetchSession() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  return user;
+  if (!user) return null;
+
+  // Decode user_role from the session JWT (custom claim set by Supabase RLS trigger)
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  const token = session?.access_token ?? "";
+  let userRole: string | undefined;
+  if (token) {
+    try {
+      const payload = JSON.parse(Buffer.from(token.split(".")[1], "base64").toString());
+      userRole = payload.user_role as string | undefined;
+    } catch {
+      // ignore decode errors
+    }
+  }
+
+  return { ...user, user_role: userRole };
 }
 
 export async function fetchSessionOrThrow() {
