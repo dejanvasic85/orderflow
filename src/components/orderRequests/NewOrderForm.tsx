@@ -1,4 +1,3 @@
-import { Link } from "@tanstack/react-router";
 import { AlertCircle, ArrowLeft, Package, Plus } from "lucide-react";
 import { useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -6,15 +5,21 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import type { CreateOrderRequestInput } from "@/lib/orderRequests/schema";
+import type { OrderRequestItemInput } from "@/lib/orderRequests/schema";
 import type { TemplateItem, TemplateWithItems } from "@/lib/templates/schema";
 
+type OrderFormPayload = {
+  templateId: string | null;
+  deliveryInstructions: string | null;
+  items: OrderRequestItemInput[];
+};
+
 type NewOrderFormProps = {
-  accountId: string;
   accountName: string;
   defaultDeliveryInstructions: string | null;
   template: TemplateWithItems | null;
-  onSubmit: (data: CreateOrderRequestInput) => Promise<void>;
+  onBack: () => void;
+  onSubmit: (data: OrderFormPayload) => Promise<void>;
 };
 
 type OrderItemCardProps = {
@@ -72,10 +77,10 @@ function TemplateItemsList({ template }: { template: TemplateWithItems }) {
 }
 
 export function NewOrderForm({
-  accountId,
   accountName,
   defaultDeliveryInstructions,
   template,
+  onBack,
   onSubmit,
 }: NewOrderFormProps) {
   const hasItems = template && template.template_items.length > 0;
@@ -100,9 +105,8 @@ export function NewOrderForm({
 
     try {
       await onSubmit({
-        account_id: accountId,
-        template_id: template?.id ?? null,
-        delivery_instructions: deliveryInstructions || null,
+        templateId: template?.id ?? null,
+        deliveryInstructions: deliveryInstructions || null,
         items,
       });
     } catch {
@@ -115,14 +119,14 @@ export function NewOrderForm({
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-6 sm:px-6">
       <div className="mb-8 flex flex-col gap-1">
-        <Link
-          to="/accounts/$accountId"
-          params={{ accountId }}
+        <button
+          type="button"
+          onClick={onBack}
           className="flex w-fit items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           {accountName}
-        </Link>
+        </button>
         <h1 className="text-2xl font-semibold tracking-tight">New order</h1>
       </div>
 
@@ -137,10 +141,14 @@ export function NewOrderForm({
         {hasItems && <Separator />}
 
         <div className="flex flex-col gap-2">
-          <label className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+          <label
+            htmlFor="deliveryInstructions"
+            className="text-xs font-medium uppercase tracking-widest text-muted-foreground"
+          >
             Delivery instructions (optional)
           </label>
           <Textarea
+            id="deliveryInstructions"
             placeholder="Any special instructions..."
             rows={3}
             className="resize-none"

@@ -16,10 +16,11 @@ export const Route = createFileRoute(
     if (!accountResult.ok) throw new Error(accountResult.error.message);
     if (!accountResult.value) throw notFound();
     if (!orderResult.ok) throw new Error(orderResult.error.message);
+    if (!orderResult.value) throw notFound();
 
     return {
       account: accountResult.value,
-      order: orderResult.value as unknown as OrderRequestWithItems,
+      order: orderResult.value as OrderRequestWithItems,
     };
   },
   component: OrderSuccessPage,

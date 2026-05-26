@@ -6,7 +6,6 @@ import {
 } from "@tanstack/react-router";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { CreateOrderRequestInput } from "@/lib/orderRequests/schema";
 import type { TemplateWithItems } from "@/lib/templates/schema";
 import { NewOrderForm } from "./NewOrderForm";
 
@@ -41,16 +40,23 @@ const template: TemplateWithItems = {
   ],
 };
 
-const onSubmit = vi.fn().mockResolvedValue(undefined);
+const onSubmit = vi.fn();
+const onBack = vi.fn();
+let user: ReturnType<typeof userEvent.setup>;
+
+beforeEach(() => {
+  onSubmit.mockResolvedValue(undefined);
+  user = userEvent.setup();
+});
 
 function renderForm(overrides?: Partial<React.ComponentProps<typeof NewOrderForm>>) {
   const rootRoute = createRootRoute({
     component: () => (
       <NewOrderForm
-        accountId="b2c3d4e5-f6a7-4b8c-9d0e-000000000a01"
         accountName="The Winery Bistro"
         defaultDeliveryInstructions={null}
         template={template}
+        onBack={onBack}
         onSubmit={onSubmit}
         {...overrides}
       />
@@ -63,10 +69,10 @@ function renderForm(overrides?: Partial<React.ComponentProps<typeof NewOrderForm
   return render(<RouterProvider router={router} />);
 }
 
-test("renders account name as back link", async () => {
+test("renders account name as back button", async () => {
   renderForm();
 
-  expect(await screen.findByRole("link", { name: /The Winery Bistro/i })).toBeInTheDocument();
+  expect(await screen.findByRole("button", { name: /The Winery Bistro/i })).toBeInTheDocument();
 });
 
 test("renders New order heading", async () => {
@@ -92,39 +98,32 @@ test("renders correct total for each item", async () => {
 });
 
 test("calls onSubmit with mapped payload when submitted with no delivery instructions", async () => {
-  const user = userEvent.setup();
   renderForm();
 
   await user.click(await screen.findByRole("button", { name: "Submit order" }));
 
   expect(onSubmit).toHaveBeenCalledWith({
-    account_id: "b2c3d4e5-f6a7-4b8c-9d0e-000000000a01",
-    template_id: "d4e5f6a7-b8c9-4d0e-9f2a-000000000001",
-    delivery_instructions: null,
+    templateId: "d4e5f6a7-b8c9-4d0e-9f2a-000000000001",
+    deliveryInstructions: null,
     items: [
       { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 2, extra_bottles: 0 },
       { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000002", boxes: 1, extra_bottles: 3 },
     ],
-  } satisfies CreateOrderRequestInput);
+  });
 });
 
 test("calls onSubmit with the entered delivery instructions", async () => {
-  const user = userEvent.setup();
   renderForm();
 
-  await user.type(
-    await screen.findByPlaceholderText("Any special instructions..."),
-    "Leave at door",
-  );
+  await user.type(await screen.findByLabelText(/Delivery instructions/i), "Leave at door");
   await user.click(screen.getByRole("button", { name: "Submit order" }));
 
   expect(onSubmit).toHaveBeenCalledWith(
-    expect.objectContaining({ delivery_instructions: "Leave at door" }),
+    expect.objectContaining({ deliveryInstructions: "Leave at door" }),
   );
 });
 
 test("pre-fills textarea with defaultDeliveryInstructions from account", async () => {
-  const user = userEvent.setup();
   renderForm({ defaultDeliveryInstructions: "Ring the bell" });
 
   expect(await screen.findByDisplayValue("Ring the bell")).toBeInTheDocument();
@@ -132,23 +131,29 @@ test("pre-fills textarea with defaultDeliveryInstructions from account", async (
   await user.click(screen.getByRole("button", { name: "Submit order" }));
 
   expect(onSubmit).toHaveBeenCalledWith(
-    expect.objectContaining({ delivery_instructions: "Ring the bell" }),
+    expect.objectContaining({ deliveryInstructions: "Ring the bell" }),
   );
 });
 
-test("submits null delivery_instructions when user clears the pre-filled value", async () => {
-  const user = userEvent.setup();
+test("submits null deliveryInstructions when user clears the pre-filled value", async () => {
   renderForm({ defaultDeliveryInstructions: "Ring the bell" });
 
   const textarea = await screen.findByDisplayValue("Ring the bell");
   await user.clear(textarea);
   await user.click(screen.getByRole("button", { name: "Submit order" }));
 
-  expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ delivery_instructions: null }));
+  expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ deliveryInstructions: null }));
+});
+
+test("calls onBack when the account name button is clicked", async () => {
+  renderForm();
+
+  await user.click(await screen.findByRole("button", { name: /The Winery Bistro/i }));
+
+  expect(onBack).toHaveBeenCalledOnce();
 });
 
 test("shows Submitting… and disables button while onSubmit is pending", async () => {
-  const user = userEvent.setup();
   let resolve: () => void;
   const pending = new Promise<void>((r) => {
     resolve = r;
@@ -162,7 +167,6 @@ test("shows Submitting… and disables button while onSubmit is pending", async 
 });
 
 test("shows error alert when onSubmit throws", async () => {
-  const user = userEvent.setup();
   renderForm({ onSubmit: vi.fn().mockRejectedValue(new Error("Network failure")) });
 
   await user.click(await screen.findByRole("button", { name: "Submit order" }));
