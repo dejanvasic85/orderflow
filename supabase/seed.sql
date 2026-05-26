@@ -183,13 +183,6 @@ INSERT INTO public.accounts (id, name, contact_name, contact_email, contact_phon
 ON CONFLICT (id) DO NOTHING;
 
 -- ============================================================
--- ACCOUNT ASSIGNMENTS
--- Sarah Mitchell → The Winery Bistro, Cellar Door Co.
--- Tom Reynolds   → Harvest Table
--- Marcus Bell    → Vine & Barrel, The Cork Room
--- ============================================================
-
--- ============================================================
 -- PRODUCTS
 -- ============================================================
 
@@ -243,16 +236,15 @@ INSERT INTO public.template_items (template_id, product_id, box_count, bottle_co
 ON CONFLICT DO NOTHING;
 
 -- ============================================================
--- ACCOUNT ASSIGNMENTS
--- Sarah Mitchell → The Winery Bistro, Cellar Door Co.
--- Tom Reynolds   → Harvest Table
--- Marcus Bell    → Vine & Barrel, The Cork Room
+-- ACCOUNT ASSIGNMENTS (user role only — admin and staff have no assigned accounts)
+-- Tom Reynolds → The Winery Bistro, Cellar Door Co., Vine & Barrel  (multiple)
+-- Priya Nair   → Harvest Table                                        (single)
+-- Olivia Chen  → (none)
 -- ============================================================
 
 INSERT INTO public.account_users (account_id, user_id) VALUES
-  ('b2c3d4e5-f6a7-4b8c-9d0e-000000000a01', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000002'),
-  ('b2c3d4e5-f6a7-4b8c-9d0e-000000000a02', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000002'),
-  ('b2c3d4e5-f6a7-4b8c-9d0e-000000000a03', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000003'),
-  ('b2c3d4e5-f6a7-4b8c-9d0e-000000000a04', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000005'),
-  ('b2c3d4e5-f6a7-4b8c-9d0e-000000000a05', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000005')
+  ('b2c3d4e5-f6a7-4b8c-9d0e-000000000a01', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000003'),
+  ('b2c3d4e5-f6a7-4b8c-9d0e-000000000a02', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000003'),
+  ('b2c3d4e5-f6a7-4b8c-9d0e-000000000a04', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000003'),
+  ('b2c3d4e5-f6a7-4b8c-9d0e-000000000a03', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000004')
 ON CONFLICT DO NOTHING;
