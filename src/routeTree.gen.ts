@@ -22,7 +22,7 @@ import { Route as ProtectedAppUsersRouteImport } from './routes/_protected/_app/
 import { Route as ProtectedAppDashboardRouteImport } from './routes/_protected/_app/dashboard'
 import { Route as ProtectedAppAccountsRouteImport } from './routes/_protected/_app/accounts'
 import { Route as ProtectedAppAccountsIndexRouteImport } from './routes/_protected/_app/accounts/index'
-import { Route as ProtectedAppAccountsAccountIdOrdersRouteImport } from './routes/_protected/_app/accounts/$accountId/orders'
+import { Route as ProtectedAppAccountsAccountIdIndexRouteImport } from './routes/_protected/_app/accounts/$accountId/index'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -88,10 +88,10 @@ const ProtectedAppAccountsIndexRoute =
     path: '/',
     getParentRoute: () => ProtectedAppAccountsRoute,
   } as any)
-const ProtectedAppAccountsAccountIdOrdersRoute =
-  ProtectedAppAccountsAccountIdOrdersRouteImport.update({
-    id: '/$accountId/orders',
-    path: '/$accountId/orders',
+const ProtectedAppAccountsAccountIdIndexRoute =
+  ProtectedAppAccountsAccountIdIndexRouteImport.update({
+    id: '/$accountId/',
+    path: '/$accountId/',
     getParentRoute: () => ProtectedAppAccountsRoute,
   } as any)
 
@@ -107,7 +107,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof ProtectedAppDashboardRoute
   '/users': typeof ProtectedAppUsersRoute
   '/accounts/': typeof ProtectedAppAccountsIndexRoute
-  '/accounts/$accountId/orders': typeof ProtectedAppAccountsAccountIdOrdersRoute
+  '/accounts/$accountId/': typeof ProtectedAppAccountsAccountIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -120,7 +120,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof ProtectedAppDashboardRoute
   '/users': typeof ProtectedAppUsersRoute
   '/accounts': typeof ProtectedAppAccountsIndexRoute
-  '/accounts/$accountId/orders': typeof ProtectedAppAccountsAccountIdOrdersRoute
+  '/accounts/$accountId': typeof ProtectedAppAccountsAccountIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -137,7 +137,7 @@ export interface FileRoutesById {
   '/_protected/_app/dashboard': typeof ProtectedAppDashboardRoute
   '/_protected/_app/users': typeof ProtectedAppUsersRoute
   '/_protected/_app/accounts/': typeof ProtectedAppAccountsIndexRoute
-  '/_protected/_app/accounts/$accountId/orders': typeof ProtectedAppAccountsAccountIdOrdersRoute
+  '/_protected/_app/accounts/$accountId/': typeof ProtectedAppAccountsAccountIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -153,7 +153,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/users'
     | '/accounts/'
-    | '/accounts/$accountId/orders'
+    | '/accounts/$accountId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -166,7 +166,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/users'
     | '/accounts'
-    | '/accounts/$accountId/orders'
+    | '/accounts/$accountId'
   id:
     | '__root__'
     | '/'
@@ -182,7 +182,7 @@ export interface FileRouteTypes {
     | '/_protected/_app/dashboard'
     | '/_protected/_app/users'
     | '/_protected/_app/accounts/'
-    | '/_protected/_app/accounts/$accountId/orders'
+    | '/_protected/_app/accounts/$accountId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -289,11 +289,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedAppAccountsIndexRouteImport
       parentRoute: typeof ProtectedAppAccountsRoute
     }
-    '/_protected/_app/accounts/$accountId/orders': {
-      id: '/_protected/_app/accounts/$accountId/orders'
-      path: '/$accountId/orders'
-      fullPath: '/accounts/$accountId/orders'
-      preLoaderRoute: typeof ProtectedAppAccountsAccountIdOrdersRouteImport
+    '/_protected/_app/accounts/$accountId/': {
+      id: '/_protected/_app/accounts/$accountId/'
+      path: '/$accountId'
+      fullPath: '/accounts/$accountId/'
+      preLoaderRoute: typeof ProtectedAppAccountsAccountIdIndexRouteImport
       parentRoute: typeof ProtectedAppAccountsRoute
     }
   }
@@ -301,13 +301,13 @@ declare module '@tanstack/react-router' {
 
 interface ProtectedAppAccountsRouteChildren {
   ProtectedAppAccountsIndexRoute: typeof ProtectedAppAccountsIndexRoute
-  ProtectedAppAccountsAccountIdOrdersRoute: typeof ProtectedAppAccountsAccountIdOrdersRoute
+  ProtectedAppAccountsAccountIdIndexRoute: typeof ProtectedAppAccountsAccountIdIndexRoute
 }
 
 const ProtectedAppAccountsRouteChildren: ProtectedAppAccountsRouteChildren = {
   ProtectedAppAccountsIndexRoute: ProtectedAppAccountsIndexRoute,
-  ProtectedAppAccountsAccountIdOrdersRoute:
-    ProtectedAppAccountsAccountIdOrdersRoute,
+  ProtectedAppAccountsAccountIdIndexRoute:
+    ProtectedAppAccountsAccountIdIndexRoute,
 }
 
 const ProtectedAppAccountsRouteWithChildren =

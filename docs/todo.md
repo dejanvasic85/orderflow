@@ -30,9 +30,10 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Infra | Must | Supabase Storage bucket for product images + upload UI (sort out sourcing wine/beer/liquor images for dev seed)
 - [x] Infra | Must | RLS policies — users see only their assigned accounts; staff read-only across all order requests
 - [x] Infra | Must | `src/lib/products/` query layer (mirror `accounts/`, `users/`)
+- [x] Feature | Must | User homepage — account selection for users with multiple accounts
+- [ ] Feature | Must | Submit order request from homepage — server function + RLS scoped to assigned accounts
 - [ ] Feature | Must | Real product catalog browse — replace mock data on account orders page
 - [ ] Feature | Must | Order draft state — add items with box + extra bottle quantities
-- [ ] Feature | Must | Submit order request — server function + RLS scoped to assigned accounts
 - [ ] Feature | Must | Order history view — replace mock data with real submitted orders
 - [ ] Feature | Must | Wire existing "New Order" button to the order flow
 - [ ] Quality | Must | Unit testing the server functions

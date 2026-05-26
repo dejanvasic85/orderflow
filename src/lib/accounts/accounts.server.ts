@@ -1,10 +1,25 @@
 import type { z } from "zod";
+import { ensureSession } from "@/lib/auth/auth.functions";
 import { err, ok } from "@/lib/result";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import type { assignSchema, createAccountSchema, updateAccountSchema } from "./schema";
 
 const accountSelect =
   "id, name, contact_name, contact_email, contact_phone, active, created_at, updated_at" as const;
+
+export async function fetchAccountsForCurrentUser() {
+  const supabase = createSupabaseServerClient();
+  const session = await ensureSession();
+  const { data, error } = await supabase
+    .from("account_users")
+    .select("account:accounts(id, name)")
+    .eq("user_id", session.id);
+  if (error) return err({ message: error.message });
+  const accounts = (data ?? [])
+    .map((r) => r.account)
+    .filter((a): a is { id: string; name: string } => a !== null);
+  return ok(accounts);
+}
 
 export async function fetchAccounts() {
   const supabase = createSupabaseServerClient();
