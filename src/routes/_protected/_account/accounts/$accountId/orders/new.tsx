@@ -41,6 +41,7 @@ function NewOrderPage() {
     <NewOrderForm
       accountId={accountId}
       accountName={account.name}
+      defaultDeliveryInstructions={account.delivery_instructions ?? null}
       template={template}
       onSubmit={handleSubmit}
     />

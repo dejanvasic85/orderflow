@@ -5,7 +5,7 @@ import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import type { createOrderRequestSchema } from "./schema";
 
 const orderRequestWithItemsSelect =
-  "id, order_number, account_id, placed_by, template_id, note, delivery_address, delivery_note, status, created_at, updated_at, order_request_items(id, product_id, boxes, extra_bottles, created_at, products(id, name, qty_per_box)), templates(id, name)" as const;
+  "id, order_number, account_id, placed_by, template_id, delivery_address, delivery_instructions, status, created_at, updated_at, order_request_items(id, product_id, boxes, extra_bottles, created_at, products(id, name, qty_per_box)), templates(id, name)" as const;
 
 export async function fetchOrderRequestsForAccount(accountId: string) {
   const supabase = createSupabaseServerClient();

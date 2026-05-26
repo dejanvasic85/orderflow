@@ -12,6 +12,7 @@ import type { TemplateItem, TemplateWithItems } from "@/lib/templates/schema";
 type NewOrderFormProps = {
   accountId: string;
   accountName: string;
+  defaultDeliveryInstructions: string | null;
   template: TemplateWithItems | null;
   onSubmit: (data: CreateOrderRequestInput) => Promise<void>;
 };
@@ -70,9 +71,17 @@ function TemplateItemsList({ template }: { template: TemplateWithItems }) {
   );
 }
 
-export function NewOrderForm({ accountId, accountName, template, onSubmit }: NewOrderFormProps) {
+export function NewOrderForm({
+  accountId,
+  accountName,
+  defaultDeliveryInstructions,
+  template,
+  onSubmit,
+}: NewOrderFormProps) {
   const hasItems = template && template.template_items.length > 0;
-  const [note, setNote] = useState("");
+  const [deliveryInstructions, setDeliveryInstructions] = useState(
+    defaultDeliveryInstructions ?? "",
+  );
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -93,7 +102,7 @@ export function NewOrderForm({ accountId, accountName, template, onSubmit }: New
       await onSubmit({
         account_id: accountId,
         template_id: template?.id ?? null,
-        note: note || null,
+        delivery_instructions: deliveryInstructions || null,
         items,
       });
     } catch {
@@ -129,14 +138,14 @@ export function NewOrderForm({ accountId, accountName, template, onSubmit }: New
 
         <div className="flex flex-col gap-2">
           <label className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
-            Note (optional)
+            Delivery instructions (optional)
           </label>
           <Textarea
             placeholder="Any special instructions..."
             rows={3}
             className="resize-none"
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
+            value={deliveryInstructions}
+            onChange={(e) => setDeliveryInstructions(e.target.value)}
           />
         </div>
 

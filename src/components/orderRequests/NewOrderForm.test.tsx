@@ -49,6 +49,7 @@ function renderForm(overrides?: Partial<React.ComponentProps<typeof NewOrderForm
       <NewOrderForm
         accountId="b2c3d4e5-f6a7-4b8c-9d0e-000000000a01"
         accountName="The Winery Bistro"
+        defaultDeliveryInstructions={null}
         template={template}
         onSubmit={onSubmit}
         {...overrides}
@@ -90,7 +91,7 @@ test("renders correct total for each item", async () => {
   expect(screen.getByText("15")).toBeInTheDocument();
 });
 
-test("calls onSubmit with mapped payload when submitted with no note", async () => {
+test("calls onSubmit with mapped payload when submitted with no delivery instructions", async () => {
   const user = userEvent.setup();
   renderForm();
 
@@ -99,7 +100,7 @@ test("calls onSubmit with mapped payload when submitted with no note", async () 
   expect(onSubmit).toHaveBeenCalledWith({
     account_id: "b2c3d4e5-f6a7-4b8c-9d0e-000000000a01",
     template_id: "d4e5f6a7-b8c9-4d0e-9f2a-000000000001",
-    note: null,
+    delivery_instructions: null,
     items: [
       { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 2, extra_bottles: 0 },
       { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000002", boxes: 1, extra_bottles: 3 },
@@ -107,7 +108,7 @@ test("calls onSubmit with mapped payload when submitted with no note", async () 
   } satisfies CreateOrderRequestInput);
 });
 
-test("calls onSubmit with the entered note", async () => {
+test("calls onSubmit with the entered delivery instructions", async () => {
   const user = userEvent.setup();
   renderForm();
 
@@ -117,7 +118,33 @@ test("calls onSubmit with the entered note", async () => {
   );
   await user.click(screen.getByRole("button", { name: "Submit order" }));
 
-  expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ note: "Leave at door" }));
+  expect(onSubmit).toHaveBeenCalledWith(
+    expect.objectContaining({ delivery_instructions: "Leave at door" }),
+  );
+});
+
+test("pre-fills textarea with defaultDeliveryInstructions from account", async () => {
+  const user = userEvent.setup();
+  renderForm({ defaultDeliveryInstructions: "Ring the bell" });
+
+  expect(await screen.findByDisplayValue("Ring the bell")).toBeInTheDocument();
+
+  await user.click(screen.getByRole("button", { name: "Submit order" }));
+
+  expect(onSubmit).toHaveBeenCalledWith(
+    expect.objectContaining({ delivery_instructions: "Ring the bell" }),
+  );
+});
+
+test("submits null delivery_instructions when user clears the pre-filled value", async () => {
+  const user = userEvent.setup();
+  renderForm({ defaultDeliveryInstructions: "Ring the bell" });
+
+  const textarea = await screen.findByDisplayValue("Ring the bell");
+  await user.clear(textarea);
+  await user.click(screen.getByRole("button", { name: "Submit order" }));
+
+  expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ delivery_instructions: null }));
 });
 
 test("shows Submitting… and disables button while onSubmit is pending", async () => {
