@@ -1,6 +1,7 @@
-import { BookOpenIcon, ShoppingCartIcon, UsersIcon } from "lucide-react";
+import { BookOpenIcon, ShoppingCartIcon, UsersIcon, HomeIcon } from "lucide-react";
 
 export const adminNavItemsValue = [
+  { label: "Home", to: "/manage/dashboard", icon: HomeIcon },
   { label: "Orders", to: "/manage/orders", icon: ShoppingCartIcon },
   { label: "Users", to: "/manage/users", icon: UsersIcon },
 ] as const;
