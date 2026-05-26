@@ -81,6 +81,8 @@ export type Database = {
           contact_name: string | null
           contact_phone: string | null
           created_at: string
+          delivery_address: string | null
+          delivery_instructions: string | null
           id: string
           name: string
           updated_at: string
@@ -91,6 +93,8 @@ export type Database = {
           contact_name?: string | null
           contact_phone?: string | null
           created_at?: string
+          delivery_address?: string | null
+          delivery_instructions?: string | null
           id?: string
           name: string
           updated_at?: string
@@ -101,11 +105,267 @@ export type Database = {
           contact_name?: string | null
           contact_phone?: string | null
           created_at?: string
+          delivery_address?: string | null
+          delivery_instructions?: string | null
           id?: string
           name?: string
           updated_at?: string
         }
         Relationships: []
+      }
+      order_request_items: {
+        Row: {
+          boxes: number
+          created_at: string
+          extra_bottles: number
+          id: string
+          order_request_id: string
+          product_id: string
+        }
+        Insert: {
+          boxes?: number
+          created_at?: string
+          extra_bottles?: number
+          id?: string
+          order_request_id: string
+          product_id: string
+        }
+        Update: {
+          boxes?: number
+          created_at?: string
+          extra_bottles?: number
+          id?: string
+          order_request_id?: string
+          product_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_request_items_order_request_id_fkey"
+            columns: ["order_request_id"]
+            isOneToOne: false
+            referencedRelation: "order_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_request_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_requests: {
+        Row: {
+          account_id: string
+          created_at: string
+          delivery_address: string | null
+          delivery_note: string | null
+          id: string
+          note: string | null
+          order_number: number
+          placed_by: string
+          status: string
+          template_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          account_id: string
+          created_at?: string
+          delivery_address?: string | null
+          delivery_note?: string | null
+          id?: string
+          note?: string | null
+          order_number?: number
+          placed_by: string
+          status?: string
+          template_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          account_id?: string
+          created_at?: string
+          delivery_address?: string | null
+          delivery_note?: string | null
+          id?: string
+          note?: string | null
+          order_number?: number
+          placed_by?: string
+          status?: string
+          template_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_requests_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_requests_placed_by_fkey"
+            columns: ["placed_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_requests_placed_by_fkey"
+            columns: ["placed_by"]
+            isOneToOne: false
+            referencedRelation: "users_with_email"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_requests_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      products: {
+        Row: {
+          active: boolean
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          name: string
+          qty_per_box: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          qty_per_box: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          qty_per_box?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      template_items: {
+        Row: {
+          bottle_count: number
+          box_count: number
+          created_at: string
+          created_by: string | null
+          id: string
+          product_id: string
+          template_id: string
+        }
+        Insert: {
+          bottle_count?: number
+          box_count?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          product_id: string
+          template_id: string
+        }
+        Update: {
+          bottle_count?: number
+          box_count?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          product_id?: string
+          template_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "template_items_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "template_items_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users_with_email"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "template_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "template_items_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      templates: {
+        Row: {
+          account_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          account_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          account_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "templates_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: true
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "templates_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "templates_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users_with_email"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       users: {
         Row: {

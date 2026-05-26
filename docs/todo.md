@@ -35,6 +35,7 @@ Priorities: `Must` · `Should` · `Nice`
 - [ ] Feature | Must | Submit order request — server function + RLS scoped to assigned accounts
 - [ ] Feature | Must | Order history view — replace mock data with real submitted orders
 - [ ] Feature | Must | Wire existing "New Order" button to the order flow
+- [ ] Quality | Must | Unit testing the server functions
 - [ ] Quality | Must | Playwright tests improved and working locally
 - [ ] Quality | Must | Playwright custom container with Supabase so it is working properly in the pipeline
 - [ ] Feature | Must | PWA — manifest, service worker, install prompt, offline app shell

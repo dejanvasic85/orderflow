@@ -1,0 +1,36 @@
+import { z } from "zod";
+import type { Database } from "@/lib/database.types";
+import type { ProductRow } from "@/lib/products/schema";
+import type { TemplateRow } from "@/lib/templates/schema";
+
+export type OrderRequestRow = Database["public"]["Tables"]["order_requests"]["Row"];
+export type OrderRequestItemRow = Database["public"]["Tables"]["order_request_items"]["Row"];
+
+export type OrderRequestWithItems = OrderRequestRow & {
+  order_request_items: Array<
+    OrderRequestItemRow & { products: Pick<ProductRow, "id" | "name" | "qty_per_box"> }
+  >;
+  templates: Pick<TemplateRow, "id" | "name"> | null;
+};
+
+export const orderRequestItemInputSchema = z.object({
+  product_id: z.uuid(),
+  boxes: z.number().int().min(0),
+  extra_bottles: z.number().int().min(0),
+});
+
+export const createOrderRequestSchema = z.object({
+  account_id: z.uuid(),
+  template_id: z.uuid().nullable().optional(),
+  note: z.string().nullable().optional(),
+  delivery_address: z.string().nullable().optional(),
+  delivery_note: z.string().nullable().optional(),
+  items: z.array(orderRequestItemInputSchema).min(1),
+});
+
+export type CreateOrderRequestInput = z.infer<typeof createOrderRequestSchema>;
+export type OrderRequestItemInput = z.infer<typeof orderRequestItemInputSchema>;
+
+export function formatOrderRef(orderNumber: number): string {
+  return `ORD-${String(orderNumber).padStart(4, "0")}`;
+}

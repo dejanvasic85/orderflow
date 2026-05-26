@@ -9,6 +9,8 @@ export const createAccountSchema = z.object({
   contact_email: z.email().nullable().optional(),
   contact_phone: z.string().nullable().optional(),
   active: z.boolean().optional(),
+  delivery_address: z.string().nullable().optional(),
+  delivery_instructions: z.string().nullable().optional(),
 });
 
 export const updateAccountSchema = createAccountSchema.partial().extend({ id: z.uuid() });
