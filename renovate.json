@@ -21,8 +21,8 @@
     "enabled": true,
     "automerge": true,
     "recreateWhen": "always",
-    "rebaseStalePrs": true,
-    "schedule": ["before 4am on monday"],
+    "rebaseWhen": "behind-base-branch",
+    "schedule": ["before 6am on monday"],
     "prBodyDefinitions": {
       "Change": "All locks refreshed"
     }
