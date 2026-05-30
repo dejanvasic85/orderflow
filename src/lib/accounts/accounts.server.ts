@@ -2,10 +2,22 @@ import type { z } from "zod";
 import { ensureSession } from "@/lib/auth/auth.functions";
 import { err, ok } from "@/lib/result";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
-import type { assignSchema, createAccountSchema, updateAccountSchema } from "./schema";
+import type {
+  Account,
+  AccountRow,
+  assignSchema,
+  createAccountSchema,
+  updateAccountSchema,
+} from "./schema";
+
+type AccountListedRow = AccountRow & { account_users: { user_id: string }[] | null };
+
+export function mapAccount(row: AccountListedRow): Account {
+  return { ...row, userCount: row.account_users?.length ?? 0 };
+}
 
 const accountSelect =
-  "id, name, contact_name, contact_email, contact_phone, delivery_address, delivery_instructions, created_at, updated_at" as const;
+  "id, name, contact_name, contact_email, contact_phone, delivery_address, delivery_instructions, created_at, updated_at, account_users!account_id ( user_id )" as const;
 
 export async function fetchAccountsForCurrentUser() {
   const supabase = createSupabaseServerClient();
@@ -28,7 +40,7 @@ export async function fetchAccounts() {
     .select(accountSelect)
     .order("name", { ascending: true });
   if (error) return err({ message: error.message });
-  return ok(data ?? []);
+  return ok((data ?? []).map((row) => mapAccount(row)));
 }
 
 export async function fetchAccount(id: string) {
@@ -39,7 +51,7 @@ export async function fetchAccount(id: string) {
     .eq("id", id)
     .single();
   if (error) return err({ message: error.message });
-  return ok(data);
+  return ok(mapAccount(data as AccountListedRow));
 }
 
 export async function fetchAccountUsers(accountId: string) {

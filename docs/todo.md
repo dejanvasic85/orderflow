@@ -33,7 +33,7 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Feature | Must | User homepage — account selection for users with multiple accounts
 - [x] Feature | Must | Submit order request — server function + RLS scoped to assigned accounts
 - [x] Feature | Must | Account management for admin - basic details
-- [ ] Feature | Must | Account management for admin - assigning and removing users
+- [x] Feature | Must | Account management for admin - assigning and removing users
 - [ ] Feature | Must | Real product catalog browse — replace mock data on account orders page
 - [ ] Feature | Must | Order draft state — add items with box + extra bottle quantities
 - [ ] Feature | Must | Order history view — replace mock data with real submitted orders

@@ -7,12 +7,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { AccountRow } from "@/lib/accounts/schema";
+import type { Account } from "@/lib/accounts/schema";
 
 type Props = {
-  accounts: AccountRow[];
+  accounts: Account[];
   selectedId: string | null;
-  onSelectAccount: (account: AccountRow) => void;
+  onSelectAccount: (account: Account) => void;
 };
 
 export function AccountList({ accounts, selectedId, onSelectAccount }: Props) {
@@ -24,6 +24,7 @@ export function AccountList({ accounts, selectedId, onSelectAccount }: Props) {
           <TableHead>Contact</TableHead>
           <TableHead>Email</TableHead>
           <TableHead>Phone</TableHead>
+          <TableHead>Users</TableHead>
           <TableHead />
         </TableRow>
       </TableHeader>
@@ -39,6 +40,9 @@ export function AccountList({ accounts, selectedId, onSelectAccount }: Props) {
             <TableCell className="text-muted-foreground">{account.contact_name ?? "—"}</TableCell>
             <TableCell className="text-muted-foreground">{account.contact_email ?? "—"}</TableCell>
             <TableCell className="text-muted-foreground">{account.contact_phone ?? "—"}</TableCell>
+            <TableCell className="text-muted-foreground">
+              {account.userCount > 0 ? account.userCount : "—"}
+            </TableCell>
             <TableCell>
               <Button
                 size="sm"

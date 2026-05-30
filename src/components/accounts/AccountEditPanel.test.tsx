@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
 import userEvent, { type UserEvent } from "@testing-library/user-event";
-import type { AccountRow } from "@/lib/accounts/schema";
+import type { Account } from "@/lib/accounts/schema";
 import { AccountEditPanel } from "./AccountEditPanel";
 
 vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
@@ -19,7 +19,7 @@ function wrapper({ children }: { children: React.ReactNode }) {
   return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 }
 
-const baseAccount: AccountRow = {
+const baseAccount: Account = {
   id: "acc-1",
   name: "Acme Corp",
   contact_name: "Jane Doe",
@@ -29,6 +29,7 @@ const baseAccount: AccountRow = {
   delivery_instructions: "Leave at door",
   created_at: "2024-01-01T00:00:00Z",
   updated_at: "2024-01-01T00:00:00Z",
+  userCount: 0,
 };
 
 const onSave = vi.fn();

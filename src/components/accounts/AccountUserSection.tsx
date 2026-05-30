@@ -17,9 +17,10 @@ type AssignedUser = { id: string; name: string };
 
 type Props = {
   accountId: string;
+  onUserCountChange?: (delta: 1 | -1) => void;
 };
 
-export function AccountUserSection({ accountId }: Props) {
+export function AccountUserSection({ accountId, onUserCountChange }: Props) {
   const queryClient = useQueryClient();
 
   const accountUsersQuery = useQuery({
@@ -53,6 +54,7 @@ export function AccountUserSection({ accountId }: Props) {
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["accountUsers", accountId] });
+      onUserCountChange?.(1);
     },
     onError: (e) => toast.error(e.message),
   });
@@ -66,6 +68,7 @@ export function AccountUserSection({ accountId }: Props) {
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["accountUsers", accountId] });
+      onUserCountChange?.(-1);
     },
     onError: (e) => toast.error(e.message),
   });
