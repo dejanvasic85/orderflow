@@ -30,30 +30,32 @@ function renderShell(overrides?: Partial<React.ComponentProps<typeof AccountShel
   );
 }
 
-test("renders children", async () => {
-  renderShell();
-  expect(await screen.findByText("Page content")).toBeInTheDocument();
-});
+describe("AccountShell", () => {
+  test("renders children", async () => {
+    renderShell();
+    expect(await screen.findByText("Page content")).toBeInTheDocument();
+  });
 
-test("renders Orders link pointing to the account in the top nav", async () => {
-  renderShell({ accountId: "abc123" });
-  const header = await screen.findByRole("banner");
-  expect(header.querySelector('a[href="/accounts/abc123"]')).toBeInTheDocument();
-});
+  test("renders Orders link pointing to the account in the top nav", async () => {
+    renderShell({ accountId: "abc123" });
+    const header = await screen.findByRole("banner");
+    expect(header.querySelector('a[href="/accounts/abc123"]')).toBeInTheDocument();
+  });
 
-test("renders Browse nav link in the top nav", async () => {
-  renderShell();
-  const header = await screen.findByRole("banner");
-  expect(header.querySelector('a[href="/browse"]')).toBeInTheDocument();
-});
+  test("renders Browse nav link in the top nav", async () => {
+    renderShell();
+    const header = await screen.findByRole("banner");
+    expect(header.querySelector('a[href="/accounts/abc123/browse"]')).toBeInTheDocument();
+  });
 
-test("calls onSignOut when Sign out is clicked", async () => {
-  const user = userEvent.setup();
-  renderShell();
+  test("calls onSignOut when Sign out is clicked", async () => {
+    const user = userEvent.setup();
+    renderShell();
 
-  const menuButtons = await screen.findAllByRole("button", { name: "Open account menu" });
-  await user.click(menuButtons[0]);
-  await user.click(await screen.findByRole("menuitem", { name: "Sign out" }));
+    const menuButtons = await screen.findAllByRole("button", { name: "Open account menu" });
+    await user.click(menuButtons[0]);
+    await user.click(await screen.findByRole("menuitem", { name: "Sign out" }));
 
-  expect(onSignOut).toHaveBeenCalledTimes(1);
+    expect(onSignOut).toHaveBeenCalledTimes(1);
+  });
 });
