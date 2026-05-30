@@ -2,7 +2,12 @@ import { ensureSession } from "@/lib/auth/auth.functions";
 import { err, ok } from "@/lib/result";
 import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
-import type { User, UserAccount } from "./schema";
+import type { User, UserAccount, UserRole } from "./schema";
+
+type FetchUsersFilters = {
+  role?: UserRole;
+  excludeIds?: string[];
+};
 
 export const userListSelect = `
   id, name, email, phone, active, invite_accepted_at, invited_at, role, notification_preferences, created_at, updated_at,
@@ -82,12 +87,21 @@ export async function resolveAccountNames(
   return (data ?? []).map((a) => ({ id: a.id, name: a.name }));
 }
 
-export async function fetchUsers() {
+export async function fetchUsers(filters: FetchUsersFilters = {}) {
   const supabaseServer = createSupabaseServerClient();
-  const { data, error } = await supabaseServer
+  let query = supabaseServer
     .from("users_with_email")
     .select(userListSelect)
     .order("name", { ascending: true });
+
+  if (filters.role) {
+    query = query.eq("role", filters.role);
+  }
+  if (filters.excludeIds && filters.excludeIds.length > 0) {
+    query = query.not("id", "in", `(${filters.excludeIds.join(",")})`);
+  }
+
+  const { data, error } = await query;
   if (error) return err({ message: error.message });
   return ok((data as ListedRow[] | null)?.map(mapUser) ?? []);
 }

@@ -1,9 +1,23 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
 import userEvent, { type UserEvent } from "@testing-library/user-event";
 import type { AccountRow } from "@/lib/accounts/schema";
 import { AccountEditPanel } from "./AccountEditPanel";
 
 vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
+vi.mock("@/lib/accounts/accounts.functions", () => ({
+  listAccountUsers: vi.fn().mockResolvedValue({ ok: true, value: [] }),
+  assignUserToAccount: vi.fn(),
+  unassignUserFromAccount: vi.fn(),
+}));
+vi.mock("@/lib/users/users.functions", () => ({
+  listUsers: vi.fn().mockResolvedValue({ ok: true, value: [] }),
+}));
+
+function wrapper({ children }: { children: React.ReactNode }) {
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+}
 
 const baseAccount: AccountRow = {
   id: "acc-1",
@@ -27,13 +41,17 @@ beforeEach(() => {
 });
 
 test("renders account name as heading", () => {
-  render(<AccountEditPanel account={baseAccount} onSave={onSave} onDiscard={onDiscard} />);
+  render(<AccountEditPanel account={baseAccount} onSave={onSave} onDiscard={onDiscard} />, {
+    wrapper,
+  });
 
   expect(screen.getByRole("heading", { name: "Acme Corp" })).toBeInTheDocument();
 });
 
 test("pre-fills all fields from account", () => {
-  render(<AccountEditPanel account={baseAccount} onSave={onSave} onDiscard={onDiscard} />);
+  render(<AccountEditPanel account={baseAccount} onSave={onSave} onDiscard={onDiscard} />, {
+    wrapper,
+  });
 
   expect(screen.getByLabelText("Account name")).toHaveValue("Acme Corp");
   expect(screen.getByLabelText("Contact name")).toHaveValue("Jane Doe");
@@ -44,7 +62,9 @@ test("pre-fills all fields from account", () => {
 });
 
 test("shows validation error when account name is cleared on submit", async () => {
-  render(<AccountEditPanel account={baseAccount} onSave={onSave} onDiscard={onDiscard} />);
+  render(<AccountEditPanel account={baseAccount} onSave={onSave} onDiscard={onDiscard} />, {
+    wrapper,
+  });
 
   await user.clear(screen.getByLabelText("Account name"));
   await user.click(screen.getByRole("button", { name: "Save changes" }));
@@ -54,7 +74,9 @@ test("shows validation error when account name is cleared on submit", async () =
 });
 
 test("shows validation error when contact email is invalid", async () => {
-  render(<AccountEditPanel account={baseAccount} onSave={onSave} onDiscard={onDiscard} />);
+  render(<AccountEditPanel account={baseAccount} onSave={onSave} onDiscard={onDiscard} />, {
+    wrapper,
+  });
 
   await user.clear(screen.getByLabelText("Email"));
   await user.type(screen.getByLabelText("Email"), "not-an-email");
@@ -65,7 +87,9 @@ test("shows validation error when contact email is invalid", async () => {
 });
 
 test("calls onSave with updated values on valid submit", async () => {
-  render(<AccountEditPanel account={baseAccount} onSave={onSave} onDiscard={onDiscard} />);
+  render(<AccountEditPanel account={baseAccount} onSave={onSave} onDiscard={onDiscard} />, {
+    wrapper,
+  });
 
   await user.clear(screen.getByLabelText("Account name"));
   await user.type(screen.getByLabelText("Account name"), "New Name");
@@ -88,6 +112,7 @@ test("calls onSave with null for empty optional fields", async () => {
       onSave={onSave}
       onDiscard={onDiscard}
     />,
+    { wrapper },
   );
 
   await user.click(screen.getByRole("button", { name: "Save changes" }));
@@ -104,20 +129,29 @@ test("calls onSave with null for empty optional fields", async () => {
 });
 
 test("read-only mode hides Save changes button", () => {
-  render(<AccountEditPanel account={baseAccount} readOnly onSave={onSave} onDiscard={onDiscard} />);
+  render(
+    <AccountEditPanel account={baseAccount} readOnly onSave={onSave} onDiscard={onDiscard} />,
+    { wrapper },
+  );
 
   expect(screen.queryByRole("button", { name: "Save changes" })).not.toBeInTheDocument();
 });
 
 test("read-only mode shows Close button instead of Discard", () => {
-  render(<AccountEditPanel account={baseAccount} readOnly onSave={onSave} onDiscard={onDiscard} />);
+  render(
+    <AccountEditPanel account={baseAccount} readOnly onSave={onSave} onDiscard={onDiscard} />,
+    { wrapper },
+  );
 
   expect(screen.getByRole("button", { name: "Close" })).toBeInTheDocument();
   expect(screen.queryByRole("button", { name: "Discard" })).not.toBeInTheDocument();
 });
 
 test("read-only mode disables all inputs", () => {
-  render(<AccountEditPanel account={baseAccount} readOnly onSave={onSave} onDiscard={onDiscard} />);
+  render(
+    <AccountEditPanel account={baseAccount} readOnly onSave={onSave} onDiscard={onDiscard} />,
+    { wrapper },
+  );
 
   expect(screen.getByLabelText("Account name")).toBeDisabled();
   expect(screen.getByLabelText("Contact name")).toBeDisabled();
@@ -128,7 +162,9 @@ test("read-only mode disables all inputs", () => {
 });
 
 test("calls onDiscard when Discard button is clicked", async () => {
-  render(<AccountEditPanel account={baseAccount} onSave={onSave} onDiscard={onDiscard} />);
+  render(<AccountEditPanel account={baseAccount} onSave={onSave} onDiscard={onDiscard} />, {
+    wrapper,
+  });
 
   await user.click(screen.getByRole("button", { name: "Discard" }));
 
@@ -136,7 +172,10 @@ test("calls onDiscard when Discard button is clicked", async () => {
 });
 
 test("calls onDiscard when Close button is clicked in read-only mode", async () => {
-  render(<AccountEditPanel account={baseAccount} readOnly onSave={onSave} onDiscard={onDiscard} />);
+  render(
+    <AccountEditPanel account={baseAccount} readOnly onSave={onSave} onDiscard={onDiscard} />,
+    { wrapper },
+  );
 
   await user.click(screen.getByRole("button", { name: "Close" }));
 

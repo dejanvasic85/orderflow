@@ -32,6 +32,8 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Infra | Must | `src/lib/products/` query layer (mirror `accounts/`, `users/`)
 - [x] Feature | Must | User homepage — account selection for users with multiple accounts
 - [x] Feature | Must | Submit order request — server function + RLS scoped to assigned accounts
+- [x] Feature | Must | Account management for admin - basic details
+- [ ] Feature | Must | Account management for admin - assigning and removing users
 - [ ] Feature | Must | Real product catalog browse — replace mock data on account orders page
 - [ ] Feature | Must | Order draft state — add items with box + extra bottle quantities
 - [ ] Feature | Must | Order history view — replace mock data with real submitted orders
@@ -48,7 +50,6 @@ Priorities: `Must` · `Should` · `Nice`
 - [ ] Productionising | Must | Email templates
 - [ ] Productionising | Must | Configure production domain in Supabase (currently https://orderflow.team-manager.workers.dev)
 - [ ] Productionising | Must | Configure production env vars in GitHub
-- [ ] Bug | Must | Admins and staff users can have accounts assigned - should they?
 - [ ] Feature | Must | Invite for staff and admin should work seamlessly - at the moment only users have been tested!
 - [ ] Feature | Must | Templates — per-account product list; users can add, only admins can remove
 - [ ] Feature | Must | Admin places order request on behalf of an account
@@ -56,7 +57,6 @@ Priorities: `Must` · `Should` · `Nice`
 - [ ] Feature | Must | Email notification on order placed
 - [ ] Feature | Must | SMS notifications (Phase 2)
 - [ ] Feature | Must | MYOB CSV export — orders out of our system into MYOB
-- [ ] Feature | Must | Account management UX — full CRUD, assigning users, delivery address editing
 - [ ] Productionising | Must | Logging and monitoring (Supabase + Cloudflare — consider unifying in Cloudflare logs)
 - [ ] Feature | Must| Search users by email or name (server-side filter)
 - [ ] Feature | Must| Sort users in admin list

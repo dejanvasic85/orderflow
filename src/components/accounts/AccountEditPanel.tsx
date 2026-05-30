@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import type { AccountRow } from "@/lib/accounts/schema";
+import { AccountUserSection } from "./AccountUserSection";
 
 type Props = {
   account: AccountRow;
@@ -210,6 +211,13 @@ export function AccountEditPanel({ account, readOnly = false, onSave, onDiscard 
           </Button>
         </div>
       </form>
+
+      {account.id && (
+        <>
+          <Separator />
+          <AccountUserSection accountId={account.id} />
+        </>
+      )}
     </div>
   );
 }
