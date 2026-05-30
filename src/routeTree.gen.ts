@@ -23,6 +23,7 @@ import { Route as ProtectedAccountsIndexRouteImport } from './routes/_protected/
 import { Route as ProtectedManageUsersRouteImport } from './routes/_protected/manage/users'
 import { Route as ProtectedManageOrdersRouteImport } from './routes/_protected/manage/orders'
 import { Route as ProtectedManageDashboardRouteImport } from './routes/_protected/manage/dashboard'
+import { Route as ProtectedManageAccountsRouteImport } from './routes/_protected/manage/accounts'
 import { Route as ProtectedAccountAccountsRouteImport } from './routes/_protected/_account/accounts'
 import { Route as ProtectedAccountAccountsAccountIdIndexRouteImport } from './routes/_protected/_account/accounts/$accountId/index'
 import { Route as ProtectedAccountAccountsAccountIdOrdersNewRouteImport } from './routes/_protected/_account/accounts/$accountId/orders/new'
@@ -97,6 +98,11 @@ const ProtectedManageDashboardRoute =
     path: '/dashboard',
     getParentRoute: () => ProtectedManageRoute,
   } as any)
+const ProtectedManageAccountsRoute = ProtectedManageAccountsRouteImport.update({
+  id: '/accounts',
+  path: '/accounts',
+  getParentRoute: () => ProtectedManageRoute,
+} as any)
 const ProtectedAccountAccountsRoute =
   ProtectedAccountAccountsRouteImport.update({
     id: '/accounts',
@@ -132,6 +138,7 @@ export interface FileRoutesByFullPath {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/set-password': typeof AuthSetPasswordRoute
   '/accounts': typeof ProtectedAccountAccountsRouteWithChildren
+  '/manage/accounts': typeof ProtectedManageAccountsRoute
   '/manage/dashboard': typeof ProtectedManageDashboardRoute
   '/manage/orders': typeof ProtectedManageOrdersRoute
   '/manage/users': typeof ProtectedManageUsersRoute
@@ -150,6 +157,7 @@ export interface FileRoutesByTo {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/set-password': typeof AuthSetPasswordRoute
   '/accounts': typeof ProtectedAccountsIndexRoute
+  '/manage/accounts': typeof ProtectedManageAccountsRoute
   '/manage/dashboard': typeof ProtectedManageDashboardRoute
   '/manage/orders': typeof ProtectedManageOrdersRoute
   '/manage/users': typeof ProtectedManageUsersRoute
@@ -170,6 +178,7 @@ export interface FileRoutesById {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/set-password': typeof AuthSetPasswordRoute
   '/_protected/_account/accounts': typeof ProtectedAccountAccountsRouteWithChildren
+  '/_protected/manage/accounts': typeof ProtectedManageAccountsRoute
   '/_protected/manage/dashboard': typeof ProtectedManageDashboardRoute
   '/_protected/manage/orders': typeof ProtectedManageOrdersRoute
   '/_protected/manage/users': typeof ProtectedManageUsersRoute
@@ -190,6 +199,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth/set-password'
     | '/accounts'
+    | '/manage/accounts'
     | '/manage/dashboard'
     | '/manage/orders'
     | '/manage/users'
@@ -208,6 +218,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth/set-password'
     | '/accounts'
+    | '/manage/accounts'
     | '/manage/dashboard'
     | '/manage/orders'
     | '/manage/users'
@@ -227,6 +238,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth/set-password'
     | '/_protected/_account/accounts'
+    | '/_protected/manage/accounts'
     | '/_protected/manage/dashboard'
     | '/_protected/manage/orders'
     | '/_protected/manage/users'
@@ -347,6 +359,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedManageDashboardRouteImport
       parentRoute: typeof ProtectedManageRoute
     }
+    '/_protected/manage/accounts': {
+      id: '/_protected/manage/accounts'
+      path: '/accounts'
+      fullPath: '/manage/accounts'
+      preLoaderRoute: typeof ProtectedManageAccountsRouteImport
+      parentRoute: typeof ProtectedManageRoute
+    }
     '/_protected/_account/accounts': {
       id: '/_protected/_account/accounts'
       path: '/accounts'
@@ -411,12 +430,14 @@ const ProtectedAccountRouteWithChildren =
   ProtectedAccountRoute._addFileChildren(ProtectedAccountRouteChildren)
 
 interface ProtectedManageRouteChildren {
+  ProtectedManageAccountsRoute: typeof ProtectedManageAccountsRoute
   ProtectedManageDashboardRoute: typeof ProtectedManageDashboardRoute
   ProtectedManageOrdersRoute: typeof ProtectedManageOrdersRoute
   ProtectedManageUsersRoute: typeof ProtectedManageUsersRoute
 }
 
 const ProtectedManageRouteChildren: ProtectedManageRouteChildren = {
+  ProtectedManageAccountsRoute: ProtectedManageAccountsRoute,
   ProtectedManageDashboardRoute: ProtectedManageDashboardRoute,
   ProtectedManageOrdersRoute: ProtectedManageOrdersRoute,
   ProtectedManageUsersRoute: ProtectedManageUsersRoute,
