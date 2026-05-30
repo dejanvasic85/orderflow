@@ -55,7 +55,7 @@ function UsersPage() {
   const selectedUser = users.find((u) => u.id === selectedId) ?? null;
   const isDesktop = useMediaQuery("(min-width: 640px)");
   const panelSide = isDesktop ? "right" : "bottom";
-  const panelClassName = "overflow-y-auto p-0 sm:w-[600px] sm:max-w-[600px]";
+  const panelClassName = "overflow-y-auto p-0 sm:w-[50vw] sm:min-w-[800px]";
 
   function handleSelectUser(user: User) {
     setSelectedId(user.id);

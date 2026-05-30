@@ -5,7 +5,7 @@ import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import type { assignSchema, createAccountSchema, updateAccountSchema } from "./schema";
 
 const accountSelect =
-  "id, name, contact_name, contact_email, contact_phone, active, delivery_address, delivery_instructions, created_at, updated_at" as const;
+  "id, name, contact_name, contact_email, contact_phone, delivery_address, delivery_instructions, created_at, updated_at" as const;
 
 export async function fetchAccountsForCurrentUser() {
   const supabase = createSupabaseServerClient();
