@@ -4,7 +4,6 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import type { AccountRow } from "@/lib/accounts/schema";
@@ -92,12 +91,8 @@ export function AccountEditPanel({ account, readOnly = false, onSave, onDiscard 
           )}
         </form.Field>
 
-        <Separator />
-
         {/* Contact details */}
         <div className="flex flex-col gap-4">
-          <Label className="text-sm font-medium">Contact details</Label>
-
           <form.Field name="contact_name">
             {(field) => (
               <Field>
@@ -153,12 +148,8 @@ export function AccountEditPanel({ account, readOnly = false, onSave, onDiscard 
           </div>
         </div>
 
-        <Separator />
-
         {/* Delivery details */}
         <div className="flex flex-col gap-4">
-          <Label className="text-sm font-medium">Delivery details</Label>
-
           <form.Field name="delivery_address">
             {(field) => (
               <Field>
@@ -194,8 +185,6 @@ export function AccountEditPanel({ account, readOnly = false, onSave, onDiscard 
             )}
           </form.Field>
         </div>
-
-        <Separator />
 
         <div className="flex items-center gap-2">
           {!readOnly && <Button type="submit">Save changes</Button>}
