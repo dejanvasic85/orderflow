@@ -1,7 +1,5 @@
 import { Package, Search } from "lucide-react";
 import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Empty,
   EmptyDescription,
@@ -11,57 +9,11 @@ import {
 } from "@/components/ui/empty";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import type { ProductRow } from "@/lib/products/schema";
+import { ProductCard } from "./ProductCard";
 
 type ProductCatalogProps = {
   products: ProductRow[];
 };
-
-type ProductImageProps = {
-  imageUrl: string | null;
-  name: string;
-};
-
-type ProductCardProps = {
-  product: ProductRow;
-};
-
-function ProductImage({ imageUrl, name }: ProductImageProps) {
-  const [errored, setErrored] = useState(false);
-
-  if (imageUrl && !errored) {
-    return (
-      <img
-        src={imageUrl}
-        alt={name}
-        className="aspect-[4/3] w-full object-cover"
-        onError={() => setErrored(true)}
-      />
-    );
-  }
-
-  return (
-    <div className="aspect-[4/3] w-full bg-muted flex items-center justify-center">
-      <Package className="size-10 text-muted-foreground/40" />
-    </div>
-  );
-}
-
-function ProductCard({ product }: ProductCardProps) {
-  return (
-    <Card className="transition-shadow hover:shadow-md">
-      <ProductImage imageUrl={product.image_url} name={product.name} />
-      <CardHeader>
-        <CardTitle className="line-clamp-2">{product.name}</CardTitle>
-        {product.description && (
-          <CardDescription className="line-clamp-3">{product.description}</CardDescription>
-        )}
-      </CardHeader>
-      <CardContent>
-        <Badge variant="secondary">{product.qty_per_box} per box</Badge>
-      </CardContent>
-    </Card>
-  );
-}
 
 export function ProductCatalog({ products }: ProductCatalogProps) {
   const [query, setQuery] = useState("");
