@@ -1,0 +1,15 @@
+{
+  "recommendations": [
+    // Linting + formatting
+    "oxc.oxc-vscode",
+
+    // Tailwind IntelliSense (autocomplete, hover docs, linting)
+    "bradlc.vscode-tailwindcss",
+
+    // Run and debug Vitest tests from the sidebar
+    "vitest.explorer",
+
+    // Run and debug Playwright e2e tests from the sidebar
+    "ms-playwright.playwright"
+  ]
+}
