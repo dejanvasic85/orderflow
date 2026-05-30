@@ -78,7 +78,7 @@ test("renders dash for user count when zero", () => {
     />,
   );
 
-  expect(screen.getAllByText("—").length).toBeGreaterThanOrEqual(4);
+  expect(screen.getAllByText("—")).toHaveLength(4);
 });
 
 test("calls onSelectAccount when a row is clicked", async () => {

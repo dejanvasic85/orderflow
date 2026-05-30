@@ -14,7 +14,7 @@ type Props = {
   readOnly?: boolean;
   onSave: (updated: Account) => void;
   onDiscard: () => void;
-  onUserCountChange?: (delta: 1 | -1) => void;
+  onUserCountChange?: (count: number) => void;
 };
 
 const accountEditSchema = z.object({

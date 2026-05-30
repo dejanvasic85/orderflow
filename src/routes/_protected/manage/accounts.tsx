@@ -61,10 +61,8 @@ function AccountsPage() {
     setCreating(false);
   }
 
-  function handleUserCountChange(accountId: string, delta: 1 | -1) {
-    setAccounts((prev) =>
-      prev.map((a) => (a.id === accountId ? { ...a, userCount: a.userCount + delta } : a)),
-    );
+  function handleUserCountChange(accountId: string, count: number) {
+    setAccounts((prev) => prev.map((a) => (a.id === accountId ? { ...a, userCount: count } : a)));
   }
 
   async function handleSave(updated: Account) {
@@ -141,7 +139,7 @@ function AccountsPage() {
                 readOnly={!isAdmin}
                 onSave={handleSave}
                 onDiscard={handleDiscard}
-                onUserCountChange={(delta) => handleUserCountChange(selectedAccount.id, delta)}
+                onUserCountChange={(count) => handleUserCountChange(selectedAccount.id, count)}
               />
             )}
           </SheetContent>
