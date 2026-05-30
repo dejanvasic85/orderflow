@@ -34,7 +34,7 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Feature | Must | Submit order request — server function + RLS scoped to assigned accounts
 - [x] Feature | Must | Account management for admin - basic details
 - [x] Feature | Must | Account management for admin - assigning and removing users
-- [ ] Feature | Must | Real product catalog browse — replace mock data on account orders page
+- [x] Feature | Must | Real product catalog browse — replace mock data on account orders page
 - [ ] Feature | Must | Order draft state — add items with box + extra bottle quantities
 - [ ] Feature | Must | Order history view — replace mock data with real submitted orders
 - [ ] Feature | Must | Wire existing "New Order" button to the order flow

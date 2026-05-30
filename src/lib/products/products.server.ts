@@ -11,6 +11,7 @@ export async function fetchProducts() {
   const { data, error } = await supabase
     .from("products")
     .select(productSelect)
+    .eq("active", true)
     .order("name", { ascending: true });
   if (error) return err({ message: error.message });
   return ok(data ?? []);

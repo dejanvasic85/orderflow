@@ -1,5 +1,5 @@
+import { BookOpenIcon, ShoppingCartIcon } from "lucide-react";
 import type { ReactNode } from "react";
-import { accountNavItemsValue } from "@/lib/routes";
 import { AccountTopNav } from "./AccountTopNav";
 import { MobileBottomNav } from "./MobileBottomNav";
 
@@ -20,8 +20,13 @@ export function AccountShell({
 }: AccountShellProps) {
   const navLinks = [
     { label: "Orders", to: `/accounts/${accountId}` },
-    { label: "Browse", to: "/browse" },
+    { label: "Browse", to: `/accounts/${accountId}/browse` },
   ];
+
+  const mobileNavItems = [
+    { label: "Orders", to: `/accounts/${accountId}`, icon: ShoppingCartIcon },
+    { label: "Browse", to: `/accounts/${accountId}/browse`, icon: BookOpenIcon },
+  ] as const;
 
   return (
     <div className="flex min-h-screen flex-col md:mx-auto md:w-full md:max-w-7xl">
@@ -35,7 +40,7 @@ export function AccountShell({
       <div className="mx-auto flex w-full flex-1 flex-col pb-16 md:pb-0">{children}</div>
       <MobileBottomNav
         email={email}
-        navItems={accountNavItemsValue}
+        navItems={mobileNavItems}
         hasMultipleAccounts={hasMultipleAccounts}
         onSignOut={onSignOut}
       />
