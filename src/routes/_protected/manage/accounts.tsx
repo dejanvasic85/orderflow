@@ -15,12 +15,12 @@ import {
 } from "@/components/ui/sheet";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { createAccount, listAccounts, updateAccount } from "@/lib/accounts/accounts.functions";
-import type { AccountRow } from "@/lib/accounts/schema";
+import type { Account, AccountRow } from "@/lib/accounts/schema";
 import { asResult } from "@/lib/result";
 
 export const Route = createFileRoute("/_protected/manage/accounts")({
   loader: async () => {
-    const result = asResult<AccountRow[]>(await listAccounts());
+    const result = asResult<Account[]>(await listAccounts());
     if (!result.ok) throw new Error(result.error.message);
     return { accounts: result.value };
   },
@@ -33,7 +33,7 @@ function AccountsPage() {
     user: { user_role?: string };
   };
   const isAdmin = user.user_role === "admin";
-  const [accounts, setAccounts] = useState<AccountRow[]>(loadedAccounts);
+  const [accounts, setAccounts] = useState<Account[]>(loadedAccounts);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
 
@@ -46,7 +46,7 @@ function AccountsPage() {
   const panelSide = isDesktop ? "right" : "bottom";
   const panelClassName = "overflow-y-auto p-0 sm:w-[50vw] sm:min-w-[800px]";
 
-  function handleSelectAccount(account: AccountRow) {
+  function handleSelectAccount(account: Account) {
     setSelectedId(account.id);
     setCreating(false);
   }
@@ -61,7 +61,11 @@ function AccountsPage() {
     setCreating(false);
   }
 
-  async function handleSave(updated: AccountRow) {
+  function handleUserCountChange(accountId: string, count: number) {
+    setAccounts((prev) => prev.map((a) => (a.id === accountId ? { ...a, userCount: count } : a)));
+  }
+
+  async function handleSave(updated: Account) {
     const result = asResult<AccountRow>(
       await updateAccount({
         data: {
@@ -79,11 +83,15 @@ function AccountsPage() {
       toast.error(result.error.message);
       return;
     }
-    setAccounts((prev) => prev.map((a) => (a.id === updated.id ? result.value : a)));
+    setAccounts((prev) =>
+      prev.map((a) =>
+        a.id === updated.id ? { ...result.value, userCount: updated.userCount } : a,
+      ),
+    );
     setSelectedId(null);
   }
 
-  async function handleCreate(draft: AccountRow) {
+  async function handleCreate(draft: Account) {
     const result = asResult<AccountRow>(
       await createAccount({
         data: {
@@ -100,7 +108,7 @@ function AccountsPage() {
       toast.error(result.error.message);
       return;
     }
-    setAccounts((prev) => [result.value, ...prev]);
+    setAccounts((prev) => [{ ...result.value, userCount: 0 }, ...prev]);
     setCreating(false);
     toast.success(`Account "${result.value.name}" created`);
   }
@@ -131,6 +139,7 @@ function AccountsPage() {
                 readOnly={!isAdmin}
                 onSave={handleSave}
                 onDiscard={handleDiscard}
+                onUserCountChange={(count) => handleUserCountChange(selectedAccount.id, count)}
               />
             )}
           </SheetContent>
@@ -154,6 +163,7 @@ function AccountsPage() {
                   delivery_instructions: null,
                   created_at: "",
                   updated_at: "",
+                  userCount: 0,
                 }}
                 onSave={handleCreate}
                 onDiscard={handleDiscard}

@@ -1,9 +1,9 @@
 import { render, screen } from "@testing-library/react";
 import userEvent, { type UserEvent } from "@testing-library/user-event";
-import type { AccountRow } from "@/lib/accounts/schema";
+import type { Account } from "@/lib/accounts/schema";
 import { AccountList } from "./AccountList";
 
-const account: AccountRow = {
+const account: Account = {
   id: "acc-1",
   name: "Acme Corp",
   contact_name: "Jane Doe",
@@ -13,9 +13,10 @@ const account: AccountRow = {
   delivery_instructions: "Leave at door",
   created_at: "2024-01-01T00:00:00Z",
   updated_at: "2024-01-01T00:00:00Z",
+  userCount: 3,
 };
 
-const accountWithNullContacts: AccountRow = {
+const accountWithNullContacts: Account = {
   id: "acc-2",
   name: "Defunct Inc",
   contact_name: null,
@@ -25,6 +26,7 @@ const accountWithNullContacts: AccountRow = {
   delivery_instructions: null,
   created_at: "2024-01-01T00:00:00Z",
   updated_at: "2024-01-01T00:00:00Z",
+  userCount: 0,
 };
 
 const onSelectAccount = vi.fn();
@@ -59,6 +61,24 @@ test("renders dashes when contact fields are null", () => {
   );
 
   expect(screen.getAllByText("—").length).toBeGreaterThanOrEqual(3);
+});
+
+test("renders user count when greater than zero", () => {
+  render(<AccountList accounts={[account]} selectedId={null} onSelectAccount={onSelectAccount} />);
+
+  expect(screen.getByText("3")).toBeInTheDocument();
+});
+
+test("renders dash for user count when zero", () => {
+  render(
+    <AccountList
+      accounts={[accountWithNullContacts]}
+      selectedId={null}
+      onSelectAccount={onSelectAccount}
+    />,
+  );
+
+  expect(screen.getAllByText("—")).toHaveLength(4);
 });
 
 test("calls onSelectAccount when a row is clicked", async () => {

@@ -10,6 +10,9 @@
     "vitest.explorer",
 
     // Run and debug Playwright e2e tests from the sidebar
-    "ms-playwright.playwright"
+    "ms-playwright.playwright",
+
+    // Supabase
+    "supabase.vscode-supabase-extension"
   ]
 }

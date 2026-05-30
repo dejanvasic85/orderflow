@@ -6,14 +6,15 @@ import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import type { AccountRow } from "@/lib/accounts/schema";
+import type { Account } from "@/lib/accounts/schema";
 import { AccountUserSection } from "./AccountUserSection";
 
 type Props = {
-  account: AccountRow;
+  account: Account;
   readOnly?: boolean;
-  onSave: (updated: AccountRow) => void;
+  onSave: (updated: Account) => void;
   onDiscard: () => void;
+  onUserCountChange?: (count: number) => void;
 };
 
 const accountEditSchema = z.object({
@@ -33,7 +34,13 @@ function toFieldErrors(errors: unknown[]): { message?: string }[] {
   }));
 }
 
-export function AccountEditPanel({ account, readOnly = false, onSave, onDiscard }: Props) {
+export function AccountEditPanel({
+  account,
+  readOnly = false,
+  onSave,
+  onDiscard,
+  onUserCountChange,
+}: Props) {
   const form = useForm({
     defaultValues: {
       name: account.name,
@@ -204,7 +211,7 @@ export function AccountEditPanel({ account, readOnly = false, onSave, onDiscard 
       {account.id && (
         <>
           <Separator />
-          <AccountUserSection accountId={account.id} />
+          <AccountUserSection accountId={account.id} onUserCountChange={onUserCountChange} />
         </>
       )}
     </div>

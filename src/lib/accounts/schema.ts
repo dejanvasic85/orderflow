@@ -3,6 +3,8 @@ import type { Database } from "@/lib/database.types";
 
 export type AccountRow = Database["public"]["Tables"]["accounts"]["Row"];
 
+export type Account = AccountRow & { userCount: number };
+
 export const createAccountSchema = z.object({
   name: z.string().min(1),
   contact_name: z.string().nullable().optional(),

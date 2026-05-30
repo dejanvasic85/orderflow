@@ -17,9 +17,10 @@ type AssignedUser = { id: string; name: string };
 
 type Props = {
   accountId: string;
+  onUserCountChange?: (count: number) => void;
 };
 
-export function AccountUserSection({ accountId }: Props) {
+export function AccountUserSection({ accountId, onUserCountChange }: Props) {
   const queryClient = useQueryClient();
 
   const accountUsersQuery = useQuery({
@@ -44,6 +45,12 @@ export function AccountUserSection({ accountId }: Props) {
     },
   });
 
+  async function refetchAndNotify() {
+    await queryClient.refetchQueries({ queryKey: ["accountUsers", accountId] });
+    const fresh = queryClient.getQueryData<{ user_id: string }[]>(["accountUsers", accountId]);
+    onUserCountChange?.(fresh?.length ?? 0);
+  }
+
   const assignMutation = useMutation({
     mutationFn: async (userId: string) => {
       const result = asResult(
@@ -51,9 +58,7 @@ export function AccountUserSection({ accountId }: Props) {
       );
       if (!result.ok) throw new Error(result.error.message);
     },
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["accountUsers", accountId] });
-    },
+    onSuccess: refetchAndNotify,
     onError: (e) => toast.error(e.message),
   });
 
@@ -64,9 +69,7 @@ export function AccountUserSection({ accountId }: Props) {
       );
       if (!result.ok) throw new Error(result.error.message);
     },
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["accountUsers", accountId] });
-    },
+    onSuccess: refetchAndNotify,
     onError: (e) => toast.error(e.message),
   });
 
