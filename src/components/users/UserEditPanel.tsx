@@ -1,8 +1,6 @@
 import { useForm } from "@tanstack/react-form";
-import { XIcon } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
@@ -19,10 +17,9 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { PendingInviteSection } from "@/components/users/PendingInviteSection";
-import { type User, type UserAccount, userRoles } from "@/lib/users/schema";
+import { type User, userRoles } from "@/lib/users/schema";
 
 type BaseProps = {
-  availableAccounts: UserAccount[];
   onSave: (updated: User) => void;
   onDiscard: () => void;
   onCheckEmailExists?: (email: string) => Promise<boolean>;
@@ -44,7 +41,6 @@ const userEditSchema = z.object({
       "Mobile number must be 10 digits starting with 04",
     ),
   role: z.enum(userRoles),
-  accounts: z.array(z.object({ id: z.string(), name: z.string() })),
   notifications: z.object({ email: z.boolean(), sms: z.boolean() }),
   active: z.boolean(),
 });
@@ -73,7 +69,7 @@ function toFieldErrors(errors: unknown[]): { message?: string }[] {
 }
 
 export function UserEditPanel(props: Props) {
-  const { availableAccounts, onSave, onDiscard, onCheckEmailExists, onResendInvite } = props;
+  const { onSave, onDiscard, onCheckEmailExists, onResendInvite } = props;
   const mode = props.mode ?? "edit";
   const isCreate = mode === "create";
   const user = props.user ?? blankUser;
@@ -85,7 +81,6 @@ export function UserEditPanel(props: Props) {
       lastName: nameParts.slice(1).join(" "),
       phone: user.phone ?? "",
       role: user.role,
-      accounts: user.accounts,
       notifications: {
         email: user.notification_preferences.email,
         sms: user.notification_preferences.sms,
@@ -101,7 +96,6 @@ export function UserEditPanel(props: Props) {
         phone: value.phone || null,
         role: value.role,
         active: value.active,
-        accounts: value.accounts,
         notification_preferences: {
           email: value.notifications.email,
           sms: value.notifications.sms,
@@ -241,73 +235,6 @@ export function UserEditPanel(props: Props) {
               </Select>
             </Field>
           )}
-        </form.Field>
-
-        <Separator />
-
-        {/* Assigned accounts */}
-        <form.Field name="accounts">
-          {(field) => {
-            const unassigned = availableAccounts.filter(
-              (a) => !field.state.value.some((ua) => ua.id === a.id),
-            );
-
-            function handleRemove(id: string) {
-              field.handleChange(field.state.value.filter((a) => a.id !== id));
-            }
-
-            function handleAdd(id: string) {
-              const account = availableAccounts.find((a) => a.id === id);
-              if (account) {
-                field.handleChange([...field.state.value, account]);
-              }
-            }
-
-            return (
-              <div className="flex flex-col gap-3">
-                <Label>Assigned accounts</Label>
-
-                {field.state.value.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {field.state.value.map((account) => (
-                      <Badge
-                        key={account.id}
-                        variant="secondary"
-                        className="gap-1.5 py-1 pl-2.5 pr-1.5"
-                      >
-                        {account.name}
-                        <button
-                          type="button"
-                          aria-label={`Remove ${account.name}`}
-                          onClick={() => handleRemove(account.id)}
-                          className="flex items-center justify-center rounded-full transition-colors hover:text-foreground"
-                        >
-                          <XIcon className="size-3" />
-                        </button>
-                      </Badge>
-                    ))}
-                  </div>
-                )}
-
-                {unassigned.length > 0 && (
-                  <Select onValueChange={handleAdd}>
-                    <SelectTrigger className="w-full text-muted-foreground">
-                      <SelectValue placeholder="Add an account..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        {unassigned.map((a) => (
-                          <SelectItem key={a.id} value={a.id}>
-                            {a.name}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                )}
-              </div>
-            );
-          }}
         </form.Field>
 
         <Separator />

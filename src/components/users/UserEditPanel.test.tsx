@@ -17,13 +17,8 @@ const baseUser: User = {
   notification_preferences: { email: true, sms: false },
   created_at: "2024-01-01T00:00:00Z",
   updated_at: "2024-01-01T00:00:00Z",
-  accounts: [{ id: "acc-1", name: "Acme" }],
+  accounts: [],
 };
-
-const availableAccounts = [
-  { id: "acc-1", name: "Acme" },
-  { id: "acc-2", name: "Globex" },
-];
 
 const onSave = vi.fn();
 const onDiscard = vi.fn();
@@ -35,42 +30,21 @@ beforeEach(() => {
 });
 
 test("renders user name and email as header", () => {
-  render(
-    <UserEditPanel
-      user={baseUser}
-      availableAccounts={availableAccounts}
-      onSave={onSave}
-      onDiscard={onDiscard}
-    />,
-  );
+  render(<UserEditPanel user={baseUser} onSave={onSave} onDiscard={onDiscard} />);
 
   expect(screen.getByRole("heading", { name: "Alice Smith" })).toBeInTheDocument();
   expect(screen.getByText("alice@example.com")).toBeInTheDocument();
 });
 
 test("pre-fills first name and last name from user.name", () => {
-  render(
-    <UserEditPanel
-      user={baseUser}
-      availableAccounts={availableAccounts}
-      onSave={onSave}
-      onDiscard={onDiscard}
-    />,
-  );
+  render(<UserEditPanel user={baseUser} onSave={onSave} onDiscard={onDiscard} />);
 
   expect(screen.getByLabelText("First name")).toHaveValue("Alice");
   expect(screen.getByLabelText("Last name")).toHaveValue("Smith");
 });
 
 test("shows validation errors when first and last name are cleared on submit", async () => {
-  render(
-    <UserEditPanel
-      user={baseUser}
-      availableAccounts={availableAccounts}
-      onSave={onSave}
-      onDiscard={onDiscard}
-    />,
-  );
+  render(<UserEditPanel user={baseUser} onSave={onSave} onDiscard={onDiscard} />);
 
   await user.clear(screen.getByLabelText("First name"));
   await user.clear(screen.getByLabelText("Last name"));
@@ -82,14 +56,7 @@ test("shows validation errors when first and last name are cleared on submit", a
 });
 
 test("calls onSave with joined name on valid submit", async () => {
-  render(
-    <UserEditPanel
-      user={baseUser}
-      availableAccounts={availableAccounts}
-      onSave={onSave}
-      onDiscard={onDiscard}
-    />,
-  );
+  render(<UserEditPanel user={baseUser} onSave={onSave} onDiscard={onDiscard} />);
 
   await user.clear(screen.getByLabelText("First name"));
   await user.type(screen.getByLabelText("First name"), "Bob");
@@ -102,70 +69,8 @@ test("calls onSave with joined name on valid submit", async () => {
   });
 });
 
-test("shows assigned account as a badge", () => {
-  render(
-    <UserEditPanel
-      user={baseUser}
-      availableAccounts={availableAccounts}
-      onSave={onSave}
-      onDiscard={onDiscard}
-    />,
-  );
-
-  expect(screen.getByText("Acme")).toBeInTheDocument();
-});
-
-test("removes an assigned account when its remove button is clicked", async () => {
-  render(
-    <UserEditPanel
-      user={baseUser}
-      availableAccounts={availableAccounts}
-      onSave={onSave}
-      onDiscard={onDiscard}
-    />,
-  );
-
-  await user.click(screen.getByRole("button", { name: "Remove Acme" }));
-
-  expect(screen.queryByRole("button", { name: "Remove Acme" })).not.toBeInTheDocument();
-});
-
-test("shows the add account trigger when unassigned accounts exist", () => {
-  render(
-    <UserEditPanel
-      user={baseUser}
-      availableAccounts={availableAccounts}
-      onSave={onSave}
-      onDiscard={onDiscard}
-    />,
-  );
-
-  // Globex is unassigned so the add trigger should be visible
-  expect(screen.getByText("Add an account...")).toBeInTheDocument();
-});
-
-test("hides the add account trigger when all accounts are already assigned", () => {
-  render(
-    <UserEditPanel
-      user={{ ...baseUser, accounts: availableAccounts }}
-      availableAccounts={availableAccounts}
-      onSave={onSave}
-      onDiscard={onDiscard}
-    />,
-  );
-
-  expect(screen.queryByText("Add an account...")).not.toBeInTheDocument();
-});
-
 test("calls onDiscard when Discard button is clicked", async () => {
-  render(
-    <UserEditPanel
-      user={baseUser}
-      availableAccounts={availableAccounts}
-      onSave={onSave}
-      onDiscard={onDiscard}
-    />,
-  );
+  render(<UserEditPanel user={baseUser} onSave={onSave} onDiscard={onDiscard} />);
 
   await user.click(screen.getByRole("button", { name: "Discard" }));
 
@@ -173,28 +78,14 @@ test("calls onDiscard when Discard button is clicked", async () => {
 });
 
 test("notification checkboxes reflect user preferences", () => {
-  render(
-    <UserEditPanel
-      user={baseUser}
-      availableAccounts={availableAccounts}
-      onSave={onSave}
-      onDiscard={onDiscard}
-    />,
-  );
+  render(<UserEditPanel user={baseUser} onSave={onSave} onDiscard={onDiscard} />);
 
   expect(screen.getByLabelText("Email notifications")).toBeChecked();
   expect(screen.getByLabelText("SMS notifications")).not.toBeChecked();
 });
 
 test("calls onSave with updated notification preferences", async () => {
-  render(
-    <UserEditPanel
-      user={baseUser}
-      availableAccounts={availableAccounts}
-      onSave={onSave}
-      onDiscard={onDiscard}
-    />,
-  );
+  render(<UserEditPanel user={baseUser} onSave={onSave} onDiscard={onDiscard} />);
 
   await user.click(screen.getByLabelText("SMS notifications"));
   await user.click(screen.getByRole("button", { name: "Save changes" }));
@@ -209,28 +100,14 @@ test("calls onSave with updated notification preferences", async () => {
 });
 
 test("create mode shows invite header and send invite button", () => {
-  render(
-    <UserEditPanel
-      mode="create"
-      availableAccounts={availableAccounts}
-      onSave={onSave}
-      onDiscard={onDiscard}
-    />,
-  );
+  render(<UserEditPanel mode="create" onSave={onSave} onDiscard={onDiscard} />);
 
   expect(screen.getByRole("heading", { name: "Invite new user" })).toBeInTheDocument();
   expect(screen.getByRole("button", { name: "Send invite" })).toBeInTheDocument();
 });
 
 test("create mode enables the email input", () => {
-  render(
-    <UserEditPanel
-      mode="create"
-      availableAccounts={availableAccounts}
-      onSave={onSave}
-      onDiscard={onDiscard}
-    />,
-  );
+  render(<UserEditPanel mode="create" onSave={onSave} onDiscard={onDiscard} />);
 
   expect(screen.getByLabelText("Email")).toBeEnabled();
 });
@@ -239,7 +116,6 @@ test("pre-fills phone from user.phone", () => {
   render(
     <UserEditPanel
       user={{ ...baseUser, phone: "0412345678" }}
-      availableAccounts={availableAccounts}
       onSave={onSave}
       onDiscard={onDiscard}
     />,
@@ -249,27 +125,13 @@ test("pre-fills phone from user.phone", () => {
 });
 
 test("shows empty phone input when user has no phone", () => {
-  render(
-    <UserEditPanel
-      user={baseUser}
-      availableAccounts={availableAccounts}
-      onSave={onSave}
-      onDiscard={onDiscard}
-    />,
-  );
+  render(<UserEditPanel user={baseUser} onSave={onSave} onDiscard={onDiscard} />);
 
   expect(screen.getByLabelText("Mobile number")).toHaveValue("");
 });
 
 test("shows validation error when phone is not a valid Australian mobile number", async () => {
-  render(
-    <UserEditPanel
-      user={baseUser}
-      availableAccounts={availableAccounts}
-      onSave={onSave}
-      onDiscard={onDiscard}
-    />,
-  );
+  render(<UserEditPanel user={baseUser} onSave={onSave} onDiscard={onDiscard} />);
 
   await user.type(screen.getByLabelText("Mobile number"), "1234567890");
   await user.click(screen.getByRole("button", { name: "Save changes" }));
@@ -281,14 +143,7 @@ test("shows validation error when phone is not a valid Australian mobile number"
 });
 
 test("passes phone as null to onSave when field is empty", async () => {
-  render(
-    <UserEditPanel
-      user={baseUser}
-      availableAccounts={availableAccounts}
-      onSave={onSave}
-      onDiscard={onDiscard}
-    />,
-  );
+  render(<UserEditPanel user={baseUser} onSave={onSave} onDiscard={onDiscard} />);
 
   await user.click(screen.getByRole("button", { name: "Save changes" }));
 
@@ -298,14 +153,7 @@ test("passes phone as null to onSave when field is empty", async () => {
 });
 
 test("passes valid Australian phone to onSave", async () => {
-  render(
-    <UserEditPanel
-      user={baseUser}
-      availableAccounts={availableAccounts}
-      onSave={onSave}
-      onDiscard={onDiscard}
-    />,
-  );
+  render(<UserEditPanel user={baseUser} onSave={onSave} onDiscard={onDiscard} />);
 
   await user.type(screen.getByLabelText("Mobile number"), "0487654321");
   await user.click(screen.getByRole("button", { name: "Save changes" }));
@@ -316,14 +164,7 @@ test("passes valid Australian phone to onSave", async () => {
 });
 
 test("create mode rejects submit when email is not a valid address", async () => {
-  render(
-    <UserEditPanel
-      mode="create"
-      availableAccounts={availableAccounts}
-      onSave={onSave}
-      onDiscard={onDiscard}
-    />,
-  );
+  render(<UserEditPanel mode="create" onSave={onSave} onDiscard={onDiscard} />);
 
   await user.type(screen.getByLabelText("Email"), "not-an-email");
   await user.type(screen.getByLabelText("First name"), "Bob");
@@ -336,14 +177,7 @@ test("create mode rejects submit when email is not a valid address", async () =>
 });
 
 test("create mode submits with collected fields", async () => {
-  render(
-    <UserEditPanel
-      mode="create"
-      availableAccounts={availableAccounts}
-      onSave={onSave}
-      onDiscard={onDiscard}
-    />,
-  );
+  render(<UserEditPanel mode="create" onSave={onSave} onDiscard={onDiscard} />);
 
   await user.type(screen.getByLabelText("Email"), "new@example.com");
   await user.type(screen.getByLabelText("First name"), "Bob");
@@ -366,7 +200,6 @@ test("create mode shows error and blocks submit when email already exists", asyn
   render(
     <UserEditPanel
       mode="create"
-      availableAccounts={availableAccounts}
       onSave={onSave}
       onDiscard={onDiscard}
       onCheckEmailExists={onCheckEmailExists}
@@ -388,7 +221,6 @@ test("create mode shows fallback error and blocks submit when email check throws
   render(
     <UserEditPanel
       mode="create"
-      availableAccounts={availableAccounts}
       onSave={onSave}
       onDiscard={onDiscard}
       onCheckEmailExists={onCheckEmailExists}
@@ -412,7 +244,6 @@ test("create mode does not show duplicate error when email is available", async 
   render(
     <UserEditPanel
       mode="create"
-      availableAccounts={availableAccounts}
       onSave={onSave}
       onDiscard={onDiscard}
       onCheckEmailExists={onCheckEmailExists}
@@ -431,14 +262,7 @@ test("create mode does not show duplicate error when email is available", async 
 });
 
 test("shows Account access section in edit mode", () => {
-  render(
-    <UserEditPanel
-      user={baseUser}
-      availableAccounts={availableAccounts}
-      onSave={onSave}
-      onDiscard={onDiscard}
-    />,
-  );
+  render(<UserEditPanel user={baseUser} onSave={onSave} onDiscard={onDiscard} />);
 
   expect(screen.getByText("Account access")).toBeInTheDocument();
   expect(
@@ -450,12 +274,7 @@ test("shows Account access section in edit mode", () => {
 
 test("Active switch is checked when user.active is true", () => {
   render(
-    <UserEditPanel
-      user={{ ...baseUser, active: true }}
-      availableAccounts={availableAccounts}
-      onSave={onSave}
-      onDiscard={onDiscard}
-    />,
+    <UserEditPanel user={{ ...baseUser, active: true }} onSave={onSave} onDiscard={onDiscard} />,
   );
 
   expect(screen.getByRole("switch", { name: "Active" })).toBeChecked();
@@ -463,26 +282,14 @@ test("Active switch is checked when user.active is true", () => {
 
 test("Active switch is unchecked when user.active is false", () => {
   render(
-    <UserEditPanel
-      user={{ ...baseUser, active: false }}
-      availableAccounts={availableAccounts}
-      onSave={onSave}
-      onDiscard={onDiscard}
-    />,
+    <UserEditPanel user={{ ...baseUser, active: false }} onSave={onSave} onDiscard={onDiscard} />,
   );
 
   expect(screen.getByRole("switch", { name: "Active" })).not.toBeChecked();
 });
 
 test("does not show Account access section in create mode", () => {
-  render(
-    <UserEditPanel
-      mode="create"
-      availableAccounts={availableAccounts}
-      onSave={onSave}
-      onDiscard={onDiscard}
-    />,
-  );
+  render(<UserEditPanel mode="create" onSave={onSave} onDiscard={onDiscard} />);
 
   expect(screen.queryByText("Account access")).not.toBeInTheDocument();
   expect(screen.queryByRole("switch", { name: "Active" })).not.toBeInTheDocument();
@@ -490,12 +297,7 @@ test("does not show Account access section in create mode", () => {
 
 test("calls onSave with active: false when switch is toggled off", async () => {
   render(
-    <UserEditPanel
-      user={{ ...baseUser, active: true }}
-      availableAccounts={availableAccounts}
-      onSave={onSave}
-      onDiscard={onDiscard}
-    />,
+    <UserEditPanel user={{ ...baseUser, active: true }} onSave={onSave} onDiscard={onDiscard} />,
   );
 
   await user.click(screen.getByRole("switch", { name: "Active" }));
@@ -508,12 +310,7 @@ test("calls onSave with active: false when switch is toggled off", async () => {
 
 test("calls onSave with active: true when switch is toggled on", async () => {
   render(
-    <UserEditPanel
-      user={{ ...baseUser, active: false }}
-      availableAccounts={availableAccounts}
-      onSave={onSave}
-      onDiscard={onDiscard}
-    />,
+    <UserEditPanel user={{ ...baseUser, active: false }} onSave={onSave} onDiscard={onDiscard} />,
   );
 
   await user.click(screen.getByRole("switch", { name: "Active" }));
@@ -526,12 +323,7 @@ test("calls onSave with active: true when switch is toggled on", async () => {
 
 test("calls onSave with active: true when switch is not changed", async () => {
   render(
-    <UserEditPanel
-      user={{ ...baseUser, active: true }}
-      availableAccounts={availableAccounts}
-      onSave={onSave}
-      onDiscard={onDiscard}
-    />,
+    <UserEditPanel user={{ ...baseUser, active: true }} onSave={onSave} onDiscard={onDiscard} />,
   );
 
   await user.click(screen.getByRole("button", { name: "Save changes" }));

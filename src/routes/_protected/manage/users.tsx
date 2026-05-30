@@ -14,9 +14,8 @@ import {
 import { UserEditPanel } from "@/components/users/UserEditPanel";
 import { UserList, type RoleFilter } from "@/components/users/UserList";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import { listAccounts } from "@/lib/accounts/accounts.functions";
 import { asResult } from "@/lib/result";
-import type { User, UserAccount } from "@/lib/users/schema";
+import type { User } from "@/lib/users/schema";
 import {
   checkEmailExists,
   inviteUser,
@@ -27,22 +26,15 @@ import {
 
 export const Route = createFileRoute("/_protected/manage/users")({
   loader: async () => {
-    const [usersResult, accountsResult] = await Promise.all([listUsers(), listAccounts()]);
-    const users = asResult<User[]>(usersResult);
-    const accounts = asResult<{ id: string; name: string }[]>(accountsResult);
-    if (!users.ok) throw new Error(users.error.message);
-    if (!accounts.ok) throw new Error(accounts.error.message);
-    const availableAccounts: UserAccount[] = accounts.value.map((a) => ({
-      id: a.id,
-      name: a.name,
-    }));
-    return { users: users.value, availableAccounts };
+    const usersResult = asResult<User[]>(await listUsers());
+    if (!usersResult.ok) throw new Error(usersResult.error.message);
+    return { users: usersResult.value };
   },
   component: UsersPage,
 });
 
 function UsersPage() {
-  const { users: loadedUsers, availableAccounts } = Route.useLoaderData();
+  const { users: loadedUsers } = Route.useLoaderData();
   const [users, setUsers] = useState<User[]>(loadedUsers);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
@@ -76,7 +68,6 @@ function UsersPage() {
           role: updated.role,
           active: updated.active,
           notification_preferences: updated.notification_preferences,
-          accountIds: updated.accounts.map((a) => a.id),
         },
       }),
     );
@@ -97,7 +88,7 @@ function UsersPage() {
           phone: draft.phone,
           role: draft.role,
           notification_preferences: draft.notification_preferences,
-          accountIds: draft.accounts.map((a) => a.id),
+          accountIds: [],
         },
       }),
     );
@@ -148,7 +139,6 @@ function UsersPage() {
               <UserEditPanel
                 key={selectedUser.id}
                 user={selectedUser}
-                availableAccounts={availableAccounts}
                 onSave={handleSave}
                 onDiscard={handleDiscard}
                 onResendInvite={() => handleResendInvite(selectedUser.id)}
@@ -166,7 +156,6 @@ function UsersPage() {
             {creating && (
               <UserEditPanel
                 mode="create"
-                availableAccounts={availableAccounts}
                 onSave={handleInvite}
                 onDiscard={handleDiscard}
                 onCheckEmailExists={async (email) => {
