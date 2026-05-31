@@ -10,6 +10,8 @@ const isTest = process.env.VITEST === "true";
 const config = defineConfig({
   server: {
     port: 3344,
+    host: process.env.TS_IP ?? "localhost",
+    allowedHosts: process.env.TS_ALLOWED_HOST ? [process.env.TS_ALLOWED_HOST] : [],
   },
   test: {
     include: ["src/**/*.{test,spec}.{ts,tsx}"],

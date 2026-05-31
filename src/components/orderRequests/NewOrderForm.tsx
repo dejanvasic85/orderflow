@@ -1,12 +1,16 @@
-import { AlertCircle, ArrowLeft, Package, Plus } from "lucide-react";
+import { AlertCircle, ArrowLeft, Plus } from "lucide-react";
 import { useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
+import { loadDraft, saveDraft } from "@/lib/orderRequests/draftOrder";
 import type { OrderRequestItemInput } from "@/lib/orderRequests/schema";
-import type { TemplateItem, TemplateWithItems } from "@/lib/templates/schema";
+import type { ProductRow } from "@/lib/products/schema";
+import type { TemplateWithItems } from "@/lib/templates/schema";
+import { CatalogPickerDrawer } from "./CatalogPickerDrawer";
+import { DraftItemsList } from "./DraftItemsList";
+import { TemplateItemsList } from "./TemplateItemsList";
 
 type OrderFormPayload = {
   templateId: string | null;
@@ -15,89 +19,65 @@ type OrderFormPayload = {
 };
 
 type NewOrderFormProps = {
+  accountId: string;
   accountName: string;
   defaultDeliveryInstructions: string | null;
   template: TemplateWithItems | null;
+  products: ProductRow[];
   onBack: () => void;
   onSubmit: (data: OrderFormPayload) => Promise<void>;
 };
 
-type OrderItemCardProps = {
-  item: TemplateItem;
-};
-
-function OrderItemCard({ item }: OrderItemCardProps) {
-  const total = item.box_count * item.products.qty_per_box + item.bottle_count;
-
-  return (
-    <Card className="border-border/60">
-      <CardContent className="px-4 py-3">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex min-w-0 flex-1 items-start gap-3">
-            <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-muted">
-              <Package className="h-4 w-4 text-muted-foreground" />
-            </div>
-            <div className="min-w-0">
-              <p className="truncate font-medium leading-snug">{item.products.name}</p>
-              <p className="mt-0.5 text-xs text-muted-foreground">
-                {item.products.qty_per_box} per box
-              </p>
-            </div>
-          </div>
-          <div className="flex shrink-0 items-start gap-6 text-sm">
-            <div className="text-right">
-              <p className="text-xs text-muted-foreground">Boxes</p>
-              <p className="font-medium">{item.box_count}</p>
-            </div>
-            <div className="text-right">
-              <p className="text-xs text-muted-foreground">Bottles</p>
-              <p className="font-medium">{item.bottle_count}</p>
-            </div>
-            <div className="w-8 text-right">
-              <p className="text-xs text-muted-foreground">Total</p>
-              <p className="font-semibold">{total}</p>
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function TemplateItemsList({ template }: { template: TemplateWithItems }) {
-  if (template.template_items.length === 0) return null;
-
-  return (
-    <div className="flex flex-col gap-2">
-      {template.template_items.map((item) => (
-        <OrderItemCard key={item.id} item={item} />
-      ))}
-    </div>
-  );
-}
-
 export function NewOrderForm({
+  accountId,
   accountName,
   defaultDeliveryInstructions,
   template,
+  products,
   onBack,
   onSubmit,
 }: NewOrderFormProps) {
-  const hasItems = template && template.template_items.length > 0;
+  const [draftItems, setDraftItems] = useState<OrderRequestItemInput[]>(() => loadDraft(accountId));
+  const [pickerOpen, setPickerOpen] = useState(false);
   const [deliveryInstructions, setDeliveryInstructions] = useState(
     defaultDeliveryInstructions ?? "",
   );
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const templateProductIds = new Set(template?.template_items.map((i) => i.product_id) ?? []);
+  const hasItems = (template?.template_items.length ?? 0) > 0 || draftItems.length > 0;
+
+  function updateDraft(items: OrderRequestItemInput[]) {
+    setDraftItems(items);
+    saveDraft(accountId, items);
+  }
+
+  function handleAddDraftItem(productId: string) {
+    if (draftItems.some((i) => i.product_id === productId)) return;
+    updateDraft([...draftItems, { product_id: productId, boxes: 1, extra_bottles: 0 }]);
+  }
+
+  function handleRemoveDraftItem(productId: string) {
+    updateDraft(draftItems.filter((i) => i.product_id !== productId));
+  }
+
+  function handleUpdateDraftItem(
+    productId: string,
+    patch: { boxes?: number; extra_bottles?: number },
+  ) {
+    updateDraft(draftItems.map((i) => (i.product_id === productId ? { ...i, ...patch } : i)));
+  }
+
   async function handleSubmit() {
-    const items =
+    const templateItems =
       template?.template_items.map((item) => ({
         product_id: item.product_id,
         boxes: item.box_count,
         extra_bottles: item.bottle_count,
       })) ?? [];
 
+    const items = [...templateItems, ...draftItems];
     if (items.length === 0) return;
 
     setSubmitting(true);
@@ -133,7 +113,20 @@ export function NewOrderForm({
       <div className="flex flex-col gap-6">
         {template ? <TemplateItemsList template={template} /> : null}
 
-        <Button variant="outline" className="w-fit gap-2 text-primary hover:text-primary">
+        <Separator />
+
+        <DraftItemsList
+          items={draftItems}
+          products={products}
+          onUpdate={handleUpdateDraftItem}
+          onRemove={handleRemoveDraftItem}
+        />
+
+        <Button
+          variant="outline"
+          className="w-fit gap-2 text-primary hover:text-primary"
+          onClick={() => setPickerOpen(true)}
+        >
           <Plus className="h-4 w-4" />
           Add item
         </Button>
@@ -176,6 +169,18 @@ export function NewOrderForm({
           </Button>
         </div>
       </div>
+
+      <CatalogPickerDrawer
+        open={pickerOpen}
+        onOpenChange={setPickerOpen}
+        products={products}
+        templateProductIds={templateProductIds}
+        draftItems={draftItems}
+        onAdd={handleAddDraftItem}
+        onRemove={handleRemoveDraftItem}
+      />
     </div>
   );
 }
+
+export type { OrderFormPayload };
