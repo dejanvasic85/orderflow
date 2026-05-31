@@ -10,7 +10,13 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import type { OrderRequestItemInput } from "@/lib/orderRequests/schema";
 import type { ProductRow } from "@/lib/products/schema";
@@ -48,7 +54,7 @@ function CatalogPickerCard({ product, action, onAdd, onRemove }: CatalogPickerCa
   let actionNode: React.ReactNode;
   switch (action.kind) {
     case "in-template":
-      actionNode = <span className="text-xs text-muted-foreground">In your template</span>;
+      actionNode = <Button disabled>In your template</Button>;
       break;
     case "add":
       actionNode = (
@@ -62,10 +68,10 @@ function CatalogPickerCard({ product, action, onAdd, onRemove }: CatalogPickerCa
         <Button
           size="sm"
           variant="secondary"
-          className="text-green-700 dark:text-green-400"
+          className="text-red-700 dark:text-red-400"
           onClick={onRemove}
         >
-          Added
+          Remove
         </Button>
       );
       break;
@@ -86,7 +92,8 @@ export function CatalogPickerDrawer({
   const [query, setQuery] = useState("");
   const isDesktop = useMediaQuery("(min-width: 640px)");
   const panelSide = isDesktop ? "right" : "bottom";
-  const panelClassName = "flex flex-col p-0 sm:w-[480px]";
+  const panelClassName =
+    "flex flex-col p-0 max-h-[85dvh] sm:max-h-none sm:h-full sm:w-[70vw] sm:min-w-[900px]";
 
   const trimmed = query.trim().toLowerCase();
   const filtered = trimmed
@@ -100,8 +107,11 @@ export function CatalogPickerDrawer({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side={panelSide} className={panelClassName}>
-        <SheetHeader className="border-b px-4 pb-3 pt-4 gap-3">
+        <SheetHeader className="shrink-0 border-b px-4 pb-3 pt-4 gap-3">
           <SheetTitle>Add item</SheetTitle>
+          <SheetDescription className="sr-only">
+            Browse and search the product catalog to add items to your order.
+          </SheetDescription>
           <InputGroup>
             <InputGroupAddon>
               <Search />
@@ -127,7 +137,7 @@ export function CatalogPickerDrawer({
               </EmptyHeader>
             </Empty>
           ) : (
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 items-stretch">
               {filtered.map((product) => {
                 const action = resolveAction(product.id, templateProductIds, draftItems);
                 return (

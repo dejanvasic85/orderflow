@@ -37,16 +37,18 @@ function ProductImage({ imageUrl, name }: ProductImageProps) {
 
 export function ProductCard({ product, action }: ProductCardProps) {
   return (
-    <Card className="transition-shadow hover:shadow-md">
+    <Card className="flex h-full flex-col transition-shadow hover:shadow-md">
       <ProductImage imageUrl={product.image_url} name={product.name} />
-      <CardHeader>
+      <CardHeader className="flex-1">
         <CardTitle className="line-clamp-2">{product.name}</CardTitle>
         {product.description && (
           <CardDescription className="line-clamp-3">{product.description}</CardDescription>
         )}
       </CardHeader>
-      <CardContent className="flex items-center justify-between gap-2">
-        <Badge variant="secondary">{product.qty_per_box} per box</Badge>
+      <CardContent className="flex flex-col gap-2">
+        <Badge variant="secondary" className="w-fit">
+          {product.qty_per_box} per box
+        </Badge>
         {action}
       </CardContent>
     </Card>
