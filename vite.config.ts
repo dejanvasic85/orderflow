@@ -11,7 +11,13 @@ const config = defineConfig({
   server: {
     port: 3344,
     host: process.env.TS_IP ?? "localhost",
-    allowedHosts: process.env.TS_ALLOWED_HOST ? [process.env.TS_ALLOWED_HOST] : [],
+    allowedHosts: [
+      "localhost",
+      ...(process.env.TS_ALLOWED_HOST ? [process.env.TS_ALLOWED_HOST] : []),
+    ],
+    origin: process.env.TS_ALLOWED_HOST
+      ? `http://${process.env.TS_ALLOWED_HOST}:3344`
+      : "http://localhost:3344",
   },
   test: {
     include: ["src/**/*.{test,spec}.{ts,tsx}"],
