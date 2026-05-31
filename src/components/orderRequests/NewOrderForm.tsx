@@ -81,6 +81,10 @@ function TemplateItemsList({ template }: { template: TemplateWithItems }) {
 
   return (
     <div className="flex flex-col gap-2">
+      <h2 className="text-xl font-semibold tracking-tight">Template Items</h2>
+      <p className="text-base text-pretty">
+        To make changes to the ordering template, contact your admin.
+      </p>
       {template.template_items.map((item) => (
         <TemplateItemCard key={item.id} item={item} />
       ))}
@@ -195,6 +199,7 @@ function DraftItemsList({ items, products, onUpdate, onRemove }: DraftItemsListP
 
   return (
     <div className="flex flex-col gap-2">
+      <h2 className="text-xl font-semibold tracking-tight">Additional items</h2>
       {items.map((item) => {
         const product = products.find((p) => p.id === item.product_id);
         return (
@@ -295,6 +300,8 @@ export function NewOrderForm({
 
       <div className="flex flex-col gap-6">
         {template ? <TemplateItemsList template={template} /> : null}
+
+        <Separator />
 
         <DraftItemsList
           items={draftItems}
