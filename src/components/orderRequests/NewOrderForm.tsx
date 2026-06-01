@@ -122,14 +122,16 @@ export function NewOrderForm({
           onRemove={handleRemoveDraftItem}
         />
 
-        <Button
-          variant="outline"
-          className="w-fit gap-2 text-primary hover:text-primary"
-          onClick={() => setPickerOpen(true)}
-        >
-          <Plus className="h-4 w-4" />
-          Add item
-        </Button>
+        <div className="flex justify-end">
+          <Button
+            variant="outline"
+            className="w-fit gap-2 text-primary hover:text-primary"
+            onClick={() => setPickerOpen(true)}
+          >
+            <Plus className="h-4 w-4" />
+            Add item
+          </Button>
+        </div>
 
         {hasItems && <Separator />}
 

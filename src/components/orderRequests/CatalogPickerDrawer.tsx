@@ -106,7 +106,11 @@ export function CatalogPickerDrawer({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side={panelSide} className={panelClassName}>
+      <SheetContent
+        side={panelSide}
+        className={panelClassName}
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
         <SheetHeader className="shrink-0 border-b px-4 pb-3 pt-4 gap-3">
           <SheetTitle>Add item</SheetTitle>
           <SheetDescription className="sr-only">
