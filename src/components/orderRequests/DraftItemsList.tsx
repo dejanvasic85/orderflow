@@ -26,7 +26,7 @@ export function DraftItemsList({ items, products, onUpdate, onRemove }: DraftIte
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.25, ease: "easeInOut" }}
-              style={{ overflow: "hidden" }}
+              className="overflow-hidden p-px"
             >
               <OrderItemCard
                 name={product?.name ?? item.product_id}
