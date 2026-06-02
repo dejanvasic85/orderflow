@@ -42,11 +42,13 @@ describe("OrderHistoryCard", () => {
     expect(screen.getByText("bottles")).toBeInTheDocument();
   });
 
-  it("renders the formatted date", () => {
+  it("renders the date as an amber pill", () => {
     render(<OrderHistoryCard order={baseOrder} />);
 
     // Mid-month noon UTC avoids timezone day-boundary shifts across any locale
-    expect(screen.getByText(/15 June? 2024/)).toBeInTheDocument();
+    const pill = screen.getByText(/15 June? 2024/);
+    expect(pill).toBeInTheDocument();
+    expect(pill).toHaveClass("bg-amber-100");
   });
 
   it("renders a View order button", () => {
@@ -63,19 +65,5 @@ describe("OrderHistoryCard", () => {
     await userEvent.click(screen.getByRole("button", { name: /view order/i }));
 
     expect(handleView).toHaveBeenCalledWith("order-abc");
-  });
-
-  it("renders the submitted status badge", () => {
-    render(<OrderHistoryCard order={baseOrder} />);
-
-    expect(screen.getByText("Submitted")).toBeInTheDocument();
-  });
-
-  it("renders the completed status badge for a completed order", () => {
-    const completedOrder: OrderHistoryItem = { ...baseOrder, status: "completed" };
-
-    render(<OrderHistoryCard order={completedOrder} />);
-
-    expect(screen.getByText("Completed")).toBeInTheDocument();
   });
 });
