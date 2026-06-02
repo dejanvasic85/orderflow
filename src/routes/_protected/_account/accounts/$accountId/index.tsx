@@ -16,10 +16,11 @@ export const Route = createFileRoute("/_protected/_account/accounts/$accountId/"
 
     if (!accountResult.ok) throw new Error(accountResult.error.message);
     if (!accountResult.value) throw notFound();
+    if (!historyResult.ok) throw new Error(historyResult.error.message);
 
     return {
       account: accountResult.value,
-      orders: historyResult.ok ? historyResult.value : [],
+      orders: historyResult.value,
     };
   },
   component: AccountPage,

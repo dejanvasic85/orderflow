@@ -10,7 +10,7 @@ const baseOrder: OrderHistoryItem = {
   placed_by: "user-1",
   placed_by_name: "Alice Smith",
   status: "submitted",
-  created_at: "2024-06-01T10:00:00Z",
+  created_at: "2024-06-15T12:00:00Z",
   total_boxes: 3,
   total_bottles: 5,
 };
@@ -45,7 +45,8 @@ describe("OrderHistoryCard", () => {
   it("renders the formatted date", () => {
     render(<OrderHistoryCard order={baseOrder} />);
 
-    expect(screen.getByText(/1 Jun(e)? 2024/)).toBeInTheDocument();
+    // Mid-month noon UTC avoids timezone day-boundary shifts across any locale
+    expect(screen.getByText(/15 June? 2024/)).toBeInTheDocument();
   });
 
   it("renders a View order button", () => {
