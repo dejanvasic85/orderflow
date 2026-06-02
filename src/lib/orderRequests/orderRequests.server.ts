@@ -2,6 +2,7 @@ import type { z } from "zod";
 import { fetchSessionOrThrow } from "@/lib/auth/auth.server";
 import { err, ok } from "@/lib/result";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
+import { assertAdminOrStaff } from "@/lib/users/users.server";
 import type { createOrderRequestSchema } from "./schema";
 
 const orderRequestWithItemsSelect =
@@ -19,7 +20,44 @@ export type OrderHistoryItem = {
   created_at: string;
   total_bottles: number;
   total_boxes: number;
+  account_name?: string;
 };
+
+const allOrderHistorySelect =
+  "id, order_number, placed_by, status, created_at, order_request_items(boxes, extra_bottles), users!order_requests_placed_by_fkey(id, name), accounts(id, name)" as const;
+
+export async function fetchAllOrderHistory() {
+  const supabase = createSupabaseServerClient();
+  await assertAdminOrStaff(supabase);
+
+  const { data, error } = await supabase
+    .from("order_requests")
+    .select(allOrderHistorySelect)
+    .order("created_at", { ascending: false });
+
+  if (error) return err({ message: error.message });
+
+  const items: OrderHistoryItem[] = (data ?? []).map((row) => {
+    const items = row.order_request_items ?? [];
+    const total_boxes = items.reduce((sum, i) => sum + (i.boxes ?? 0), 0);
+    const total_bottles = items.reduce((sum, i) => sum + (i.extra_bottles ?? 0), 0);
+    const user = row.users as { id: string; name: string } | null;
+    const account = row.accounts as { id: string; name: string } | null;
+    return {
+      id: row.id,
+      order_number: row.order_number,
+      placed_by: row.placed_by,
+      placed_by_name: user?.name ?? "Unknown",
+      status: row.status,
+      created_at: row.created_at,
+      total_boxes,
+      total_bottles,
+      account_name: account?.name,
+    };
+  });
+
+  return ok(items);
+}
 
 export async function fetchOrderHistoryForAccount(accountId: string) {
   const supabase = createSupabaseServerClient();
