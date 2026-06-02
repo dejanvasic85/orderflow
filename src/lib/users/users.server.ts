@@ -75,6 +75,20 @@ export async function assertAdmin(supabase: ReturnType<typeof createSupabaseServ
   if (profile.role !== "admin") throw new Error("Forbidden");
 }
 
+export async function assertAdminOrStaff(supabase: ReturnType<typeof createSupabaseServerClient>) {
+  const sessionUser = await ensureSession();
+  const { data: profile, error: profileError } = await supabase
+    .from("users")
+    .select("role")
+    .eq("id", sessionUser.id)
+    .single();
+  if (profileError) {
+    console.error("Failed to fetch user profile for role check:", profileError);
+    throw new Error("Unauthorized");
+  }
+  if (profile.role !== "admin" && profile.role !== "staff") throw new Error("Forbidden");
+}
+
 export async function resolveAccountNames(
   supabase: ReturnType<typeof createSupabaseServerClient>,
   accountIds: string[],

@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import {
+  fetchAllOrderHistory,
   fetchOrderRequest,
   fetchOrderHistoryForAccount,
   fetchOrderRequestsForAccount,
@@ -25,3 +26,7 @@ export const createOrderRequest = createServerFn({ method: "POST", strict: { out
 export const listOrderHistory = createServerFn({ method: "GET", strict: { output: false } })
   .inputValidator((accountId: string) => accountId)
   .handler(async ({ data: accountId }) => fetchOrderHistoryForAccount(accountId));
+
+export const listAllOrders = createServerFn({ method: "GET", strict: { output: false } }).handler(
+  async () => fetchAllOrderHistory(),
+);
