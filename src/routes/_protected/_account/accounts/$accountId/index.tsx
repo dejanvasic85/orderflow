@@ -2,21 +2,31 @@ import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
 import { PageContent } from "@/components/layout/PageContent";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { OrderHistoryList } from "@/components/orderRequests/OrderHistoryList";
 import { Button } from "@/components/ui/button";
 import { getAccount } from "@/lib/accounts/accounts.functions";
+import { listOrderHistory } from "@/lib/orderRequests/orderRequests.functions";
 
 export const Route = createFileRoute("/_protected/_account/accounts/$accountId/")({
   loader: async ({ params }) => {
-    const result = await getAccount({ data: params.accountId });
-    if (!result.ok) throw new Error(result.error.message);
-    if (!result.value) throw notFound();
-    return { account: result.value };
+    const [accountResult, historyResult] = await Promise.all([
+      getAccount({ data: params.accountId }),
+      listOrderHistory({ data: params.accountId }),
+    ]);
+
+    if (!accountResult.ok) throw new Error(accountResult.error.message);
+    if (!accountResult.value) throw notFound();
+
+    return {
+      account: accountResult.value,
+      orders: historyResult.ok ? historyResult.value : [],
+    };
   },
   component: AccountPage,
 });
 
 function AccountPage() {
-  const { account } = Route.useLoaderData();
+  const { account, orders } = Route.useLoaderData();
   const { accountId } = Route.useParams();
   const navigate = useNavigate();
 
@@ -26,13 +36,21 @@ function AccountPage() {
 
   return (
     <>
-      <PageHeader title={account.name} />
-      <PageContent>
-        <div>
+      <PageHeader
+        title={account.name}
+        actions={
           <Button onClick={handleCreateOrder}>
             <Plus className="mr-2 h-4 w-4" />
-            Create Order
+            New Order
           </Button>
+        }
+      />
+      <PageContent>
+        <div>
+          <h2 className="mb-3 text-sm font-medium text-muted-foreground uppercase tracking-wide">
+            Order History
+          </h2>
+          <OrderHistoryList orders={orders} />
         </div>
       </PageContent>
     </>
