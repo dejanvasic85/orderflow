@@ -11,6 +11,11 @@ const orderRequestWithItemsSelect =
 const orderHistorySelect =
   "id, order_number, placed_by, status, created_at, order_request_items(boxes, extra_bottles), users!order_requests_placed_by_fkey(id, name)" as const;
 
+const allOrderHistorySelect =
+  "id, order_number, placed_by, status, created_at, order_request_items(boxes, extra_bottles), users!order_requests_placed_by_fkey(id, name), accounts(id, name)" as const;
+
+const maxOrderHistoryRows = 200;
+
 export type OrderHistoryItem = {
   id: string;
   order_number: number;
@@ -23,8 +28,33 @@ export type OrderHistoryItem = {
   account_name?: string;
 };
 
-const allOrderHistorySelect =
-  "id, order_number, placed_by, status, created_at, order_request_items(boxes, extra_bottles), users!order_requests_placed_by_fkey(id, name), accounts(id, name)" as const;
+type OrderHistoryRow = {
+  id: string;
+  order_number: number;
+  placed_by: string;
+  status: string;
+  created_at: string;
+  order_request_items: { boxes: number | null; extra_bottles: number | null }[];
+  users: unknown;
+  accounts?: unknown;
+};
+
+function mapOrderHistoryRow(row: OrderHistoryRow): OrderHistoryItem {
+  const rowItems = row.order_request_items ?? [];
+  const user = row.users as { id: string; name: string } | null;
+  const account = row.accounts as { id: string; name: string } | null | undefined;
+  return {
+    id: row.id,
+    order_number: row.order_number,
+    placed_by: row.placed_by,
+    placed_by_name: user?.name ?? "Unknown",
+    status: row.status,
+    created_at: row.created_at,
+    total_boxes: rowItems.reduce((sum, i) => sum + (i.boxes ?? 0), 0),
+    total_bottles: rowItems.reduce((sum, i) => sum + (i.extra_bottles ?? 0), 0),
+    ...(account?.name ? { account_name: account.name } : {}),
+  };
+}
 
 export async function fetchAllOrderHistory() {
   const supabase = createSupabaseServerClient();
@@ -33,30 +63,11 @@ export async function fetchAllOrderHistory() {
   const { data, error } = await supabase
     .from("order_requests")
     .select(allOrderHistorySelect)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(maxOrderHistoryRows);
 
   if (error) return err({ message: error.message });
-
-  const items: OrderHistoryItem[] = (data ?? []).map((row) => {
-    const items = row.order_request_items ?? [];
-    const total_boxes = items.reduce((sum, i) => sum + (i.boxes ?? 0), 0);
-    const total_bottles = items.reduce((sum, i) => sum + (i.extra_bottles ?? 0), 0);
-    const user = row.users as { id: string; name: string } | null;
-    const account = row.accounts as { id: string; name: string } | null;
-    return {
-      id: row.id,
-      order_number: row.order_number,
-      placed_by: row.placed_by,
-      placed_by_name: user?.name ?? "Unknown",
-      status: row.status,
-      created_at: row.created_at,
-      total_boxes,
-      total_bottles,
-      account_name: account?.name,
-    };
-  });
-
-  return ok(items);
+  return ok((data ?? []).map(mapOrderHistoryRow));
 }
 
 export async function fetchOrderHistoryForAccount(accountId: string) {
@@ -68,25 +79,7 @@ export async function fetchOrderHistoryForAccount(accountId: string) {
     .order("created_at", { ascending: false });
 
   if (error) return err({ message: error.message });
-
-  const items: OrderHistoryItem[] = (data ?? []).map((row) => {
-    const items = row.order_request_items ?? [];
-    const total_boxes = items.reduce((sum, i) => sum + (i.boxes ?? 0), 0);
-    const total_bottles = items.reduce((sum, i) => sum + (i.extra_bottles ?? 0), 0);
-    const user = row.users as { id: string; name: string } | null;
-    return {
-      id: row.id,
-      order_number: row.order_number,
-      placed_by: row.placed_by,
-      placed_by_name: user?.name ?? "Unknown",
-      status: row.status,
-      created_at: row.created_at,
-      total_boxes,
-      total_bottles,
-    };
-  });
-
-  return ok(items);
+  return ok((data ?? []).map(mapOrderHistoryRow));
 }
 
 export async function fetchOrderRequestsForAccount(accountId: string) {
