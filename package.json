@@ -16,11 +16,11 @@
     "db:gentypes": "supabase gen types typescript --local > src/lib/database.types.ts"
   },
   "dependencies": {
-    "@cloudflare/vite-plugin": "1.39.1",
+    "@cloudflare/vite-plugin": "1.39.2",
     "@fontsource-variable/outfit": "5.2.8",
-    "@sentry/tanstackstart-react": "10.55.0",
+    "@sentry/tanstackstart-react": "10.56.0",
     "@supabase/ssr": "0.10.3",
-    "@supabase/supabase-js": "2.106.2",
+    "@supabase/supabase-js": "2.107.0",
     "@tailwindcss/vite": "4.3.0",
     "@tanstack/react-devtools": "0.10.5",
     "@tanstack/react-form": "1.33.0",
@@ -70,7 +70,7 @@
     "vite": "npm:@voidzero-dev/vite-plus-core@0.1.24",
     "vite-plus": "0.1.24",
     "vitest": "npm:@voidzero-dev/vite-plus-test@0.1.24",
-    "wrangler": "4.96.0"
+    "wrangler": "4.97.0"
   },
   "packageManager": "pnpm@10.34.1",
   "pnpm": {
