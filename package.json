@@ -72,7 +72,7 @@
     "vitest": "npm:@voidzero-dev/vite-plus-test@0.1.24",
     "wrangler": "4.96.0"
   },
-  "packageManager": "pnpm@10.34.1",
+  "packageManager": "pnpm@11.5.1",
   "pnpm": {
     "onlyBuiltDependencies": [
       "@sentry/cli",

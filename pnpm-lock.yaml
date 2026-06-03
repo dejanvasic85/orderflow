@@ -4,10 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-overrides:
-  vite: npm:@voidzero-dev/vite-plus-core@0.1.24
-  vitest: npm:@voidzero-dev/vite-plus-test@0.1.24
-
 importers:
 
   .:
@@ -165,10 +161,10 @@ importers:
         version: '@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.12.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3)'
       vite-plus:
         specifier: 0.1.24
-        version: 0.1.24(@opentelemetry/api@1.9.1)(@types/node@24.12.4)(@vitest/coverage-v8@4.1.8(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.12.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(esbuild@0.28.0)(jiti@2.7.0)(jsdom@29.1.1(@noble/hashes@1.8.0))(tsx@4.22.4)(typescript@6.0.3)
+        version: 0.1.24(@opentelemetry/api@1.9.1)(@types/node@24.12.4)(@vitest/coverage-v8@4.1.8)(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.12.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(esbuild@0.28.0)(jiti@2.7.0)(jsdom@29.1.1(@noble/hashes@1.8.0))(tsx@4.22.4)(typescript@6.0.3)
       vitest:
         specifier: npm:@voidzero-dev/vite-plus-test@0.1.24
-        version: '@voidzero-dev/vite-plus-test@0.1.24(@opentelemetry/api@1.9.1)(@types/node@24.12.4)(@vitest/coverage-v8@4.1.8(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.12.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(esbuild@0.28.0)(jiti@2.7.0)(jsdom@29.1.1(@noble/hashes@1.8.0))(tsx@4.22.4)(typescript@6.0.3)'
+        version: '@voidzero-dev/vite-plus-test@0.1.24(@opentelemetry/api@1.9.1)(@types/node@24.12.4)(@vitest/coverage-v8@4.1.8)(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.12.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(esbuild@0.28.0)(jiti@2.7.0)(jsdom@29.1.1(@noble/hashes@1.8.0))(tsx@4.22.4)(typescript@6.0.3)'
       wrangler:
         specifier: 4.96.0
         version: 4.96.0
@@ -7573,7 +7569,7 @@ snapshots:
       obug: 2.1.1
       std-env: 4.1.0
       tinyrainbow: 3.1.0
-      vitest: '@voidzero-dev/vite-plus-test@0.1.24(@opentelemetry/api@1.9.1)(@types/node@24.12.4)(@vitest/coverage-v8@4.1.8(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.12.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(esbuild@0.28.0)(jiti@2.7.0)(jsdom@29.1.1(@noble/hashes@1.8.0))(tsx@4.22.4)(typescript@6.0.3)'
+      vitest: '@voidzero-dev/vite-plus-test@0.1.24(@opentelemetry/api@1.9.1)(@types/node@24.12.4)(@vitest/coverage-v8@4.1.8)(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.12.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(esbuild@0.28.0)(jiti@2.7.0)(jsdom@29.1.1(@noble/hashes@1.8.0))(tsx@4.22.4)(typescript@6.0.3)'
 
   '@vitest/pretty-format@4.1.8':
     dependencies:
@@ -7617,7 +7613,7 @@ snapshots:
   '@voidzero-dev/vite-plus-linux-x64-musl@0.1.24':
     optional: true
 
-  '@voidzero-dev/vite-plus-test@0.1.24(@opentelemetry/api@1.9.1)(@types/node@24.12.4)(@vitest/coverage-v8@4.1.8(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.12.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(esbuild@0.28.0)(jiti@2.7.0)(jsdom@29.1.1(@noble/hashes@1.8.0))(tsx@4.22.4)(typescript@6.0.3)':
+  '@voidzero-dev/vite-plus-test@0.1.24(@opentelemetry/api@1.9.1)(@types/node@24.12.4)(@vitest/coverage-v8@4.1.8)(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.12.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(esbuild@0.28.0)(jiti@2.7.0)(jsdom@29.1.1(@noble/hashes@1.8.0))(tsx@4.22.4)(typescript@6.0.3)':
     dependencies:
       '@standard-schema/spec': 1.1.0
       '@types/chai': 5.2.3
@@ -8781,7 +8777,7 @@ snapshots:
       - '@emnapi/core'
       - '@emnapi/runtime'
 
-  oxfmt@0.52.0(vite-plus@0.1.24(@opentelemetry/api@1.9.1)(@types/node@24.12.4)(@vitest/coverage-v8@4.1.8(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.12.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(esbuild@0.28.0)(jiti@2.7.0)(jsdom@29.1.1(@noble/hashes@1.8.0))(tsx@4.22.4)(typescript@6.0.3)):
+  oxfmt@0.52.0(vite-plus@0.1.24(@opentelemetry/api@1.9.1)(@types/node@24.12.4)(@vitest/coverage-v8@4.1.8)(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.12.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(esbuild@0.28.0)(jiti@2.7.0)(jsdom@29.1.1(@noble/hashes@1.8.0))(tsx@4.22.4)(typescript@6.0.3)):
     dependencies:
       tinypool: 2.1.0
     optionalDependencies:
@@ -8804,7 +8800,7 @@ snapshots:
       '@oxfmt/binding-win32-arm64-msvc': 0.52.0
       '@oxfmt/binding-win32-ia32-msvc': 0.52.0
       '@oxfmt/binding-win32-x64-msvc': 0.52.0
-      vite-plus: 0.1.24(@opentelemetry/api@1.9.1)(@types/node@24.12.4)(@vitest/coverage-v8@4.1.8(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.12.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(esbuild@0.28.0)(jiti@2.7.0)(jsdom@29.1.1(@noble/hashes@1.8.0))(tsx@4.22.4)(typescript@6.0.3)
+      vite-plus: 0.1.24(@opentelemetry/api@1.9.1)(@types/node@24.12.4)(@vitest/coverage-v8@4.1.8)(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.12.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(esbuild@0.28.0)(jiti@2.7.0)(jsdom@29.1.1(@noble/hashes@1.8.0))(tsx@4.22.4)(typescript@6.0.3)
 
   oxlint-tsgolint@0.23.0:
     optionalDependencies:
@@ -8815,7 +8811,7 @@ snapshots:
       '@oxlint-tsgolint/win32-arm64': 0.23.0
       '@oxlint-tsgolint/win32-x64': 0.23.0
 
-  oxlint@1.67.0(oxlint-tsgolint@0.23.0)(vite-plus@0.1.24(@opentelemetry/api@1.9.1)(@types/node@24.12.4)(@vitest/coverage-v8@4.1.8(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.12.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(esbuild@0.28.0)(jiti@2.7.0)(jsdom@29.1.1(@noble/hashes@1.8.0))(tsx@4.22.4)(typescript@6.0.3)):
+  oxlint@1.67.0(oxlint-tsgolint@0.23.0)(vite-plus@0.1.24(@opentelemetry/api@1.9.1)(@types/node@24.12.4)(@vitest/coverage-v8@4.1.8)(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.12.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(esbuild@0.28.0)(jiti@2.7.0)(jsdom@29.1.1(@noble/hashes@1.8.0))(tsx@4.22.4)(typescript@6.0.3)):
     optionalDependencies:
       '@oxlint/binding-android-arm-eabi': 1.67.0
       '@oxlint/binding-android-arm64': 1.67.0
@@ -8837,7 +8833,7 @@ snapshots:
       '@oxlint/binding-win32-ia32-msvc': 1.67.0
       '@oxlint/binding-win32-x64-msvc': 1.67.0
       oxlint-tsgolint: 0.23.0
-      vite-plus: 0.1.24(@opentelemetry/api@1.9.1)(@types/node@24.12.4)(@vitest/coverage-v8@4.1.8(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.12.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(esbuild@0.28.0)(jiti@2.7.0)(jsdom@29.1.1(@noble/hashes@1.8.0))(tsx@4.22.4)(typescript@6.0.3)
+      vite-plus: 0.1.24(@opentelemetry/api@1.9.1)(@types/node@24.12.4)(@vitest/coverage-v8@4.1.8)(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.12.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(esbuild@0.28.0)(jiti@2.7.0)(jsdom@29.1.1(@noble/hashes@1.8.0))(tsx@4.22.4)(typescript@6.0.3)
 
   p-limit@3.1.0:
     dependencies:
@@ -9510,14 +9506,14 @@ snapshots:
 
   vary@1.1.2: {}
 
-  vite-plus@0.1.24(@opentelemetry/api@1.9.1)(@types/node@24.12.4)(@vitest/coverage-v8@4.1.8(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.12.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(esbuild@0.28.0)(jiti@2.7.0)(jsdom@29.1.1(@noble/hashes@1.8.0))(tsx@4.22.4)(typescript@6.0.3):
+  vite-plus@0.1.24(@opentelemetry/api@1.9.1)(@types/node@24.12.4)(@vitest/coverage-v8@4.1.8)(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.12.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(esbuild@0.28.0)(jiti@2.7.0)(jsdom@29.1.1(@noble/hashes@1.8.0))(tsx@4.22.4)(typescript@6.0.3):
     dependencies:
       '@oxc-project/types': 0.133.0
       '@oxlint/plugins': 1.61.0
       '@voidzero-dev/vite-plus-core': 0.1.24(@types/node@24.12.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3)
-      '@voidzero-dev/vite-plus-test': 0.1.24(@opentelemetry/api@1.9.1)(@types/node@24.12.4)(@vitest/coverage-v8@4.1.8(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.12.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(esbuild@0.28.0)(jiti@2.7.0)(jsdom@29.1.1(@noble/hashes@1.8.0))(tsx@4.22.4)(typescript@6.0.3)
-      oxfmt: 0.52.0(vite-plus@0.1.24(@opentelemetry/api@1.9.1)(@types/node@24.12.4)(@vitest/coverage-v8@4.1.8(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.12.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(esbuild@0.28.0)(jiti@2.7.0)(jsdom@29.1.1(@noble/hashes@1.8.0))(tsx@4.22.4)(typescript@6.0.3))
-      oxlint: 1.67.0(oxlint-tsgolint@0.23.0)(vite-plus@0.1.24(@opentelemetry/api@1.9.1)(@types/node@24.12.4)(@vitest/coverage-v8@4.1.8(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.12.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(esbuild@0.28.0)(jiti@2.7.0)(jsdom@29.1.1(@noble/hashes@1.8.0))(tsx@4.22.4)(typescript@6.0.3))
+      '@voidzero-dev/vite-plus-test': 0.1.24(@opentelemetry/api@1.9.1)(@types/node@24.12.4)(@vitest/coverage-v8@4.1.8)(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.12.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(esbuild@0.28.0)(jiti@2.7.0)(jsdom@29.1.1(@noble/hashes@1.8.0))(tsx@4.22.4)(typescript@6.0.3)
+      oxfmt: 0.52.0(vite-plus@0.1.24(@opentelemetry/api@1.9.1)(@types/node@24.12.4)(@vitest/coverage-v8@4.1.8)(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.12.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(esbuild@0.28.0)(jiti@2.7.0)(jsdom@29.1.1(@noble/hashes@1.8.0))(tsx@4.22.4)(typescript@6.0.3))
+      oxlint: 1.67.0(oxlint-tsgolint@0.23.0)(vite-plus@0.1.24(@opentelemetry/api@1.9.1)(@types/node@24.12.4)(@vitest/coverage-v8@4.1.8)(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.12.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(typescript@6.0.3))(esbuild@0.28.0)(jiti@2.7.0)(jsdom@29.1.1(@noble/hashes@1.8.0))(tsx@4.22.4)(typescript@6.0.3))
       oxlint-tsgolint: 0.23.0
     optionalDependencies:
       '@voidzero-dev/vite-plus-darwin-arm64': 0.1.24
