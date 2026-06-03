@@ -59,7 +59,7 @@
     "@types/node": "22.19.19",
     "@types/react": "19.2.16",
     "@types/react-dom": "19.2.3",
-    "@vitejs/plugin-react": "5.2.0",
+    "@vitejs/plugin-react": "6.0.2",
     "@vitest/coverage-v8": "4.1.8",
     "dotenv": "17.4.2",
     "jsdom": "28.1.0",
