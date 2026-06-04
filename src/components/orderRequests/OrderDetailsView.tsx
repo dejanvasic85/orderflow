@@ -1,6 +1,7 @@
 import { ArrowLeft, Box, Calendar, MapPin, Package, User2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { formatDate, formatTime } from "@/lib/dates";
 import type { OrderRequestWithItems } from "@/lib/orderRequests/schema";
 import { formatOrderRef } from "@/lib/orderRequests/schema";
 import { OrderItemCard } from "./OrderItemCard";
@@ -10,24 +11,6 @@ type OrderDetailsViewProps = {
   placedByName: string;
   onBack: () => void;
 };
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("en-AU", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-}
-
-function formatTime(iso: string): string {
-  const date = new Date(iso);
-  const h = date.getHours();
-  const m = date.getMinutes().toString().padStart(2, "0");
-  const period = h >= 12 ? "pm" : "am";
-  const hour = h % 12 || 12;
-  return `${hour}:${m} ${period}`;
-}
 
 export function OrderDetailsView({ order, placedByName, onBack }: OrderDetailsViewProps) {
   const totalBoxes = order.order_request_items.reduce((sum, i) => sum + (i.boxes ?? 0), 0);

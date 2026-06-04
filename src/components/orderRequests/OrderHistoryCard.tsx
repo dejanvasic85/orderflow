@@ -1,5 +1,6 @@
 import { ArrowRight, Box, Building2, Package, User2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { formatShortDate } from "@/lib/dates";
 import type { OrderHistoryItem } from "@/lib/orderRequests/orderRequests.server";
 import { formatOrderRef } from "@/lib/orderRequests/schema";
 
@@ -7,14 +8,6 @@ type OrderHistoryCardProps = {
   order: OrderHistoryItem;
   onView?: (orderId: string) => void;
 };
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("en-AU", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-}
 
 export function OrderHistoryCard({ order, onView }: OrderHistoryCardProps) {
   return (
@@ -24,7 +17,7 @@ export function OrderHistoryCard({ order, onView }: OrderHistoryCardProps) {
           {formatOrderRef(order.order_number)}
         </span>
         <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">
-          {formatDate(order.created_at)}
+          {formatShortDate(order.created_at)}
         </span>
       </div>
 
