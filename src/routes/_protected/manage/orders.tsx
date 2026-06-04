@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { PageContent } from "@/components/layout/PageContent";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { OrderHistoryList } from "@/components/orderRequests/OrderHistoryList";
@@ -17,12 +17,17 @@ export const Route = createFileRoute("/_protected/manage/orders")({
 
 function OrdersPage() {
   const { orders } = Route.useLoaderData();
+  const navigate = useNavigate();
+
+  function handleViewOrder(orderId: string) {
+    void navigate({ to: "/manage/orders/$orderId", params: { orderId } });
+  }
 
   return (
     <>
       <PageHeader title="Orders" />
       <PageContent>
-        <OrderHistoryList orders={orders} />
+        <OrderHistoryList orders={orders} onViewOrder={handleViewOrder} />
       </PageContent>
     </>
   );

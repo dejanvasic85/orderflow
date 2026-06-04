@@ -12,6 +12,7 @@ export type OrderRequestWithItems = OrderRequestRow & {
   >;
   templates: Pick<TemplateRow, "id" | "name"> | null;
   users: { id: string; name: string } | null;
+  accounts: { id: string; name: string } | null;
 };
 
 export const orderRequestItemInputSchema = z.object({
