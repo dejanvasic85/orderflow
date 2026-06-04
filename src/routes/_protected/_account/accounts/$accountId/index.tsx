@@ -35,13 +35,6 @@ function AccountPage() {
     void navigate({ to: "/accounts/$accountId/orders/new", params: { accountId } });
   }
 
-  function handleViewOrder(orderId: string) {
-    void navigate({
-      to: "/accounts/$accountId/orders/$orderId",
-      params: { accountId, orderId },
-    });
-  }
-
   return (
     <>
       <PageHeader
@@ -58,7 +51,10 @@ function AccountPage() {
           <h2 className="mb-3 text-sm font-medium text-muted-foreground uppercase tracking-wide">
             Order History
           </h2>
-          <OrderHistoryList orders={orders} onViewOrder={handleViewOrder} />
+          <OrderHistoryList
+            orders={orders}
+            buildViewHref={(orderId) => `/accounts/${accountId}/orders/${orderId}`}
+          />
         </div>
       </PageContent>
     </>

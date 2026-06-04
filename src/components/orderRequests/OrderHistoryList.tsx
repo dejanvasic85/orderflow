@@ -4,10 +4,10 @@ import { OrderHistoryCard } from "./OrderHistoryCard";
 
 type OrderHistoryListProps = {
   orders: OrderHistoryItem[];
-  onViewOrder?: (orderId: string) => void;
+  buildViewHref?: (orderId: string) => string;
 };
 
-export function OrderHistoryList({ orders, onViewOrder }: OrderHistoryListProps) {
+export function OrderHistoryList({ orders, buildViewHref }: OrderHistoryListProps) {
   if (orders.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border/60 py-14 text-center">
@@ -27,7 +27,7 @@ export function OrderHistoryList({ orders, onViewOrder }: OrderHistoryListProps)
   return (
     <div className="flex flex-col gap-2">
       {orders.map((order) => (
-        <OrderHistoryCard key={order.id} order={order} onView={onViewOrder} />
+        <OrderHistoryCard key={order.id} order={order} viewHref={buildViewHref?.(order.id)} />
       ))}
     </div>
   );

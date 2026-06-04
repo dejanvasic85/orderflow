@@ -1,6 +1,4 @@
 import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { vi } from "vitest";
 import type { OrderHistoryItem } from "@/lib/orderRequests/orderRequests.server";
 import { OrderHistoryList } from "./OrderHistoryList";
 
@@ -50,14 +48,13 @@ describe("OrderHistoryList", () => {
     expect(screen.getByText("Bob Jones")).toBeInTheDocument();
   });
 
-  it("calls onViewOrder with the correct order id when View order is clicked", async () => {
-    const handleViewOrder = vi.fn();
+  it("renders View order links with correct hrefs when buildViewHref is provided", () => {
+    render(
+      <OrderHistoryList orders={[orderOne, orderTwo]} buildViewHref={(id) => `/orders/${id}`} />,
+    );
 
-    render(<OrderHistoryList orders={[orderOne, orderTwo]} onViewOrder={handleViewOrder} />);
-
-    const viewButtons = screen.getAllByRole("button", { name: /view order/i });
-    await userEvent.click(viewButtons[0]);
-
-    expect(handleViewOrder).toHaveBeenCalledWith("order-1");
+    const links = screen.getAllByRole("link", { name: /view order/i });
+    expect(links[0]).toHaveAttribute("href", "/orders/order-1");
+    expect(links[1]).toHaveAttribute("href", "/orders/order-2");
   });
 });
