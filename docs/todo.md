@@ -35,9 +35,12 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Feature | Must | Account management for admin - basic details
 - [x] Feature | Must | Account management for admin - assigning and removing users
 - [x] Feature | Must | Real product catalog browse — replace mock data on account orders page
-- [ ] Feature | Must | Order draft state — add items with box + extra bottle quantities
-- [ ] Feature | Must | Order history view — replace mock data with real submitted orders
-- [ ] Feature | Must | Wire existing "New Order" button to the order flow
+- [x] Feature | Must | Order draft state — add items with box + extra bottle quantities
+- [x] Feature | Must | Order history view
+- [x] Feature | Must | Wire existing "New Order" button to the order flow
+- [ ] Feature | Must | View order details - readonly page with details of the bottles, boxes, quantities date + who ordered
+- [ ] Feature | Must | New order by staff and admins on behalf of accounts
+- [ ] Feature | Must | Manage template for Accounts - below the user management for the account
 - [ ] Quality | Must | Unit testing the server functions
 - [ ] Quality | Must | Playwright tests improved and working locally
 - [ ] Quality | Must | Playwright custom container with Supabase so it is working properly in the pipeline
