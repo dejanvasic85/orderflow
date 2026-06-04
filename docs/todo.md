@@ -38,7 +38,7 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Feature | Must | Order draft state — add items with box + extra bottle quantities
 - [x] Feature | Must | Order history view
 - [x] Feature | Must | Wire existing "New Order" button to the order flow
-- [ ] Feature | Must | View order details - readonly page with details of the bottles, boxes, quantities date + who ordered
+- [x] Feature | Must | View order details - readonly page with details of the bottles, boxes, quantities date + who ordered
 - [ ] Feature | Must | New order by staff and admins on behalf of accounts
 - [ ] Feature | Must | Manage template for Accounts - below the user management for the account
 - [ ] Quality | Must | Unit testing the server functions
