@@ -18,6 +18,7 @@ export const Route = createFileRoute("/_protected/_account/accounts/$accountId/o
     if (!accountResult.value) throw notFound();
     if (!orderResult.ok) throw new Error(orderResult.error.message);
     if (!orderResult.value) throw notFound();
+    if (orderResult.value.account_id !== params.accountId) throw notFound();
 
     return {
       account: accountResult.value,

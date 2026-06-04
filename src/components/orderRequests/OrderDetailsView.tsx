@@ -1,10 +1,10 @@
 import { ArrowLeft, Box, Calendar, MapPin, Package, User2 } from "lucide-react";
+import { OrderItemCard } from "@/components/orderRequests/OrderItemCard";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { formatDate, formatTime } from "@/lib/dates";
 import type { OrderRequestWithItems } from "@/lib/orderRequests/schema";
 import { formatOrderRef } from "@/lib/orderRequests/schema";
-import { OrderItemCard } from "./OrderItemCard";
 
 type OrderDetailsViewProps = {
   order: OrderRequestWithItems;
