@@ -1,22 +1,12 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { formatDateTime } from "@/lib/dates";
 
 type Props = {
   invitedAt: string;
   onResend: () => Promise<void>;
 };
-
-function formatInviteDate(iso: string): string {
-  return new Date(iso).toLocaleString("en-AU", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-  });
-}
 
 export function PendingInviteSection({ invitedAt, onResend }: Props) {
   const [displayedInvitedAt, setDisplayedInvitedAt] = useState(invitedAt);
@@ -43,7 +33,7 @@ export function PendingInviteSection({ invitedAt, onResend }: Props) {
   return (
     <div className="flex flex-col gap-3">
       <h3 className="text-sm font-medium">Invitation</h3>
-      <p className="text-sm text-muted-foreground">Sent {formatInviteDate(displayedInvitedAt)}</p>
+      <p className="text-sm text-muted-foreground">Sent {formatDateTime(displayedInvitedAt)}</p>
       <Button type="button" variant="outline" size="sm" disabled={loading} onClick={handleResend}>
         {loading ? "Sending…" : "Resend invitation"}
       </Button>

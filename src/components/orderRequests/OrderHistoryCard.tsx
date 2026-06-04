@@ -1,22 +1,14 @@
 import { ArrowRight, Box, Building2, Package, User2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { formatShortDate } from "@/lib/dates";
 import type { OrderHistoryItem } from "@/lib/orderRequests/orderRequests.server";
 import { formatOrderRef } from "@/lib/orderRequests/schema";
 
 type OrderHistoryCardProps = {
   order: OrderHistoryItem;
-  onView?: (orderId: string) => void;
+  viewHref?: string;
 };
 
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("en-AU", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-}
-
-export function OrderHistoryCard({ order, onView }: OrderHistoryCardProps) {
+export function OrderHistoryCard({ order, viewHref }: OrderHistoryCardProps) {
   return (
     <div className="group relative flex flex-col gap-3 rounded-xl border border-border/60 bg-card p-4 shadow-sm transition-all duration-200 hover:border-border hover:shadow-md sm:flex-row sm:items-center sm:gap-4">
       <div className="flex items-center gap-3 sm:w-32 sm:shrink-0 sm:flex-col sm:items-start sm:gap-1">
@@ -24,7 +16,7 @@ export function OrderHistoryCard({ order, onView }: OrderHistoryCardProps) {
           {formatOrderRef(order.order_number)}
         </span>
         <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">
-          {formatDate(order.created_at)}
+          {formatShortDate(order.created_at)}
         </span>
       </div>
 
@@ -58,17 +50,17 @@ export function OrderHistoryCard({ order, onView }: OrderHistoryCardProps) {
         </div>
       </div>
 
-      <div className="flex justify-end sm:shrink-0">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground"
-          onClick={() => onView?.(order.id)}
-        >
-          View order
-          <ArrowRight className="h-3.5 w-3.5 transition-transform duration-150 group-hover:translate-x-0.5" />
-        </Button>
-      </div>
+      {viewHref && (
+        <div className="flex justify-end sm:shrink-0">
+          <a
+            href={viewHref}
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground"
+          >
+            View order
+            <ArrowRight className="h-3.5 w-3.5 transition-transform duration-150 group-hover:translate-x-0.5" />
+          </a>
+        </div>
+      )}
     </div>
   );
 }

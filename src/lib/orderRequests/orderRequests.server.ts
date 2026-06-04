@@ -6,7 +6,7 @@ import { assertAdminOrStaff } from "@/lib/users/users.server";
 import type { createOrderRequestSchema } from "./schema";
 
 const orderRequestWithItemsSelect =
-  "id, order_number, account_id, placed_by, template_id, delivery_address, delivery_instructions, status, created_at, updated_at, order_request_items(id, product_id, boxes, extra_bottles, created_at, products(id, name, qty_per_box)), templates(id, name)" as const;
+  "id, order_number, account_id, placed_by, template_id, delivery_address, delivery_instructions, status, created_at, updated_at, order_request_items(id, product_id, boxes, extra_bottles, created_at, products(id, name, qty_per_box)), templates(id, name), users!order_requests_placed_by_fkey(id, name), accounts(id, name)" as const;
 
 const orderHistorySelect =
   "id, order_number, placed_by, status, created_at, order_request_items(boxes, extra_bottles), users!order_requests_placed_by_fkey(id, name)" as const;
@@ -95,6 +95,18 @@ export async function fetchOrderRequestsForAccount(accountId: string) {
 
 export async function fetchOrderRequest(id: string) {
   const supabase = createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("order_requests")
+    .select(orderRequestWithItemsSelect)
+    .eq("id", id)
+    .single();
+  if (error) return err({ message: error.message });
+  return ok(data);
+}
+
+export async function fetchOrderRequestAsAdminOrStaff(id: string) {
+  const supabase = createSupabaseServerClient();
+  await assertAdminOrStaff(supabase);
   const { data, error } = await supabase
     .from("order_requests")
     .select(orderRequestWithItemsSelect)

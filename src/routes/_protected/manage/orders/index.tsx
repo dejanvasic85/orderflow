@@ -6,7 +6,7 @@ import { listAllOrders } from "@/lib/orderRequests/orderRequests.functions";
 import type { OrderHistoryItem } from "@/lib/orderRequests/orderRequests.server";
 import { asResult } from "@/lib/result";
 
-export const Route = createFileRoute("/_protected/manage/orders")({
+export const Route = createFileRoute("/_protected/manage/orders/")({
   loader: async () => {
     const result = asResult<OrderHistoryItem[]>(await listAllOrders());
     if (!result.ok) throw new Error(result.error.message);
@@ -22,7 +22,10 @@ function OrdersPage() {
     <>
       <PageHeader title="Orders" />
       <PageContent>
-        <OrderHistoryList orders={orders} />
+        <OrderHistoryList
+          orders={orders}
+          buildViewHref={(orderId) => `/manage/orders/${orderId}`}
+        />
       </PageContent>
     </>
   );

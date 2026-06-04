@@ -1,6 +1,4 @@
 import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { vi } from "vitest";
 import type { OrderHistoryItem } from "@/lib/orderRequests/orderRequests.server";
 import { OrderHistoryCard } from "./OrderHistoryCard";
 
@@ -51,19 +49,16 @@ describe("OrderHistoryCard", () => {
     expect(pill).toHaveClass("bg-amber-100");
   });
 
-  it("renders a View order button", () => {
+  it("does not render a View order link when viewHref is not provided", () => {
     render(<OrderHistoryCard order={baseOrder} />);
 
-    expect(screen.getByRole("button", { name: /view order/i })).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /view order/i })).not.toBeInTheDocument();
   });
 
-  it("calls onView with the order id when View order is clicked", async () => {
-    const handleView = vi.fn();
+  it("renders a View order link with the correct href when viewHref is provided", () => {
+    render(<OrderHistoryCard order={baseOrder} viewHref="/orders/order-abc" />);
 
-    render(<OrderHistoryCard order={baseOrder} onView={handleView} />);
-
-    await userEvent.click(screen.getByRole("button", { name: /view order/i }));
-
-    expect(handleView).toHaveBeenCalledWith("order-abc");
+    const link = screen.getByRole("link", { name: /view order/i });
+    expect(link).toHaveAttribute("href", "/orders/order-abc");
   });
 });

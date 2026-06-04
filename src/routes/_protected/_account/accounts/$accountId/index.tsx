@@ -51,7 +51,10 @@ function AccountPage() {
           <h2 className="mb-3 text-sm font-medium text-muted-foreground uppercase tracking-wide">
             Order History
           </h2>
-          <OrderHistoryList orders={orders} />
+          <OrderHistoryList
+            orders={orders}
+            buildViewHref={(orderId) => `/accounts/${accountId}/orders/${orderId}`}
+          />
         </div>
       </PageContent>
     </>
