@@ -116,6 +116,12 @@ export async function fetchOrderRequestAsAdminOrStaff(id: string) {
   return ok(data);
 }
 
+export async function insertOrderRequestOnBehalf(data: z.infer<typeof createOrderRequestSchema>) {
+  const supabase = createSupabaseServerClient();
+  await assertAdminOrStaff(supabase);
+  return insertOrderRequest(data);
+}
+
 export async function insertOrderRequest(data: z.infer<typeof createOrderRequestSchema>) {
   const supabase = createSupabaseServerClient();
   const user = await fetchSessionOrThrow();

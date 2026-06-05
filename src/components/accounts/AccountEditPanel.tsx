@@ -1,4 +1,6 @@
 import { useForm } from "@tanstack/react-form";
+import { Link } from "@tanstack/react-router";
+import { ShoppingCartIcon } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -39,6 +41,7 @@ export function AccountEditPanel({
   readOnly = false,
   onSave,
   onDiscard,
+
   onUserCountChange,
 }: Props) {
   const form = useForm({
@@ -55,11 +58,11 @@ export function AccountEditPanel({
       onSave({
         ...account,
         name: value.name,
-        contact_name: value.contact_name || null,
-        contact_email: value.contact_email || null,
-        contact_phone: value.contact_phone || null,
-        delivery_address: value.delivery_address || null,
-        delivery_instructions: value.delivery_instructions || null,
+        contact_name: value.contact_name,
+        contact_email: value.contact_email,
+        contact_phone: value.contact_phone,
+        delivery_address: value.delivery_address,
+        delivery_instructions: value.delivery_instructions,
       });
       toast.success("Changes saved");
     },
@@ -67,9 +70,19 @@ export function AccountEditPanel({
 
   return (
     <div className="flex flex-col gap-6 p-6">
-      <div>
-        <h2 className="text-base font-semibold">{account.name}</h2>
-        <p className="text-sm text-muted-foreground">Account details</p>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h2 className="text-base font-semibold">{account.name}</h2>
+          <p className="text-sm text-muted-foreground">Account details</p>
+        </div>
+        {account.id && (
+          <Button asChild variant="outline" className="gap-2">
+            <Link to="/manage/orders/new" search={{ accountId: account.id }}>
+              <ShoppingCartIcon className="h-4 w-4" />
+              Place order
+            </Link>
+          </Button>
+        )}
       </div>
 
       <Separator />
