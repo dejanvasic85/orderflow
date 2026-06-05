@@ -5,6 +5,11 @@ import type { Account } from "@/lib/accounts/schema";
 import { AccountEditPanel } from "./AccountEditPanel";
 
 vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
+vi.mock("@tanstack/react-router", () => ({
+  Link: ({ children, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
+    <a {...props}>{children}</a>
+  ),
+}));
 vi.mock("@/lib/accounts/accounts.functions", () => ({
   listAccountUsers: vi.fn().mockResolvedValue({ ok: true, value: [] }),
   assignUserToAccount: vi.fn(),

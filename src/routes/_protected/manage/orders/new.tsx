@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
 import { z } from "zod";
 import { PageContent } from "@/components/layout/PageContent";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -84,6 +85,7 @@ function ManageNewOrderPage() {
       },
     });
     if (!result.ok) throw new Error(result.error.message);
+    toast.success("Order request created");
     void navigate({ to: "/manage/orders/$orderId", params: { orderId: result.value.id } });
   }
 

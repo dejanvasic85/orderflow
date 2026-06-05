@@ -58,11 +58,11 @@ export function AccountEditPanel({
       onSave({
         ...account,
         name: value.name,
-        contact_name: value.contact_name,
-        contact_email: value.contact_email,
-        contact_phone: value.contact_phone,
-        delivery_address: value.delivery_address,
-        delivery_instructions: value.delivery_instructions,
+        contact_name: value.contact_name || null,
+        contact_email: value.contact_email || null,
+        contact_phone: value.contact_phone || null,
+        delivery_address: value.delivery_address || null,
+        delivery_instructions: value.delivery_instructions || null,
       });
       toast.success("Changes saved");
     },
