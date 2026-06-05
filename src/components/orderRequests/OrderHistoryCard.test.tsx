@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import type { OrderHistoryItem } from "@/lib/orderRequests/orderRequests.server";
 import { OrderHistoryCard } from "./OrderHistoryCard";
 
@@ -11,6 +12,12 @@ const baseOrder: OrderHistoryItem = {
   created_at: "2024-06-15T12:00:00Z",
   total_boxes: 3,
   total_bottles: 5,
+};
+
+const externalOrder: OrderHistoryItem = {
+  ...baseOrder,
+  placed_by_name: "bwow",
+  placed_by_org_name: "Boutique Wines of the World",
 };
 
 describe("OrderHistoryCard", () => {
@@ -60,5 +67,16 @@ describe("OrderHistoryCard", () => {
 
     const link = screen.getByRole("link", { name: /view order/i });
     expect(link).toHaveAttribute("href", "/orders/order-abc");
+  });
+
+  it("shows placed_by_name when placed_by_org_name is set", () => {
+    render(
+      <TooltipProvider>
+        <OrderHistoryCard order={externalOrder} />
+      </TooltipProvider>,
+    );
+
+    expect(screen.getByText("bwow")).toBeInTheDocument();
+    expect(screen.queryByText("Alice Smith")).not.toBeInTheDocument();
   });
 });

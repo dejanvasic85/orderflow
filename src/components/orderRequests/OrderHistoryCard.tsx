@@ -1,4 +1,5 @@
 import { ArrowRight, Box, Building2, Package, User2 } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { formatShortDate } from "@/lib/dates";
 import type { OrderHistoryItem } from "@/lib/orderRequests/orderRequests.server";
 import { formatOrderRef } from "@/lib/orderRequests/schema";
@@ -29,7 +30,16 @@ export function OrderHistoryCard({ order, viewHref }: OrderHistoryCardProps) {
         )}
         <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
           <User2 className="h-3.5 w-3.5 shrink-0" />
-          <span className="truncate">{order.placed_by_name}</span>
+          {order.placed_by_org_name ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="truncate cursor-default">{order.placed_by_name}</span>
+              </TooltipTrigger>
+              <TooltipContent>{order.placed_by_org_name}</TooltipContent>
+            </Tooltip>
+          ) : (
+            <span className="truncate">{order.placed_by_name}</span>
+          )}
         </div>
 
         <div className="flex items-center gap-3">
