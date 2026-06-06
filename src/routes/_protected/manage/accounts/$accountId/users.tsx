@@ -21,7 +21,10 @@ function AccountUsersPage() {
 
   return (
     <>
-      <PageHeader title={`${account.name} — Users`} />
+      <PageHeader
+        title={`${account.name} — Users`}
+        description="Manage which users have access to this account."
+      />
       <PageContent>
         <AccountUserSection accountId={account.id} readOnly={!isAdmin} />
       </PageContent>

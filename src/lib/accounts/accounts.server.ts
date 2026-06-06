@@ -58,7 +58,7 @@ export async function fetchAccountUsers(accountId: string) {
   const supabase = createSupabaseServerClient();
   const { data, error } = await supabase
     .from("account_users")
-    .select("user_id, created_at, users:users(id, name, role, active)")
+    .select("user_id, created_at, users:users_with_email(id, name, email, role, active)")
     .eq("account_id", accountId);
   if (error) return err({ message: error.message });
   return ok(data ?? []);
