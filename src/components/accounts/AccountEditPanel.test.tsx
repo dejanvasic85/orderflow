@@ -5,6 +5,11 @@ import type { Account } from "@/lib/accounts/schema";
 import { AccountEditPanel } from "./AccountEditPanel";
 
 vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
+vi.mock("@tanstack/react-router", () => ({
+  Link: ({ children, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
+    <a {...props}>{children}</a>
+  ),
+}));
 vi.mock("@/lib/accounts/accounts.functions", () => ({
   listAccountUsers: vi.fn().mockResolvedValue({ ok: true, value: [] }),
   assignUserToAccount: vi.fn(),
@@ -170,6 +175,27 @@ test("calls onDiscard when Discard button is clicked", async () => {
   await user.click(screen.getByRole("button", { name: "Discard" }));
 
   expect(onDiscard).toHaveBeenCalled();
+});
+
+test("renders Place order button when account has an id", () => {
+  render(<AccountEditPanel account={baseAccount} onSave={onSave} onDiscard={onDiscard} />, {
+    wrapper,
+  });
+
+  expect(screen.getByText(/Place order/i)).toBeInTheDocument();
+});
+
+test("does not render Place order button when account has no id", () => {
+  render(
+    <AccountEditPanel
+      account={{ ...baseAccount, id: undefined as unknown as string }}
+      onSave={onSave}
+      onDiscard={onDiscard}
+    />,
+    { wrapper },
+  );
+
+  expect(screen.queryByText(/Place order/i)).not.toBeInTheDocument();
 });
 
 test("calls onDiscard when Close button is clicked in read-only mode", async () => {

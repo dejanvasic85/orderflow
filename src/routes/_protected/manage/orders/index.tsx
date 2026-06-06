@@ -1,7 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { PageContent } from "@/components/layout/PageContent";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { OrderHistoryList } from "@/components/orderRequests/OrderHistoryList";
+import { Button } from "@/components/ui/button";
 import { listAllOrders } from "@/lib/orderRequests/orderRequests.functions";
 import type { OrderHistoryItem } from "@/lib/orderRequests/orderRequests.server";
 import { asResult } from "@/lib/result";
@@ -20,7 +21,14 @@ function OrdersPage() {
 
   return (
     <>
-      <PageHeader title="Orders" />
+      <PageHeader
+        title="Orders"
+        actions={
+          <Button asChild>
+            <Link to="/manage/orders/new">+ New order</Link>
+          </Button>
+        }
+      />
       <PageContent>
         <OrderHistoryList
           orders={orders}

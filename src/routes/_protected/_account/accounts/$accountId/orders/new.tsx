@@ -1,4 +1,5 @@
 import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
 import { NewOrderForm } from "@/components/orderRequests/NewOrderForm";
 import { getAccount } from "@/lib/accounts/accounts.functions";
 import { clearDraft } from "@/lib/orderRequests/draftOrder";
@@ -54,6 +55,7 @@ function NewOrderPage() {
       },
     });
     if (!result.ok) throw new Error(result.error.message);
+    toast.success("Order request submitted");
     clearDraft(accountId);
     void navigate({
       to: "/accounts/$accountId/orders/$orderId/success",

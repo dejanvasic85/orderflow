@@ -25,6 +25,7 @@ import { Route as ProtectedManageDashboardRouteImport } from './routes/_protecte
 import { Route as ProtectedManageAccountsRouteImport } from './routes/_protected/manage/accounts'
 import { Route as ProtectedAccountAccountsRouteImport } from './routes/_protected/_account/accounts'
 import { Route as ProtectedManageOrdersIndexRouteImport } from './routes/_protected/manage/orders/index'
+import { Route as ProtectedManageOrdersNewRouteImport } from './routes/_protected/manage/orders/new'
 import { Route as ProtectedManageOrdersOrderIdRouteImport } from './routes/_protected/manage/orders/$orderId'
 import { Route as ProtectedAccountAccountsAccountIdIndexRouteImport } from './routes/_protected/_account/accounts/$accountId/index'
 import { Route as ProtectedAccountAccountsAccountIdBrowseRouteImport } from './routes/_protected/_account/accounts/$accountId/browse'
@@ -113,6 +114,12 @@ const ProtectedManageOrdersIndexRoute =
     path: '/orders/',
     getParentRoute: () => ProtectedManageRoute,
   } as any)
+const ProtectedManageOrdersNewRoute =
+  ProtectedManageOrdersNewRouteImport.update({
+    id: '/orders/new',
+    path: '/orders/new',
+    getParentRoute: () => ProtectedManageRoute,
+  } as any)
 const ProtectedManageOrdersOrderIdRoute =
   ProtectedManageOrdersOrderIdRouteImport.update({
     id: '/orders/$orderId',
@@ -165,6 +172,7 @@ export interface FileRoutesByFullPath {
   '/manage/users': typeof ProtectedManageUsersRoute
   '/accounts/': typeof ProtectedAccountsIndexRoute
   '/manage/orders/$orderId': typeof ProtectedManageOrdersOrderIdRoute
+  '/manage/orders/new': typeof ProtectedManageOrdersNewRoute
   '/manage/orders/': typeof ProtectedManageOrdersIndexRoute
   '/accounts/$accountId/browse': typeof ProtectedAccountAccountsAccountIdBrowseRoute
   '/accounts/$accountId/': typeof ProtectedAccountAccountsAccountIdIndexRoute
@@ -186,6 +194,7 @@ export interface FileRoutesByTo {
   '/manage/dashboard': typeof ProtectedManageDashboardRoute
   '/manage/users': typeof ProtectedManageUsersRoute
   '/manage/orders/$orderId': typeof ProtectedManageOrdersOrderIdRoute
+  '/manage/orders/new': typeof ProtectedManageOrdersNewRoute
   '/manage/orders': typeof ProtectedManageOrdersIndexRoute
   '/accounts/$accountId/browse': typeof ProtectedAccountAccountsAccountIdBrowseRoute
   '/accounts/$accountId': typeof ProtectedAccountAccountsAccountIdIndexRoute
@@ -211,6 +220,7 @@ export interface FileRoutesById {
   '/_protected/manage/users': typeof ProtectedManageUsersRoute
   '/_protected/accounts/': typeof ProtectedAccountsIndexRoute
   '/_protected/manage/orders/$orderId': typeof ProtectedManageOrdersOrderIdRoute
+  '/_protected/manage/orders/new': typeof ProtectedManageOrdersNewRoute
   '/_protected/manage/orders/': typeof ProtectedManageOrdersIndexRoute
   '/_protected/_account/accounts/$accountId/browse': typeof ProtectedAccountAccountsAccountIdBrowseRoute
   '/_protected/_account/accounts/$accountId/': typeof ProtectedAccountAccountsAccountIdIndexRoute
@@ -235,6 +245,7 @@ export interface FileRouteTypes {
     | '/manage/users'
     | '/accounts/'
     | '/manage/orders/$orderId'
+    | '/manage/orders/new'
     | '/manage/orders/'
     | '/accounts/$accountId/browse'
     | '/accounts/$accountId/'
@@ -256,6 +267,7 @@ export interface FileRouteTypes {
     | '/manage/dashboard'
     | '/manage/users'
     | '/manage/orders/$orderId'
+    | '/manage/orders/new'
     | '/manage/orders'
     | '/accounts/$accountId/browse'
     | '/accounts/$accountId'
@@ -280,6 +292,7 @@ export interface FileRouteTypes {
     | '/_protected/manage/users'
     | '/_protected/accounts/'
     | '/_protected/manage/orders/$orderId'
+    | '/_protected/manage/orders/new'
     | '/_protected/manage/orders/'
     | '/_protected/_account/accounts/$accountId/browse'
     | '/_protected/_account/accounts/$accountId/'
@@ -413,6 +426,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedManageOrdersIndexRouteImport
       parentRoute: typeof ProtectedManageRoute
     }
+    '/_protected/manage/orders/new': {
+      id: '/_protected/manage/orders/new'
+      path: '/orders/new'
+      fullPath: '/manage/orders/new'
+      preLoaderRoute: typeof ProtectedManageOrdersNewRouteImport
+      parentRoute: typeof ProtectedManageRoute
+    }
     '/_protected/manage/orders/$orderId': {
       id: '/_protected/manage/orders/$orderId'
       path: '/orders/$orderId'
@@ -501,6 +521,7 @@ interface ProtectedManageRouteChildren {
   ProtectedManageDashboardRoute: typeof ProtectedManageDashboardRoute
   ProtectedManageUsersRoute: typeof ProtectedManageUsersRoute
   ProtectedManageOrdersOrderIdRoute: typeof ProtectedManageOrdersOrderIdRoute
+  ProtectedManageOrdersNewRoute: typeof ProtectedManageOrdersNewRoute
   ProtectedManageOrdersIndexRoute: typeof ProtectedManageOrdersIndexRoute
 }
 
@@ -509,6 +530,7 @@ const ProtectedManageRouteChildren: ProtectedManageRouteChildren = {
   ProtectedManageDashboardRoute: ProtectedManageDashboardRoute,
   ProtectedManageUsersRoute: ProtectedManageUsersRoute,
   ProtectedManageOrdersOrderIdRoute: ProtectedManageOrdersOrderIdRoute,
+  ProtectedManageOrdersNewRoute: ProtectedManageOrdersNewRoute,
   ProtectedManageOrdersIndexRoute: ProtectedManageOrdersIndexRoute,
 }
 

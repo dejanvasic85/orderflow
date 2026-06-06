@@ -9,10 +9,10 @@ const orderRequestWithItemsSelect =
   "id, order_number, account_id, placed_by, template_id, delivery_address, delivery_instructions, status, created_at, updated_at, order_request_items(id, product_id, boxes, extra_bottles, created_at, products(id, name, qty_per_box)), templates(id, name), users!order_requests_placed_by_fkey(id, name), accounts(id, name)" as const;
 
 const orderHistorySelect =
-  "id, order_number, placed_by, status, created_at, order_request_items(boxes, extra_bottles), users!order_requests_placed_by_fkey(id, name)" as const;
+  "id, order_number, placed_by, status, created_at, order_request_items(boxes, extra_bottles), users!order_requests_placed_by_fkey(id, name, role)" as const;
 
 const allOrderHistorySelect =
-  "id, order_number, placed_by, status, created_at, order_request_items(boxes, extra_bottles), users!order_requests_placed_by_fkey(id, name), accounts(id, name)" as const;
+  "id, order_number, placed_by, status, created_at, order_request_items(boxes, extra_bottles), users!order_requests_placed_by_fkey(id, name, role), accounts(id, name)" as const;
 
 const maxOrderHistoryRows = 200;
 
@@ -21,12 +21,18 @@ export type OrderHistoryItem = {
   order_number: number;
   placed_by: string;
   placed_by_name: string;
+  placed_by_org_name?: string;
   status: string;
   created_at: string;
   total_bottles: number;
   total_boxes: number;
   account_name?: string;
 };
+
+const bwowLabel = { placed_by_name: "bwow", placed_by_org_name: "Boutique Wines of the World" };
+const unknownPlacedByValue = { placed_by_name: "Unknown" } as const;
+
+type PlacedByUser = { id: string; name: string; role: string } | null;
 
 type OrderHistoryRow = {
   id: string;
@@ -39,15 +45,26 @@ type OrderHistoryRow = {
   accounts?: unknown;
 };
 
+function resolvePlacedByName(user: PlacedByUser): {
+  placed_by_name: string;
+  placed_by_org_name?: string;
+} {
+  if (!user) return unknownPlacedByValue;
+  if (user.role === "admin" || user.role === "staff") return bwowLabel;
+  return { placed_by_name: user.name || "Unknown" };
+}
+
 function mapOrderHistoryRow(row: OrderHistoryRow): OrderHistoryItem {
   const rowItems = row.order_request_items ?? [];
-  const user = row.users as { id: string; name: string } | null;
+  const user = row.users as PlacedByUser;
   const account = row.accounts as { id: string; name: string } | null | undefined;
+  const { placed_by_name, placed_by_org_name } = resolvePlacedByName(user);
   return {
     id: row.id,
     order_number: row.order_number,
     placed_by: row.placed_by,
-    placed_by_name: user?.name ?? "Unknown",
+    placed_by_name,
+    ...(placed_by_org_name ? { placed_by_org_name } : {}),
     status: row.status,
     created_at: row.created_at,
     total_boxes: rowItems.reduce((sum, i) => sum + (i.boxes ?? 0), 0),
@@ -114,6 +131,12 @@ export async function fetchOrderRequestAsAdminOrStaff(id: string) {
     .single();
   if (error) return err({ message: error.message });
   return ok(data);
+}
+
+export async function insertOrderRequestOnBehalf(data: z.infer<typeof createOrderRequestSchema>) {
+  const supabase = createSupabaseServerClient();
+  await assertAdminOrStaff(supabase);
+  return insertOrderRequest(data);
 }
 
 export async function insertOrderRequest(data: z.infer<typeof createOrderRequestSchema>) {

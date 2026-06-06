@@ -334,3 +334,29 @@ test("saveDraft is called when an item is added", async () => {
     { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003", boxes: 1, extra_bottles: 0 },
   ]);
 });
+
+test("does not load draft from localStorage when persistDraft is false", async () => {
+  const storedItem: OrderRequestItemInput = {
+    product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003",
+    boxes: 2,
+    extra_bottles: 0,
+  };
+  loadDraftMock.mockReturnValue([storedItem]);
+
+  renderForm({ persistDraft: false, products: [product1, product2] });
+
+  await screen.findByRole("heading", { name: "New order" });
+  expect(loadDraftMock).not.toHaveBeenCalled();
+  expect(screen.queryByLabelText(/Remove Chardonnay/i)).not.toBeInTheDocument();
+});
+
+test("does not call saveDraft when persistDraft is false and an item is added", async () => {
+  renderForm({ persistDraft: false, template: null });
+
+  await user.click(await screen.findByRole("button", { name: /add item/i }));
+  const addButtons = await screen.findAllByRole("button", { name: "Add" });
+  await user.click(addButtons[0]);
+
+  expect(screen.getByLabelText(/Remove Chardonnay/i)).toBeInTheDocument();
+  expect(saveDraftMock).not.toHaveBeenCalled();
+});

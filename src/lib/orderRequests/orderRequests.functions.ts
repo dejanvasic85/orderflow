@@ -6,6 +6,7 @@ import {
   fetchOrderHistoryForAccount,
   fetchOrderRequestsForAccount,
   insertOrderRequest,
+  insertOrderRequestOnBehalf,
 } from "./orderRequests.server";
 import { createOrderRequestSchema } from "./schema";
 
@@ -23,6 +24,13 @@ export const getOrderRequest = createServerFn({ method: "GET", strict: { output:
 export const createOrderRequest = createServerFn({ method: "POST", strict: { output: false } })
   .inputValidator(createOrderRequestSchema)
   .handler(async ({ data }) => insertOrderRequest(data));
+
+export const createOrderRequestOnBehalf = createServerFn({
+  method: "POST",
+  strict: { output: false },
+})
+  .inputValidator(createOrderRequestSchema)
+  .handler(async ({ data }) => insertOrderRequestOnBehalf(data));
 
 export const listOrderHistory = createServerFn({ method: "GET", strict: { output: false } })
   .inputValidator((accountId: string) => accountId)

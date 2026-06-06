@@ -24,6 +24,7 @@ type NewOrderFormProps = {
   defaultDeliveryInstructions: string | null;
   template: TemplateWithItems | null;
   products: ProductRow[];
+  persistDraft?: boolean;
   onBack: () => void;
   onSubmit: (data: OrderFormPayload) => Promise<void>;
 };
@@ -34,10 +35,13 @@ export function NewOrderForm({
   defaultDeliveryInstructions,
   template,
   products,
+  persistDraft = true,
   onBack,
   onSubmit,
 }: NewOrderFormProps) {
-  const [draftItems, setDraftItems] = useState<OrderRequestItemInput[]>(() => loadDraft(accountId));
+  const [draftItems, setDraftItems] = useState<OrderRequestItemInput[]>(() =>
+    persistDraft ? loadDraft(accountId) : [],
+  );
   const [pickerOpen, setPickerOpen] = useState(false);
   const [deliveryInstructions, setDeliveryInstructions] = useState(
     defaultDeliveryInstructions ?? "",
@@ -50,7 +54,7 @@ export function NewOrderForm({
 
   function updateDraft(items: OrderRequestItemInput[]) {
     setDraftItems(items);
-    saveDraft(accountId, items);
+    if (persistDraft) saveDraft(accountId, items);
   }
 
   function handleAddDraftItem(productId: string) {
