@@ -1,8 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { XIcon } from "lucide-react";
+import { UserPlusIcon, UserXIcon } from "lucide-react";
 import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
-import { Label } from "@/components/ui/label";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   assignUserToAccount,
@@ -13,22 +14,34 @@ import { asResult } from "@/lib/result";
 import { listUsers } from "@/lib/users/users.functions";
 import { UserSearchCombobox } from "./UserSearchCombobox";
 
-type AssignedUser = { id: string; name: string };
+type AssignedUser = { id: string; name: string; email: string | null };
 
 type Props = {
   accountId: string;
+  readOnly?: boolean;
   onUserCountChange?: (count: number) => void;
 };
 
-export function AccountUserSection({ accountId, onUserCountChange }: Props) {
+function getInitials(name: string) {
+  return name
+    .trim()
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part.charAt(0))
+    .join("")
+    .toUpperCase();
+}
+
+export function AccountUserSection({ accountId, readOnly = false, onUserCountChange }: Props) {
   const queryClient = useQueryClient();
 
   const accountUsersQuery = useQuery({
     queryKey: ["accountUsers", accountId],
     queryFn: async () => {
-      const result = asResult<{ user_id: string; users: { id: string; name: string } | null }[]>(
-        await listAccountUsers({ data: accountId }),
-      );
+      const result = asResult<
+        { user_id: string; users: { id: string; name: string; email: string | null } | null }[]
+      >(await listAccountUsers({ data: accountId }));
       if (!result.ok) throw new Error(result.error.message);
       return result.value;
     },
@@ -36,6 +49,7 @@ export function AccountUserSection({ accountId, onUserCountChange }: Props) {
 
   const allUsersQuery = useQuery({
     queryKey: ["users", "user"],
+    enabled: !readOnly,
     queryFn: async () => {
       const result = asResult<{ id: string; name: string }[]>(
         await listUsers({ data: { role: "user" } }),
@@ -73,11 +87,20 @@ export function AccountUserSection({ accountId, onUserCountChange }: Props) {
     onError: (e) => toast.error(e.message),
   });
 
-  if (accountUsersQuery.isPending || allUsersQuery.isPending) {
+  if (accountUsersQuery.isPending || (!readOnly && allUsersQuery.isPending)) {
     return (
-      <div className="flex flex-col gap-3">
-        <Label>Assigned users</Label>
-        <Skeleton className="h-9 w-full" />
+      <div className="rounded-lg border border-border">
+        <div className="flex items-center justify-between px-4 py-3">
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-8 w-24" />
+        </div>
+        <Separator />
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="flex items-center gap-3 px-4 py-3">
+            <Skeleton className="size-8 rounded-full" />
+            <Skeleton className="h-4 w-32" />
+          </div>
+        ))}
       </div>
     );
   }
@@ -86,40 +109,86 @@ export function AccountUserSection({ accountId, onUserCountChange }: Props) {
 
   const assignedUsers: AssignedUser[] = (accountUsersQuery.data ?? [])
     .filter((r) => r.users !== null)
-    .map((r) => ({ id: r.user_id, name: r.users!.name }));
+    .map((r) => ({ id: r.user_id, name: r.users!.name, email: r.users!.email }));
 
   const unassignedUsers = (allUsersQuery.data ?? []).filter((u) => !assignedUserIds.has(u.id));
 
   const isMutating = assignMutation.isPending || unassignMutation.isPending;
 
   return (
-    <div className="flex flex-col gap-3">
-      <Label>Assigned users</Label>
-
-      {assignedUsers.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {assignedUsers.map((user) => (
-            <Badge key={user.id} variant="secondary" className="gap-1.5 py-1 pl-2.5 pr-1.5">
-              {user.name}
-              <button
-                type="button"
-                aria-label={`Remove ${user.name}`}
-                disabled={unassignMutation.variables === user.id || isMutating}
-                onClick={() => unassignMutation.mutate(user.id)}
-                className="flex items-center justify-center rounded-full transition-colors hover:text-foreground disabled:opacity-40"
-              >
-                <XIcon className="size-3" />
-              </button>
-            </Badge>
-          ))}
+    <div className="rounded-lg border border-border">
+      <div className="flex items-center justify-between px-4 py-3">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium">Members</span>
+          <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+            {assignedUsers.length}
+          </span>
         </div>
-      )}
+        {!readOnly && (
+          <UserSearchCombobox
+            users={unassignedUsers}
+            disabled={isMutating}
+            onSelect={(userId) => assignMutation.mutate(userId)}
+            trigger={
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5"
+                disabled={isMutating || unassignedUsers.length === 0}
+              >
+                <UserPlusIcon className="size-3.5" />
+                Add user
+              </Button>
+            }
+          />
+        )}
+      </div>
 
-      <UserSearchCombobox
-        users={unassignedUsers}
-        disabled={isMutating}
-        onSelect={(userId) => assignMutation.mutate(userId)}
-      />
+      <Separator />
+
+      {assignedUsers.length === 0 ? (
+        <div className="flex flex-col items-center gap-2 px-4 py-10 text-center">
+          <div className="flex size-10 items-center justify-center rounded-full bg-muted">
+            <UserPlusIcon className="size-4 text-muted-foreground" />
+          </div>
+          <p className="text-sm text-muted-foreground">No users assigned to this account yet.</p>
+        </div>
+      ) : (
+        <ul>
+          {assignedUsers.map((user, index) => {
+            const isRemoving = unassignMutation.isPending && unassignMutation.variables === user.id;
+            return (
+              <li key={user.id}>
+                <div className="group flex items-center gap-3 px-4 py-3 transition-colors hover:bg-muted/40">
+                  <Avatar size="sm">
+                    <AvatarFallback className="text-[0.65rem] font-medium">
+                      {getInitials(user.name)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-1 flex-col">
+                    <span className="text-sm font-medium">{user.name}</span>
+                    {user.email && (
+                      <span className="text-xs text-muted-foreground">{user.email}</span>
+                    )}
+                  </div>
+                  {!readOnly && (
+                    <button
+                      type="button"
+                      aria-label={`Remove ${user.name}`}
+                      disabled={isRemoving || isMutating}
+                      onClick={() => unassignMutation.mutate(user.id)}
+                      className="flex size-7 items-center justify-center rounded-md text-muted-foreground opacity-0 transition-all hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100 disabled:pointer-events-none disabled:opacity-30"
+                    >
+                      <UserXIcon className="size-3.5" />
+                    </button>
+                  )}
+                </div>
+                {index < assignedUsers.length - 1 && <Separator />}
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </div>
   );
 }

@@ -1,6 +1,4 @@
 import { useForm } from "@tanstack/react-form";
-import { Link } from "@tanstack/react-router";
-import { ShoppingCartIcon } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -9,14 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import type { Account } from "@/lib/accounts/schema";
-import { AccountUserSection } from "./AccountUserSection";
 
 type Props = {
   account: Account;
   readOnly?: boolean;
   onSave: (updated: Account) => void;
   onDiscard: () => void;
-  onUserCountChange?: (count: number) => void;
 };
 
 const accountEditSchema = z.object({
@@ -36,14 +32,7 @@ function toFieldErrors(errors: unknown[]): { message?: string }[] {
   }));
 }
 
-export function AccountEditPanel({
-  account,
-  readOnly = false,
-  onSave,
-  onDiscard,
-
-  onUserCountChange,
-}: Props) {
+export function AccountEditPanel({ account, readOnly = false, onSave, onDiscard }: Props) {
   const form = useForm({
     defaultValues: {
       name: account.name,
@@ -75,14 +64,6 @@ export function AccountEditPanel({
           <h2 className="text-base font-semibold">{account.name}</h2>
           <p className="text-sm text-muted-foreground">Account details</p>
         </div>
-        {account.id && (
-          <Button asChild variant="outline" className="gap-2">
-            <Link to="/manage/orders/new" search={{ accountId: account.id }}>
-              <ShoppingCartIcon className="h-4 w-4" />
-              Place order
-            </Link>
-          </Button>
-        )}
       </div>
 
       <Separator />
@@ -220,13 +201,6 @@ export function AccountEditPanel({
           </Button>
         </div>
       </form>
-
-      {account.id && (
-        <>
-          <Separator />
-          <AccountUserSection accountId={account.id} onUserCountChange={onUserCountChange} />
-        </>
-      )}
     </div>
   );
 }

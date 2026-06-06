@@ -3,6 +3,7 @@ import {
   addTemplateItemSchema,
   createTemplateSchema,
   removeTemplateItemSchema,
+  saveTemplateItemsSchema,
   updateTemplateSchema,
 } from "./schema";
 import {
@@ -12,6 +13,7 @@ import {
   insertTemplate,
   insertTemplateItem,
   patchTemplate,
+  saveTemplateItemsForAccount,
 } from "./templates.server";
 
 export const getTemplateForAccount = createServerFn({ method: "GET", strict: { output: false } })
@@ -37,3 +39,7 @@ export const addTemplateItem = createServerFn({ method: "POST", strict: { output
 export const removeTemplateItem = createServerFn({ method: "POST", strict: { output: false } })
   .inputValidator(removeTemplateItemSchema)
   .handler(async ({ data }) => deleteTemplateItem(data.id));
+
+export const saveTemplateItems = createServerFn({ method: "POST", strict: { output: false } })
+  .inputValidator(saveTemplateItemsSchema)
+  .handler(async ({ data }) => saveTemplateItemsForAccount(data));

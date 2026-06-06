@@ -1,4 +1,13 @@
+import { Link } from "@tanstack/react-router";
+import { FileText, MoreHorizontal, PencilLine, ShoppingCart, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Table,
   TableBody,
@@ -44,16 +53,64 @@ export function AccountList({ accounts, selectedId, onSelectAccount }: Props) {
               {account.userCount > 0 ? account.userCount : "—"}
             </TableCell>
             <TableCell>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onSelectAccount(account);
-                }}
-              >
-                Edit
-              </Button>
+              <div className="flex items-center justify-end">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="size-7 p-0"
+                      onClick={(e) => e.stopPropagation()}
+                      aria-label="Account actions"
+                    >
+                      <MoreHorizontal className="size-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-44">
+                    <DropdownMenuItem
+                      onSelect={(e) => {
+                        e.preventDefault();
+                        onSelectAccount(account);
+                      }}
+                    >
+                      <PencilLine className="size-4" />
+                      Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link
+                        to="/manage/accounts/$accountId/template"
+                        params={{ accountId: account.id }}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <FileText className="size-4" />
+                        Template
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link
+                        to="/manage/accounts/$accountId/users"
+                        params={{ accountId: account.id }}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Users className="size-4" />
+                        Users
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link
+                        to="/manage/orders/new"
+                        search={{ accountId: account.id }}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <ShoppingCart className="size-4" />
+                        Place order
+                      </Link>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </TableCell>
           </TableRow>
         ))}

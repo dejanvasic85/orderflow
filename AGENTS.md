@@ -9,6 +9,8 @@ It contains the product vision, tech stack, and data model decisions.
 
 ## Key conventions
 
+- PREFER functional approach over object oriented and imperative
+- Functions shouldn't be doing too much - try and ensure they do one thing
 - Use `vp` (Vite Plus) for all dev/build/test/lint workflows — not raw `pnpm` or `vite`
 - Path alias `@/*` maps to `./src/*` — prefer it over relative imports
 - Auth is handled by Supabase Auth; use `getSession` / `ensureSession` from `src/lib/auth/auth.functions.ts`

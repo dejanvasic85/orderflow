@@ -18,7 +18,7 @@ import { createAccount, listAccounts, updateAccount } from "@/lib/accounts/accou
 import type { Account, AccountRow } from "@/lib/accounts/schema";
 import { asResult } from "@/lib/result";
 
-export const Route = createFileRoute("/_protected/manage/accounts")({
+export const Route = createFileRoute("/_protected/manage/accounts/")({
   loader: async () => {
     const result = asResult<Account[]>(await listAccounts());
     if (!result.ok) throw new Error(result.error.message);
@@ -59,10 +59,6 @@ function AccountsPage() {
   function handleDiscard() {
     setSelectedId(null);
     setCreating(false);
-  }
-
-  function handleUserCountChange(accountId: string, count: number) {
-    setAccounts((prev) => prev.map((a) => (a.id === accountId ? { ...a, userCount: count } : a)));
   }
 
   async function handleSave(updated: Account) {
@@ -139,7 +135,6 @@ function AccountsPage() {
                 readOnly={!isAdmin}
                 onSave={handleSave}
                 onDiscard={handleDiscard}
-                onUserCountChange={(count) => handleUserCountChange(selectedAccount.id, count)}
               />
             )}
           </SheetContent>

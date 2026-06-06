@@ -3,6 +3,29 @@ import userEvent, { type UserEvent } from "@testing-library/user-event";
 import type { Account } from "@/lib/accounts/schema";
 import { AccountList } from "./AccountList";
 
+vi.mock("@tanstack/react-router", () => ({
+  Link: ({
+    children,
+    to,
+    params,
+    ...props
+  }: {
+    children: React.ReactNode;
+    to: string;
+    params?: Record<string, string>;
+    onClick?: React.MouseEventHandler;
+  }) => {
+    const href = params
+      ? Object.entries(params).reduce((acc, [k, v]) => acc.replace(`$${k}`, v), to)
+      : to;
+    return (
+      <a href={href} {...props}>
+        {children}
+      </a>
+    );
+  },
+}));
+
 const account: Account = {
   id: "acc-1",
   name: "Acme Corp",
@@ -89,10 +112,11 @@ test("calls onSelectAccount when a row is clicked", async () => {
   expect(onSelectAccount).toHaveBeenCalledWith(account);
 });
 
-test("calls onSelectAccount when the Edit button is clicked", async () => {
+test("calls onSelectAccount when Edit is selected from the dropdown", async () => {
   render(<AccountList accounts={[account]} selectedId={null} onSelectAccount={onSelectAccount} />);
 
-  await user.click(screen.getByRole("button", { name: "Edit" }));
+  await user.click(screen.getByRole("button", { name: "Account actions" }));
+  await user.click(screen.getByRole("menuitem", { name: /edit/i }));
 
   expect(onSelectAccount).toHaveBeenCalledWith(account);
 });
@@ -108,4 +132,18 @@ test("renders multiple accounts", () => {
 
   expect(screen.getByText("Acme Corp")).toBeInTheDocument();
   expect(screen.getByText("Defunct Inc")).toBeInTheDocument();
+});
+
+test("dropdown contains Template, Users and Place order links for the account", async () => {
+  render(<AccountList accounts={[account]} selectedId={null} onSelectAccount={onSelectAccount} />);
+
+  await user.click(screen.getByRole("button", { name: "Account actions" }));
+
+  const templateLink = screen.getByRole("menuitem", { name: /template/i });
+  const usersLink = screen.getByRole("menuitem", { name: /users/i });
+  const placeOrderLink = screen.getByRole("menuitem", { name: /place order/i });
+
+  expect(templateLink).toBeInTheDocument();
+  expect(usersLink).toBeInTheDocument();
+  expect(placeOrderLink).toBeInTheDocument();
 });

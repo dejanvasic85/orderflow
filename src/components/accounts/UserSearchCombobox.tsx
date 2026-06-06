@@ -1,5 +1,5 @@
 import { ChevronsUpDownIcon } from "lucide-react";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -17,9 +17,10 @@ type Props = {
   users: User[];
   disabled?: boolean;
   onSelect: (userId: string) => void;
+  trigger?: ReactNode;
 };
 
-export function UserSearchCombobox({ users, disabled, onSelect }: Props) {
+export function UserSearchCombobox({ users, disabled, onSelect, trigger }: Props) {
   const [open, setOpen] = useState(false);
 
   function handleSelect(userId: string) {
@@ -27,21 +28,23 @@ export function UserSearchCombobox({ users, disabled, onSelect }: Props) {
     setOpen(false);
   }
 
+  const defaultTrigger = (
+    <Button
+      variant="outline"
+      role="combobox"
+      aria-expanded={open}
+      disabled={disabled || users.length === 0}
+      className="w-full justify-between font-normal text-muted-foreground"
+    >
+      {users.length === 0 ? "All users assigned" : "Add a user..."}
+      <ChevronsUpDownIcon className="ml-2 size-4 shrink-0 opacity-50" />
+    </Button>
+  );
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          disabled={disabled || users.length === 0}
-          className="w-full justify-between font-normal text-muted-foreground"
-        >
-          {users.length === 0 ? "All users assigned" : "Add a user..."}
-          <ChevronsUpDownIcon className="ml-2 size-4 shrink-0 opacity-50" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+      <PopoverTrigger asChild>{trigger ?? defaultTrigger}</PopoverTrigger>
+      <PopoverContent className="w-56 p-0" align="end">
         <Command>
           <CommandInput placeholder="Search users..." />
           <CommandList>
