@@ -177,6 +177,27 @@ test("calls onDiscard when Discard button is clicked", async () => {
   expect(onDiscard).toHaveBeenCalled();
 });
 
+test("renders Place order button when account has an id", () => {
+  render(<AccountEditPanel account={baseAccount} onSave={onSave} onDiscard={onDiscard} />, {
+    wrapper,
+  });
+
+  expect(screen.getByText(/Place order/i)).toBeInTheDocument();
+});
+
+test("does not render Place order button when account has no id", () => {
+  render(
+    <AccountEditPanel
+      account={{ ...baseAccount, id: undefined as unknown as string }}
+      onSave={onSave}
+      onDiscard={onDiscard}
+    />,
+    { wrapper },
+  );
+
+  expect(screen.queryByText(/Place order/i)).not.toBeInTheDocument();
+});
+
 test("calls onDiscard when Close button is clicked in read-only mode", async () => {
   render(
     <AccountEditPanel account={baseAccount} readOnly onSave={onSave} onDiscard={onDiscard} />,

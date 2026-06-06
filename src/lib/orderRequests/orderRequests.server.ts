@@ -30,6 +30,7 @@ export type OrderHistoryItem = {
 };
 
 const bwowLabel = { placed_by_name: "bwow", placed_by_org_name: "Boutique Wines of the World" };
+const unknownPlacedByValue = { placed_by_name: "Unknown" } as const;
 
 type PlacedByUser = { id: string; name: string; role: string } | null;
 
@@ -48,8 +49,9 @@ function resolvePlacedByName(user: PlacedByUser): {
   placed_by_name: string;
   placed_by_org_name?: string;
 } {
-  if (!user || user.role === "admin" || user.role === "staff") return bwowLabel;
-  return { placed_by_name: user.name };
+  if (!user) return unknownPlacedByValue;
+  if (user.role === "admin" || user.role === "staff") return bwowLabel;
+  return { placed_by_name: user.name || "Unknown" };
 }
 
 function mapOrderHistoryRow(row: OrderHistoryRow): OrderHistoryItem {

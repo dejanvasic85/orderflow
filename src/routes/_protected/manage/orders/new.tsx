@@ -94,21 +94,16 @@ function ManageNewOrderPage() {
       <PageHeader title="New order" description="Place an order on behalf of an account" />
       <PageContent>
         <div className="mx-auto w-full max-w-2xl px-4 py-6 sm:px-6">
-          <div className="flex flex-col gap-2">
-            <label
-              htmlFor="account-picker"
-              className="text-xs font-medium uppercase tracking-widest text-muted-foreground"
-            >
+          <fieldset className="flex flex-col gap-2">
+            <legend className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
               Account
-            </label>
-            <div id="account-picker">
-              <AccountCombobox
-                accounts={accounts}
-                selectedId={selected?.account.id ?? null}
-                onSelect={handleSelectAccount}
-              />
-            </div>
-          </div>
+            </legend>
+            <AccountCombobox
+              accounts={accounts}
+              selectedId={selected?.account.id ?? null}
+              onSelect={handleSelectAccount}
+            />
+          </fieldset>
         </div>
 
         {selected && (
