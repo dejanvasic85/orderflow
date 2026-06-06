@@ -44,18 +44,15 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Feature | Must | Manage users for Accounts in a new dedicated page
 - [ ] Feature | Must | Manage accounts for users in the user drawer
 - [ ] Feature | Must | Invite for staff and admin should work seamlessly - at the moment only users have been tested!
-- [ ] Feature | Must | Templates — per-account product list; users can add, only admins can remove
-- [ ] Feature | Must | Admin places order request on behalf of an account
 - [ ] Feature | Must | Per-request delivery override (note + address)
 - [ ] Feature | Must | Email notification on order placed
 - [ ] Feature | Must | SMS notifications (Phase 2)
-- [ ] Feature | Must | MYOB CSV export — orders out of our system into MYOB
-- [ ] Productionising | Must | Logging and monitoring (Supabase + Cloudflare — consider unifying in Cloudflare logs)
 - [ ] Feature | Must| Search users by email or name (server-side filter)
 - [ ] Feature | Must| Sort users in admin list
 - [ ] Feature | Must | Paging on users list
-- [ ] Feature | Must | CSV import for products and accounts (incl. MYOB import back into our system)
 - [ ] Feature | Must | Change password while logged in
+- [ ] Feature | Must | CSV import for products and accounts (incl. MYOB import back into our system)
+- [ ] Feature | Must | MYOB CSV export — orders out of our system into MYOB
 - [ ] Quality | Must | Unit testing the server functions
 - [ ] Quality | Must | Playwright tests improved and working locally
 - [ ] Quality | Must | Playwright custom container with Supabase so it is working properly in the pipeline
@@ -64,10 +61,11 @@ Priorities: `Must` · `Should` · `Nice`
 - [ ] Feature | Must | Staff role surface — read-only view of all order requests
 - [ ] Productionising | Must | Fix the publicly available view users_with_email - see email for warning from supabase
 - [ ] Productionising | Must | Set up production domain (orders.bwow.com.au) — confirm access with Sam or register new
-- [ ] Productionising | Must | SMTP server (AWS SES) for email notifications — configure in Supabase, verify `vasic.com.au` for DKIM as interim sender
+- [ ] Productionising | Must | SMTP server (AWS SES) for email notifications — configure in Supabase, verify `vasic.com.au` for DKIM as interim
 - [ ] Productionising | Must | Email templates
 - [ ] Productionising | Must | Configure production domain in Supabase (currently https://orderflow.team-manager.workers.dev)
 - [ ] Productionising | Must | Configure production env vars in GitHub
+- [ ] Productionising | Must | Logging and monitoring (Supabase + Cloudflare — consider unifying in Cloudflare logs)sender
 - [ ] Feature | Nice | Homepage dashboard — reporting / summary tiles (Phase 4, quoted separately)
 - [ ] Cleanup | Nice | Remove hardcoded routes and API endpoints
 - [ ] Quality | Nice | Question architecture direction and whether we are heading in the right direction - https://claude.ai/code/session_01FuB3evNxHRJvTYkVDEod2n

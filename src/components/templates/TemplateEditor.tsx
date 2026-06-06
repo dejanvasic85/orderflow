@@ -1,10 +1,9 @@
 import { Link } from "@tanstack/react-router";
-import { AlertCircle, ArrowLeft, Plus } from "lucide-react";
+import { ArrowLeft, Plus } from "lucide-react";
 import { useReducer, useState } from "react";
 import { CatalogPickerDrawer } from "@/components/orderRequests/CatalogPickerDrawer";
 import { DraftItemsList } from "@/components/orderRequests/DraftItemsList";
 import { OrderItemCard } from "@/components/orderRequests/OrderItemCard";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import type { Account } from "@/lib/accounts/schema";
@@ -107,7 +106,6 @@ export function TemplateEditor({
   const [items, dispatch] = useReducer(itemsReducer, template, templateItemsToState);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const visibleItems = items.filter((i) => i.kind !== "removed");
 
@@ -126,11 +124,8 @@ export function TemplateEditor({
 
   async function handleSave() {
     setSubmitting(true);
-    setError(null);
     try {
       await onSave(buildPayload(account.id, items));
-    } catch {
-      setError("Something went wrong saving the template. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -177,14 +172,6 @@ export function TemplateEditor({
               Add item
             </Button>
           </div>
-        )}
-
-        {error && (
-          <Alert variant="destructive">
-            <AlertCircle />
-            <AlertTitle>Save failed</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
         )}
 
         {!readOnly && (
