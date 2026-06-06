@@ -42,6 +42,7 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Feature | Must | New order by staff and admins on behalf of accounts
 - [x] Feature | Must | Manage template for Accounts in a new dedicated page
 - [x] Feature | Must | Manage users for Accounts in a new dedicated page
+- [ ] Feature | Must | Manage accounts for users in the user drawer
 - [ ] Feature | Must | Invite for staff and admin should work seamlessly - at the moment only users have been tested!
 - [ ] Feature | Must | Templates — per-account product list; users can add, only admins can remove
 - [ ] Feature | Must | Admin places order request on behalf of an account
