@@ -112,10 +112,11 @@ test("calls onSelectAccount when a row is clicked", async () => {
   expect(onSelectAccount).toHaveBeenCalledWith(account);
 });
 
-test("calls onSelectAccount when the Edit button is clicked", async () => {
+test("calls onSelectAccount when Edit is selected from the dropdown", async () => {
   render(<AccountList accounts={[account]} selectedId={null} onSelectAccount={onSelectAccount} />);
 
-  await user.click(screen.getByRole("button", { name: "Edit" }));
+  await user.click(screen.getByRole("button", { name: "Account actions" }));
+  await user.click(screen.getByRole("menuitem", { name: /edit/i }));
 
   expect(onSelectAccount).toHaveBeenCalledWith(account);
 });
@@ -133,18 +134,16 @@ test("renders multiple accounts", () => {
   expect(screen.getByText("Defunct Inc")).toBeInTheDocument();
 });
 
-test("renders a Template link pointing to the account template route", () => {
+test("dropdown contains Template, Users and Place order links for the account", async () => {
   render(<AccountList accounts={[account]} selectedId={null} onSelectAccount={onSelectAccount} />);
 
-  const templateLink = screen.getByRole("link", { name: /template/i });
+  await user.click(screen.getByRole("button", { name: "Account actions" }));
+
+  const templateLink = screen.getByRole("menuitem", { name: /template/i });
+  const usersLink = screen.getByRole("menuitem", { name: /users/i });
+  const placeOrderLink = screen.getByRole("menuitem", { name: /place order/i });
+
   expect(templateLink).toBeInTheDocument();
-  expect(templateLink).toHaveAttribute("href", "/manage/accounts/acc-1/template");
-});
-
-test("clicking Template link does not call onSelectAccount", async () => {
-  render(<AccountList accounts={[account]} selectedId={null} onSelectAccount={onSelectAccount} />);
-
-  await user.click(screen.getByRole("link", { name: /template/i }));
-
-  expect(onSelectAccount).not.toHaveBeenCalled();
+  expect(usersLink).toBeInTheDocument();
+  expect(placeOrderLink).toBeInTheDocument();
 });

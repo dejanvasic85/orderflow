@@ -1,6 +1,4 @@
 import { useForm } from "@tanstack/react-form";
-import { Link } from "@tanstack/react-router";
-import { ShoppingCartIcon } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -66,14 +64,6 @@ export function AccountEditPanel({ account, readOnly = false, onSave, onDiscard 
           <h2 className="text-base font-semibold">{account.name}</h2>
           <p className="text-sm text-muted-foreground">Account details</p>
         </div>
-        {account.id && (
-          <Button asChild variant="outline" className="gap-2">
-            <Link to="/manage/orders/new" search={{ accountId: account.id }}>
-              <ShoppingCartIcon className="h-4 w-4" />
-              Place order
-            </Link>
-          </Button>
-        )}
       </div>
 
       <Separator />
