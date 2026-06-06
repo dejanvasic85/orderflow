@@ -17,10 +17,11 @@ type AssignedUser = { id: string; name: string };
 
 type Props = {
   accountId: string;
+  readOnly?: boolean;
   onUserCountChange?: (count: number) => void;
 };
 
-export function AccountUserSection({ accountId, onUserCountChange }: Props) {
+export function AccountUserSection({ accountId, readOnly = false, onUserCountChange }: Props) {
   const queryClient = useQueryClient();
 
   const accountUsersQuery = useQuery({
@@ -36,6 +37,7 @@ export function AccountUserSection({ accountId, onUserCountChange }: Props) {
 
   const allUsersQuery = useQuery({
     queryKey: ["users", "user"],
+    enabled: !readOnly,
     queryFn: async () => {
       const result = asResult<{ id: string; name: string }[]>(
         await listUsers({ data: { role: "user" } }),
@@ -73,7 +75,7 @@ export function AccountUserSection({ accountId, onUserCountChange }: Props) {
     onError: (e) => toast.error(e.message),
   });
 
-  if (accountUsersQuery.isPending || allUsersQuery.isPending) {
+  if (accountUsersQuery.isPending || (!readOnly && allUsersQuery.isPending)) {
     return (
       <div className="flex flex-col gap-3">
         <Label>Assigned users</Label>
@@ -101,25 +103,29 @@ export function AccountUserSection({ accountId, onUserCountChange }: Props) {
           {assignedUsers.map((user) => (
             <Badge key={user.id} variant="secondary" className="gap-1.5 py-1 pl-2.5 pr-1.5">
               {user.name}
-              <button
-                type="button"
-                aria-label={`Remove ${user.name}`}
-                disabled={unassignMutation.variables === user.id || isMutating}
-                onClick={() => unassignMutation.mutate(user.id)}
-                className="flex items-center justify-center rounded-full transition-colors hover:text-foreground disabled:opacity-40"
-              >
-                <XIcon className="size-3" />
-              </button>
+              {!readOnly && (
+                <button
+                  type="button"
+                  aria-label={`Remove ${user.name}`}
+                  disabled={unassignMutation.variables === user.id || isMutating}
+                  onClick={() => unassignMutation.mutate(user.id)}
+                  className="flex items-center justify-center rounded-full transition-colors hover:text-foreground disabled:opacity-40"
+                >
+                  <XIcon className="size-3" />
+                </button>
+              )}
             </Badge>
           ))}
         </div>
       )}
 
-      <UserSearchCombobox
-        users={unassignedUsers}
-        disabled={isMutating}
-        onSelect={(userId) => assignMutation.mutate(userId)}
-      />
+      {!readOnly && (
+        <UserSearchCombobox
+          users={unassignedUsers}
+          disabled={isMutating}
+          onSelect={(userId) => assignMutation.mutate(userId)}
+        />
+      )}
     </div>
   );
 }

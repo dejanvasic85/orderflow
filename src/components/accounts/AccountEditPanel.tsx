@@ -9,14 +9,12 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import type { Account } from "@/lib/accounts/schema";
-import { AccountUserSection } from "./AccountUserSection";
 
 type Props = {
   account: Account;
   readOnly?: boolean;
   onSave: (updated: Account) => void;
   onDiscard: () => void;
-  onUserCountChange?: (count: number) => void;
 };
 
 const accountEditSchema = z.object({
@@ -36,14 +34,7 @@ function toFieldErrors(errors: unknown[]): { message?: string }[] {
   }));
 }
 
-export function AccountEditPanel({
-  account,
-  readOnly = false,
-  onSave,
-  onDiscard,
-
-  onUserCountChange,
-}: Props) {
+export function AccountEditPanel({ account, readOnly = false, onSave, onDiscard }: Props) {
   const form = useForm({
     defaultValues: {
       name: account.name,
@@ -220,13 +211,6 @@ export function AccountEditPanel({
           </Button>
         </div>
       </form>
-
-      {account.id && (
-        <>
-          <Separator />
-          <AccountUserSection accountId={account.id} onUserCountChange={onUserCountChange} />
-        </>
-      )}
     </div>
   );
 }

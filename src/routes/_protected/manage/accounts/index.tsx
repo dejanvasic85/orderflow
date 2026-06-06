@@ -61,10 +61,6 @@ function AccountsPage() {
     setCreating(false);
   }
 
-  function handleUserCountChange(accountId: string, count: number) {
-    setAccounts((prev) => prev.map((a) => (a.id === accountId ? { ...a, userCount: count } : a)));
-  }
-
   async function handleSave(updated: Account) {
     const result = asResult<AccountRow>(
       await updateAccount({
@@ -139,7 +135,6 @@ function AccountsPage() {
                 readOnly={!isAdmin}
                 onSave={handleSave}
                 onDiscard={handleDiscard}
-                onUserCountChange={(count) => handleUserCountChange(selectedAccount.id, count)}
               />
             )}
           </SheetContent>

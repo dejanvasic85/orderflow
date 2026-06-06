@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { FileText } from "lucide-react";
+import { FileText, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -56,6 +56,16 @@ export function AccountList({ accounts, selectedId, onSelectAccount }: Props) {
                 >
                   <FileText className="h-3.5 w-3.5" />
                   Template
+                </Link>
+                <Separator orientation="vertical" className="h-4" />
+                <Link
+                  to="/manage/accounts/$accountId/users"
+                  params={{ accountId: account.id }}
+                  onClick={(e) => e.stopPropagation()}
+                  className="inline-flex h-7 items-center gap-1.5 rounded-lg px-2.5 text-[0.8rem] font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                >
+                  <Users className="h-3.5 w-3.5" />
+                  Users
                 </Link>
                 <Separator orientation="vertical" className="h-4" />
                 <Button
