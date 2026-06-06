@@ -3,6 +3,29 @@ import userEvent, { type UserEvent } from "@testing-library/user-event";
 import type { Account } from "@/lib/accounts/schema";
 import { AccountList } from "./AccountList";
 
+vi.mock("@tanstack/react-router", () => ({
+  Link: ({
+    children,
+    to,
+    params,
+    ...props
+  }: {
+    children: React.ReactNode;
+    to: string;
+    params?: Record<string, string>;
+    onClick?: React.MouseEventHandler;
+  }) => {
+    const href = params
+      ? Object.entries(params).reduce((acc, [k, v]) => acc.replace(`$${k}`, v), to)
+      : to;
+    return (
+      <a href={href} {...props}>
+        {children}
+      </a>
+    );
+  },
+}));
+
 const account: Account = {
   id: "acc-1",
   name: "Acme Corp",
@@ -108,4 +131,20 @@ test("renders multiple accounts", () => {
 
   expect(screen.getByText("Acme Corp")).toBeInTheDocument();
   expect(screen.getByText("Defunct Inc")).toBeInTheDocument();
+});
+
+test("renders a Template link pointing to the account template route", () => {
+  render(<AccountList accounts={[account]} selectedId={null} onSelectAccount={onSelectAccount} />);
+
+  const templateLink = screen.getByRole("link", { name: /template/i });
+  expect(templateLink).toBeInTheDocument();
+  expect(templateLink).toHaveAttribute("href", "/manage/accounts/acc-1/template");
+});
+
+test("clicking Template link does not call onSelectAccount", async () => {
+  render(<AccountList accounts={[account]} selectedId={null} onSelectAccount={onSelectAccount} />);
+
+  await user.click(screen.getByRole("link", { name: /template/i }));
+
+  expect(onSelectAccount).not.toHaveBeenCalled();
 });

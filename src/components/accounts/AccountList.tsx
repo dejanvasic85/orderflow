@@ -1,4 +1,7 @@
+import { Link } from "@tanstack/react-router";
+import { FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import {
   Table,
   TableBody,
@@ -44,16 +47,28 @@ export function AccountList({ accounts, selectedId, onSelectAccount }: Props) {
               {account.userCount > 0 ? account.userCount : "—"}
             </TableCell>
             <TableCell>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onSelectAccount(account);
-                }}
-              >
-                Edit
-              </Button>
+              <div className="flex items-center justify-end gap-1">
+                <Link
+                  to="/manage/accounts/$accountId/template"
+                  params={{ accountId: account.id }}
+                  onClick={(e) => e.stopPropagation()}
+                  className="inline-flex h-7 items-center gap-1.5 rounded-lg px-2.5 text-[0.8rem] font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                >
+                  <FileText className="h-3.5 w-3.5" />
+                  Template
+                </Link>
+                <Separator orientation="vertical" className="h-4" />
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onSelectAccount(account);
+                  }}
+                >
+                  Edit
+                </Button>
+              </div>
             </TableCell>
           </TableRow>
         ))}

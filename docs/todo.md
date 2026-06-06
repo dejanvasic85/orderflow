@@ -1,4 +1,4 @@
-# Todo list
+# Todo list - MVP
 
 Format: `[status] Category | Priority | Description`
 
@@ -40,19 +40,8 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Feature | Must | Wire existing "New Order" button to the order flow
 - [x] Feature | Must | View order details - readonly page with details of the bottles, boxes, quantities date + who ordered
 - [x] Feature | Must | New order by staff and admins on behalf of accounts
-- [ ] Feature | Must | Manage template for Accounts - below the user management for the account
-- [ ] Quality | Must | Unit testing the server functions
-- [ ] Quality | Must | Playwright tests improved and working locally
-- [ ] Quality | Must | Playwright custom container with Supabase so it is working properly in the pipeline
-- [ ] Feature | Must | PWA — manifest, service worker, install prompt, offline app shell
-- [ ] Feature | Must | Notification preferences UI — users edit their own email/SMS preferences
-- [ ] Feature | Must | Staff role surface — read-only view of all order requests
-- [ ] Productionising | Must | Fix the publicly available view users_with_email - see email for warning from supabase
-- [ ] Productionising | Must | Set up production domain (orders.bwow.com.au) — confirm access with Sam or register new
-- [ ] Productionising | Must | SMTP server (AWS SES) for email notifications — configure in Supabase, verify `vasic.com.au` for DKIM as interim sender
-- [ ] Productionising | Must | Email templates
-- [ ] Productionising | Must | Configure production domain in Supabase (currently https://orderflow.team-manager.workers.dev)
-- [ ] Productionising | Must | Configure production env vars in GitHub
+- [x] Feature | Must | Manage template for Accounts in a new dedicated page
+- [ ] Feature | Must | Manage users for Accounts in a new dedicated page
 - [ ] Feature | Must | Invite for staff and admin should work seamlessly - at the moment only users have been tested!
 - [ ] Feature | Must | Templates — per-account product list; users can add, only admins can remove
 - [ ] Feature | Must | Admin places order request on behalf of an account
@@ -66,6 +55,46 @@ Priorities: `Must` · `Should` · `Nice`
 - [ ] Feature | Must | Paging on users list
 - [ ] Feature | Must | CSV import for products and accounts (incl. MYOB import back into our system)
 - [ ] Feature | Must | Change password while logged in
+- [ ] Quality | Must | Unit testing the server functions
+- [ ] Quality | Must | Playwright tests improved and working locally
+- [ ] Quality | Must | Playwright custom container with Supabase so it is working properly in the pipeline
+- [ ] Feature | Must | PWA — manifest, service worker, install prompt, offline app shell
+- [ ] Feature | Must | Notification preferences UI — users edit their own email/SMS preferences
+- [ ] Feature | Must | Staff role surface — read-only view of all order requests
+- [ ] Productionising | Must | Fix the publicly available view users_with_email - see email for warning from supabase
+- [ ] Productionising | Must | Set up production domain (orders.bwow.com.au) — confirm access with Sam or register new
+- [ ] Productionising | Must | SMTP server (AWS SES) for email notifications — configure in Supabase, verify `vasic.com.au` for DKIM as interim sender
+- [ ] Productionising | Must | Email templates
+- [ ] Productionising | Must | Configure production domain in Supabase (currently https://orderflow.team-manager.workers.dev)
+- [ ] Productionising | Must | Configure production env vars in GitHub
 - [ ] Feature | Nice | Homepage dashboard — reporting / summary tiles (Phase 4, quoted separately)
 - [ ] Cleanup | Nice | Remove hardcoded routes and API endpoints
 - [ ] Quality | Nice | Question architecture direction and whether we are heading in the right direction - https://claude.ai/code/session_01FuB3evNxHRJvTYkVDEod2n
+
+---
+
+## Code Cleanup
+
+- [ ] We need a much better and cleaner pattern for Authz
+
+- [ ] Cleanup | Casting and typescript needs general cleanup
+
+```ts
+const { user } = Route.useRouteContext() as { user: { user_role?: string } };
+```
+
+- [ ] Cleanup | Improve the code pattern around fetching and checking result
+
+```ts
+const existingResult = await fetchTemplateForAccount(data.account_id);
+if (!existingResult.ok) return existingResult;
+```
+
+- [ ] Cleanup | Page loaders are could be improved with this pattern of reading and throwing:
+
+```ts
+if (!accountResult.ok) throw new Error(accountResult.error.message);
+if (!accountResult.value) throw notFound();
+if (!templateResult.ok) throw new Error(templateResult.error.message);
+if (!productsResult.ok) throw new Error(productsResult.error.message);
+```

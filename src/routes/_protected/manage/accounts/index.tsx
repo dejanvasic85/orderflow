@@ -18,7 +18,7 @@ import { createAccount, listAccounts, updateAccount } from "@/lib/accounts/accou
 import type { Account, AccountRow } from "@/lib/accounts/schema";
 import { asResult } from "@/lib/result";
 
-export const Route = createFileRoute("/_protected/manage/accounts")({
+export const Route = createFileRoute("/_protected/manage/accounts/")({
   loader: async () => {
     const result = asResult<Account[]>(await listAccounts());
     if (!result.ok) throw new Error(result.error.message);
