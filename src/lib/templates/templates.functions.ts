@@ -3,7 +3,7 @@ import {
   addTemplateItemSchema,
   createTemplateSchema,
   removeTemplateItemSchema,
-  replaceTemplateItemsSchema,
+  saveTemplateItemsSchema,
   updateTemplateSchema,
 } from "./schema";
 import {
@@ -13,7 +13,7 @@ import {
   insertTemplate,
   insertTemplateItem,
   patchTemplate,
-  replaceTemplateItemsForAccount,
+  saveTemplateItemsForAccount,
 } from "./templates.server";
 
 export const getTemplateForAccount = createServerFn({ method: "GET", strict: { output: false } })
@@ -40,6 +40,6 @@ export const removeTemplateItem = createServerFn({ method: "POST", strict: { out
   .inputValidator(removeTemplateItemSchema)
   .handler(async ({ data }) => deleteTemplateItem(data.id));
 
-export const replaceTemplateItems = createServerFn({ method: "POST", strict: { output: false } })
-  .inputValidator(replaceTemplateItemsSchema)
-  .handler(async ({ data }) => replaceTemplateItemsForAccount(data));
+export const saveTemplateItems = createServerFn({ method: "POST", strict: { output: false } })
+  .inputValidator(saveTemplateItemsSchema)
+  .handler(async ({ data }) => saveTemplateItemsForAccount(data));

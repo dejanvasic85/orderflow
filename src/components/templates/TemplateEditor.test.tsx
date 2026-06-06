@@ -95,7 +95,7 @@ beforeEach(() => {
   user = userEvent.setup();
 });
 
-test("renders existing template items with product name and boxes/bottles", () => {
+test("renders existing template items with product name", () => {
   render(
     <TemplateEditor
       account={account}
@@ -106,11 +106,9 @@ test("renders existing template items with product name and boxes/bottles", () =
   );
 
   expect(screen.getByText("Chardonnay")).toBeInTheDocument();
-  expect(screen.getByText("2")).toBeInTheDocument();
-  expect(screen.getByText("3")).toBeInTheDocument();
 });
 
-test("incrementing boxes updates the displayed count", async () => {
+test("save with existing item unchanged sends empty diffs", async () => {
   render(
     <TemplateEditor
       account={account}
@@ -120,20 +118,42 @@ test("incrementing boxes updates the displayed count", async () => {
     />,
   );
 
-  const increaseBoxes = screen.getByRole("button", { name: "Increase boxes" });
-  await user.click(increaseBoxes);
-
-  // After increment: boxes=3, bottles=3 — assert onSave is called with the right value
   await user.click(screen.getByRole("button", { name: /save template/i }));
+
   await vi.waitFor(() => {
     expect(onSave).toHaveBeenCalledWith({
       account_id: "acc-1",
-      items: [{ product_id: "prod-1", box_count: 3, bottle_count: 3 }],
+      toAdd: [],
+      toUpdate: [],
+      toRemove: [],
     });
   });
 });
 
-test("decrementing bottles updates the displayed count", async () => {
+test("save after increment sends item in toUpdate", async () => {
+  render(
+    <TemplateEditor
+      account={account}
+      template={templateWithOneItem}
+      products={products}
+      onSave={onSave}
+    />,
+  );
+
+  await user.click(screen.getByRole("button", { name: "Increase boxes" }));
+  await user.click(screen.getByRole("button", { name: /save template/i }));
+
+  await vi.waitFor(() => {
+    expect(onSave).toHaveBeenCalledWith({
+      account_id: "acc-1",
+      toAdd: [],
+      toUpdate: [{ id: "item-1", box_count: 3, bottle_count: 3 }],
+      toRemove: [],
+    });
+  });
+});
+
+test("save after decrement sends item in toUpdate", async () => {
   render(
     <TemplateEditor
       account={account}
@@ -144,18 +164,19 @@ test("decrementing bottles updates the displayed count", async () => {
   );
 
   await user.click(screen.getByRole("button", { name: "Decrease bottles" }));
-
-  // After decrement: boxes=2, bottles=2 — assert onSave is called with the right value
   await user.click(screen.getByRole("button", { name: /save template/i }));
+
   await vi.waitFor(() => {
     expect(onSave).toHaveBeenCalledWith({
       account_id: "acc-1",
-      items: [{ product_id: "prod-1", box_count: 2, bottle_count: 2 }],
+      toAdd: [],
+      toUpdate: [{ id: "item-1", box_count: 2, bottle_count: 2 }],
+      toRemove: [],
     });
   });
 });
 
-test("removing an item removes it from the list", async () => {
+test("removed item is hidden from the list before save", async () => {
   render(
     <TemplateEditor
       account={account}
@@ -170,16 +191,7 @@ test("removing an item removes it from the list", async () => {
   expect(screen.queryByText("Chardonnay")).not.toBeInTheDocument();
 });
 
-test("clicking Add item opens the picker and adding a product shows a new card", async () => {
-  render(<TemplateEditor account={account} template={null} products={products} onSave={onSave} />);
-
-  await user.click(screen.getByRole("button", { name: /add item/i }));
-  await user.click(await screen.findByRole("button", { name: "Add Rosé" }));
-
-  expect(screen.getByText("Rosé")).toBeInTheDocument();
-});
-
-test("Save template calls onSave with mapped payload", async () => {
+test("save after remove sends item id in toRemove", async () => {
   render(
     <TemplateEditor
       account={account}
@@ -189,17 +201,37 @@ test("Save template calls onSave with mapped payload", async () => {
     />,
   );
 
+  await user.click(screen.getByRole("button", { name: "Remove Chardonnay" }));
   await user.click(screen.getByRole("button", { name: /save template/i }));
 
   await vi.waitFor(() => {
     expect(onSave).toHaveBeenCalledWith({
       account_id: "acc-1",
-      items: [{ product_id: "prod-1", box_count: 2, bottle_count: 3 }],
+      toAdd: [],
+      toUpdate: [],
+      toRemove: ["item-1"],
     });
   });
 });
 
-test("Save template with empty template calls onSave with items: []", async () => {
+test("save after adding a new product sends item in toAdd", async () => {
+  render(<TemplateEditor account={account} template={null} products={products} onSave={onSave} />);
+
+  await user.click(screen.getByRole("button", { name: /add item/i }));
+  await user.click(await screen.findByRole("button", { name: "Add Rosé" }));
+  await user.click(screen.getByRole("button", { name: /save template/i }));
+
+  await vi.waitFor(() => {
+    expect(onSave).toHaveBeenCalledWith({
+      account_id: "acc-1",
+      toAdd: [{ product_id: "prod-2", box_count: 1, bottle_count: 0 }],
+      toUpdate: [],
+      toRemove: [],
+    });
+  });
+});
+
+test("save with empty template sends all empty diffs", async () => {
   render(<TemplateEditor account={account} template={null} products={products} onSave={onSave} />);
 
   await user.click(screen.getByRole("button", { name: /save template/i }));
@@ -207,7 +239,9 @@ test("Save template with empty template calls onSave with items: []", async () =
   await vi.waitFor(() => {
     expect(onSave).toHaveBeenCalledWith({
       account_id: "acc-1",
-      items: [],
+      toAdd: [],
+      toUpdate: [],
+      toRemove: [],
     });
   });
 });

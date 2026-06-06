@@ -9,7 +9,7 @@ import { listProducts } from "@/lib/products/products.functions";
 import type { ProductRow } from "@/lib/products/schema";
 import { asResult } from "@/lib/result";
 import type { TemplateWithItems } from "@/lib/templates/schema";
-import { getTemplateForAccount, replaceTemplateItems } from "@/lib/templates/templates.functions";
+import { getTemplateForAccount, saveTemplateItems } from "@/lib/templates/templates.functions";
 
 export const Route = createFileRoute("/_protected/manage/accounts/$accountId/template")({
   loader: async ({ params }) => {
@@ -39,7 +39,7 @@ function AccountTemplatePage() {
   const isAdmin = user.user_role === "admin";
 
   async function handleSave(payload: TemplateEditorPayload) {
-    const result = asResult(await replaceTemplateItems({ data: payload }));
+    const result = asResult(await saveTemplateItems({ data: payload }));
     if (!result.ok) {
       toast.error(result.error.message);
       throw new Error(result.error.message);

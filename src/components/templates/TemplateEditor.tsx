@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { AlertCircle, ArrowLeft, Plus } from "lucide-react";
-import { useState } from "react";
+import { useReducer, useState } from "react";
 import { CatalogPickerDrawer } from "@/components/orderRequests/CatalogPickerDrawer";
 import { DraftItemsList } from "@/components/orderRequests/DraftItemsList";
 import { OrderItemCard } from "@/components/orderRequests/OrderItemCard";
@@ -12,9 +12,21 @@ import type { OrderRequestItemInput } from "@/lib/orderRequests/schema";
 import type { ProductRow } from "@/lib/products/schema";
 import type { TemplateWithItems } from "@/lib/templates/schema";
 
+type ItemChangeKind = "existing" | "added" | "updated" | "removed";
+
+type TemplateItemState = {
+  id: string | null;
+  product_id: string;
+  boxes: number;
+  extra_bottles: number;
+  kind: ItemChangeKind;
+};
+
 type TemplateEditorPayload = {
   account_id: string;
-  items: { product_id: string; box_count: number; bottle_count: number }[];
+  toAdd: { product_id: string; box_count: number; bottle_count: number }[];
+  toUpdate: { id: string; box_count: number; bottle_count: number }[];
+  toRemove: string[];
 };
 
 type TemplateEditorProps = {
@@ -25,22 +37,64 @@ type TemplateEditorProps = {
   onSave: (payload: TemplateEditorPayload) => Promise<void>;
 };
 
-function templateItemsToInputs(template: TemplateWithItems | null): OrderRequestItemInput[] {
+type ItemsAction =
+  | { type: "add"; productId: string }
+  | { type: "remove"; productId: string }
+  | { type: "update"; productId: string; patch: { boxes?: number; extra_bottles?: number } };
+
+function templateItemsToState(template: TemplateWithItems | null): TemplateItemState[] {
   return (template?.template_items ?? []).map((item) => ({
+    id: item.id,
     product_id: item.product_id,
     boxes: item.box_count,
     extra_bottles: item.bottle_count,
+    kind: "existing" as const,
   }));
 }
 
-function inputsToPayloadItems(
-  inputs: OrderRequestItemInput[],
-): { product_id: string; box_count: number; bottle_count: number }[] {
-  return inputs.map((item) => ({
-    product_id: item.product_id,
-    box_count: item.boxes,
-    bottle_count: item.extra_bottles,
-  }));
+function toOrderRequestInput(item: TemplateItemState): OrderRequestItemInput {
+  return { product_id: item.product_id, boxes: item.boxes, extra_bottles: item.extra_bottles };
+}
+
+function buildPayload(accountId: string, items: TemplateItemState[]): TemplateEditorPayload {
+  return {
+    account_id: accountId,
+    toAdd: items
+      .filter((i) => i.kind === "added")
+      .map(({ product_id, boxes, extra_bottles }) => ({
+        product_id,
+        box_count: boxes,
+        bottle_count: extra_bottles,
+      })),
+    toUpdate: items
+      .filter((i) => i.kind === "updated" && i.id !== null)
+      .map(({ id, boxes, extra_bottles }) => ({
+        id: id as string,
+        box_count: boxes,
+        bottle_count: extra_bottles,
+      })),
+    toRemove: items.filter((i) => i.kind === "removed" && i.id !== null).map((i) => i.id as string),
+  };
+}
+
+function itemsReducer(state: TemplateItemState[], action: ItemsAction): TemplateItemState[] {
+  switch (action.type) {
+    case "add":
+      return [
+        ...state,
+        { id: null, product_id: action.productId, boxes: 1, extra_bottles: 0, kind: "added" },
+      ];
+    case "remove":
+      return state.map((item) =>
+        item.product_id === action.productId ? { ...item, kind: "removed" as const } : item,
+      );
+    case "update":
+      return state.map((item) => {
+        if (item.product_id !== action.productId) return item;
+        const nextKind = item.kind === "existing" ? "updated" : item.kind;
+        return { ...item, ...action.patch, kind: nextKind };
+      });
+  }
 }
 
 export function TemplateEditor({
@@ -50,34 +104,31 @@ export function TemplateEditor({
   readOnly = false,
   onSave,
 }: TemplateEditorProps) {
-  const [items, setItems] = useState<OrderRequestItemInput[]>(() =>
-    templateItemsToInputs(template),
-  );
+  const [items, dispatch] = useReducer(itemsReducer, template, templateItemsToState);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const visibleItems = items.filter((i) => i.kind !== "removed");
+
   function handleAddItem(productId: string) {
-    if (items.some((i) => i.product_id === productId)) return;
-    setItems((prev) => [...prev, { product_id: productId, boxes: 1, extra_bottles: 0 }]);
+    if (visibleItems.some((i) => i.product_id === productId)) return;
+    dispatch({ type: "add", productId });
   }
 
   function handleRemoveItem(productId: string) {
-    setItems((prev) => prev.filter((i) => i.product_id !== productId));
+    dispatch({ type: "remove", productId });
   }
 
   function handleUpdateItem(productId: string, patch: { boxes?: number; extra_bottles?: number }) {
-    setItems((prev) => prev.map((i) => (i.product_id === productId ? { ...i, ...patch } : i)));
+    dispatch({ type: "update", productId, patch });
   }
 
   async function handleSave() {
     setSubmitting(true);
     setError(null);
     try {
-      await onSave({
-        account_id: account.id,
-        items: inputsToPayloadItems(items),
-      });
+      await onSave(buildPayload(account.id, items));
     } catch {
       setError("Something went wrong saving the template. Please try again.");
     } finally {
@@ -105,10 +156,10 @@ export function TemplateEditor({
 
       <div className="flex flex-col gap-6">
         {readOnly ? (
-          <ReadOnlyItemsList items={items} products={products} />
+          <ReadOnlyItemsList items={visibleItems} products={products} />
         ) : (
           <DraftItemsList
-            items={items}
+            items={visibleItems.map(toOrderRequestInput)}
             products={products}
             onUpdate={handleUpdateItem}
             onRemove={handleRemoveItem}
@@ -159,7 +210,7 @@ export function TemplateEditor({
           onOpenChange={setPickerOpen}
           products={products}
           templateProductIds={new Set<string>()}
-          draftItems={items}
+          draftItems={visibleItems.map(toOrderRequestInput)}
           onAdd={handleAddItem}
           onRemove={handleRemoveItem}
         />
@@ -169,7 +220,7 @@ export function TemplateEditor({
 }
 
 type ReadOnlyItemsListProps = {
-  items: OrderRequestItemInput[];
+  items: TemplateItemState[];
   products: ProductRow[];
 };
 

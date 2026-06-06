@@ -1,11 +1,12 @@
 import type { z } from "zod";
 import { err, ok } from "@/lib/result";
+import type { Result } from "@/lib/result";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import { assertAdmin } from "@/lib/users/users.server";
 import type {
   addTemplateItemSchema,
   createTemplateSchema,
-  replaceTemplateItemsSchema,
+  saveTemplateItemsSchema,
   updateTemplateSchema,
 } from "./schema";
 
@@ -68,41 +69,52 @@ export async function deleteTemplateItem(id: string) {
   return ok();
 }
 
-export async function replaceTemplateItemsForAccount(
-  data: z.infer<typeof replaceTemplateItemsSchema>,
-) {
+async function ensureTemplateId(accountId: string): Promise<Result<string>> {
+  const existing = await fetchTemplateForAccount(accountId);
+  if (!existing.ok) return existing;
+  if (existing.value) return ok(existing.value.id);
+  const created = await insertTemplate({ account_id: accountId, name: "Default" });
+  if (!created.ok) return created;
+  return ok(created.value.id);
+}
+
+export async function saveTemplateItemsForAccount(data: z.infer<typeof saveTemplateItemsSchema>) {
   const supabase = createSupabaseServerClient();
   await assertAdmin(supabase);
 
-  const existingResult = await fetchTemplateForAccount(data.account_id);
-  if (!existingResult.ok) return existingResult;
+  const templateIdResult = await ensureTemplateId(data.account_id);
+  if (!templateIdResult.ok) return templateIdResult;
+  const templateId = templateIdResult.value;
 
-  let templateId: string;
+  const [deleteError, updateError, insertError] = await Promise.all([
+    data.toRemove.length > 0
+      ? supabase
+          .from("template_items")
+          .delete()
+          .in("id", data.toRemove)
+          .then((r) => r.error)
+      : Promise.resolve(null),
+    data.toUpdate.length > 0
+      ? Promise.all(
+          data.toUpdate.map(({ id, box_count, bottle_count }) =>
+            supabase
+              .from("template_items")
+              .update({ box_count, bottle_count })
+              .eq("id", id)
+              .then((r) => r.error),
+          ),
+        ).then((errors) => errors.find(Boolean) ?? null)
+      : Promise.resolve(null),
+    data.toAdd.length > 0
+      ? supabase
+          .from("template_items")
+          .insert(data.toAdd.map((item) => ({ ...item, template_id: templateId })))
+          .then((r) => r.error)
+      : Promise.resolve(null),
+  ]);
 
-  if (!existingResult.value) {
-    const insertResult = await insertTemplate({ account_id: data.account_id, name: "Default" });
-    if (!insertResult.ok) return insertResult;
-    templateId = insertResult.value.id;
-  } else {
-    templateId = existingResult.value.id;
-  }
+  const firstError = [deleteError, updateError, insertError].find(Boolean);
+  if (firstError) return err({ message: firstError.message });
 
-  const { error: deleteError } = await supabase
-    .from("template_items")
-    .delete()
-    .eq("template_id", templateId);
-  if (deleteError) return err({ message: deleteError.message });
-
-  if (data.items.length > 0) {
-    const rows = data.items.map((item) => ({
-      template_id: templateId,
-      product_id: item.product_id,
-      box_count: item.box_count,
-      bottle_count: item.bottle_count,
-    }));
-    const { error: insertError } = await supabase.from("template_items").insert(rows);
-    if (insertError) return err({ message: insertError.message });
-  }
-
-  return fetchTemplate(templateId);
+  return ok();
 }

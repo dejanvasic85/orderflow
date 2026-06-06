@@ -29,18 +29,26 @@ export const addTemplateItemSchema = z.object({
 
 export const removeTemplateItemSchema = z.object({ id: z.uuid() });
 
-export const replaceTemplateItemsSchema = z.object({
+export const saveTemplateItemsSchema = z.object({
   account_id: z.uuid(),
-  items: z.array(
+  toAdd: z.array(
     z.object({
       product_id: z.uuid(),
       box_count: z.number().int().min(0),
       bottle_count: z.number().int().min(0),
     }),
   ),
+  toUpdate: z.array(
+    z.object({
+      id: z.uuid(),
+      box_count: z.number().int().min(0),
+      bottle_count: z.number().int().min(0),
+    }),
+  ),
+  toRemove: z.array(z.uuid()),
 });
 
 export type CreateTemplateInput = z.infer<typeof createTemplateSchema>;
 export type UpdateTemplateInput = z.infer<typeof updateTemplateSchema>;
 export type AddTemplateItemInput = z.infer<typeof addTemplateItemSchema>;
-export type ReplaceTemplateItemsInput = z.infer<typeof replaceTemplateItemsSchema>;
+export type SaveTemplateItemsInput = z.infer<typeof saveTemplateItemsSchema>;
