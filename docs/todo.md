@@ -41,7 +41,7 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Feature | Must | View order details - readonly page with details of the bottles, boxes, quantities date + who ordered
 - [x] Feature | Must | New order by staff and admins on behalf of accounts
 - [x] Feature | Must | Manage template for Accounts in a new dedicated page
-- [ ] Feature | Must | Manage users for Accounts in a new dedicated page
+- [x] Feature | Must | Manage users for Accounts in a new dedicated page
 - [ ] Feature | Must | Invite for staff and admin should work seamlessly - at the moment only users have been tested!
 - [ ] Feature | Must | Templates — per-account product list; users can add, only admins can remove
 - [ ] Feature | Must | Admin places order request on behalf of an account
