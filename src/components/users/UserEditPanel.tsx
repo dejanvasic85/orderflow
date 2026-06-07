@@ -1,5 +1,5 @@
 import { useForm } from "@tanstack/react-form";
-import { useRef } from "react";
+import { useCallback, useRef } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -78,6 +78,9 @@ export function UserEditPanel(props: Props) {
   const user = props.user ?? blankUser;
   const nameParts = user.name.split(" ");
   const accountsPayloadRef = useRef<UpdateUserAccountsInput | null>(null);
+  const handleAccountsChange = useCallback((payload: UpdateUserAccountsInput) => {
+    accountsPayloadRef.current = payload;
+  }, []);
   const form = useForm({
     defaultValues: {
       email: user.email,
@@ -316,9 +319,7 @@ export function UserEditPanel(props: Props) {
               userId={user.id}
               initialAccounts={user.accounts}
               allAccounts={allAccounts}
-              onChange={(payload) => {
-                accountsPayloadRef.current = payload;
-              }}
+              onChange={handleAccountsChange}
             />
           </>
         )}
