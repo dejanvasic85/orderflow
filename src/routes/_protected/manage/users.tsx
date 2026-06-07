@@ -14,27 +14,33 @@ import {
 import { UserEditPanel } from "@/components/users/UserEditPanel";
 import { UserList, type RoleFilter } from "@/components/users/UserList";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { listAccounts } from "@/lib/accounts/accounts.functions";
+import type { Account } from "@/lib/accounts/schema";
 import { asResult } from "@/lib/result";
-import type { User } from "@/lib/users/schema";
+import type { UpdateUserAccountsInput, User } from "@/lib/users/schema";
 import {
   checkEmailExists,
   inviteUser,
   listUsers,
   resendInvite,
   updateUser,
+  updateUserAccounts,
 } from "@/lib/users/users.functions";
 
 export const Route = createFileRoute("/_protected/manage/users")({
   loader: async () => {
-    const usersResult = asResult<User[]>(await listUsers());
+    const [usersRaw, accountsRaw] = await Promise.all([listUsers(), listAccounts()]);
+    const usersResult = asResult<User[]>(usersRaw);
+    const accountsResult = asResult<Account[]>(accountsRaw);
     if (!usersResult.ok) throw new Error(usersResult.error.message);
-    return { users: usersResult.value };
+    if (!accountsResult.ok) throw new Error(accountsResult.error.message);
+    return { users: usersResult.value, accounts: accountsResult.value };
   },
   component: UsersPage,
 });
 
 function UsersPage() {
-  const { users: loadedUsers } = Route.useLoaderData();
+  const { users: loadedUsers, accounts } = Route.useLoaderData();
   const [users, setUsers] = useState<User[]>(loadedUsers);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
@@ -58,7 +64,7 @@ function UsersPage() {
     setCreating(true);
   }
 
-  async function handleSave(updated: User) {
+  async function handleSave(updated: User, accountsPayload?: UpdateUserAccountsInput) {
     const result = asResult<void>(
       await updateUser({
         data: {
@@ -75,6 +81,24 @@ function UsersPage() {
       toast.error(result.error.message);
       return;
     }
+
+    if (
+      accountsPayload &&
+      (accountsPayload.toAdd.length > 0 || accountsPayload.toRemove.length > 0)
+    ) {
+      const accountsResult = asResult<void>(await updateUserAccounts({ data: accountsPayload }));
+      if (!accountsResult.ok) {
+        toast.error(accountsResult.error.message);
+        return;
+      }
+      const kept = updated.accounts.filter((a) => !accountsPayload.toRemove.includes(a.id));
+      const added = accountsPayload.toAdd
+        .map((id) => accounts.find((a) => a.id === id))
+        .filter((a): a is Account => a !== undefined)
+        .map((a) => ({ id: a.id, name: a.name }));
+      updated = { ...updated, accounts: [...kept, ...added] };
+    }
+
     setUsers((prev) => prev.map((u) => (u.id === updated.id ? updated : u)));
     setSelectedId(null);
   }
@@ -130,7 +154,11 @@ function UsersPage() {
         />
 
         <Sheet open={!!selectedUser} onOpenChange={(open) => !open && handleDiscard()}>
-          <SheetContent side={panelSide} className={panelClassName}>
+          <SheetContent
+            side={panelSide}
+            className={panelClassName}
+            onInteractOutside={(e) => e.preventDefault()}
+          >
             <SheetHeader className="sr-only">
               <SheetTitle>Edit user</SheetTitle>
               <SheetDescription>Edit user details and settings</SheetDescription>
@@ -142,6 +170,7 @@ function UsersPage() {
                 onSave={handleSave}
                 onDiscard={handleDiscard}
                 onResendInvite={() => handleResendInvite(selectedUser.id)}
+                allAccounts={accounts}
               />
             )}
           </SheetContent>

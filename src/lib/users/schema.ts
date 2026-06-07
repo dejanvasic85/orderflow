@@ -53,3 +53,11 @@ export const createUserSchema = z.object({
 });
 
 export type CreateUserInput = z.infer<typeof createUserSchema>;
+
+export const updateUserAccountsSchema = z.object({
+  userId: z.uuid(),
+  toAdd: z.array(z.uuid()),
+  toRemove: z.array(z.uuid()),
+});
+
+export type UpdateUserAccountsInput = z.infer<typeof updateUserAccountsSchema>;

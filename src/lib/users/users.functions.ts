@@ -1,12 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getServerConfig } from "@/lib/config";
 import type { UserRole } from "./schema";
-import { createUserSchema, updateUserSchema } from "./schema";
+import { createUserSchema, updateUserSchema, updateUserAccountsSchema } from "./schema";
 import {
   checkEmail,
   fetchUser,
   fetchUsers,
   patchUser,
+  patchUserAccounts,
   resendUserInvite,
   sendInvite,
 } from "./users.server";
@@ -45,3 +46,7 @@ export const resendInvite = createServerFn({ method: "POST", strict: { output: f
     const { SITE_URL } = getServerConfig();
     return resendUserInvite(id, SITE_URL);
   });
+
+export const updateUserAccounts = createServerFn({ method: "POST", strict: { output: false } })
+  .inputValidator(updateUserAccountsSchema)
+  .handler(async ({ data }) => patchUserAccounts(data));

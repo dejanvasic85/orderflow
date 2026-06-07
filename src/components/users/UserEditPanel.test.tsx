@@ -65,7 +65,7 @@ test("calls onSave with joined name on valid submit", async () => {
   await user.click(screen.getByRole("button", { name: "Save changes" }));
 
   await vi.waitFor(() => {
-    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ name: "Bob Jones" }));
+    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ name: "Bob Jones" }), undefined);
   });
 });
 
@@ -95,6 +95,7 @@ test("calls onSave with updated notification preferences", async () => {
       expect.objectContaining({
         notification_preferences: { email: true, sms: true },
       }),
+      undefined,
     );
   });
 });
@@ -148,7 +149,7 @@ test("passes phone as null to onSave when field is empty", async () => {
   await user.click(screen.getByRole("button", { name: "Save changes" }));
 
   await vi.waitFor(() => {
-    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ phone: null }));
+    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ phone: null }), undefined);
   });
 });
 
@@ -159,7 +160,10 @@ test("passes valid Australian phone to onSave", async () => {
   await user.click(screen.getByRole("button", { name: "Save changes" }));
 
   await vi.waitFor(() => {
-    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ phone: "0487654321" }));
+    expect(onSave).toHaveBeenCalledWith(
+      expect.objectContaining({ phone: "0487654321" }),
+      undefined,
+    );
   });
 });
 
@@ -190,6 +194,7 @@ test("create mode submits with collected fields", async () => {
         email: "new@example.com",
         name: "Bob Jones",
       }),
+      undefined,
     );
   });
 });
@@ -256,7 +261,10 @@ test("create mode does not show duplicate error when email is available", async 
   await user.click(screen.getByRole("button", { name: "Send invite" }));
 
   await vi.waitFor(() => {
-    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ email: "new@example.com" }));
+    expect(onSave).toHaveBeenCalledWith(
+      expect.objectContaining({ email: "new@example.com" }),
+      undefined,
+    );
   });
   expect(screen.queryByText("A user with this email already exists")).not.toBeInTheDocument();
 });
@@ -304,7 +312,7 @@ test("calls onSave with active: false when switch is toggled off", async () => {
   await user.click(screen.getByRole("button", { name: "Save changes" }));
 
   await vi.waitFor(() => {
-    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ active: false }));
+    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ active: false }), undefined);
   });
 });
 
@@ -317,7 +325,7 @@ test("calls onSave with active: true when switch is toggled on", async () => {
   await user.click(screen.getByRole("button", { name: "Save changes" }));
 
   await vi.waitFor(() => {
-    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ active: true }));
+    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ active: true }), undefined);
   });
 });
 
@@ -329,6 +337,6 @@ test("calls onSave with active: true when switch is not changed", async () => {
   await user.click(screen.getByRole("button", { name: "Save changes" }));
 
   await vi.waitFor(() => {
-    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ active: true }));
+    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ active: true }), undefined);
   });
 });

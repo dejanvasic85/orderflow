@@ -2,7 +2,7 @@ import { ensureSession } from "@/lib/auth/auth.functions";
 import { err, ok } from "@/lib/result";
 import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
-import type { User, UserAccount, UserRole } from "./schema";
+import type { UpdateUserAccountsInput, User, UserAccount, UserRole } from "./schema";
 
 type FetchUsersFilters = {
   role?: UserRole;
@@ -269,6 +269,30 @@ export async function sendInvite(data: {
     updated_at: now,
     accounts,
   });
+}
+
+export async function patchUserAccounts(data: UpdateUserAccountsInput) {
+  const supabase = createSupabaseServerClient();
+  await assertAdmin(supabase);
+
+  const [deleteResult, insertResult] = await Promise.all([
+    data.toRemove.length > 0
+      ? supabase
+          .from("account_users")
+          .delete()
+          .eq("user_id", data.userId)
+          .in("account_id", data.toRemove)
+      : Promise.resolve(null),
+    data.toAdd.length > 0
+      ? supabase
+          .from("account_users")
+          .insert(data.toAdd.map((account_id) => ({ account_id, user_id: data.userId })))
+      : Promise.resolve(null),
+  ]);
+
+  const firstError = [deleteResult?.error, insertResult?.error].find(Boolean);
+  if (firstError) return err({ message: firstError.message });
+  return ok();
 }
 
 export async function resendUserInvite(id: string, siteUrl: string) {
