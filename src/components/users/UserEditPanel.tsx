@@ -1,4 +1,5 @@
 import { useForm } from "@tanstack/react-form";
+import { useRef } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -17,13 +18,15 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { PendingInviteSection } from "@/components/users/PendingInviteSection";
-import { type User, userRoles } from "@/lib/users/schema";
+import { UserAccountsSection } from "@/components/users/UserAccountsSection";
+import { type UpdateUserAccountsInput, type User, userRoles } from "@/lib/users/schema";
 
 type BaseProps = {
-  onSave: (updated: User) => void;
+  onSave: (updated: User, accountsPayload?: UpdateUserAccountsInput) => void;
   onDiscard: () => void;
   onCheckEmailExists?: (email: string) => Promise<boolean>;
   onResendInvite?: () => Promise<void>;
+  allAccounts?: { id: string; name: string }[];
 };
 
 type Props =
@@ -69,11 +72,12 @@ function toFieldErrors(errors: unknown[]): { message?: string }[] {
 }
 
 export function UserEditPanel(props: Props) {
-  const { onSave, onDiscard, onCheckEmailExists, onResendInvite } = props;
+  const { onSave, onDiscard, onCheckEmailExists, onResendInvite, allAccounts } = props;
   const mode = props.mode ?? "edit";
   const isCreate = mode === "create";
   const user = props.user ?? blankUser;
   const nameParts = user.name.split(" ");
+  const accountsPayloadRef = useRef<UpdateUserAccountsInput | null>(null);
   const form = useForm({
     defaultValues: {
       email: user.email,
@@ -89,7 +93,7 @@ export function UserEditPanel(props: Props) {
     },
     validators: { onSubmit: userEditSchema },
     onSubmit: ({ value }) => {
-      onSave({
+      const updatedUser: User = {
         ...user,
         email: value.email,
         name: [value.firstName, value.lastName].filter(Boolean).join(" "),
@@ -100,7 +104,9 @@ export function UserEditPanel(props: Props) {
           email: value.notifications.email,
           sms: value.notifications.sms,
         },
-      });
+      };
+      const accountsPayload = accountsPayloadRef.current;
+      onSave(updatedUser, accountsPayload ?? undefined);
       if (!isCreate) toast.success("Changes saved");
     },
   });
@@ -300,6 +306,20 @@ export function UserEditPanel(props: Props) {
                 </div>
               )}
             </form.Field>
+          </>
+        )}
+
+        {!isCreate && user.role === "user" && allAccounts && (
+          <>
+            <Separator />
+            <UserAccountsSection
+              userId={user.id}
+              initialAccounts={user.accounts}
+              allAccounts={allAccounts}
+              onChange={(payload) => {
+                accountsPayloadRef.current = payload;
+              }}
+            />
           </>
         )}
 
