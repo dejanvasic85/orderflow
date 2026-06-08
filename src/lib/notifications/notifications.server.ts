@@ -1,5 +1,5 @@
 import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
-import type { UserRole } from "@/lib/users/schema";
+import type { UserWithEmailRow } from "@/lib/users/schema";
 import { parseNotificationPrefs } from "@/lib/users/users.server";
 import { sendEmail } from "./email";
 import { sendSms } from "./sms";
@@ -18,19 +18,16 @@ type NotificationRecipient = {
   id: string;
   email: string | null;
   phone: string | null;
-  role: UserRole;
+  role: NonNullable<UserWithEmailRow["role"]>;
   notificationPreferences: { email: boolean; sms: boolean };
 };
 
-function mapRecipients(
-  users: {
-    id: string | null;
-    email: string | null;
-    phone: string | null;
-    role: UserRole | null;
-    notification_preferences: unknown;
-  }[],
-): NotificationRecipient[] {
+type RecipientRow = Pick<
+  UserWithEmailRow,
+  "id" | "email" | "phone" | "role" | "notification_preferences"
+>;
+
+function mapRecipients(users: RecipientRow[]): NotificationRecipient[] {
   return users.flatMap((user) => {
     if (!user.email && !user.phone) return [];
     return [
