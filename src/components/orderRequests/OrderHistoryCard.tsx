@@ -30,15 +30,15 @@ export function OrderHistoryCard({ order, viewHref }: OrderHistoryCardProps) {
         )}
         <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
           <User2 className="h-3.5 w-3.5 shrink-0" />
-          {order.placed_by_org_name ? (
+          {order.placedByOrgName ? (
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className="truncate cursor-default">{order.placed_by_name}</span>
+                <span className="truncate cursor-default">{order.placedByName}</span>
               </TooltipTrigger>
-              <TooltipContent>{order.placed_by_org_name}</TooltipContent>
+              <TooltipContent>{order.placedByOrgName}</TooltipContent>
             </Tooltip>
           ) : (
-            <span className="truncate">{order.placed_by_name}</span>
+            <span className="truncate">{order.placedByName}</span>
           )}
         </div>
 

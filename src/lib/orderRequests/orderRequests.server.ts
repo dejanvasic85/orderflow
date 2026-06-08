@@ -22,8 +22,8 @@ export type OrderHistoryItem = {
   id: string;
   order_number: number;
   placed_by: string;
-  placed_by_name: string;
-  placed_by_org_name?: string;
+  placedByName: string;
+  placedByOrgName?: string;
   status: string;
   created_at: string;
   total_bottles: number;
@@ -31,8 +31,8 @@ export type OrderHistoryItem = {
   account_name?: string;
 };
 
-const bwowLabel = { placed_by_name: "bwow", placed_by_org_name: "Boutique Wines of the World" };
-const unknownPlacedByValue = { placed_by_name: "Unknown" } as const;
+const bwowLabel = { placedByName: "bwow", placedByOrgName: "Boutique Wines of the World" };
+const unknownPlacedByValue = { placedByName: "Unknown" } as const;
 
 type PlacedByUser = { id: string; name: string; role: string } | null;
 
@@ -48,25 +48,25 @@ type OrderHistoryRow = {
 };
 
 function resolvePlacedByName(user: PlacedByUser): {
-  placed_by_name: string;
-  placed_by_org_name?: string;
+  placedByName: string;
+  placedByOrgName?: string;
 } {
   if (!user) return unknownPlacedByValue;
   if (user.role === "admin" || user.role === "staff") return bwowLabel;
-  return { placed_by_name: user.name || "Unknown" };
+  return { placedByName: user.name || "Unknown" };
 }
 
 function mapOrderHistoryRow(row: OrderHistoryRow): OrderHistoryItem {
   const rowItems = row.order_request_items ?? [];
   const user = row.users as PlacedByUser;
   const account = row.accounts as { id: string; name: string } | null | undefined;
-  const { placed_by_name, placed_by_org_name } = resolvePlacedByName(user);
+  const { placedByName, placedByOrgName } = resolvePlacedByName(user);
   return {
     id: row.id,
     order_number: row.order_number,
     placed_by: row.placed_by,
-    placed_by_name,
-    ...(placed_by_org_name ? { placed_by_org_name } : {}),
+    placedByName,
+    ...(placedByOrgName ? { placedByOrgName } : {}),
     status: row.status,
     created_at: row.created_at,
     total_boxes: rowItems.reduce((sum, i) => sum + (i.boxes ?? 0), 0),
