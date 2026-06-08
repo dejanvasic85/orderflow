@@ -1,3 +1,5 @@
+import { getServerConfig } from "@/lib/config";
+
 type SendEmailInput = {
   to: string;
   subject: string;
@@ -28,8 +30,7 @@ export async function sendEmail(input: SendEmailInput): Promise<void> {
 }
 
 function getAwsEmailConfig() {
-  const region = process.env.AWS_REGION;
-  const fromAddress = process.env.SES_FROM_ADDRESS;
+  const { AWS_REGION: region, SES_FROM_ADDRESS: fromAddress } = getServerConfig();
 
   if (!region || !fromAddress) {
     throw new Error("Missing required env vars: AWS_REGION, SES_FROM_ADDRESS");

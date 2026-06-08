@@ -1,3 +1,5 @@
+import { getServerConfig } from "@/lib/config";
+
 type SendSmsInput = {
   to: string;
   body: string;
@@ -11,7 +13,7 @@ export async function sendSms(input: SendSmsInput): Promise<void> {
 
   const { SNSClient, PublishCommand } = await import("@aws-sdk/client-sns");
 
-  const region = process.env.AWS_REGION;
+  const region = getServerConfig().AWS_REGION;
   if (!region) {
     throw new Error("Missing required env var: AWS_REGION");
   }
