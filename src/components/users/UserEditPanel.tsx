@@ -1,5 +1,6 @@
 import { useForm } from "@tanstack/react-form";
-import { useCallback, useRef } from "react";
+import { Check, Copy } from "lucide-react";
+import { useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -78,6 +79,7 @@ export function UserEditPanel(props: Props) {
   const user = props.user ?? blankUser;
   const nameParts = user.name.split(" ");
   const accountsPayloadRef = useRef<UpdateUserAccountsInput | null>(null);
+  const [emailCopied, setEmailCopied] = useState(false);
   const handleAccountsChange = useCallback((payload: UpdateUserAccountsInput) => {
     accountsPayloadRef.current = payload;
   }, []);
@@ -193,14 +195,35 @@ export function UserEditPanel(props: Props) {
           {(field) => (
             <Field>
               <FieldLabel htmlFor="email">Email</FieldLabel>
-              <Input
-                id="email"
-                type="email"
-                value={field.state.value}
-                onChange={(e) => field.handleChange(e.target.value)}
-                onBlur={field.handleBlur}
-                disabled={!isCreate}
-              />
+              <div className="flex items-center gap-2">
+                <Input
+                  id="email"
+                  type="email"
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  onBlur={field.handleBlur}
+                  disabled={!isCreate}
+                />
+                {!isCreate && (
+                  <button
+                    type="button"
+                    aria-label="Copy email"
+                    className="shrink-0 text-muted-foreground hover:text-foreground transition-colors"
+                    onClick={() => {
+                      void navigator.clipboard.writeText(field.state.value).then(() => {
+                        setEmailCopied(true);
+                        setTimeout(() => setEmailCopied(false), 2000);
+                      });
+                    }}
+                  >
+                    {emailCopied ? (
+                      <Check className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
+                  </button>
+                )}
+              </div>
               <FieldError errors={toFieldErrors(field.state.meta.errors)} />
             </Field>
           )}
