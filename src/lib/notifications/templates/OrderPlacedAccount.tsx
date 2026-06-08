@@ -1,4 +1,4 @@
-import { Heading, Text } from "react-email";
+import { Button, Heading, Text } from "react-email";
 import { render } from "react-email";
 import { EmailLayout } from "./EmailLayout";
 import { ItemsTable } from "./ItemsTable";
@@ -12,6 +12,7 @@ function OrderPlacedAccount({
   placedByName,
   deliveryAddress,
   items,
+  orderUrl,
 }: Props) {
   return (
     <EmailLayout preview={`Order ${orderRef} placed for ${accountName}`}>
@@ -30,6 +31,22 @@ function OrderPlacedAccount({
         </Text>
       )}
       <ItemsTable items={items} />
+      <Button
+        href={orderUrl}
+        style={{
+          backgroundColor: "#1e3a5f",
+          borderRadius: "6px",
+          color: "#ffffff",
+          display: "inline-block",
+          fontSize: "14px",
+          fontWeight: "600",
+          marginTop: "24px",
+          padding: "12px 24px",
+          textDecoration: "none",
+        }}
+      >
+        View order
+      </Button>
     </EmailLayout>
   );
 }

@@ -10,4 +10,5 @@ export type OrderEmailInput = {
   placedByName: string;
   deliveryAddress: string | null;
   items: OrderEmailItem[];
+  orderUrl: string;
 };

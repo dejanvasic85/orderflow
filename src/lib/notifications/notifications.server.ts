@@ -1,5 +1,6 @@
+import { getServerConfig } from "@/lib/config";
 import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
-import type { UserWithEmailRow } from "@/lib/users/schema";
+import type { UserRole, UserWithEmailRow } from "@/lib/users/schema";
 import { parseNotificationPrefs } from "@/lib/users/users.server";
 import { sendEmail } from "./email";
 import { sendSms } from "./sms";
@@ -9,10 +10,23 @@ import { renderOrderPlacedPlacer } from "./templates/OrderPlacedPlacer";
 import { renderOrderPlacedStaff } from "./templates/OrderPlacedStaff";
 import type { OrderEmailInput } from "./templates/types";
 
-type NotifyOrderPlacedInput = OrderEmailInput & {
+type NotifyOrderPlacedInput = Omit<OrderEmailInput, "orderUrl"> & {
+  orderId: string;
   accountId: string;
   placedById: string;
 };
+
+function buildOrderUrl(
+  siteUrl: string,
+  orderId: string,
+  accountId: string,
+  role: UserRole,
+): string {
+  if (role === "admin" || role === "staff") {
+    return `${siteUrl}/manage/orders/${orderId}`;
+  }
+  return `${siteUrl}/accounts/${accountId}/orders/${orderId}`;
+}
 
 type NotificationRecipient = {
   id: string;
@@ -95,7 +109,9 @@ export async function notifyOrderPlaced(input: NotifyOrderPlacedInput): Promise<
   const recipients = await fetchOrderRecipients(input.accountId);
   if (recipients.length === 0) return;
 
-  const emailInput: OrderEmailInput = {
+  const { SITE_URL: siteUrl } = getServerConfig();
+
+  const baseInput = {
     orderRef: input.orderRef,
     accountName: input.accountName,
     placedByName: input.placedByName,
@@ -103,38 +119,37 @@ export async function notifyOrderPlaced(input: NotifyOrderPlacedInput): Promise<
     items: input.items,
   };
 
-  const [placerTemplate, accountTemplate, staffTemplate, smsBody] = await Promise.all([
-    renderOrderPlacedPlacer(emailInput),
-    renderOrderPlacedAccount(emailInput),
-    renderOrderPlacedStaff(emailInput),
-    Promise.resolve(renderOrderPlacedSms(emailInput)),
-  ]);
-
   await Promise.allSettled(
     recipients.flatMap((recipient) => {
       const tasks: Promise<void>[] = [];
+      const orderUrl = buildOrderUrl(siteUrl, input.orderId, input.accountId, recipient.role);
+      const emailInput: OrderEmailInput = { ...baseInput, orderUrl };
 
       if (recipient.notificationPreferences.email && recipient.email) {
         const isStaffOrAdmin = recipient.role === "admin" || recipient.role === "staff";
         const isPlacer = recipient.id === input.placedById;
-        const template = isStaffOrAdmin
-          ? staffTemplate
+
+        const templatePromise = isStaffOrAdmin
+          ? renderOrderPlacedStaff(emailInput)
           : isPlacer
-            ? placerTemplate
-            : accountTemplate;
+            ? renderOrderPlacedPlacer(emailInput)
+            : renderOrderPlacedAccount(emailInput);
 
         tasks.push(
-          sendEmail({ to: recipient.email, subject: template.subject, html: template.html }).catch(
-            (error) => console.error("[notifications] email send failed:", error),
-          ),
+          templatePromise
+            .then((template) =>
+              sendEmail({ to: recipient.email!, subject: template.subject, html: template.html }),
+            )
+            .catch((error) => console.error("[notifications] email send failed:", error)),
         );
       }
 
       if (recipient.notificationPreferences.sms && recipient.phone) {
         tasks.push(
-          sendSms({ to: recipient.phone, body: smsBody }).catch((error) =>
-            console.error("[notifications] sms send failed:", error),
-          ),
+          sendSms({
+            to: recipient.phone,
+            body: renderOrderPlacedSms({ ...baseInput, orderUrl }),
+          }).catch((error) => console.error("[notifications] sms send failed:", error)),
         );
       }
 
