@@ -1,3 +1,5 @@
+import { company } from "@/lib/config";
+
 type OrderPlacedSmsInput = {
   orderRef: string;
   accountName: string;
@@ -9,5 +11,5 @@ export function renderOrderPlacedSms({
   accountName,
   placedByName,
 }: OrderPlacedSmsInput): string {
-  return `OrderFlow: ${orderRef} placed for ${accountName} by ${placedByName}.`;
+  return `${company.shortName}: ${orderRef} placed for ${accountName} by ${placedByName}.`;
 }

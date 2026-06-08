@@ -31,7 +31,7 @@ export function EmailLayout({ preview, children }: EmailLayoutProps) {
           <Section style={styles.footer}>
             <Text style={styles.footerText}>
               You are receiving this because you are assigned to this account. Manage your
-              notification preferences in OrderFlow.
+              notification preferences in {company.name}.
             </Text>
           </Section>
         </Container>

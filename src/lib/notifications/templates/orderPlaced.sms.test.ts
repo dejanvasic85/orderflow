@@ -8,6 +8,6 @@ describe("renderOrderPlacedSms", () => {
       placedByName: "Jane Smith",
     });
 
-    expect(result).toBe("OrderFlow: ORD-0007 placed for Acme Wines by Jane Smith.");
+    expect(result).toBe("bwow: ORD-0007 placed for Acme Wines by Jane Smith.");
   });
 });
