@@ -1,9 +1,11 @@
 import type { z } from "zod";
 import { fetchSessionOrThrow } from "@/lib/auth/auth.server";
+import { notifyOrderPlaced } from "@/lib/notifications/notifications.server";
 import { err, ok } from "@/lib/result";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import { assertAdminOrStaff } from "@/lib/users/users.server";
 import type { createOrderRequestSchema } from "./schema";
+import { formatOrderRef } from "./schema";
 
 const orderRequestWithItemsSelect =
   "id, order_number, account_id, placed_by, template_id, delivery_address, delivery_instructions, status, created_at, updated_at, order_request_items(id, product_id, boxes, extra_bottles, created_at, products(id, name, qty_per_box)), templates(id, name), users!order_requests_placed_by_fkey(id, name), accounts(id, name)" as const;
@@ -157,5 +159,56 @@ export async function insertOrderRequest(data: z.infer<typeof createOrderRequest
 
   if (itemsError) return err({ message: itemsError.message });
 
+  fireOrderNotification({ supabase, order, data, placedById: user.id });
+
   return ok(order);
+}
+
+function fireOrderNotification({
+  supabase,
+  order,
+  data,
+  placedById,
+}: {
+  supabase: ReturnType<typeof createSupabaseServerClient>;
+  order: { id: string; order_number: number };
+  data: z.infer<typeof createOrderRequestSchema>;
+  placedById: string;
+}): void {
+  const fetchPayload = async () => {
+    const [accountResult, placedByResult, productsResult] = await Promise.all([
+      supabase.from("accounts").select("name").eq("id", data.account_id).single(),
+      supabase.from("users").select("name").eq("id", placedById).single(),
+      supabase
+        .from("products")
+        .select("id, name")
+        .in(
+          "id",
+          data.items.map((i) => i.product_id),
+        ),
+    ]);
+
+    const accountName = accountResult.data?.name ?? data.account_id;
+    const placedByName = placedByResult.data?.name ?? "Unknown";
+    const productMap = new Map((productsResult.data ?? []).map((p) => [p.id, p.name]));
+
+    const items = data.items.map((item) => ({
+      productName: productMap.get(item.product_id) ?? item.product_id,
+      boxes: item.boxes,
+      extraBottles: item.extra_bottles,
+    }));
+
+    await notifyOrderPlaced({
+      orderRef: formatOrderRef(order.order_number),
+      accountId: data.account_id,
+      accountName,
+      placedByName,
+      deliveryAddress: data.delivery_address ?? null,
+      items,
+    });
+  };
+
+  fetchPayload().catch((error) =>
+    console.error("[notifications] order notification failed:", error),
+  );
 }
