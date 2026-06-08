@@ -73,7 +73,7 @@ function UsersPage() {
           phone: updated.phone,
           role: updated.role,
           active: updated.active,
-          notification_preferences: updated.notification_preferences,
+          notificationPreferences: updated.notificationPreferences,
         },
       }),
     );
@@ -111,7 +111,7 @@ function UsersPage() {
           name: draft.name,
           phone: draft.phone,
           role: draft.role,
-          notification_preferences: draft.notification_preferences,
+          notificationPreferences: draft.notificationPreferences,
           accountIds: [],
         },
       }),

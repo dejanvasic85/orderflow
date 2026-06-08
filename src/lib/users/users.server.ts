@@ -52,7 +52,7 @@ export function mapUser(row: ListedRow): User {
     invite_accepted_at: row.invite_accepted_at ?? null,
     invited_at: row.invited_at ?? null,
     role: row.role ?? "user",
-    notification_preferences: parseNotificationPrefs(row.notification_preferences),
+    notificationPreferences: parseNotificationPrefs(row.notification_preferences),
     created_at: row.created_at ?? "",
     updated_at: row.updated_at ?? "",
     accounts: (row.account_users ?? [])
@@ -138,7 +138,12 @@ export async function patchUser(data: {
   [key: string]: unknown;
 }) {
   const supabaseServer = createSupabaseServerClient();
-  const { id, accountIds, ...patch } = data;
+  const { id, accountIds, notificationPreferences, ...rest } = data as typeof data & {
+    notificationPreferences?: { email: boolean; sms: boolean };
+  };
+  const patch = notificationPreferences
+    ? { ...rest, notification_preferences: notificationPreferences }
+    : rest;
 
   if ("active" in patch) {
     await assertAdmin(supabaseServer);
@@ -200,7 +205,7 @@ export async function sendInvite(data: {
   name: string;
   phone?: string | null;
   role: User["role"];
-  notification_preferences: User["notification_preferences"];
+  notificationPreferences: User["notificationPreferences"];
   accountIds: string[];
   siteUrl: string;
 }) {
@@ -227,7 +232,7 @@ export async function sendInvite(data: {
       name: data.name,
       phone: data.phone ?? null,
       role: data.role,
-      notification_preferences: data.notification_preferences,
+      notification_preferences: data.notificationPreferences,
     })
     .eq("id", newUserId);
 
@@ -264,7 +269,7 @@ export async function sendInvite(data: {
     invite_accepted_at: null,
     invited_at: now,
     role: data.role,
-    notification_preferences: data.notification_preferences,
+    notificationPreferences: data.notificationPreferences,
     created_at: now,
     updated_at: now,
     accounts,
