@@ -220,6 +220,7 @@ Pre-commit hooks are configured through Vite+ staged checks; ensure any auto-fix
 
 - Check for current stable package versions before adding dependencies
 - Avoid deprecated packages/APIs when alternatives exist
+- Always pin dependencies to **exact versions** — no `^` or `~` prefixes in `package.json`
 
 ## Common Pitfalls
 
