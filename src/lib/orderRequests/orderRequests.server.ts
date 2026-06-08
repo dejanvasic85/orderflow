@@ -178,7 +178,7 @@ function fireOrderNotification({
   const fetchPayload = async () => {
     const [accountResult, placedByResult, productsResult] = await Promise.all([
       supabase.from("accounts").select("name").eq("id", data.account_id).single(),
-      supabase.from("users").select("name").eq("id", placedById).single(),
+      supabase.from("users").select("id, name, role").eq("id", placedById).single(),
       supabase
         .from("products")
         .select("id, name")
@@ -189,7 +189,7 @@ function fireOrderNotification({
     ]);
 
     const accountName = accountResult.data?.name ?? data.account_id;
-    const placedByName = placedByResult.data?.name ?? "Unknown";
+    const { placedByName } = resolvePlacedByName(placedByResult.data ?? null);
     const productMap = new Map((productsResult.data ?? []).map((p) => [p.id, p.name]));
 
     const items = data.items.map((item) => ({
