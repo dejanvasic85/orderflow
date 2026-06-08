@@ -42,11 +42,10 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Feature | Must | New order by staff and admins on behalf of accounts
 - [x] Feature | Must | Manage template for Accounts in a new dedicated page
 - [x] Feature | Must | Manage users for Accounts in a new dedicated page
-- [ ] Feature | Must | Manage accounts for users in the user drawer
+- [x] Feature | Must | Manage accounts for users in the user drawer
 - [ ] Feature | Must | Invite for staff and admin should work seamlessly - at the moment only users have been tested!
-- [ ] Feature | Must | Per-request delivery override (note + address)
-- [ ] Feature | Must | Email notification on order placed
-- [ ] Feature | Must | SMS notifications (Phase 2)
+- [x] Feature | Must | Email notification on order placed
+- [x] Feature | Must | SMS notifications (Phase 2)
 - [ ] Feature | Must| Search users by email or name (server-side filter)
 - [ ] Feature | Must| Sort users in admin list
 - [ ] Feature | Must | Paging on users list
@@ -65,7 +64,7 @@ Priorities: `Must` · `Should` · `Nice`
 - [ ] Productionising | Must | Email templates
 - [ ] Productionising | Must | Configure production domain in Supabase (currently https://orderflow.team-manager.workers.dev)
 - [ ] Productionising | Must | Configure production env vars in GitHub
-- [ ] Productionising | Must | Logging and monitoring (Supabase + Cloudflare — consider unifying in Cloudflare logs)sender
+- [ ] Productionising | Must | Logging and monitoring (Supabase + Cloudflare — consider unifying in Cloudflare logs) sender
 - [ ] Feature | Nice | Homepage dashboard — reporting / summary tiles (Phase 4, quoted separately)
 - [ ] Cleanup | Nice | Remove hardcoded routes and API endpoints
 - [ ] Quality | Nice | Question architecture direction and whether we are heading in the right direction - https://claude.ai/code/session_01FuB3evNxHRJvTYkVDEod2n
@@ -75,6 +74,10 @@ Priorities: `Must` · `Should` · `Nice`
 ## Code Cleanup
 
 - [ ] We need a much better and cleaner pattern for Authz
+
+- [ ] The .server.ts files have too much logic in them or all database operations should be somewhere else
+
+- [ ] Replace all the deprecated API's like `inputValidator` on the tanstack lib
 
 - [ ] Cleanup | Casting and typescript needs general cleanup
 
@@ -97,3 +100,5 @@ if (!accountResult.value) throw notFound();
 if (!templateResult.ok) throw new Error(templateResult.error.message);
 if (!productsResult.ok) throw new Error(productsResult.error.message);
 ```
+
+- [ ] Audit all the variable naming so they are camelCased

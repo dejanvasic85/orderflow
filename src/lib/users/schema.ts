@@ -8,6 +8,11 @@ export type UserRole = Database["public"]["Enums"]["user_role"];
 
 export const userRoles = ["admin", "staff", "user"] as const satisfies readonly UserRole[];
 
+export const isAdmin = (role: UserRole): boolean => role === "admin";
+export const isStaff = (role: UserRole): boolean => role === "staff";
+export const isUser = (role: UserRole): boolean => role === "user";
+export const isStaffOrAdmin = (role: UserRole): boolean => role === "admin" || role === "staff";
+
 export type UserAccount = { id: string; name: string };
 
 export type User = {
@@ -19,7 +24,7 @@ export type User = {
   invite_accepted_at: string | null;
   invited_at: string | null;
   role: UserRole;
-  notification_preferences: { email: boolean; sms: boolean };
+  notificationPreferences: { email: boolean; sms: boolean };
   created_at: string;
   updated_at: string;
   accounts: UserAccount[];
@@ -37,7 +42,7 @@ export const updateUserSchema = z.object({
   phone: auPhoneSchema,
   active: z.boolean().optional(),
   role: z.enum(userRoles).optional(),
-  notification_preferences: z.object({ email: z.boolean(), sms: z.boolean() }).optional(),
+  notificationPreferences: z.object({ email: z.boolean(), sms: z.boolean() }).optional(),
   accountIds: z.array(z.uuid()).optional(),
 });
 
@@ -48,7 +53,7 @@ export const createUserSchema = z.object({
   name: z.string().min(1),
   phone: auPhoneSchema,
   role: z.enum(userRoles),
-  notification_preferences: z.object({ email: z.boolean(), sms: z.boolean() }),
+  notificationPreferences: z.object({ email: z.boolean(), sms: z.boolean() }),
   accountIds: z.array(z.uuid()),
 });
 

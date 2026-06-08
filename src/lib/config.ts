@@ -26,6 +26,8 @@ export function getClientConfig() {
 const serverEnvSchema = clientEnvSchema.extend({
   SUPABASE_SECRET_KEY: z.string().min(1),
   SITE_URL: z.url().default("http://localhost:3344"),
+  AWS_REGION: z.string().optional(),
+  SES_FROM_ADDRESS: z.string().email().optional(),
 });
 
 export function getServerConfig() {
@@ -34,5 +36,7 @@ export function getServerConfig() {
     VITE_SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY,
     SUPABASE_SECRET_KEY: process.env.SUPABASE_SECRET_KEY,
     SITE_URL: process.env.SITE_URL,
+    AWS_REGION: process.env.AWS_REGION,
+    SES_FROM_ADDRESS: process.env.SES_FROM_ADDRESS,
   });
 }

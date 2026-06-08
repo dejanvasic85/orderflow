@@ -18,35 +18,35 @@ type ListUsersFilters = {
 };
 
 export const listUsers = createServerFn({ method: "GET", strict: { output: false } })
-  .inputValidator((filters: ListUsersFilters = {}) => filters)
+  .validator((filters: ListUsersFilters = {}) => filters)
   .handler(async ({ data: filters }) => fetchUsers(filters));
 
 export const getUser = createServerFn({ method: "GET", strict: { output: false } })
-  .inputValidator((id: string) => id)
+  .validator((id: string) => id)
   .handler(async ({ data: id }) => fetchUser(id));
 
 export const updateUser = createServerFn({ method: "POST", strict: { output: false } })
-  .inputValidator(updateUserSchema)
+  .validator(updateUserSchema)
   .handler(async ({ data }) => patchUser(data));
 
 export const checkEmailExists = createServerFn({ method: "GET", strict: { output: false } })
-  .inputValidator((email: string) => email)
+  .validator((email: string) => email)
   .handler(async ({ data: email }) => checkEmail(email));
 
 export const inviteUser = createServerFn({ method: "POST", strict: { output: false } })
-  .inputValidator(createUserSchema)
+  .validator(createUserSchema)
   .handler(async ({ data }) => {
     const { SITE_URL } = getServerConfig();
     return sendInvite({ ...data, siteUrl: SITE_URL });
   });
 
 export const resendInvite = createServerFn({ method: "POST", strict: { output: false } })
-  .inputValidator((id: string) => id)
+  .validator((id: string) => id)
   .handler(async ({ data: id }) => {
     const { SITE_URL } = getServerConfig();
     return resendUserInvite(id, SITE_URL);
   });
 
 export const updateUserAccounts = createServerFn({ method: "POST", strict: { output: false } })
-  .inputValidator(updateUserAccountsSchema)
+  .validator(updateUserAccountsSchema)
   .handler(async ({ data }) => patchUserAccounts(data));

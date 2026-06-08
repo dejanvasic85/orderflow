@@ -1,9 +1,13 @@
 import type { z } from "zod";
 import { fetchSessionOrThrow } from "@/lib/auth/auth.server";
+import { notifyOrderPlaced } from "@/lib/notifications/notifications.server";
 import { err, ok } from "@/lib/result";
+import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
+import { isStaffOrAdmin, type UserRole } from "@/lib/users/schema";
 import { assertAdminOrStaff } from "@/lib/users/users.server";
 import type { createOrderRequestSchema } from "./schema";
+import { formatOrderRef } from "./schema";
 
 const orderRequestWithItemsSelect =
   "id, order_number, account_id, placed_by, template_id, delivery_address, delivery_instructions, status, created_at, updated_at, order_request_items(id, product_id, boxes, extra_bottles, created_at, products(id, name, qty_per_box)), templates(id, name), users!order_requests_placed_by_fkey(id, name), accounts(id, name)" as const;
@@ -20,8 +24,8 @@ export type OrderHistoryItem = {
   id: string;
   order_number: number;
   placed_by: string;
-  placed_by_name: string;
-  placed_by_org_name?: string;
+  placedByName: string;
+  placedByOrgName?: string;
   status: string;
   created_at: string;
   total_bottles: number;
@@ -29,10 +33,10 @@ export type OrderHistoryItem = {
   account_name?: string;
 };
 
-const bwowLabel = { placed_by_name: "bwow", placed_by_org_name: "Boutique Wines of the World" };
-const unknownPlacedByValue = { placed_by_name: "Unknown" } as const;
+const bwowLabel = { placedByName: "bwow", placedByOrgName: "Boutique Wines of the World" };
+const unknownPlacedByValue = { placedByName: "Unknown" } as const;
 
-type PlacedByUser = { id: string; name: string; role: string } | null;
+type PlacedByUser = { id: string; name: string; role: UserRole } | null;
 
 type OrderHistoryRow = {
   id: string;
@@ -46,25 +50,25 @@ type OrderHistoryRow = {
 };
 
 function resolvePlacedByName(user: PlacedByUser): {
-  placed_by_name: string;
-  placed_by_org_name?: string;
+  placedByName: string;
+  placedByOrgName?: string;
 } {
   if (!user) return unknownPlacedByValue;
-  if (user.role === "admin" || user.role === "staff") return bwowLabel;
-  return { placed_by_name: user.name || "Unknown" };
+  if (isStaffOrAdmin(user.role)) return bwowLabel;
+  return { placedByName: user.name || "Unknown" };
 }
 
 function mapOrderHistoryRow(row: OrderHistoryRow): OrderHistoryItem {
   const rowItems = row.order_request_items ?? [];
   const user = row.users as PlacedByUser;
   const account = row.accounts as { id: string; name: string } | null | undefined;
-  const { placed_by_name, placed_by_org_name } = resolvePlacedByName(user);
+  const { placedByName, placedByOrgName } = resolvePlacedByName(user);
   return {
     id: row.id,
     order_number: row.order_number,
     placed_by: row.placed_by,
-    placed_by_name,
-    ...(placed_by_org_name ? { placed_by_org_name } : {}),
+    placedByName,
+    ...(placedByOrgName ? { placedByOrgName } : {}),
     status: row.status,
     created_at: row.created_at,
     total_boxes: rowItems.reduce((sum, i) => sum + (i.boxes ?? 0), 0),
@@ -157,5 +161,54 @@ export async function insertOrderRequest(data: z.infer<typeof createOrderRequest
 
   if (itemsError) return err({ message: itemsError.message });
 
+  await fireOrderNotification({ order, data, placedById: user.id });
+
   return ok(order);
+}
+
+type OrderNotificationOptions = {
+  order: { id: string; order_number: number };
+  data: z.infer<typeof createOrderRequestSchema>;
+  placedById: string;
+};
+
+async function fireOrderNotification({
+  order,
+  data,
+  placedById,
+}: OrderNotificationOptions): Promise<void> {
+  const admin = createSupabaseAdminClient();
+
+  const [accountResult, placedByResult, productsResult] = await Promise.all([
+    admin.from("accounts").select("name").eq("id", data.account_id).single(),
+    admin.from("users").select("id, name, role").eq("id", placedById).single(),
+    admin
+      .from("products")
+      .select("id, name")
+      .in(
+        "id",
+        data.items.map((i) => i.product_id),
+      ),
+  ]);
+
+  const accountName = accountResult.data?.name ?? data.account_id;
+  const { placedByName } = resolvePlacedByName(placedByResult.data ?? null);
+  const productMap = new Map((productsResult.data ?? []).map((p) => [p.id, p.name]));
+
+  const items = data.items.map((item) => ({
+    productName: productMap.get(item.product_id) ?? item.product_id,
+    boxes: item.boxes,
+    extraBottles: item.extra_bottles,
+  }));
+
+  await notifyOrderPlaced({
+    orderId: order.id,
+    orderRef: formatOrderRef(order.order_number),
+    accountId: data.account_id,
+    placedById,
+    accountName,
+    placedByName,
+    deliveryAddress: data.delivery_address ?? null,
+    items,
+  });
 }

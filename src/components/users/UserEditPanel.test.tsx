@@ -14,7 +14,7 @@ const baseUser: User = {
   invite_accepted_at: "2024-01-02T00:00:00Z",
   invited_at: "2024-01-01T00:00:00Z",
   role: "staff",
-  notification_preferences: { email: true, sms: false },
+  notificationPreferences: { email: true, sms: false },
   created_at: "2024-01-01T00:00:00Z",
   updated_at: "2024-01-01T00:00:00Z",
   accounts: [],
@@ -93,7 +93,7 @@ test("calls onSave with updated notification preferences", async () => {
   await vi.waitFor(() => {
     expect(onSave).toHaveBeenCalledWith(
       expect.objectContaining({
-        notification_preferences: { email: true, sms: true },
+        notificationPreferences: { email: true, sms: true },
       }),
       undefined,
     );

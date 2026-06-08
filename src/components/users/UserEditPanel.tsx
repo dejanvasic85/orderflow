@@ -59,7 +59,7 @@ const blankUser: User = {
   invite_accepted_at: null,
   invited_at: null,
   role: "user",
-  notification_preferences: { email: true, sms: false },
+  notificationPreferences: { email: true, sms: false },
   created_at: "",
   updated_at: "",
   accounts: [],
@@ -89,8 +89,8 @@ export function UserEditPanel(props: Props) {
       phone: user.phone ?? "",
       role: user.role,
       notifications: {
-        email: user.notification_preferences.email,
-        sms: user.notification_preferences.sms,
+        email: user.notificationPreferences.email,
+        sms: user.notificationPreferences.sms,
       },
       active: user.active,
     },
@@ -103,7 +103,7 @@ export function UserEditPanel(props: Props) {
         phone: value.phone || null,
         role: value.role,
         active: value.active,
-        notification_preferences: {
+        notificationPreferences: {
           email: value.notifications.email,
           sms: value.notifications.sms,
         },

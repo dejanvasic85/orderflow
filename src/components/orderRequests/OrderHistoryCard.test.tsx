@@ -7,7 +7,7 @@ const baseOrder: OrderHistoryItem = {
   id: "order-abc",
   order_number: 42,
   placed_by: "user-1",
-  placed_by_name: "Alice Smith",
+  placedByName: "Alice Smith",
   status: "submitted",
   created_at: "2024-06-15T12:00:00Z",
   total_boxes: 3,
@@ -16,8 +16,8 @@ const baseOrder: OrderHistoryItem = {
 
 const externalOrder: OrderHistoryItem = {
   ...baseOrder,
-  placed_by_name: "bwow",
-  placed_by_org_name: "Boutique Wines of the World",
+  placedByName: "bwow",
+  placedByOrgName: "Boutique Wines of the World",
 };
 
 describe("OrderHistoryCard", () => {
@@ -69,7 +69,7 @@ describe("OrderHistoryCard", () => {
     expect(link).toHaveAttribute("href", "/orders/order-abc");
   });
 
-  it("shows placed_by_name when placed_by_org_name is set", () => {
+  it("shows placedByName when placedByOrgName is set", () => {
     render(
       <TooltipProvider>
         <OrderHistoryCard order={externalOrder} />

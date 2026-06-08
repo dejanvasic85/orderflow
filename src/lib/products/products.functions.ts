@@ -7,13 +7,13 @@ export const listProducts = createServerFn({ method: "GET", strict: { output: fa
 );
 
 export const getProduct = createServerFn({ method: "GET", strict: { output: false } })
-  .inputValidator((id: string) => id)
+  .validator((id: string) => id)
   .handler(async ({ data: id }) => fetchProduct(id));
 
 export const createProduct = createServerFn({ method: "POST", strict: { output: false } })
-  .inputValidator(createProductSchema)
+  .validator(createProductSchema)
   .handler(async ({ data }) => insertProduct(data));
 
 export const updateProduct = createServerFn({ method: "POST", strict: { output: false } })
-  .inputValidator(updateProductSchema)
+  .validator(updateProductSchema)
   .handler(async ({ data }) => patchProduct(data));
