@@ -1,6 +1,6 @@
 import { getServerConfig } from "@/lib/config";
 import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
-import type { UserRole, UserWithEmailRow } from "@/lib/users/schema";
+import { isStaffOrAdmin, type UserRole, type UserWithEmailRow } from "@/lib/users/schema";
 import { parseNotificationPrefs } from "@/lib/users/users.server";
 import { sendEmail } from "./email";
 import { sendSms } from "./sms";
@@ -22,7 +22,7 @@ function buildOrderUrl(
   accountId: string,
   role: UserRole,
 ): string {
-  if (role === "admin" || role === "staff") {
+  if (isStaffOrAdmin(role)) {
     return `${siteUrl}/manage/orders/${orderId}`;
   }
   return `${siteUrl}/accounts/${accountId}/orders/${orderId}`;
@@ -126,10 +126,9 @@ export async function notifyOrderPlaced(input: NotifyOrderPlacedInput): Promise<
       const emailInput: OrderEmailInput = { ...baseInput, orderUrl };
 
       if (recipient.notificationPreferences.email && recipient.email) {
-        const isStaffOrAdmin = recipient.role === "admin" || recipient.role === "staff";
         const isPlacer = recipient.id === input.placedById;
 
-        const templatePromise = isStaffOrAdmin
+        const templatePromise = isStaffOrAdmin(recipient.role)
           ? renderOrderPlacedStaff(emailInput)
           : isPlacer
             ? renderOrderPlacedPlacer(emailInput)

@@ -3,6 +3,7 @@ import { fetchSessionOrThrow } from "@/lib/auth/auth.server";
 import { notifyOrderPlaced } from "@/lib/notifications/notifications.server";
 import { err, ok } from "@/lib/result";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
+import { isStaffOrAdmin, type UserRole } from "@/lib/users/schema";
 import { assertAdminOrStaff } from "@/lib/users/users.server";
 import type { createOrderRequestSchema } from "./schema";
 import { formatOrderRef } from "./schema";
@@ -34,7 +35,7 @@ export type OrderHistoryItem = {
 const bwowLabel = { placedByName: "bwow", placedByOrgName: "Boutique Wines of the World" };
 const unknownPlacedByValue = { placedByName: "Unknown" } as const;
 
-type PlacedByUser = { id: string; name: string; role: string } | null;
+type PlacedByUser = { id: string; name: string; role: UserRole } | null;
 
 type OrderHistoryRow = {
   id: string;
@@ -52,7 +53,7 @@ function resolvePlacedByName(user: PlacedByUser): {
   placedByOrgName?: string;
 } {
   if (!user) return unknownPlacedByValue;
-  if (user.role === "admin" || user.role === "staff") return bwowLabel;
+  if (isStaffOrAdmin(user.role)) return bwowLabel;
   return { placedByName: user.name || "Unknown" };
 }
 
