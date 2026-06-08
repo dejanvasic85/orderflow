@@ -119,6 +119,8 @@ export async function notifyOrderPlaced(input: NotifyOrderPlacedInput): Promise<
     items: input.items,
   };
 
+  console.log("**** notifyOrderPlaced: baseInput", baseInput);
+
   await Promise.allSettled(
     recipients.flatMap((recipient) => {
       const tasks: Promise<void>[] = [];

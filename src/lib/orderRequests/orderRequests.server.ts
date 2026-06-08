@@ -2,6 +2,7 @@ import type { z } from "zod";
 import { fetchSessionOrThrow } from "@/lib/auth/auth.server";
 import { notifyOrderPlaced } from "@/lib/notifications/notifications.server";
 import { err, ok } from "@/lib/result";
+import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import { isStaffOrAdmin, type UserRole } from "@/lib/users/schema";
 import { assertAdminOrStaff } from "@/lib/users/users.server";
@@ -160,58 +161,54 @@ export async function insertOrderRequest(data: z.infer<typeof createOrderRequest
 
   if (itemsError) return err({ message: itemsError.message });
 
-  fireOrderNotification({ supabase, order, data, placedById: user.id });
+  await fireOrderNotification({ order, data, placedById: user.id });
 
   return ok(order);
 }
 
-function fireOrderNotification({
-  supabase,
-  order,
-  data,
-  placedById,
-}: {
-  supabase: ReturnType<typeof createSupabaseServerClient>;
+type OrderNotificationOptions = {
   order: { id: string; order_number: number };
   data: z.infer<typeof createOrderRequestSchema>;
   placedById: string;
-}): void {
-  const fetchPayload = async () => {
-    const [accountResult, placedByResult, productsResult] = await Promise.all([
-      supabase.from("accounts").select("name").eq("id", data.account_id).single(),
-      supabase.from("users").select("id, name, role").eq("id", placedById).single(),
-      supabase
-        .from("products")
-        .select("id, name")
-        .in(
-          "id",
-          data.items.map((i) => i.product_id),
-        ),
-    ]);
+};
 
-    const accountName = accountResult.data?.name ?? data.account_id;
-    const { placedByName } = resolvePlacedByName(placedByResult.data ?? null);
-    const productMap = new Map((productsResult.data ?? []).map((p) => [p.id, p.name]));
+async function fireOrderNotification({
+  order,
+  data,
+  placedById,
+}: OrderNotificationOptions): Promise<void> {
+  const admin = createSupabaseAdminClient();
 
-    const items = data.items.map((item) => ({
-      productName: productMap.get(item.product_id) ?? item.product_id,
-      boxes: item.boxes,
-      extraBottles: item.extra_bottles,
-    }));
+  const [accountResult, placedByResult, productsResult] = await Promise.all([
+    admin.from("accounts").select("name").eq("id", data.account_id).single(),
+    admin.from("users").select("id, name, role").eq("id", placedById).single(),
+    admin
+      .from("products")
+      .select("id, name")
+      .in(
+        "id",
+        data.items.map((i) => i.product_id),
+      ),
+  ]);
 
-    await notifyOrderPlaced({
-      orderId: order.id,
-      orderRef: formatOrderRef(order.order_number),
-      accountId: data.account_id,
-      placedById,
-      accountName,
-      placedByName,
-      deliveryAddress: data.delivery_address ?? null,
-      items,
-    });
-  };
+  const accountName = accountResult.data?.name ?? data.account_id;
+  const { placedByName } = resolvePlacedByName(placedByResult.data ?? null);
+  const productMap = new Map((productsResult.data ?? []).map((p) => [p.id, p.name]));
 
-  fetchPayload().catch((error) =>
-    console.error("[notifications] order notification failed:", error),
-  );
+  const items = data.items.map((item) => ({
+    productName: productMap.get(item.product_id) ?? item.product_id,
+    boxes: item.boxes,
+    extraBottles: item.extra_bottles,
+  }));
+
+  await notifyOrderPlaced({
+    orderId: order.id,
+    orderRef: formatOrderRef(order.order_number),
+    accountId: data.account_id,
+    placedById,
+    accountName,
+    placedByName,
+    deliveryAddress: data.delivery_address ?? null,
+    items,
+  });
 }
