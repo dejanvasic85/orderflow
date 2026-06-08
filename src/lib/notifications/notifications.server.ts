@@ -62,8 +62,8 @@ async function fetchOrderRecipients(accountId: string): Promise<NotificationReci
   const [accountUsersResult, staffAdminResult] = await Promise.all([
     admin.from("account_users").select("user_id").eq("account_id", accountId),
     admin
-      .from("users_with_email")
-      .select("id, email, phone, role, notification_preferences")
+      .from("users")
+      .select("id, phone, role, notification_preferences")
       .in("role", ["admin", "staff"]),
   ]);
 
@@ -82,8 +82,8 @@ async function fetchOrderRecipients(accountId: string): Promise<NotificationReci
   const accountUsersData =
     accountUserIds.length > 0
       ? await admin
-          .from("users_with_email")
-          .select("id, email, phone, role, notification_preferences")
+          .from("users")
+          .select("id, phone, role, notification_preferences")
           .in("id", accountUserIds)
       : { data: [], error: null };
 
@@ -95,19 +95,42 @@ async function fetchOrderRecipients(accountId: string): Promise<NotificationReci
   const allUsers = [...(accountUsersData.data ?? []), ...(staffAdminResult.data ?? [])];
 
   const seen = new Set<string>();
-  const unique = allUsers.filter((u) => {
-    const key = u.id ?? u.email ?? "";
+  const uniqueUsers = allUsers.filter((u) => {
+    const key = u.id ?? "";
     if (!key || seen.has(key)) return false;
     seen.add(key);
     return true;
   });
 
-  return mapRecipients(unique);
+  if (uniqueUsers.length === 0) {
+    return [];
+  }
+
+  const userIds = uniqueUsers.map((u) => u.id);
+  const { data: authUsers, error: authError } = await admin.auth.admin.listUsers({ perPage: 1000 });
+  if (authError) {
+    console.error("[notifications] failed to fetch auth users:", authError);
+    return [];
+  }
+
+  const emailMap = new Map(authUsers.users.map((u) => [u.id, u.email ?? null]));
+
+  const withEmails: RecipientRow[] = uniqueUsers
+    .filter((u) => userIds.includes(u.id))
+    .map((u) => ({
+      ...u,
+      email: emailMap.get(u.id) ?? null,
+    }));
+
+  return mapRecipients(withEmails);
 }
 
 export async function notifyOrderPlaced(input: NotifyOrderPlacedInput): Promise<void> {
   const recipients = await fetchOrderRecipients(input.accountId);
-  if (recipients.length === 0) return;
+  if (recipients.length === 0) {
+    console.log("WARN: notifyOrderPlaced: There are no recipients");
+    return;
+  }
 
   const { SITE_URL: siteUrl } = getServerConfig();
 
@@ -126,6 +149,8 @@ export async function notifyOrderPlaced(input: NotifyOrderPlacedInput): Promise<
       const tasks: Promise<void>[] = [];
       const orderUrl = buildOrderUrl(siteUrl, input.orderId, input.accountId, recipient.role);
       const emailInput: OrderEmailInput = { ...baseInput, orderUrl };
+
+      console.log("*** Recipient...", recipient.email, recipient.notificationPreferences);
 
       if (recipient.notificationPreferences.email && recipient.email) {
         const isPlacer = recipient.id === input.placedById;
