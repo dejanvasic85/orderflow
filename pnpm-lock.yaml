@@ -13,10 +13,10 @@ importers:
   .:
     dependencies:
       '@aws-sdk/client-ses':
-        specifier: ^3.1063.0
+        specifier: 3.1063.0
         version: 3.1063.0
       '@aws-sdk/client-sns':
-        specifier: ^3.1063.0
+        specifier: 3.1063.0
         version: 3.1063.0
       '@cloudflare/vite-plugin':
         specifier: 1.40.0
