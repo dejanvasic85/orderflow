@@ -42,11 +42,10 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Feature | Must | New order by staff and admins on behalf of accounts
 - [x] Feature | Must | Manage template for Accounts in a new dedicated page
 - [x] Feature | Must | Manage users for Accounts in a new dedicated page
-- [ ] Feature | Must | Manage accounts for users in the user drawer
+- [x] Feature | Must | Manage accounts for users in the user drawer
 - [ ] Feature | Must | Invite for staff and admin should work seamlessly - at the moment only users have been tested!
-- [ ] Feature | Must | Per-request delivery override (note + address)
-- [ ] Feature | Must | Email notification on order placed
-- [ ] Feature | Must | SMS notifications (Phase 2)
+- [x] Feature | Must | Email notification on order placed
+- [x] Feature | Must | SMS notifications (Phase 2)
 - [ ] Feature | Must| Search users by email or name (server-side filter)
 - [ ] Feature | Must| Sort users in admin list
 - [ ] Feature | Must | Paging on users list
