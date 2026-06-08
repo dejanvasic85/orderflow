@@ -1,3 +1,6 @@
+import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
+import { getServerConfig } from "@/lib/config";
+
 type SendEmailInput = {
   to: string;
   subject: string;
@@ -5,19 +8,23 @@ type SendEmailInput = {
 };
 
 export async function sendEmail(input: SendEmailInput): Promise<void> {
-  if (process.env.NODE_ENV !== "production") {
-    console.log("[email] would send to:", input.to, "| subject:", input.subject);
+  const { AWS_REGION: region, SES_FROM_ADDRESS: fromAddress } = getServerConfig();
+
+  if (!region || !fromAddress) {
+    console.log(
+      "[email] AWS not configured — would send to:",
+      input.to,
+      "| subject:",
+      input.subject,
+    );
     return;
   }
 
-  const { SESClient, SendEmailCommand } = await import("@aws-sdk/client-ses");
-
-  const config = getAwsEmailConfig();
-  const client = new SESClient({ region: config.region });
+  const client = new SESClient({ region });
 
   await client.send(
     new SendEmailCommand({
-      Source: config.fromAddress,
+      Source: fromAddress,
       Destination: { ToAddresses: [input.to] },
       Message: {
         Subject: { Data: input.subject, Charset: "UTF-8" },
@@ -25,15 +32,4 @@ export async function sendEmail(input: SendEmailInput): Promise<void> {
       },
     }),
   );
-}
-
-function getAwsEmailConfig() {
-  const region = process.env.AWS_REGION;
-  const fromAddress = process.env.SES_FROM_ADDRESS;
-
-  if (!region || !fromAddress) {
-    throw new Error("Missing required env vars: AWS_REGION, SES_FROM_ADDRESS");
-  }
-
-  return { region, fromAddress };
 }

@@ -201,6 +201,7 @@ function fireOrderNotification({
     await notifyOrderPlaced({
       orderRef: formatOrderRef(order.order_number),
       accountId: data.account_id,
+      placedById,
       accountName,
       placedByName,
       deliveryAddress: data.delivery_address ?? null,

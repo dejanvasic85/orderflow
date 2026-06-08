@@ -1,19 +1,17 @@
+import { SNSClient, PublishCommand } from "@aws-sdk/client-sns";
+import { getServerConfig } from "@/lib/config";
+
 type SendSmsInput = {
   to: string;
   body: string;
 };
 
 export async function sendSms(input: SendSmsInput): Promise<void> {
-  if (process.env.NODE_ENV !== "production") {
-    console.log("[sms] would send to:", input.to, "| body:", input.body);
-    return;
-  }
+  const { AWS_REGION: region } = getServerConfig();
 
-  const { SNSClient, PublishCommand } = await import("@aws-sdk/client-sns");
-
-  const region = process.env.AWS_REGION;
   if (!region) {
-    throw new Error("Missing required env var: AWS_REGION");
+    console.log("[sms] AWS not configured — would send to:", input.to, "| body:", input.body);
+    return;
   }
 
   const client = new SNSClient({ region });
