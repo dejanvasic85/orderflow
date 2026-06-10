@@ -8,9 +8,14 @@ type SendEmailInput = {
 };
 
 export async function sendEmail(input: SendEmailInput): Promise<void> {
-  const { AWS_REGION: region, SES_FROM_ADDRESS: fromAddress } = getServerConfig();
+  const {
+    AWS_REGION: region,
+    AWS_ACCESS_KEY_ID: accessKeyId,
+    AWS_SECRET_ACCESS_KEY: secretAccessKey,
+    SES_FROM_ADDRESS: fromAddress,
+  } = getServerConfig();
 
-  if (!region || !fromAddress) {
+  if (!region || !accessKeyId || !secretAccessKey || !fromAddress) {
     console.log(
       "[email] AWS not configured — would send to:",
       input.to,
@@ -20,7 +25,7 @@ export async function sendEmail(input: SendEmailInput): Promise<void> {
     return;
   }
 
-  const client = new SESClient({ region });
+  const client = new SESClient({ region, credentials: { accessKeyId, secretAccessKey } });
 
   await client.send(
     new SendEmailCommand({
