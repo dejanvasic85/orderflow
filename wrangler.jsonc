@@ -4,4 +4,9 @@
   "compatibility_date": "2025-09-02",
   "compatibility_flags": ["nodejs_compat"],
   "main": "@tanstack/react-start/server-entry",
+  "vars": {
+    "AWS_REGION": "ap-southeast-2",
+    "SES_FROM_ADDRESS": "info@vasic.com.au",
+    "SITE_URL": "https://orderflow.team-manager.workers.dev",
+  },
 }
