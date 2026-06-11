@@ -46,7 +46,7 @@ Priorities: `Must` · `Should` · `Nice`
 - [ ] Feature | Must | Invite for staff and admin should work seamlessly - at the moment only users have been tested!
 - [x] Feature | Must | Email notification on order placed
 - [x] Feature | Must | SMS notifications (Phase 2)
-- [ ] Feature | Must| Search users by email or name (server-side filter)
+- [x] Feature | Must| Search users by email or name (server-side filter)
 - [ ] Feature | Must| Sort users in admin list
 - [ ] Feature | Must | Paging on users list
 - [ ] Feature | Must | Change password while logged in
