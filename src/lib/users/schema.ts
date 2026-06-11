@@ -66,3 +66,10 @@ export const updateUserAccountsSchema = z.object({
 });
 
 export type UpdateUserAccountsInput = z.infer<typeof updateUserAccountsSchema>;
+
+export const listUsersSearchSchema = z.object({
+  q: z.string().optional(),
+  role: z.enum(userRoles).optional(),
+});
+
+export type ListUsersSearch = z.infer<typeof listUsersSearchSchema>;

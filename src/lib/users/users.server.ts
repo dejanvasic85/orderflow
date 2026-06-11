@@ -5,6 +5,7 @@ import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import type { UpdateUserAccountsInput, User, UserAccount, UserRole } from "./schema";
 
 type FetchUsersFilters = {
+  q?: string;
   role?: UserRole;
   excludeIds?: string[];
 };
@@ -103,11 +104,17 @@ export async function resolveAccountNames(
 
 export async function fetchUsers(filters: FetchUsersFilters = {}) {
   const supabaseServer = createSupabaseServerClient();
+  await assertAdminOrStaff(supabaseServer);
+
   let query = supabaseServer
     .from("users_with_email")
     .select(userListSelect)
     .order("name", { ascending: true });
 
+  if (filters.q) {
+    const safe = filters.q.replace(/[%_()]/g, "");
+    query = query.or(`name.ilike.%${safe}%,email.ilike.%${safe}%`);
+  }
   if (filters.role) {
     query = query.eq("role", filters.role);
   }

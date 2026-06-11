@@ -1,7 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getServerConfig } from "@/lib/config";
-import type { UserRole } from "./schema";
-import { createUserSchema, updateUserSchema, updateUserAccountsSchema } from "./schema";
+import {
+  createUserSchema,
+  listUsersSearchSchema,
+  type ListUsersSearch,
+  updateUserSchema,
+  updateUserAccountsSchema,
+} from "./schema";
 import {
   checkEmail,
   fetchUser,
@@ -12,13 +17,8 @@ import {
   sendInvite,
 } from "./users.server";
 
-type ListUsersFilters = {
-  role?: UserRole;
-  excludeIds?: string[];
-};
-
 export const listUsers = createServerFn({ method: "GET", strict: { output: false } })
-  .validator((filters: ListUsersFilters = {}) => filters)
+  .validator((filters: ListUsersSearch = {}) => listUsersSearchSchema.parse(filters))
   .handler(async ({ data: filters }) => fetchUsers(filters));
 
 export const getUser = createServerFn({ method: "GET", strict: { output: false } })

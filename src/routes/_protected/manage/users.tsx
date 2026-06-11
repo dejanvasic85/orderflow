@@ -1,3 +1,4 @@
+import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -18,6 +19,7 @@ import { listAccounts } from "@/lib/accounts/accounts.functions";
 import type { Account } from "@/lib/accounts/schema";
 import { asResult } from "@/lib/result";
 import type { UpdateUserAccountsInput, User } from "@/lib/users/schema";
+import { listUsersSearchSchema } from "@/lib/users/schema";
 import {
   checkEmailExists,
   inviteUser,
@@ -28,23 +30,30 @@ import {
 } from "@/lib/users/users.functions";
 
 export const Route = createFileRoute("/_protected/manage/users")({
-  loader: async () => {
-    const [usersRaw, accountsRaw] = await Promise.all([listUsers(), listAccounts()]);
-    const usersResult = asResult<User[]>(usersRaw);
-    const accountsResult = asResult<Account[]>(accountsRaw);
-    if (!usersResult.ok) throw new Error(usersResult.error.message);
+  validateSearch: listUsersSearchSchema,
+  loaderDeps: ({ search }) => ({ q: search.q, role: search.role }),
+  loader: async ({ deps }) => {
+    const users = asResult<User[]>(await listUsers({ data: { q: deps.q, role: deps.role } }));
+
+    if (!users.ok) throw new Error(users.error.message);
+
+    const accountsResult = asResult<Account[]>(await listAccounts());
     if (!accountsResult.ok) throw new Error(accountsResult.error.message);
-    return { users: usersResult.value, accounts: accountsResult.value };
+
+    return { users: users.value, accounts: accountsResult.value };
   },
   component: UsersPage,
 });
 
 function UsersPage() {
   const { users: loadedUsers, accounts } = Route.useLoaderData();
+  const search = Route.useSearch();
+  const navigate = useNavigate();
+  const isLoading = useRouterState({ select: (s) => s.isLoading });
+
   const [users, setUsers] = useState<User[]>(loadedUsers);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
-  const [roleFilter, setRoleFilter] = useState<RoleFilter>("all");
 
   useEffect(() => {
     setUsers(loadedUsers);
@@ -54,6 +63,25 @@ function UsersPage() {
   const isDesktop = useMediaQuery("(min-width: 640px)");
   const panelSide = isDesktop ? "right" : "bottom";
   const panelClassName = "overflow-y-auto p-0 sm:w-[50vw] sm:min-w-[800px]";
+
+  const roleFilter: RoleFilter = search.role ?? "all";
+  const searchQuery = search.q ?? "";
+
+  function handleSearchChange(q: string) {
+    void navigate({
+      to: "/manage/users",
+      search: { q: q || undefined, role: search.role },
+      replace: true,
+    });
+  }
+
+  function handleRoleFilterChange(role: RoleFilter) {
+    void navigate({
+      to: "/manage/users",
+      search: { q: search.q, role: role === "all" ? undefined : role },
+      replace: true,
+    });
+  }
 
   function handleSelectUser(user: User) {
     setSelectedId(user.id);
@@ -149,8 +177,11 @@ function UsersPage() {
           users={users}
           selectedId={selectedId}
           roleFilter={roleFilter}
+          searchQuery={searchQuery}
+          isLoading={isLoading}
           onSelectUser={handleSelectUser}
-          onRoleFilterChange={setRoleFilter}
+          onRoleFilterChange={handleRoleFilterChange}
+          onSearchChange={handleSearchChange}
         />
 
         <Sheet open={!!selectedUser} onOpenChange={(open) => !open && handleDiscard()}>
