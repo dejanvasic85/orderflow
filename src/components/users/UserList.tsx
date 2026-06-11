@@ -1,5 +1,9 @@
+import { Search } from "lucide-react";
+import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -8,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useDebounce } from "@/hooks/use-debounce";
 import { type User, type UserRole, userRoles } from "@/lib/users/schema";
 import { cn } from "@/lib/utils";
 import { UserStatusBadge } from "./UserStatusBadge";
@@ -18,8 +23,14 @@ type Props = {
   users: User[];
   selectedId: string | null;
   roleFilter: RoleFilter;
+  searchQuery: string;
+  isLoading?: boolean;
+  currentPage: number;
+  totalPages: number;
   onSelectUser: (user: User) => void;
   onRoleFilterChange: (filter: RoleFilter) => void;
+  onSearchChange: (q: string) => void;
+  onPageChange: (page: number) => void;
 };
 
 const roleLabelMap: Record<UserRole, string> = {
@@ -37,13 +48,40 @@ export function UserList({
   users,
   selectedId,
   roleFilter,
+  searchQuery,
+  isLoading = false,
+  currentPage,
+  totalPages,
   onSelectUser,
   onRoleFilterChange,
+  onSearchChange,
+  onPageChange,
 }: Props) {
-  const filtered = roleFilter === "all" ? users : users.filter((u) => u.role === roleFilter);
+  const [inputValue, setInputValue] = useState(searchQuery);
+  const debouncedInput = useDebounce(inputValue, 300);
+
+  useEffect(() => {
+    onSearchChange(debouncedInput);
+  }, [debouncedInput]);
+
+  useEffect(() => {
+    setInputValue(searchQuery);
+  }, [searchQuery]);
+
+  const showEmpty = !isLoading && users.length === 0;
 
   return (
     <div className="flex flex-col gap-4">
+      <div className="relative">
+        <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+        <Input
+          className="pl-9"
+          placeholder="Search by name or email..."
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+        />
+      </div>
+
       <div className="flex items-center gap-1.5">
         {roleFilters.map((f) => (
           <button
@@ -73,44 +111,101 @@ export function UserList({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filtered.map((user) => (
-            <TableRow
-              key={user.id}
-              data-state={selectedId === user.id ? "selected" : undefined}
-              className="cursor-pointer"
-              onClick={() => onSelectUser(user)}
-            >
-              <TableCell className="font-medium">{user.name}</TableCell>
-              <TableCell className="text-muted-foreground">{user.email}</TableCell>
-              <TableCell>
-                <Badge variant="secondary">{roleLabelMap[user.role]}</Badge>
-              </TableCell>
-              <TableCell className="text-muted-foreground">
-                {user.accounts.length > 0 ? user.accounts.length : "—"}
-              </TableCell>
-              <TableCell>
-                <UserStatusBadge
-                  status={
-                    !user.active ? "inactive" : !user.invite_accepted_at ? "pending" : "active"
-                  }
-                />
-              </TableCell>
-              <TableCell>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onSelectUser(user);
-                  }}
-                >
-                  Edit
-                </Button>
+          {isLoading &&
+            Array.from({ length: 3 }).map((_, i) => (
+              <TableRow key={i}>
+                <TableCell>
+                  <Skeleton className="h-4 w-32" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-48" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-16" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-8" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-16" />
+                </TableCell>
+                <TableCell />
+              </TableRow>
+            ))}
+
+          {showEmpty && (
+            <TableRow>
+              <TableCell colSpan={6} className="text-muted-foreground py-12 text-center text-sm">
+                {searchQuery !== "" || roleFilter !== "all"
+                  ? "No users match your search"
+                  : "No users found"}
               </TableCell>
             </TableRow>
-          ))}
+          )}
+
+          {!isLoading &&
+            users.map((user) => (
+              <TableRow
+                key={user.id}
+                data-state={selectedId === user.id ? "selected" : undefined}
+                className="cursor-pointer"
+                onClick={() => onSelectUser(user)}
+              >
+                <TableCell className="font-medium">{user.name}</TableCell>
+                <TableCell className="text-muted-foreground">{user.email}</TableCell>
+                <TableCell>
+                  <Badge variant="secondary">{roleLabelMap[user.role]}</Badge>
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {user.accounts.length > 0 ? user.accounts.length : "—"}
+                </TableCell>
+                <TableCell>
+                  <UserStatusBadge
+                    status={
+                      !user.active ? "inactive" : !user.invite_accepted_at ? "pending" : "active"
+                    }
+                  />
+                </TableCell>
+                <TableCell>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSelectUser(user);
+                    }}
+                  >
+                    Edit
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
         </TableBody>
       </Table>
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-3 py-2">
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={currentPage <= 1 || isLoading}
+            onClick={() => onPageChange(currentPage - 1)}
+          >
+            Previous
+          </Button>
+          <span className="text-muted-foreground text-sm">
+            Page {currentPage} of {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={currentPage >= totalPages || isLoading}
+            onClick={() => onPageChange(currentPage + 1)}
+          >
+            Next
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

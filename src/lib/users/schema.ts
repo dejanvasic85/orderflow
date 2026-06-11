@@ -66,3 +66,15 @@ export const updateUserAccountsSchema = z.object({
 });
 
 export type UpdateUserAccountsInput = z.infer<typeof updateUserAccountsSchema>;
+
+export const userPageSize = 20;
+
+export const listUsersSearchSchema = z.object({
+  q: z.string().optional(),
+  role: z.enum(userRoles).optional(),
+  page: z.coerce.number().int().positive().optional(),
+});
+
+export type ListUsersSearch = z.infer<typeof listUsersSearchSchema>;
+
+export type PagedUsersResult = { users: User[]; total: number };
