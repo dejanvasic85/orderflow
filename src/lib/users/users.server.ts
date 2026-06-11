@@ -2,11 +2,18 @@ import { ensureSession } from "@/lib/auth/auth.functions";
 import { err, ok } from "@/lib/result";
 import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
-import type { UpdateUserAccountsInput, User, UserAccount, UserRole } from "./schema";
+import {
+  userPageSize,
+  type UpdateUserAccountsInput,
+  type User,
+  type UserAccount,
+  type UserRole,
+} from "./schema";
 
 type FetchUsersFilters = {
   q?: string;
   role?: UserRole;
+  page?: number;
   excludeIds?: string[];
 };
 
@@ -106,9 +113,11 @@ export async function fetchUsers(filters: FetchUsersFilters = {}) {
   const supabaseServer = createSupabaseServerClient();
   await assertAdminOrStaff(supabaseServer);
 
+  const isSubsetQuery = filters.excludeIds && filters.excludeIds.length > 0;
+
   let query = supabaseServer
     .from("users_with_email")
-    .select(userListSelect)
+    .select(userListSelect, isSubsetQuery ? undefined : { count: "exact" })
     .order("name", { ascending: true });
 
   if (filters.q) {
@@ -118,13 +127,20 @@ export async function fetchUsers(filters: FetchUsersFilters = {}) {
   if (filters.role) {
     query = query.eq("role", filters.role);
   }
-  if (filters.excludeIds && filters.excludeIds.length > 0) {
-    query = query.not("id", "in", `(${filters.excludeIds.join(",")})`);
+  if (isSubsetQuery) {
+    query = query.not("id", "in", `(${filters.excludeIds!.join(",")})`);
+    const { data, error } = await query;
+    if (error) return err({ message: error.message });
+    return ok({ users: (data as ListedRow[] | null)?.map(mapUser) ?? [], total: 0 });
   }
 
-  const { data, error } = await query;
+  const page = filters.page ?? 1;
+  const from = (page - 1) * userPageSize;
+  query = query.range(from, from + userPageSize - 1);
+
+  const { data, error, count } = await query;
   if (error) return err({ message: error.message });
-  return ok((data as ListedRow[] | null)?.map(mapUser) ?? []);
+  return ok({ users: (data as ListedRow[] | null)?.map(mapUser) ?? [], total: count ?? 0 });
 }
 
 export async function fetchUser(id: string) {

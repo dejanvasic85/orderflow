@@ -51,6 +51,7 @@ const pendingUser: User = {
 const onSelectUser = vi.fn();
 const onRoleFilterChange = vi.fn();
 const onSearchChange = vi.fn();
+const onPageChange = vi.fn();
 
 let user: UserEvent;
 
@@ -65,9 +66,12 @@ function renderList(overrides: Partial<Parameters<typeof UserList>[0]> = {}) {
       selectedId={null}
       roleFilter="all"
       searchQuery=""
+      currentPage={1}
+      totalPages={1}
       onSelectUser={onSelectUser}
       onRoleFilterChange={onRoleFilterChange}
       onSearchChange={onSearchChange}
+      onPageChange={onPageChange}
       {...overrides}
     />,
   );
@@ -185,4 +189,47 @@ test("shows skeleton rows when isLoading is true", () => {
   const rows = screen.getAllByRole("row");
   // 1 header row + 3 skeleton rows
   expect(rows).toHaveLength(4);
+});
+
+test("hides pagination when totalPages is 1", () => {
+  renderList({ currentPage: 1, totalPages: 1 });
+
+  expect(screen.queryByRole("button", { name: "Previous" })).not.toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: "Next" })).not.toBeInTheDocument();
+});
+
+test("shows pagination controls when totalPages is greater than 1", () => {
+  renderList({ currentPage: 1, totalPages: 3 });
+
+  expect(screen.getByRole("button", { name: "Previous" })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Next" })).toBeInTheDocument();
+  expect(screen.getByText("Page 1 of 3")).toBeInTheDocument();
+});
+
+test("disables Previous button on first page", () => {
+  renderList({ currentPage: 1, totalPages: 3 });
+
+  expect(screen.getByRole("button", { name: "Previous" })).toBeDisabled();
+});
+
+test("disables Next button on last page", () => {
+  renderList({ currentPage: 3, totalPages: 3 });
+
+  expect(screen.getByRole("button", { name: "Next" })).toBeDisabled();
+});
+
+test("calls onPageChange with previous page when Previous is clicked", async () => {
+  renderList({ currentPage: 2, totalPages: 3 });
+
+  await user.click(screen.getByRole("button", { name: "Previous" }));
+
+  expect(onPageChange).toHaveBeenCalledWith(1);
+});
+
+test("calls onPageChange with next page when Next is clicked", async () => {
+  renderList({ currentPage: 2, totalPages: 3 });
+
+  await user.click(screen.getByRole("button", { name: "Next" }));
+
+  expect(onPageChange).toHaveBeenCalledWith(3);
 });

@@ -47,7 +47,7 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Feature | Must | Email notification on order placed
 - [x] Feature | Must | SMS notifications (Phase 2)
 - [x] Feature | Must| Search users by email or name (server-side filter)
-- [ ] Feature | Must| Sort users in admin list
+- [x] Feature | Must| Sort users in admin list
 - [ ] Feature | Must | Paging on users list
 - [ ] Feature | Must | Change password while logged in
 - [ ] Feature | Must | CSV import for products and accounts (incl. MYOB import back into our system)

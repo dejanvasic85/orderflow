@@ -25,9 +25,12 @@ type Props = {
   roleFilter: RoleFilter;
   searchQuery: string;
   isLoading?: boolean;
+  currentPage: number;
+  totalPages: number;
   onSelectUser: (user: User) => void;
   onRoleFilterChange: (filter: RoleFilter) => void;
   onSearchChange: (q: string) => void;
+  onPageChange: (page: number) => void;
 };
 
 const roleLabelMap: Record<UserRole, string> = {
@@ -47,9 +50,12 @@ export function UserList({
   roleFilter,
   searchQuery,
   isLoading = false,
+  currentPage,
+  totalPages,
   onSelectUser,
   onRoleFilterChange,
   onSearchChange,
+  onPageChange,
 }: Props) {
   const [inputValue, setInputValue] = useState(searchQuery);
   const debouncedInput = useDebounce(inputValue, 300);
@@ -176,6 +182,30 @@ export function UserList({
             ))}
         </TableBody>
       </Table>
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-3 py-2">
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={currentPage <= 1 || isLoading}
+            onClick={() => onPageChange(currentPage - 1)}
+          >
+            Previous
+          </Button>
+          <span className="text-muted-foreground text-sm">
+            Page {currentPage} of {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={currentPage >= totalPages || isLoading}
+            onClick={() => onPageChange(currentPage + 1)}
+          >
+            Next
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
