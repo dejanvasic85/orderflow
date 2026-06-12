@@ -50,9 +50,9 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Feature | Must | Paging on users list
 - [x] Feature | Must | Paging on accounts
 - [x] Feature | Must | Paging on orders
+- [x] Feature | Must | Product management
+- [ ] Feature | Must | Image upload and transformations
 - [ ] Feature | Must | Change password while logged in
-- [ ] Feature | Must | CSV import for products and accounts (incl. MYOB import back into our system)
-- [ ] Feature | Must | MYOB CSV export — orders out of our system into MYOB
 - [ ] Quality | Must | Unit testing the server functions
 - [ ] Quality | Must | Playwright tests improved and working locally
 - [ ] Quality | Must | Playwright custom container with Supabase so it is working properly in the pipeline
@@ -60,6 +60,8 @@ Priorities: `Must` · `Should` · `Nice`
 - [ ] Feature | Must | Notification preferences UI — users edit their own email/SMS preferences
 - [ ] Feature | Must | Staff role surface — read-only view of all order requests
 - [ ] Productionising | Must | Fix the publicly available view users_with_email - see email for warning from supabase
+- [ ] Feature | Must | CSV import for products and accounts (incl. MYOB import back into our system)
+- [ ] Feature | Must | MYOB CSV export — orders out of our system into MYOB
 - [ ] Productionising | Must | Set up production domain (orders.bwow.com.au) — confirm access with Sam or register new
 - [ ] Productionising | Must | SMTP server (AWS SES) for email notifications — configure in Supabase, verify `vasic.com.au` for DKIM as interim
 - [ ] Productionising | Must | Email templates
