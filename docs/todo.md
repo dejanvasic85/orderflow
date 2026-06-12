@@ -48,6 +48,8 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Feature | Must | SMS notifications (Phase 2)
 - [x] Feature | Must| Search users by email or name (server-side filter)
 - [x] Feature | Must | Paging on users list
+- [x] Feature | Must | Paging on accounts
+- [x] Feature | Must | Paging on orders
 - [ ] Feature | Must | Change password while logged in
 - [ ] Feature | Must | CSV import for products and accounts (incl. MYOB import back into our system)
 - [ ] Feature | Must | MYOB CSV export — orders out of our system into MYOB

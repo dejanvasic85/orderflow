@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import type { OrderHistoryItem } from "@/lib/orderRequests/orderRequests.server";
+import type { OrderHistoryItem } from "@/lib/orderRequests/schema";
 import { OrderHistoryList } from "./OrderHistoryList";
 
 const orderOne: OrderHistoryItem = {

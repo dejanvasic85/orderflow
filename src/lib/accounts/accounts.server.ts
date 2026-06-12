@@ -9,6 +9,7 @@ import type {
   createAccountSchema,
   updateAccountSchema,
 } from "./schema";
+import { accountPageSize } from "./schema";
 
 type AccountListedRow = AccountRow & { account_users: { user_id: string }[] | null };
 
@@ -33,14 +34,31 @@ export async function fetchAccountsForCurrentUser() {
   return ok(accounts);
 }
 
-export async function fetchAccounts() {
+type FetchAccountsFilters = {
+  q?: string;
+  page?: number;
+};
+
+export async function fetchAccounts(filters: FetchAccountsFilters = {}) {
   const supabase = createSupabaseServerClient();
-  const { data, error } = await supabase
+  let query = supabase
     .from("accounts")
-    .select(accountSelect)
+    .select(accountSelect, { count: "exact" })
     .order("name", { ascending: true });
+
+  if (filters.q) {
+    const safe = filters.q.replace(/[%_()]/g, "");
+    query = query.ilike("name", `%${safe}%`);
+  }
+
+  if (filters.page !== undefined) {
+    const from = (filters.page - 1) * accountPageSize;
+    query = query.range(from, from + accountPageSize - 1);
+  }
+
+  const { data, error, count } = await query;
   if (error) return err({ message: error.message });
-  return ok((data ?? []).map((row) => mapAccount(row)));
+  return ok({ accounts: (data ?? []).map((row) => mapAccount(row)), total: count ?? 0 });
 }
 
 export async function fetchAccount(id: string) {

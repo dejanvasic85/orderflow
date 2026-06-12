@@ -32,6 +32,33 @@ export const createOrderRequestSchema = z.object({
 export type CreateOrderRequestInput = z.infer<typeof createOrderRequestSchema>;
 export type OrderRequestItemInput = z.infer<typeof orderRequestItemInputSchema>;
 
+export type OrderHistoryItem = {
+  id: string;
+  order_number: number;
+  placed_by: string;
+  placedByName: string;
+  placedByOrgName?: string;
+  status: string;
+  created_at: string;
+  total_bottles: number;
+  total_boxes: number;
+  account_name?: string;
+};
+
+export const listOrdersSearchSchema = z.object({
+  q: z.string().optional(),
+  page: z.coerce.number().int().positive().optional(),
+});
+
+export type ListOrdersSearch = z.infer<typeof listOrdersSearchSchema>;
+
+export type PagedOrdersResult = {
+  orders: OrderHistoryItem[];
+  total: number;
+};
+
+export const orderPageSize = 20;
+
 export function formatOrderRef(orderNumber: number): string {
   return `ORD-${String(orderNumber).padStart(4, "0")}`;
 }

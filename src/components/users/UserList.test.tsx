@@ -63,6 +63,7 @@ function renderList(overrides: Partial<Parameters<typeof UserList>[0]> = {}) {
   return render(
     <UserList
       users={[adminUser, staffUser]}
+      total={2}
       selectedId={null}
       roleFilter="all"
       searchQuery=""
@@ -179,6 +180,20 @@ test("calls onSearchChange after 300ms debounce when user types", async () => {
   });
 
   expect(onSearchChange).toHaveBeenCalledWith("alice");
+
+  vi.useRealTimers();
+});
+
+test("does not call onSearchChange on mount when input matches the search query", async () => {
+  vi.useFakeTimers({ shouldAdvanceTime: true });
+
+  renderList({ searchQuery: "alice" });
+
+  await act(async () => {
+    vi.runAllTimers();
+  });
+
+  expect(onSearchChange).not.toHaveBeenCalled();
 
   vi.useRealTimers();
 });

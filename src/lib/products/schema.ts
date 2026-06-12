@@ -15,3 +15,18 @@ export const updateProductSchema = createProductSchema.partial().extend({ id: z.
 
 export type CreateProductInput = z.infer<typeof createProductSchema>;
 export type UpdateProductInput = z.infer<typeof updateProductSchema>;
+
+export const productPageSize = 12;
+
+export const listProductsSearchSchema = z.object({
+  q: z.string().optional(),
+  page: z.coerce.number().int().positive().optional(),
+});
+
+export const listProductsFiltersSchema = listProductsSearchSchema.extend({
+  includeInactive: z.boolean().optional(),
+});
+
+export type ListProductsSearch = z.infer<typeof listProductsSearchSchema>;
+export type ListProductsFilters = z.infer<typeof listProductsFiltersSchema>;
+export type PagedProductsResult = { products: ProductRow[]; total: number };

@@ -9,11 +9,16 @@ import {
   insertAccountUser,
   patchAccount,
 } from "./accounts.server";
-import { assignSchema, createAccountSchema, updateAccountSchema } from "./schema";
+import {
+  assignSchema,
+  createAccountSchema,
+  listAccountsSearchSchema,
+  updateAccountSchema,
+} from "./schema";
 
-export const listAccounts = createServerFn({ method: "GET", strict: { output: false } }).handler(
-  fetchAccounts,
-);
+export const listAccounts = createServerFn({ method: "GET", strict: { output: false } })
+  .validator(listAccountsSearchSchema)
+  .handler(async ({ data }) => fetchAccounts(data));
 
 export const listAccountsForCurrentUser = createServerFn({
   method: "GET",

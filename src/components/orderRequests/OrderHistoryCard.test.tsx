@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import type { OrderHistoryItem } from "@/lib/orderRequests/orderRequests.server";
+import type { OrderHistoryItem } from "@/lib/orderRequests/schema";
 import { OrderHistoryCard } from "./OrderHistoryCard";
 
 const baseOrder: OrderHistoryItem = {

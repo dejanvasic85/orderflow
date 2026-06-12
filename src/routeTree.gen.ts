@@ -21,6 +21,7 @@ import { Route as ProtectedManageRouteImport } from './routes/_protected/manage'
 import { Route as ProtectedAccountRouteImport } from './routes/_protected/_account'
 import { Route as ProtectedAccountsIndexRouteImport } from './routes/_protected/accounts/index'
 import { Route as ProtectedManageUsersRouteImport } from './routes/_protected/manage/users'
+import { Route as ProtectedManageProductsRouteImport } from './routes/_protected/manage/products'
 import { Route as ProtectedManageDashboardRouteImport } from './routes/_protected/manage/dashboard'
 import { Route as ProtectedAccountAccountsRouteImport } from './routes/_protected/_account/accounts'
 import { Route as ProtectedManageOrdersIndexRouteImport } from './routes/_protected/manage/orders/index'
@@ -91,6 +92,11 @@ const ProtectedAccountsIndexRoute = ProtectedAccountsIndexRouteImport.update({
 const ProtectedManageUsersRoute = ProtectedManageUsersRouteImport.update({
   id: '/users',
   path: '/users',
+  getParentRoute: () => ProtectedManageRoute,
+} as any)
+const ProtectedManageProductsRoute = ProtectedManageProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
   getParentRoute: () => ProtectedManageRoute,
 } as any)
 const ProtectedManageDashboardRoute =
@@ -183,6 +189,7 @@ export interface FileRoutesByFullPath {
   '/auth/set-password': typeof AuthSetPasswordRoute
   '/accounts': typeof ProtectedAccountAccountsRouteWithChildren
   '/manage/dashboard': typeof ProtectedManageDashboardRoute
+  '/manage/products': typeof ProtectedManageProductsRoute
   '/manage/users': typeof ProtectedManageUsersRoute
   '/accounts/': typeof ProtectedAccountsIndexRoute
   '/manage/orders/$orderId': typeof ProtectedManageOrdersOrderIdRoute
@@ -208,6 +215,7 @@ export interface FileRoutesByTo {
   '/auth/set-password': typeof AuthSetPasswordRoute
   '/accounts': typeof ProtectedAccountsIndexRoute
   '/manage/dashboard': typeof ProtectedManageDashboardRoute
+  '/manage/products': typeof ProtectedManageProductsRoute
   '/manage/users': typeof ProtectedManageUsersRoute
   '/manage/orders/$orderId': typeof ProtectedManageOrdersOrderIdRoute
   '/manage/orders/new': typeof ProtectedManageOrdersNewRoute
@@ -235,6 +243,7 @@ export interface FileRoutesById {
   '/auth/set-password': typeof AuthSetPasswordRoute
   '/_protected/_account/accounts': typeof ProtectedAccountAccountsRouteWithChildren
   '/_protected/manage/dashboard': typeof ProtectedManageDashboardRoute
+  '/_protected/manage/products': typeof ProtectedManageProductsRoute
   '/_protected/manage/users': typeof ProtectedManageUsersRoute
   '/_protected/accounts/': typeof ProtectedAccountsIndexRoute
   '/_protected/manage/orders/$orderId': typeof ProtectedManageOrdersOrderIdRoute
@@ -262,6 +271,7 @@ export interface FileRouteTypes {
     | '/auth/set-password'
     | '/accounts'
     | '/manage/dashboard'
+    | '/manage/products'
     | '/manage/users'
     | '/accounts/'
     | '/manage/orders/$orderId'
@@ -287,6 +297,7 @@ export interface FileRouteTypes {
     | '/auth/set-password'
     | '/accounts'
     | '/manage/dashboard'
+    | '/manage/products'
     | '/manage/users'
     | '/manage/orders/$orderId'
     | '/manage/orders/new'
@@ -313,6 +324,7 @@ export interface FileRouteTypes {
     | '/auth/set-password'
     | '/_protected/_account/accounts'
     | '/_protected/manage/dashboard'
+    | '/_protected/manage/products'
     | '/_protected/manage/users'
     | '/_protected/accounts/'
     | '/_protected/manage/orders/$orderId'
@@ -423,6 +435,13 @@ declare module '@tanstack/react-router' {
       path: '/users'
       fullPath: '/manage/users'
       preLoaderRoute: typeof ProtectedManageUsersRouteImport
+      parentRoute: typeof ProtectedManageRoute
+    }
+    '/_protected/manage/products': {
+      id: '/_protected/manage/products'
+      path: '/products'
+      fullPath: '/manage/products'
+      preLoaderRoute: typeof ProtectedManageProductsRouteImport
       parentRoute: typeof ProtectedManageRoute
     }
     '/_protected/manage/dashboard': {
@@ -559,6 +578,7 @@ const ProtectedAccountRouteWithChildren =
 
 interface ProtectedManageRouteChildren {
   ProtectedManageDashboardRoute: typeof ProtectedManageDashboardRoute
+  ProtectedManageProductsRoute: typeof ProtectedManageProductsRoute
   ProtectedManageUsersRoute: typeof ProtectedManageUsersRoute
   ProtectedManageOrdersOrderIdRoute: typeof ProtectedManageOrdersOrderIdRoute
   ProtectedManageOrdersNewRoute: typeof ProtectedManageOrdersNewRoute
@@ -570,6 +590,7 @@ interface ProtectedManageRouteChildren {
 
 const ProtectedManageRouteChildren: ProtectedManageRouteChildren = {
   ProtectedManageDashboardRoute: ProtectedManageDashboardRoute,
+  ProtectedManageProductsRoute: ProtectedManageProductsRoute,
   ProtectedManageUsersRoute: ProtectedManageUsersRoute,
   ProtectedManageOrdersOrderIdRoute: ProtectedManageOrdersOrderIdRoute,
   ProtectedManageOrdersNewRoute: ProtectedManageOrdersNewRoute,

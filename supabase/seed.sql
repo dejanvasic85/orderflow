@@ -248,3 +248,127 @@ INSERT INTO public.account_users (account_id, user_id) VALUES
   ('b2c3d4e5-f6a7-4b8c-9d0e-000000000a04', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000003'),
   ('b2c3d4e5-f6a7-4b8c-9d0e-000000000a03', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000004')
 ON CONFLICT DO NOTHING;
+
+-- ============================================================
+-- ORDER REQUESTS  (The Winery Bistro — 25 orders)
+-- account:    b2c3d4e5-f6a7-4b8c-9d0e-000000000a01  (The Winery Bistro)
+-- placed by:  a1b2c3d4-e5f6-4a7b-8c9d-000000000003  (Tom Reynolds, user)
+--             a1b2c3d4-e5f6-4a7b-8c9d-000000000001  (admin placing on behalf)
+-- products:   001 Rosé, 002 Pinot Noir, 003 Chardonnay, 004 Sauv Blanc,
+--             005 Shiraz, 006 Prosecco, 012 Sparkling Water
+-- ============================================================
+
+INSERT INTO public.order_requests (id, account_id, placed_by, status, delivery_address, created_at) VALUES
+  ('e5f6a7b8-0001-4c9d-8e1f-000000000001', 'b2c3d4e5-f6a7-4b8c-9d0e-000000000a01', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000003', 'submitted', '12 Vineyard Lane, McLaren Vale SA 5171', now() - interval '180 days'),
+  ('e5f6a7b8-0002-4c9d-8e1f-000000000002', 'b2c3d4e5-f6a7-4b8c-9d0e-000000000a01', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000003', 'submitted', '12 Vineyard Lane, McLaren Vale SA 5171', now() - interval '173 days'),
+  ('e5f6a7b8-0003-4c9d-8e1f-000000000003', 'b2c3d4e5-f6a7-4b8c-9d0e-000000000a01', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000001', 'submitted', '12 Vineyard Lane, McLaren Vale SA 5171', now() - interval '166 days'),
+  ('e5f6a7b8-0004-4c9d-8e1f-000000000004', 'b2c3d4e5-f6a7-4b8c-9d0e-000000000a01', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000003', 'submitted', '12 Vineyard Lane, McLaren Vale SA 5171', now() - interval '159 days'),
+  ('e5f6a7b8-0005-4c9d-8e1f-000000000005', 'b2c3d4e5-f6a7-4b8c-9d0e-000000000a01', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000003', 'submitted', '12 Vineyard Lane, McLaren Vale SA 5171', now() - interval '152 days'),
+  ('e5f6a7b8-0006-4c9d-8e1f-000000000006', 'b2c3d4e5-f6a7-4b8c-9d0e-000000000a01', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000001', 'submitted', '12 Vineyard Lane, McLaren Vale SA 5171', now() - interval '145 days'),
+  ('e5f6a7b8-0007-4c9d-8e1f-000000000007', 'b2c3d4e5-f6a7-4b8c-9d0e-000000000a01', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000003', 'submitted', '12 Vineyard Lane, McLaren Vale SA 5171', now() - interval '138 days'),
+  ('e5f6a7b8-0008-4c9d-8e1f-000000000008', 'b2c3d4e5-f6a7-4b8c-9d0e-000000000a01', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000003', 'submitted', '12 Vineyard Lane, McLaren Vale SA 5171', now() - interval '131 days'),
+  ('e5f6a7b8-0009-4c9d-8e1f-000000000009', 'b2c3d4e5-f6a7-4b8c-9d0e-000000000a01', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000001', 'submitted', '12 Vineyard Lane, McLaren Vale SA 5171', now() - interval '124 days'),
+  ('e5f6a7b8-0010-4c9d-8e1f-000000000010', 'b2c3d4e5-f6a7-4b8c-9d0e-000000000a01', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000003', 'submitted', '12 Vineyard Lane, McLaren Vale SA 5171', now() - interval '117 days'),
+  ('e5f6a7b8-0011-4c9d-8e1f-000000000011', 'b2c3d4e5-f6a7-4b8c-9d0e-000000000a01', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000003', 'submitted', '12 Vineyard Lane, McLaren Vale SA 5171', now() - interval '110 days'),
+  ('e5f6a7b8-0012-4c9d-8e1f-000000000012', 'b2c3d4e5-f6a7-4b8c-9d0e-000000000a01', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000001', 'submitted', '12 Vineyard Lane, McLaren Vale SA 5171', now() - interval '103 days'),
+  ('e5f6a7b8-0013-4c9d-8e1f-000000000013', 'b2c3d4e5-f6a7-4b8c-9d0e-000000000a01', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000003', 'submitted', '12 Vineyard Lane, McLaren Vale SA 5171', now() - interval '96 days'),
+  ('e5f6a7b8-0014-4c9d-8e1f-000000000014', 'b2c3d4e5-f6a7-4b8c-9d0e-000000000a01', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000003', 'submitted', '12 Vineyard Lane, McLaren Vale SA 5171', now() - interval '89 days'),
+  ('e5f6a7b8-0015-4c9d-8e1f-000000000015', 'b2c3d4e5-f6a7-4b8c-9d0e-000000000a01', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000001', 'submitted', '12 Vineyard Lane, McLaren Vale SA 5171', now() - interval '82 days'),
+  ('e5f6a7b8-0016-4c9d-8e1f-000000000016', 'b2c3d4e5-f6a7-4b8c-9d0e-000000000a01', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000003', 'submitted', '12 Vineyard Lane, McLaren Vale SA 5171', now() - interval '75 days'),
+  ('e5f6a7b8-0017-4c9d-8e1f-000000000017', 'b2c3d4e5-f6a7-4b8c-9d0e-000000000a01', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000003', 'submitted', '12 Vineyard Lane, McLaren Vale SA 5171', now() - interval '68 days'),
+  ('e5f6a7b8-0018-4c9d-8e1f-000000000018', 'b2c3d4e5-f6a7-4b8c-9d0e-000000000a01', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000001', 'submitted', '12 Vineyard Lane, McLaren Vale SA 5171', now() - interval '61 days'),
+  ('e5f6a7b8-0019-4c9d-8e1f-000000000019', 'b2c3d4e5-f6a7-4b8c-9d0e-000000000a01', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000003', 'submitted', '12 Vineyard Lane, McLaren Vale SA 5171', now() - interval '54 days'),
+  ('e5f6a7b8-0020-4c9d-8e1f-000000000020', 'b2c3d4e5-f6a7-4b8c-9d0e-000000000a01', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000003', 'submitted', '12 Vineyard Lane, McLaren Vale SA 5171', now() - interval '47 days'),
+  ('e5f6a7b8-0021-4c9d-8e1f-000000000021', 'b2c3d4e5-f6a7-4b8c-9d0e-000000000a01', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000001', 'submitted', '12 Vineyard Lane, McLaren Vale SA 5171', now() - interval '40 days'),
+  ('e5f6a7b8-0022-4c9d-8e1f-000000000022', 'b2c3d4e5-f6a7-4b8c-9d0e-000000000a01', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000003', 'submitted', '12 Vineyard Lane, McLaren Vale SA 5171', now() - interval '33 days'),
+  ('e5f6a7b8-0023-4c9d-8e1f-000000000023', 'b2c3d4e5-f6a7-4b8c-9d0e-000000000a01', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000003', 'submitted', '12 Vineyard Lane, McLaren Vale SA 5171', now() - interval '26 days'),
+  ('e5f6a7b8-0024-4c9d-8e1f-000000000024', 'b2c3d4e5-f6a7-4b8c-9d0e-000000000a01', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000001', 'submitted', '12 Vineyard Lane, McLaren Vale SA 5171', now() - interval '19 days'),
+  ('e5f6a7b8-0025-4c9d-8e1f-000000000025', 'b2c3d4e5-f6a7-4b8c-9d0e-000000000a01', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000003', 'submitted', '12 Vineyard Lane, McLaren Vale SA 5171', now() - interval '12 days')
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO public.order_request_items (order_request_id, product_id, boxes, extra_bottles) VALUES
+  -- order 1: Rosé x2, Pinot Noir x1
+  ('e5f6a7b8-0001-4c9d-8e1f-000000000001', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000001', 2, 0),
+  ('e5f6a7b8-0001-4c9d-8e1f-000000000001', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000002', 1, 0),
+  -- order 2: Chardonnay x2, Sauv Blanc x1, Sparkling Water x1
+  ('e5f6a7b8-0002-4c9d-8e1f-000000000002', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000003', 2, 0),
+  ('e5f6a7b8-0002-4c9d-8e1f-000000000002', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000004', 1, 0),
+  ('e5f6a7b8-0002-4c9d-8e1f-000000000002', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000012', 1, 0),
+  -- order 3: Rosé x3, Prosecco x1, extra 6 bottles
+  ('e5f6a7b8-0003-4c9d-8e1f-000000000003', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000001', 3, 0),
+  ('e5f6a7b8-0003-4c9d-8e1f-000000000003', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000006', 1, 6),
+  -- order 4: Pinot Noir x2, Shiraz x1
+  ('e5f6a7b8-0004-4c9d-8e1f-000000000004', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000002', 2, 0),
+  ('e5f6a7b8-0004-4c9d-8e1f-000000000004', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000005', 1, 0),
+  -- order 5: Sauv Blanc x2, Sparkling Water x2
+  ('e5f6a7b8-0005-4c9d-8e1f-000000000005', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000004', 2, 0),
+  ('e5f6a7b8-0005-4c9d-8e1f-000000000005', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000012', 2, 0),
+  -- order 6: Rosé x2, Chardonnay x2, Pinot Noir x1
+  ('e5f6a7b8-0006-4c9d-8e1f-000000000006', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000001', 2, 0),
+  ('e5f6a7b8-0006-4c9d-8e1f-000000000006', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000003', 2, 0),
+  ('e5f6a7b8-0006-4c9d-8e1f-000000000006', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000002', 1, 0),
+  -- order 7: Prosecco x2, Sauv Blanc x1, extra 12 bottles
+  ('e5f6a7b8-0007-4c9d-8e1f-000000000007', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000006', 2, 12),
+  ('e5f6a7b8-0007-4c9d-8e1f-000000000007', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000004', 1, 0),
+  -- order 8: Shiraz x2, Pinot Noir x2
+  ('e5f6a7b8-0008-4c9d-8e1f-000000000008', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000005', 2, 0),
+  ('e5f6a7b8-0008-4c9d-8e1f-000000000008', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000002', 2, 0),
+  -- order 9: Rosé x1, Chardonnay x1, Sauv Blanc x1, Sparkling Water x1
+  ('e5f6a7b8-0009-4c9d-8e1f-000000000009', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000001', 1, 0),
+  ('e5f6a7b8-0009-4c9d-8e1f-000000000009', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000003', 1, 0),
+  ('e5f6a7b8-0009-4c9d-8e1f-000000000009', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000004', 1, 0),
+  ('e5f6a7b8-0009-4c9d-8e1f-000000000009', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000012', 1, 0),
+  -- order 10: Rosé x4
+  ('e5f6a7b8-0010-4c9d-8e1f-000000000010', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000001', 4, 0),
+  -- order 11: Pinot Noir x3, Prosecco x1
+  ('e5f6a7b8-0011-4c9d-8e1f-000000000011', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000002', 3, 0),
+  ('e5f6a7b8-0011-4c9d-8e1f-000000000011', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000006', 1, 0),
+  -- order 12: Chardonnay x3, Shiraz x1
+  ('e5f6a7b8-0012-4c9d-8e1f-000000000012', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000003', 3, 0),
+  ('e5f6a7b8-0012-4c9d-8e1f-000000000012', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000005', 1, 0),
+  -- order 13: Sauv Blanc x2, Rosé x2
+  ('e5f6a7b8-0013-4c9d-8e1f-000000000013', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000004', 2, 0),
+  ('e5f6a7b8-0013-4c9d-8e1f-000000000013', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000001', 2, 0),
+  -- order 14: Prosecco x3, extra 6 bottles
+  ('e5f6a7b8-0014-4c9d-8e1f-000000000014', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000006', 3, 6),
+  -- order 15: Pinot Noir x2, Chardonnay x1, Sparkling Water x2
+  ('e5f6a7b8-0015-4c9d-8e1f-000000000015', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000002', 2, 0),
+  ('e5f6a7b8-0015-4c9d-8e1f-000000000015', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000003', 1, 0),
+  ('e5f6a7b8-0015-4c9d-8e1f-000000000015', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000012', 2, 0),
+  -- order 16: Shiraz x3, Rosé x1
+  ('e5f6a7b8-0016-4c9d-8e1f-000000000016', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000005', 3, 0),
+  ('e5f6a7b8-0016-4c9d-8e1f-000000000016', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000001', 1, 0),
+  -- order 17: Sauv Blanc x1, Chardonnay x2, Prosecco x1
+  ('e5f6a7b8-0017-4c9d-8e1f-000000000017', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000004', 1, 0),
+  ('e5f6a7b8-0017-4c9d-8e1f-000000000017', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000003', 2, 0),
+  ('e5f6a7b8-0017-4c9d-8e1f-000000000017', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000006', 1, 0),
+  -- order 18: Rosé x2, Pinot Noir x2, Sparkling Water x1
+  ('e5f6a7b8-0018-4c9d-8e1f-000000000018', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000001', 2, 0),
+  ('e5f6a7b8-0018-4c9d-8e1f-000000000018', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000002', 2, 0),
+  ('e5f6a7b8-0018-4c9d-8e1f-000000000018', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000012', 1, 0),
+  -- order 19: Shiraz x2, Prosecco x2
+  ('e5f6a7b8-0019-4c9d-8e1f-000000000019', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000005', 2, 0),
+  ('e5f6a7b8-0019-4c9d-8e1f-000000000019', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000006', 2, 0),
+  -- order 20: Rosé x3, Chardonnay x1, Sauv Blanc x1
+  ('e5f6a7b8-0020-4c9d-8e1f-000000000020', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000001', 3, 0),
+  ('e5f6a7b8-0020-4c9d-8e1f-000000000020', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000003', 1, 0),
+  ('e5f6a7b8-0020-4c9d-8e1f-000000000020', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000004', 1, 0),
+  -- order 21: Pinot Noir x4
+  ('e5f6a7b8-0021-4c9d-8e1f-000000000021', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000002', 4, 0),
+  -- order 22: Chardonnay x2, Rosé x1, Sparkling Water x2
+  ('e5f6a7b8-0022-4c9d-8e1f-000000000022', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000003', 2, 0),
+  ('e5f6a7b8-0022-4c9d-8e1f-000000000022', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000001', 1, 0),
+  ('e5f6a7b8-0022-4c9d-8e1f-000000000022', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000012', 2, 0),
+  -- order 23: Shiraz x1, Pinot Noir x2, Prosecco x1
+  ('e5f6a7b8-0023-4c9d-8e1f-000000000023', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000005', 1, 0),
+  ('e5f6a7b8-0023-4c9d-8e1f-000000000023', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000002', 2, 0),
+  ('e5f6a7b8-0023-4c9d-8e1f-000000000023', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000006', 1, 0),
+  -- order 24: Rosé x2, Sauv Blanc x2, Chardonnay x1
+  ('e5f6a7b8-0024-4c9d-8e1f-000000000024', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000001', 2, 0),
+  ('e5f6a7b8-0024-4c9d-8e1f-000000000024', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000004', 2, 0),
+  ('e5f6a7b8-0024-4c9d-8e1f-000000000024', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000003', 1, 0),
+  -- order 25: Prosecco x2, Shiraz x1, Sparkling Water x1
+  ('e5f6a7b8-0025-4c9d-8e1f-000000000025', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000006', 2, 0),
+  ('e5f6a7b8-0025-4c9d-8e1f-000000000025', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000005', 1, 0),
+  ('e5f6a7b8-0025-4c9d-8e1f-000000000025', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000012', 1, 0)
+ON CONFLICT DO NOTHING;
