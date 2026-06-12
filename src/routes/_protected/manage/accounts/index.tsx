@@ -149,6 +149,7 @@ function AccountsPage() {
       <PageContent>
         <AccountList
           accounts={accounts}
+          total={total}
           selectedId={selectedId}
           searchQuery={searchQuery}
           isLoading={isLoading}

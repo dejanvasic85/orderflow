@@ -1,13 +1,14 @@
 import { ClipboardList, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Paging } from "@/components/Paging";
-import { Input } from "@/components/ui/input";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { useDebounce } from "@/hooks/use-debounce";
 import type { OrderHistoryItem } from "@/lib/orderRequests/schema";
 import { OrderHistoryCard } from "./OrderHistoryCard";
 
 type OrderHistoryListProps = {
   orders: OrderHistoryItem[];
+  total?: number;
   buildViewHref?: (orderId: string) => string;
   searchQuery?: string;
   currentPage?: number;
@@ -19,6 +20,7 @@ type OrderHistoryListProps = {
 
 export function OrderHistoryList({
   orders,
+  total,
   buildViewHref,
   searchQuery = "",
   currentPage = 1,
@@ -37,14 +39,23 @@ export function OrderHistoryList({
   return (
     <div className="flex flex-col gap-4">
       {onSearchChange && (
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            className="pl-9"
-            placeholder="Search by order number…"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-          />
+        <div className="flex items-center gap-3">
+          <InputGroup className="max-w-sm">
+            <InputGroupAddon>
+              <Search />
+            </InputGroupAddon>
+            <InputGroupInput
+              aria-label="Search orders"
+              placeholder="Search by order number…"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+            />
+          </InputGroup>
+          {total !== undefined && (
+            <span className="text-sm text-muted-foreground">
+              {total} {total === 1 ? "order" : "orders"}
+            </span>
+          )}
         </div>
       )}
 

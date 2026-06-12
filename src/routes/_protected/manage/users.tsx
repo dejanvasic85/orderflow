@@ -193,6 +193,7 @@ function UsersPage() {
       <PageContent>
         <UserList
           users={users}
+          total={total}
           selectedId={selectedId}
           roleFilter={roleFilter}
           searchQuery={searchQuery}

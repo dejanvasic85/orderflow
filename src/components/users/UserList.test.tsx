@@ -63,6 +63,7 @@ function renderList(overrides: Partial<Parameters<typeof UserList>[0]> = {}) {
   return render(
     <UserList
       users={[adminUser, staffUser]}
+      total={2}
       selectedId={null}
       roleFilter="all"
       searchQuery=""

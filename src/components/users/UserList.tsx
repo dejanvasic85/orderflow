@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Paging } from "@/components/Paging";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -22,6 +22,7 @@ export type RoleFilter = "all" | UserRole;
 
 type Props = {
   users: User[];
+  total: number;
   selectedId: string | null;
   roleFilter: RoleFilter;
   searchQuery: string;
@@ -47,6 +48,7 @@ const roleFilters: { label: string; value: RoleFilter }[] = [
 
 export function UserList({
   users,
+  total,
   selectedId,
   roleFilter,
   searchQuery,
@@ -73,14 +75,21 @@ export function UserList({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="relative">
-        <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-        <Input
-          className="pl-9"
-          placeholder="Search by name or email..."
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-        />
+      <div className="flex items-center gap-3">
+        <InputGroup className="max-w-sm">
+          <InputGroupAddon>
+            <Search />
+          </InputGroupAddon>
+          <InputGroupInput
+            aria-label="Search users"
+            placeholder="Search by name or email..."
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+          />
+        </InputGroup>
+        <span className="text-sm text-muted-foreground">
+          {total} {total === 1 ? "user" : "users"}
+        </span>
       </div>
 
       <div className="flex items-center gap-1.5">

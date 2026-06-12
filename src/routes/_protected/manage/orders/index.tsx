@@ -65,6 +65,7 @@ function OrdersPage() {
       <PageContent>
         <OrderHistoryList
           orders={orders}
+          total={total}
           buildViewHref={(orderId) => `/manage/orders/${orderId}`}
           searchQuery={searchQuery}
           currentPage={currentPage}

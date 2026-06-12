@@ -53,6 +53,7 @@ const accountWithNullContacts: Account = {
 };
 
 const defaultProps = {
+  total: 2,
   selectedId: null as string | null,
   searchQuery: "",
   isLoading: false,

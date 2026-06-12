@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -25,6 +25,7 @@ import type { Account } from "@/lib/accounts/schema";
 
 type Props = {
   accounts: Account[];
+  total: number;
   selectedId: string | null;
   searchQuery: string;
   isLoading?: boolean;
@@ -37,6 +38,7 @@ type Props = {
 
 export function AccountList({
   accounts,
+  total,
   selectedId,
   searchQuery,
   isLoading = false,
@@ -61,14 +63,21 @@ export function AccountList({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="relative">
-        <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-        <Input
-          className="pl-9"
-          placeholder="Search by name..."
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-        />
+      <div className="flex items-center gap-3">
+        <InputGroup className="max-w-sm">
+          <InputGroupAddon>
+            <Search />
+          </InputGroupAddon>
+          <InputGroupInput
+            aria-label="Search accounts"
+            placeholder="Search by name..."
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+          />
+        </InputGroup>
+        <span className="text-sm text-muted-foreground">
+          {total} {total === 1 ? "account" : "accounts"}
+        </span>
       </div>
 
       <Table>
