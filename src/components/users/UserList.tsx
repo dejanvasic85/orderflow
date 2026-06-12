@@ -1,5 +1,6 @@
 import { Search } from "lucide-react";
 import { useState, useEffect } from "react";
+import { Paging } from "@/components/Paging";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -183,29 +184,12 @@ export function UserList({
         </TableBody>
       </Table>
 
-      {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-3 py-2">
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={currentPage <= 1 || isLoading}
-            onClick={() => onPageChange(currentPage - 1)}
-          >
-            Previous
-          </Button>
-          <span className="text-muted-foreground text-sm">
-            Page {currentPage} of {totalPages}
-          </span>
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={currentPage >= totalPages || isLoading}
-            onClick={() => onPageChange(currentPage + 1)}
-          >
-            Next
-          </Button>
-        </div>
-      )}
+      <Paging
+        currentPage={currentPage}
+        totalPages={totalPages}
+        isLoading={isLoading}
+        onPageChange={onPageChange}
+      />
     </div>
   );
 }

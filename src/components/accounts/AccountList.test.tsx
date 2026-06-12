@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import userEvent, { type UserEvent } from "@testing-library/user-event";
 import type { Account } from "@/lib/accounts/schema";
 import { AccountList } from "./AccountList";
@@ -52,7 +52,16 @@ const accountWithNullContacts: Account = {
   userCount: 0,
 };
 
-const onSelectAccount = vi.fn();
+const defaultProps = {
+  selectedId: null as string | null,
+  searchQuery: "",
+  isLoading: false,
+  currentPage: 1,
+  totalPages: 1,
+  onSelectAccount: vi.fn(),
+  onSearchChange: vi.fn(),
+  onPageChange: vi.fn(),
+};
 
 let user: UserEvent;
 
@@ -61,13 +70,13 @@ beforeEach(() => {
 });
 
 test("renders account name in the table", () => {
-  render(<AccountList accounts={[account]} selectedId={null} onSelectAccount={onSelectAccount} />);
+  render(<AccountList {...defaultProps} accounts={[account]} />);
 
   expect(screen.getByText("Acme Corp")).toBeInTheDocument();
 });
 
 test("renders contact name, email and phone when present", () => {
-  render(<AccountList accounts={[account]} selectedId={null} onSelectAccount={onSelectAccount} />);
+  render(<AccountList {...defaultProps} accounts={[account]} />);
 
   expect(screen.getByText("Jane Doe")).toBeInTheDocument();
   expect(screen.getByText("jane@acme.com")).toBeInTheDocument();
@@ -75,37 +84,27 @@ test("renders contact name, email and phone when present", () => {
 });
 
 test("renders dashes when contact fields are null", () => {
-  render(
-    <AccountList
-      accounts={[accountWithNullContacts]}
-      selectedId={null}
-      onSelectAccount={onSelectAccount}
-    />,
-  );
+  render(<AccountList {...defaultProps} accounts={[accountWithNullContacts]} />);
 
   expect(screen.getAllByText("—").length).toBeGreaterThanOrEqual(3);
 });
 
 test("renders user count when greater than zero", () => {
-  render(<AccountList accounts={[account]} selectedId={null} onSelectAccount={onSelectAccount} />);
+  render(<AccountList {...defaultProps} accounts={[account]} />);
 
   expect(screen.getByText("3")).toBeInTheDocument();
 });
 
 test("renders dash for user count when zero", () => {
-  render(
-    <AccountList
-      accounts={[accountWithNullContacts]}
-      selectedId={null}
-      onSelectAccount={onSelectAccount}
-    />,
-  );
+  render(<AccountList {...defaultProps} accounts={[accountWithNullContacts]} />);
 
   expect(screen.getAllByText("—")).toHaveLength(4);
 });
 
 test("calls onSelectAccount when a row is clicked", async () => {
-  render(<AccountList accounts={[account]} selectedId={null} onSelectAccount={onSelectAccount} />);
+  const onSelectAccount = vi.fn();
+
+  render(<AccountList {...defaultProps} accounts={[account]} onSelectAccount={onSelectAccount} />);
 
   await user.click(screen.getByText("Acme Corp"));
 
@@ -113,7 +112,9 @@ test("calls onSelectAccount when a row is clicked", async () => {
 });
 
 test("calls onSelectAccount when Edit is selected from the dropdown", async () => {
-  render(<AccountList accounts={[account]} selectedId={null} onSelectAccount={onSelectAccount} />);
+  const onSelectAccount = vi.fn();
+
+  render(<AccountList {...defaultProps} accounts={[account]} onSelectAccount={onSelectAccount} />);
 
   await user.click(screen.getByRole("button", { name: "Account actions" }));
   await user.click(screen.getByRole("menuitem", { name: /edit/i }));
@@ -122,28 +123,106 @@ test("calls onSelectAccount when Edit is selected from the dropdown", async () =
 });
 
 test("renders multiple accounts", () => {
-  render(
-    <AccountList
-      accounts={[account, accountWithNullContacts]}
-      selectedId={null}
-      onSelectAccount={onSelectAccount}
-    />,
-  );
+  render(<AccountList {...defaultProps} accounts={[account, accountWithNullContacts]} />);
 
   expect(screen.getByText("Acme Corp")).toBeInTheDocument();
   expect(screen.getByText("Defunct Inc")).toBeInTheDocument();
 });
 
 test("dropdown contains Template, Users and Place order links for the account", async () => {
-  render(<AccountList accounts={[account]} selectedId={null} onSelectAccount={onSelectAccount} />);
+  render(<AccountList {...defaultProps} accounts={[account]} />);
 
   await user.click(screen.getByRole("button", { name: "Account actions" }));
 
-  const templateLink = screen.getByRole("menuitem", { name: /template/i });
-  const usersLink = screen.getByRole("menuitem", { name: /users/i });
-  const placeOrderLink = screen.getByRole("menuitem", { name: /place order/i });
+  expect(screen.getByRole("menuitem", { name: /template/i })).toBeInTheDocument();
+  expect(screen.getByRole("menuitem", { name: /users/i })).toBeInTheDocument();
+  expect(screen.getByRole("menuitem", { name: /place order/i })).toBeInTheDocument();
+});
 
-  expect(templateLink).toBeInTheDocument();
-  expect(usersLink).toBeInTheDocument();
-  expect(placeOrderLink).toBeInTheDocument();
+test("calls onSearchChange after 300ms debounce when user types", async () => {
+  vi.useFakeTimers({ shouldAdvanceTime: true });
+  const debouncedUser = userEvent.setup({ advanceTimers: vi.advanceTimersByTime.bind(vi) });
+  const onSearchChange = vi.fn();
+
+  render(<AccountList {...defaultProps} accounts={[account]} onSearchChange={onSearchChange} />);
+
+  const input = screen.getByPlaceholderText("Search by name...");
+  await debouncedUser.type(input, "Acme");
+
+  await act(async () => {
+    vi.runAllTimers();
+  });
+
+  expect(onSearchChange).toHaveBeenCalledWith("Acme");
+
+  vi.useRealTimers();
+});
+
+test("shows empty state message when no accounts and no search query", () => {
+  render(<AccountList {...defaultProps} accounts={[]} searchQuery="" />);
+
+  expect(screen.getByText("No accounts found")).toBeInTheDocument();
+});
+
+test("shows no match message when no accounts and search query is set", () => {
+  render(<AccountList {...defaultProps} accounts={[]} searchQuery="xyz" />);
+
+  expect(screen.getByText("No accounts match your search")).toBeInTheDocument();
+});
+
+test("shows loading skeletons and hides rows when isLoading is true", () => {
+  render(<AccountList {...defaultProps} accounts={[account]} isLoading />);
+
+  expect(screen.queryByText("Acme Corp")).not.toBeInTheDocument();
+});
+
+test("shows pagination controls when totalPages is greater than 1", () => {
+  render(<AccountList {...defaultProps} accounts={[account]} currentPage={1} totalPages={3} />);
+
+  expect(screen.getByRole("button", { name: "Previous" })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Next" })).toBeInTheDocument();
+  expect(screen.getByText("Page 1 of 3")).toBeInTheDocument();
+});
+
+test("hides pagination controls when totalPages is 1", () => {
+  render(<AccountList {...defaultProps} accounts={[account]} currentPage={1} totalPages={1} />);
+
+  expect(screen.queryByRole("button", { name: "Previous" })).not.toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: "Next" })).not.toBeInTheDocument();
+});
+
+test("calls onPageChange with next page when Next is clicked", async () => {
+  const onPageChange = vi.fn();
+
+  render(
+    <AccountList
+      {...defaultProps}
+      accounts={[account]}
+      currentPage={1}
+      totalPages={3}
+      onPageChange={onPageChange}
+    />,
+  );
+
+  await user.click(screen.getByRole("button", { name: "Next" }));
+
+  expect(onPageChange).toHaveBeenCalledWith(2);
+});
+
+test("calls onPageChange with previous page when Previous is clicked", async () => {
+  const onPageChange = vi.fn();
+
+  render(
+    <AccountList
+      {...defaultProps}
+      accounts={[account]}
+      currentPage={2}
+      totalPages={3}
+      onPageChange={onPageChange}
+    />,
+  );
+
+  await user.click(screen.getByRole("button", { name: "Previous" }));
+
+  expect(onPageChange).toHaveBeenCalledWith(1);
 });

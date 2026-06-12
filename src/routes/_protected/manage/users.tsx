@@ -17,7 +17,7 @@ import { UserList, type RoleFilter } from "@/components/users/UserList";
 import { useDelayedBoolean } from "@/hooks/use-delayed-boolean";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { listAccounts } from "@/lib/accounts/accounts.functions";
-import type { Account } from "@/lib/accounts/schema";
+import type { Account, PagedAccountsResult } from "@/lib/accounts/schema";
 import { asResult } from "@/lib/result";
 import type { PagedUsersResult, UpdateUserAccountsInput, User } from "@/lib/users/schema";
 import { listUsersSearchSchema, userPageSize } from "@/lib/users/schema";
@@ -40,10 +40,14 @@ export const Route = createFileRoute("/_protected/manage/users")({
 
     if (!result.ok) throw new Error(result.error.message);
 
-    const accountsResult = asResult<Account[]>(await listAccounts());
+    const accountsResult = asResult<PagedAccountsResult>(await listAccounts({ data: {} }));
     if (!accountsResult.ok) throw new Error(accountsResult.error.message);
 
-    return { users: result.value.users, total: result.value.total, accounts: accountsResult.value };
+    return {
+      users: result.value.users,
+      total: result.value.total,
+      accounts: accountsResult.value.accounts,
+    };
   },
   component: UsersPage,
 });

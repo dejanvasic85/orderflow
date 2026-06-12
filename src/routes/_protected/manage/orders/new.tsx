@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { AccountCombobox } from "@/components/orderRequests/AccountCombobox";
 import { NewOrderForm } from "@/components/orderRequests/NewOrderForm";
 import { getAccount, listAccounts } from "@/lib/accounts/accounts.functions";
-import type { Account } from "@/lib/accounts/schema";
+import type { PagedAccountsResult } from "@/lib/accounts/schema";
 import { createOrderRequestOnBehalf } from "@/lib/orderRequests/orderRequests.functions";
 import { listProducts } from "@/lib/products/products.functions";
 import type { ProductRow } from "@/lib/products/schema";
@@ -23,7 +23,7 @@ export const Route = createFileRoute("/_protected/manage/orders/new")({
   loaderDeps: ({ search }) => ({ accountId: search.accountId }),
   loader: async ({ deps }) => {
     const [accountsResult, productsResult] = await Promise.all([
-      listAccounts().then((r) => asResult<Account[]>(r)),
+      listAccounts({ data: {} }).then((r) => asResult<PagedAccountsResult>(r)),
       listProducts().then((r) => asResult<ProductRow[]>(r)),
     ]);
     if (!accountsResult.ok) throw new Error(accountsResult.error.message);
@@ -31,7 +31,7 @@ export const Route = createFileRoute("/_protected/manage/orders/new")({
 
     if (!deps.accountId) {
       return {
-        accounts: accountsResult.value,
+        accounts: accountsResult.value.accounts,
         products: productsResult.value,
         selected: null,
       };
@@ -45,7 +45,7 @@ export const Route = createFileRoute("/_protected/manage/orders/new")({
     if (!templateResult.ok) throw new Error(templateResult.error.message);
 
     return {
-      accounts: accountsResult.value,
+      accounts: accountsResult.value.accounts,
       products: productsResult.value,
       selected: accountResult.value
         ? {

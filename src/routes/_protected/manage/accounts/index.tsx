@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AccountEditPanel } from "@/components/accounts/AccountEditPanel";
@@ -13,26 +13,37 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { useDelayedBoolean } from "@/hooks/use-delayed-boolean";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { createAccount, listAccounts, updateAccount } from "@/lib/accounts/accounts.functions";
-import type { Account, AccountRow } from "@/lib/accounts/schema";
+import type { Account, AccountRow, PagedAccountsResult } from "@/lib/accounts/schema";
+import { accountPageSize, listAccountsSearchSchema } from "@/lib/accounts/schema";
 import { asResult } from "@/lib/result";
 
 export const Route = createFileRoute("/_protected/manage/accounts/")({
-  loader: async () => {
-    const result = asResult<Account[]>(await listAccounts());
+  validateSearch: listAccountsSearchSchema,
+  loaderDeps: ({ search }) => ({ q: search.q, page: search.page }),
+  loader: async ({ deps }) => {
+    const result = asResult<PagedAccountsResult>(
+      await listAccounts({ data: { q: deps.q, page: deps.page } }),
+    );
     if (!result.ok) throw new Error(result.error.message);
-    return { accounts: result.value };
+    return { accounts: result.value.accounts, total: result.value.total };
   },
   component: AccountsPage,
 });
 
 function AccountsPage() {
-  const { accounts: loadedAccounts } = Route.useLoaderData();
+  const { accounts: loadedAccounts, total } = Route.useLoaderData();
+  const search = Route.useSearch();
+  const navigate = useNavigate();
+  const routerLoading = useRouterState({ select: (s) => s.isLoading });
+  const isLoading = useDelayedBoolean(routerLoading);
   const { user } = Route.useRouteContext() as unknown as {
     user: { user_role?: string };
   };
   const isAdmin = user.user_role === "admin";
+
   const [accounts, setAccounts] = useState<Account[]>(loadedAccounts);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
@@ -45,6 +56,26 @@ function AccountsPage() {
   const isDesktop = useMediaQuery("(min-width: 640px)");
   const panelSide = isDesktop ? "right" : "bottom";
   const panelClassName = "overflow-y-auto p-0 sm:w-[50vw] sm:min-w-[800px]";
+
+  const searchQuery = search.q ?? "";
+  const currentPage = search.page ?? 1;
+  const totalPages = Math.ceil(total / accountPageSize);
+
+  function handleSearchChange(q: string) {
+    void navigate({
+      to: "/manage/accounts",
+      search: { q: q || undefined, page: undefined },
+      replace: true,
+    });
+  }
+
+  function handlePageChange(page: number) {
+    void navigate({
+      to: "/manage/accounts",
+      search: { q: search.q, page: page === 1 ? undefined : page },
+      replace: true,
+    });
+  }
 
   function handleSelectAccount(account: Account) {
     setSelectedId(account.id);
@@ -119,7 +150,13 @@ function AccountsPage() {
         <AccountList
           accounts={accounts}
           selectedId={selectedId}
+          searchQuery={searchQuery}
+          isLoading={isLoading}
+          currentPage={currentPage}
+          totalPages={totalPages}
           onSelectAccount={handleSelectAccount}
+          onSearchChange={handleSearchChange}
+          onPageChange={handlePageChange}
         />
 
         <Sheet open={!!selectedAccount} onOpenChange={(open) => !open && handleDiscard()}>
