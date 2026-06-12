@@ -183,6 +183,20 @@ test("calls onSearchChange after 300ms debounce when user types", async () => {
   vi.useRealTimers();
 });
 
+test("does not call onSearchChange on mount when input matches the search query", async () => {
+  vi.useFakeTimers({ shouldAdvanceTime: true });
+
+  renderList({ searchQuery: "alice" });
+
+  await act(async () => {
+    vi.runAllTimers();
+  });
+
+  expect(onSearchChange).not.toHaveBeenCalled();
+
+  vi.useRealTimers();
+});
+
 test("shows skeleton rows when isLoading is true", () => {
   renderList({ isLoading: true, users: [] });
 

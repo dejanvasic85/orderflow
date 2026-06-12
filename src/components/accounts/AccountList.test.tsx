@@ -158,6 +158,28 @@ test("calls onSearchChange after 300ms debounce when user types", async () => {
   vi.useRealTimers();
 });
 
+test("does not call onSearchChange on mount when input matches the search query", async () => {
+  vi.useFakeTimers({ shouldAdvanceTime: true });
+  const onSearchChange = vi.fn();
+
+  render(
+    <AccountList
+      {...defaultProps}
+      accounts={[account]}
+      searchQuery="Acme"
+      onSearchChange={onSearchChange}
+    />,
+  );
+
+  await act(async () => {
+    vi.runAllTimers();
+  });
+
+  expect(onSearchChange).not.toHaveBeenCalled();
+
+  vi.useRealTimers();
+});
+
 test("shows empty state message when no accounts and no search query", () => {
   render(<AccountList {...defaultProps} accounts={[]} searchQuery="" />);
 

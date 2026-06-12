@@ -50,7 +50,7 @@ export function AccountList({
   const debouncedInput = useDebounce(inputValue, 300);
 
   useEffect(() => {
-    onSearchChange(debouncedInput);
+    if (debouncedInput !== searchQuery) onSearchChange(debouncedInput);
   }, [debouncedInput]);
 
   useEffect(() => {
