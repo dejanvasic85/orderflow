@@ -1,4 +1,4 @@
-import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
+import { AwsClient } from "aws4fetch";
 import { getServerConfig } from "@/lib/config";
 
 type SendEmailInput = {
@@ -25,16 +25,26 @@ export async function sendEmail(input: SendEmailInput): Promise<void> {
     return;
   }
 
-  const client = new SESClient({ region, credentials: { accessKeyId, secretAccessKey } });
+  const aws = new AwsClient({ accessKeyId, secretAccessKey, region, service: "ses" });
 
-  await client.send(
-    new SendEmailCommand({
-      Source: fromAddress,
-      Destination: { ToAddresses: [input.to] },
-      Message: {
-        Subject: { Data: input.subject, Charset: "UTF-8" },
-        Body: { Html: { Data: input.html, Charset: "UTF-8" } },
-      },
-    }),
-  );
+  const body = new URLSearchParams({
+    Action: "SendEmail",
+    Source: fromAddress,
+    "Destination.ToAddresses.member.1": input.to,
+    "Message.Subject.Data": input.subject,
+    "Message.Subject.Charset": "UTF-8",
+    "Message.Body.Html.Data": input.html,
+    "Message.Body.Html.Charset": "UTF-8",
+  });
+
+  const res = await aws.fetch(`https://email.${region}.amazonaws.com/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: body.toString(),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`SES error ${res.status}: ${text}`);
+  }
 }
