@@ -1,6 +1,12 @@
 import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import userEvent, { type UserEvent } from "@testing-library/user-event";
 import { Paging } from "./Paging";
+
+let user: UserEvent;
+
+beforeEach(() => {
+  user = userEvent.setup();
+});
 
 test("renders nothing when totalPages is 1", () => {
   const { container } = render(<Paging currentPage={1} totalPages={1} onPageChange={vi.fn()} />);
@@ -44,7 +50,6 @@ test("disables both buttons when isLoading is true", () => {
 });
 
 test("calls onPageChange with page - 1 when Previous is clicked", async () => {
-  const user = userEvent.setup();
   const onPageChange = vi.fn();
 
   render(<Paging currentPage={3} totalPages={5} onPageChange={onPageChange} />);
@@ -55,7 +60,6 @@ test("calls onPageChange with page - 1 when Previous is clicked", async () => {
 });
 
 test("calls onPageChange with page + 1 when Next is clicked", async () => {
-  const user = userEvent.setup();
   const onPageChange = vi.fn();
 
   render(<Paging currentPage={3} totalPages={5} onPageChange={onPageChange} />);

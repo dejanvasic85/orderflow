@@ -135,9 +135,13 @@ function AccountsPage() {
       toast.error(result.error.message);
       return;
     }
-    setAccounts((prev) => [{ ...result.value, userCount: 0 }, ...prev]);
     setCreating(false);
     toast.success(`Account "${result.value.name}" created`);
+    void navigate({
+      to: "/manage/accounts",
+      search: { q: search.q, page: undefined },
+      replace: true,
+    });
   }
 
   return (

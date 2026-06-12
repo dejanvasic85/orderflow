@@ -33,6 +33,10 @@ beforeEach(() => {
   user = userEvent.setup();
 });
 
+afterEach(() => {
+  vi.useRealTimers();
+});
+
 function renderCatalog(overrides: Partial<Parameters<typeof ProductCatalog>[0]> = {}) {
   return render(
     <ProductCatalog
@@ -82,8 +86,6 @@ test("calls onSearchChange after 300ms debounce when user types", async () => {
   });
 
   expect(onSearchChange).toHaveBeenCalledWith("gin");
-
-  vi.useRealTimers();
 });
 
 test("does not call onSearchChange on mount when input matches the search query", async () => {
@@ -96,8 +98,6 @@ test("does not call onSearchChange on mount when input matches the search query"
   });
 
   expect(onSearchChange).not.toHaveBeenCalled();
-
-  vi.useRealTimers();
 });
 
 test("shows no-results empty state when empty with a search query", () => {

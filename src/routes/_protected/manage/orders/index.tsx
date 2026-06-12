@@ -37,9 +37,10 @@ function OrdersPage() {
   const totalPages = Math.ceil(total / orderPageSize);
 
   function handleSearchChange(q: string) {
+    const normalized = q.trim();
     void navigate({
       to: "/manage/orders",
-      search: { q: q || undefined, page: undefined },
+      search: { q: normalized || undefined, page: undefined },
       replace: true,
     });
   }

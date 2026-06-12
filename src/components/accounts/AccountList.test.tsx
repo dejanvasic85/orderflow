@@ -147,7 +147,7 @@ test("calls onSearchChange after 300ms debounce when user types", async () => {
 
   render(<AccountList {...defaultProps} accounts={[account]} onSearchChange={onSearchChange} />);
 
-  const input = screen.getByPlaceholderText("Search by name...");
+  const input = screen.getByRole("textbox", { name: "Search accounts" });
   await debouncedUser.type(input, "Acme");
 
   await act(async () => {

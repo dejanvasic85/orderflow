@@ -51,9 +51,10 @@ export async function fetchAccounts(filters: FetchAccountsFilters = {}) {
     query = query.ilike("name", `%${safe}%`);
   }
 
-  const page = filters.page ?? 1;
-  const from = (page - 1) * accountPageSize;
-  query = query.range(from, from + accountPageSize - 1);
+  if (filters.page !== undefined) {
+    const from = (filters.page - 1) * accountPageSize;
+    query = query.range(from, from + accountPageSize - 1);
+  }
 
   const { data, error, count } = await query;
   if (error) return err({ message: error.message });

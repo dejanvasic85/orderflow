@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, useRouterState } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useRouter, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { PageContent } from "@/components/layout/PageContent";
@@ -42,6 +42,7 @@ function ProductsPage() {
   const { products: loadedProducts, total } = Route.useLoaderData();
   const search = Route.useSearch();
   const navigate = useNavigate();
+  const router = useRouter();
   const routerLoading = useRouterState({ select: (s) => s.isLoading });
   const isLoading = useDelayedBoolean(routerLoading);
   const { user } = Route.useRouteContext() as unknown as {
@@ -103,9 +104,9 @@ function ProductsPage() {
       toast.error(result.error.message);
       return;
     }
-    setProducts((prev) => prev.map((p) => (p.id === result.value.id ? result.value : p)));
     setSelectedId(null);
     toast.success("Changes saved");
+    void router.invalidate();
   }
 
   async function handleCreate(payload: CreateProductInput) {
@@ -114,9 +115,9 @@ function ProductsPage() {
       toast.error(result.error.message);
       return;
     }
-    setProducts((prev) => [result.value, ...prev]);
     setCreating(false);
     toast.success(`Product "${result.value.name}" created`);
+    void router.invalidate();
   }
 
   return (

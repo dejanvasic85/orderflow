@@ -33,8 +33,14 @@ export function OrderHistoryList({
   const debouncedInput = useDebounce(inputValue, 300);
 
   useEffect(() => {
-    onSearchChange?.(debouncedInput);
-  }, [debouncedInput]);
+    setInputValue(searchQuery);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    if (!onSearchChange) return;
+    if (debouncedInput === searchQuery) return;
+    onSearchChange(debouncedInput);
+  }, [debouncedInput, onSearchChange, searchQuery]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -65,10 +71,21 @@ export function OrderHistoryList({
             <ClipboardList className="h-5 w-5 text-muted-foreground" />
           </div>
           <div className="flex flex-col gap-1">
-            <p className="text-sm font-medium text-foreground">No orders yet</p>
-            <p className="text-xs text-muted-foreground">
-              Orders placed for this account will appear here.
-            </p>
+            {searchQuery ? (
+              <>
+                <p className="text-sm font-medium text-foreground">
+                  No results for "{searchQuery}"
+                </p>
+                <p className="text-xs text-muted-foreground">Try a different search term.</p>
+              </>
+            ) : (
+              <>
+                <p className="text-sm font-medium text-foreground">No orders yet</p>
+                <p className="text-xs text-muted-foreground">
+                  Orders placed for this account will appear here.
+                </p>
+              </>
+            )}
           </div>
         </div>
       ) : (
