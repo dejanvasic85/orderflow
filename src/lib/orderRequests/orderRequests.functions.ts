@@ -8,7 +8,7 @@ import {
   insertOrderRequest,
   insertOrderRequestOnBehalf,
 } from "./orderRequests.server";
-import { createOrderRequestSchema } from "./schema";
+import { createOrderRequestSchema, listOrdersSearchSchema, type ListOrdersSearch } from "./schema";
 
 export const listOrderRequestsForAccount = createServerFn({
   method: "GET",
@@ -36,9 +36,9 @@ export const listOrderHistory = createServerFn({ method: "GET", strict: { output
   .validator((accountId: string) => accountId)
   .handler(async ({ data: accountId }) => fetchOrderHistoryForAccount(accountId));
 
-export const listAllOrders = createServerFn({ method: "GET", strict: { output: false } }).handler(
-  async () => fetchAllOrderHistory(),
-);
+export const listAllOrders = createServerFn({ method: "GET", strict: { output: false } })
+  .validator((filters: ListOrdersSearch = {}) => listOrdersSearchSchema.parse(filters))
+  .handler(async ({ data: filters }) => fetchAllOrderHistory(filters));
 
 export const getOrderRequestAsAdminOrStaff = createServerFn({
   method: "GET",

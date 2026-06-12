@@ -1,7 +1,7 @@
 import { ArrowRight, Box, Building2, Package, User2 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { formatShortDate } from "@/lib/dates";
-import type { OrderHistoryItem } from "@/lib/orderRequests/orderRequests.server";
+import type { OrderHistoryItem } from "@/lib/orderRequests/schema";
 import { formatOrderRef } from "@/lib/orderRequests/schema";
 
 type OrderHistoryCardProps = {

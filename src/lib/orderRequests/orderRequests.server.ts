@@ -6,8 +6,8 @@ import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import { isStaffOrAdmin, type UserRole } from "@/lib/users/schema";
 import { assertAdminOrStaff } from "@/lib/users/users.server";
-import type { createOrderRequestSchema } from "./schema";
-import { formatOrderRef } from "./schema";
+import type { createOrderRequestSchema, ListOrdersSearch } from "./schema";
+import { formatOrderRef, orderPageSize, type OrderHistoryItem } from "./schema";
 
 const orderRequestWithItemsSelect =
   "id, order_number, account_id, placed_by, template_id, delivery_address, delivery_instructions, status, created_at, updated_at, order_request_items(id, product_id, boxes, extra_bottles, created_at, products(id, name, qty_per_box)), templates(id, name), users!order_requests_placed_by_fkey(id, name), accounts(id, name)" as const;
@@ -17,21 +17,6 @@ const orderHistorySelect =
 
 const allOrderHistorySelect =
   "id, order_number, placed_by, status, created_at, order_request_items(boxes, extra_bottles), users!order_requests_placed_by_fkey(id, name, role), accounts(id, name)" as const;
-
-const maxOrderHistoryRows = 200;
-
-export type OrderHistoryItem = {
-  id: string;
-  order_number: number;
-  placed_by: string;
-  placedByName: string;
-  placedByOrgName?: string;
-  status: string;
-  created_at: string;
-  total_bottles: number;
-  total_boxes: number;
-  account_name?: string;
-};
 
 const bwowLabel = { placedByName: "bwow", placedByOrgName: "Boutique Wines of the World" };
 const unknownPlacedByValue = { placedByName: "Unknown" } as const;
@@ -77,18 +62,31 @@ function mapOrderHistoryRow(row: OrderHistoryRow): OrderHistoryItem {
   };
 }
 
-export async function fetchAllOrderHistory() {
+export async function fetchAllOrderHistory(filters: ListOrdersSearch = {}) {
   const supabase = createSupabaseServerClient();
   await assertAdminOrStaff(supabase);
 
-  const { data, error } = await supabase
+  let query = supabase
     .from("order_requests")
-    .select(allOrderHistorySelect)
-    .order("created_at", { ascending: false })
-    .limit(maxOrderHistoryRows);
+    .select(allOrderHistorySelect, { count: "exact" })
+    .order("created_at", { ascending: false });
 
+  if (filters.q) {
+    const num = parseInt(filters.q.replace(/\D/g, ""), 10);
+    if (!isNaN(num)) {
+      query = query.eq("order_number", num);
+    } else {
+      return ok({ orders: [], total: 0 });
+    }
+  }
+
+  const page = filters.page ?? 1;
+  const from = (page - 1) * orderPageSize;
+  query = query.range(from, from + orderPageSize - 1);
+
+  const { data, error, count } = await query;
   if (error) return err({ message: error.message });
-  return ok((data ?? []).map(mapOrderHistoryRow));
+  return ok({ orders: (data ?? []).map(mapOrderHistoryRow), total: count ?? 0 });
 }
 
 export async function fetchOrderHistoryForAccount(accountId: string) {
