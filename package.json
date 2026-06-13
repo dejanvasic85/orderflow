@@ -16,7 +16,7 @@
     "db:gentypes": "supabase gen types typescript --local > src/lib/database.types.ts"
   },
   "dependencies": {
-    "@aws-sdk/client-sns": "3.1067.0",
+    "@aws-sdk/client-sns": "3.1068.0",
     "@cloudflare/vite-plugin": "1.40.2",
     "@fontsource-variable/outfit": "5.2.8",
     "@sentry/tanstackstart-react": "10.57.0",
