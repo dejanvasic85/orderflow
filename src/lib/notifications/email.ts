@@ -1,5 +1,5 @@
 import { AwsClient } from "aws4fetch";
-import { getServerConfig } from "@/lib/config";
+import { company, getServerConfig } from "@/lib/config";
 
 type SendEmailInput = {
   to: string;
@@ -29,7 +29,7 @@ export async function sendEmail(input: SendEmailInput): Promise<void> {
 
   const body = new URLSearchParams({
     Action: "SendEmail",
-    Source: fromAddress,
+    Source: `${company.name} <${fromAddress}>`,
     "Destination.ToAddresses.member.1": input.to,
     "Message.Subject.Data": input.subject,
     "Message.Subject.Charset": "UTF-8",
