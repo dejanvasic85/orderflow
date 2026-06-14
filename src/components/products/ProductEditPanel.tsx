@@ -1,5 +1,6 @@
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
+import { ImageUpload } from "@/components/products/ImageUpload";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -128,17 +129,11 @@ export function ProductEditPanel(props: Props) {
         <form.Field name="imageUrl">
           {(field) => (
             <Field>
-              <FieldLabel htmlFor="product-image-url">Image URL</FieldLabel>
-              <Input
-                id="product-image-url"
-                type="text"
-                inputMode="url"
-                placeholder="https://…"
-                value={field.state.value}
-                onChange={(e) => field.handleChange(e.target.value)}
-                onBlur={field.handleBlur}
+              <FieldLabel>Image</FieldLabel>
+              <ImageUpload
+                currentUrl={field.state.value || null}
+                onUploaded={(url) => field.handleChange(url)}
               />
-              <p className="text-sm text-muted-foreground">Hosted image URL (Cloudflare)</p>
               <FieldError errors={toFieldErrors(field.state.meta.errors)} />
             </Field>
           )}

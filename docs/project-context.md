@@ -67,11 +67,26 @@ Replaces SMS/email ordering with a centralised order request management system f
 ## Architecture
 
 ```text
-Cloudflare Pages    — serves TanStack Start app (SSR + static assets)
-Cloudflare Workers  — MYOB sync, webhooks, background tasks (deferred)
-Supabase            — Postgres, Auth, PostgREST, Storage
+Cloudflare Workers  — serves TanStack Start app (SSR + API server functions)
+Cloudflare R2       — product image storage (bucket: orderflow-product-images)
+Supabase            — Postgres, Auth, PostgREST
 ```
 
 The browser calls Supabase directly via `@supabase/supabase-js`. Row Level Security (RLS) enforces per-user data access at the database layer, so the anon key is safe to ship in the browser bundle.
 
 TanStack server functions (`createServerFn`) are used for sensitive operations that require verified identity. They use `createSupabaseServerClient()` which reads cookies from the incoming request and calls `supabase.auth.getUser()` — a network-verified check, not a cookie read.
+
+### Product image upload
+
+Admins upload product images directly from the browser to Cloudflare R2 — file bytes never pass through the Worker. Flow:
+
+1. Admin selects and optionally crops a file in `ProductEditPanel`
+2. Browser resizes to max 1200 px and converts to WebP (quality 0.82) via canvas
+3. Browser calls the `getProductImageUploadUrl` server fn with `{ key, contentType }`
+4. Server fn uses `aws4fetch` to generate a presigned S3-compatible PUT URL (5-minute expiry) against the R2 S3 API (`https://<accountId>.r2.cloudflarestorage.com`)
+5. Browser PUTs the WebP blob directly to the presigned URL
+6. The public R2 URL is saved to `products.image_url`
+
+R2 credentials (`R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`) are Worker secrets. `R2_BUCKET_NAME` and `R2_PUBLIC_BASE_URL` are `wrangler.jsonc` vars. See `.env.example` for local setup.
+
+Cloudflare Image Transformations (`/cdn-cgi/image/`) can be layered on later for additional CDN-side resizing; client-side WebP conversion handles the bandwidth requirement for now.
