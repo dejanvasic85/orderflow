@@ -1,39 +1,4 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    ":rebaseStalePrs",
-    ":renovatePrefix",
-    ":semanticCommits",
-    ":timezone(Australia/Melbourne)",
-    ":dependencyDashboard",
-    ":pinDependencies",
-    ":pinDevDependencies",
-    "group:allNonMajor"
-  ],
-  "automerge": true,
-  "minimumReleaseAge": "1 day",
-  "commitMessageAction": "",
-  "labels": ["dependencies"],
-  "prConcurrentLimit": 3,
-  "prNotPendingHours": 1,
-  "semanticCommitScope": "",
-  "semanticCommitType": "deps",
-  "lockFileMaintenance": {
-    "enabled": true,
-    "automerge": true,
-    "recreateWhen": "always",
-    "rebaseWhen": "behind-base-branch",
-    "schedule": ["before 6am on monday"],
-    "prBodyDefinitions": {
-      "Change": "All locks refreshed"
-    }
-  },
-  "packageRules": [
-    {
-      "description": "Node and types - LTS versions only",
-      "matchPackageNames": ["node", "@types/node"],
-      "groupName": "node and types",
-      "allowedVersions": "/^(20|22|24|26|28|30|32|34|36|38|40)\\./"
-    }
-  ]
+	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+	"extends": ["github>dejanvasic85/renovate-config:renovate"]
 }
