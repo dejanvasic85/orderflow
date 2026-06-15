@@ -23,5 +23,7 @@
     "AWS_REGION": "ap-southeast-2",
     "SES_FROM_ADDRESS": "info@vasic.com.au",
     "SITE_URL": "https://orderflow.team-manager.workers.dev",
+    "R2_BUCKET_NAME": "orderflow-assets",
+    "R2_PUBLIC_BASE_URL": "https://pub-8ed295401d494d38a2bf577dd8b8d502.r2.dev",
   },
 }

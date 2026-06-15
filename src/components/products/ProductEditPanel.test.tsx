@@ -3,6 +3,21 @@ import userEvent, { type UserEvent } from "@testing-library/user-event";
 import type { ProductRow } from "@/lib/products/schema";
 import { ProductEditPanel } from "./ProductEditPanel";
 
+vi.mock("@/components/products/ImageUpload", () => ({
+  ImageUpload: ({
+    currentUrl,
+    onUploaded,
+  }: {
+    currentUrl: string | null;
+    onUploaded: (url: string) => void;
+  }) => (
+    <div>
+      {currentUrl && <img src={currentUrl} alt="Current product image" />}
+      <input aria-label="Image upload" type="text" onChange={(e) => onUploaded(e.target.value)} />
+    </div>
+  ),
+}));
+
 const existingProduct: ProductRow = {
   id: "prod-1",
   name: "Sparkling Water",
@@ -28,7 +43,7 @@ test("create mode submits the mapped payload", async () => {
 
   await user.type(screen.getByLabelText("Name"), "Cider — Apple");
   await user.type(screen.getByLabelText("Description"), "Crisp and dry");
-  await user.type(screen.getByLabelText("Image URL"), "https://images.example.com/cider.jpg");
+  await user.type(screen.getByLabelText("Image upload"), "https://images.example.com/cider.jpg");
   await user.clear(screen.getByLabelText("Quantity per box"));
   await user.type(screen.getByLabelText("Quantity per box"), "6");
   await user.click(screen.getByRole("button", { name: "Create product" }));
@@ -66,23 +81,13 @@ test("create mode shows an error and does not submit when name is empty", async 
   expect(onSave).not.toHaveBeenCalled();
 });
 
-test("create mode shows an error for an invalid image URL", async () => {
-  render(<ProductEditPanel mode="create" onSave={onSave} onDiscard={onDiscard} />);
-
-  await user.type(screen.getByLabelText("Name"), "Cider — Apple");
-  await user.type(screen.getByLabelText("Image URL"), "not-a-url");
-  await user.click(screen.getByRole("button", { name: "Create product" }));
-
-  expect(await screen.findByText("Must be a valid URL")).toBeInTheDocument();
-  expect(onSave).not.toHaveBeenCalled();
-});
-
 test("edit mode prefills fields from the product", () => {
   render(<ProductEditPanel product={existingProduct} onSave={onSave} onDiscard={onDiscard} />);
 
   expect(screen.getByLabelText("Name")).toHaveValue("Sparkling Water");
   expect(screen.getByLabelText("Description")).toHaveValue("Refreshing bubbles");
-  expect(screen.getByLabelText("Image URL")).toHaveValue(
+  expect(screen.getByAltText("Current product image")).toHaveAttribute(
+    "src",
     "https://images.example.com/sparkling.jpg",
   );
   expect(screen.getByLabelText("Quantity per box")).toHaveValue(12);
