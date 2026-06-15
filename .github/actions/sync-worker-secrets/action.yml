@@ -18,8 +18,11 @@ inputs:
   aws_access_key_id:
     description: AWS access key ID
     required: true
-  aws_secret_access_key:
-    description: AWS secret access key
+  r2_access_key_id:
+    description: R2 storage in cloudflare key id
+    required: true
+  r2_secret_access_key:
+    description: R2 storage in cloudflare access secret
     required: true
 
 runs:
@@ -28,11 +31,14 @@ runs:
     - name: Sync secrets
       shell: bash
       env:
-        CLOUDFLARE_API_TOKEN: ${{ inputs.cloudflare_api_token }}
-        CLOUDFLARE_ACCOUNT_ID: ${{ inputs.cloudflare_account_id }}
-        SUPABASE_SECRET_KEY: ${{ inputs.supabase_secret_key }}
         AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
+        CLOUDFLARE_API_TOKEN: ${{ inputs.cloudflare_api_token }}
+        CLOUDFLARE_ACCOUNT_ID: ${{ inputs.cloudflare_account_id }}
+        R2_ACCOUNT_ID: ${{ inputs.cloudflare_account_id }}
+        R2_ACCESS_KEY_ID: ${{ inputs.r2_access_key_id }}
+        R2_SECRET_ACCESS_KEY: ${{ inputs.r2_secret_access_key }}
+        SUPABASE_SECRET_KEY: ${{ inputs.supabase_secret_key }}
         WORKER_NAME: ${{ inputs.worker_name }}
       run: |
         name_flag=""

@@ -57,8 +57,10 @@ jobs:
       - name: Sync Cloudflare Worker secrets
         uses: ./.github/actions/sync-worker-secrets
         with:
-          cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          cloudflare_account_id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          supabase_secret_key: ${{ secrets.SUPABASE_SECRET_KEY }}
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          cloudflare_account_id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          r2_access_key_id: ${{ secrets.R2_ACCESS_KEY_ID }}
+          r2_secret_access_key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          supabase_secret_key: ${{ secrets.SUPABASE_SECRET_KEY }}

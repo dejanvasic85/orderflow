@@ -100,7 +100,10 @@ export function ImageUpload({ currentUrl, onUploaded }: Props) {
     setUploading(true);
     try {
       const blob = await resizeAndConvertToWebP(file, croppedArea ?? undefined);
-      const key = `products/${crypto.randomUUID()}-${Date.now()}.webp`;
+      const randomId = Array.from(crypto.getRandomValues(new Uint8Array(8)))
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+      const key = `products/${Date.now()}-${randomId}.webp`;
 
       const { uploadUrl, publicUrl } = await getProductImageUploadUrl({
         data: { key, contentType: "image/webp" },
@@ -164,11 +167,13 @@ export function ImageUpload({ currentUrl, onUploaded }: Props) {
               />
             </div>
           ) : (
-            <img
-              src={previewUrl}
-              alt="Selected image preview"
-              className="max-h-40 w-full rounded-lg object-cover"
-            />
+            <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-border p-6">
+              <img
+                src={previewUrl}
+                alt="Selected image preview"
+                className="mb-3 max-h-40 rounded object-cover"
+              />
+            </div>
           )}
 
           <div className="flex items-center gap-2">

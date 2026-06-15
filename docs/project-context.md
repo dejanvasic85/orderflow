@@ -68,7 +68,7 @@ Replaces SMS/email ordering with a centralised order request management system f
 
 ```text
 Cloudflare Workers  — serves TanStack Start app (SSR + API server functions)
-Cloudflare R2       — product image storage (bucket: orderflow-product-images)
+Cloudflare R2       — product image storage (bucket: orderflow-assets)
 Supabase            — Postgres, Auth, PostgREST
 ```
 

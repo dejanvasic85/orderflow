@@ -24,7 +24,7 @@ Implement direct browser-to-R2 image upload for product management. Admins selec
 Using the Cloudflare dashboard or Wrangler CLI:
 
 ```bash
-npx wrangler r2 bucket create orderflow-product-images
+npx wrangler r2 bucket create orderflow-assets
 ```
 
 Enable the **public R2.dev subdomain** on the bucket in the Cloudflare dashboard (Settings → Public access → Allow Access). This gives a stable `pub-<hash>.r2.dev` base URL for dev. For production, attach a custom domain (e.g. `images.bwow.com.au`) later.
@@ -33,7 +33,7 @@ Enable the **public R2.dev subdomain** on the bucket in the Cloudflare dashboard
 
 In Cloudflare dashboard → R2 → Manage R2 API tokens → Create API token:
 
-- Permissions: **Object Read & Write** on the `orderflow-product-images` bucket only
+- Permissions: **Object Read & Write** on the `orderflow-assets` bucket only
 - Note the **Access Key ID**, **Secret Access Key**, and **Account ID**
 
 ### 1.3 Add env vars
@@ -45,14 +45,14 @@ In Cloudflare dashboard → R2 → Manage R2 API tokens → Create API token:
 R2_ACCOUNT_ID=
 R2_ACCESS_KEY_ID=
 R2_SECRET_ACCESS_KEY=
-R2_BUCKET_NAME=orderflow-product-images
+R2_BUCKET_NAME=orderflow-assets
 R2_PUBLIC_BASE_URL=https://pub-<hash>.r2.dev
 ```
 
 **`wrangler.jsonc`** — add to `vars`:
 
 ```jsonc
-"R2_BUCKET_NAME": "orderflow-product-images",
+"R2_BUCKET_NAME": "orderflow-assets",
 "R2_PUBLIC_BASE_URL": "https://pub-<hash>.r2.dev",
 ```
 
@@ -225,7 +225,7 @@ That is an optional future step and requires the Cloudflare Images addon — not
 
 Update the Architecture section to reflect:
 
-- R2 bucket `orderflow-product-images` stores product image originals
+- R2 bucket `orderflow-assets` stores product image originals
 - Browser uploads directly via presigned URLs; Worker never handles file bytes
 - `image_url` on the products table holds the public R2 object URL
 - Cloudflare Image Transformations can be layered on later via `/cdn-cgi/image/` prefix
