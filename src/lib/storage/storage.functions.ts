@@ -19,18 +19,7 @@ export const getProductImageUploadUrl = createServerFn({ method: "POST" })
       R2_PUBLIC_BASE_URL,
     } = getServerConfig();
 
-    if (
-      !R2_ACCOUNT_ID ||
-      !R2_ACCESS_KEY_ID ||
-      !R2_SECRET_ACCESS_KEY ||
-      !R2_BUCKET_NAME ||
-      !R2_PUBLIC_BASE_URL
-    ) {
-      throw new Error("R2 storage is not configured");
-    }
-
-    // Set X-Amz-Expires before signing so the presigned URL is valid for 5 minutes.
-    // AwsV4Signer defaults to 86400s when the param is absent.
+    // Presign expires in 5 minutes; AwsV4Signer defaults to 86400s when absent.
     const url = new URL(
       `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com/${R2_BUCKET_NAME}/${data.key}`,
     );
