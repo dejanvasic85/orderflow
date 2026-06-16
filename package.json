@@ -16,7 +16,7 @@
     "db:gentypes": "supabase gen types typescript --local > src/lib/database.types.ts"
   },
   "dependencies": {
-    "@aws-sdk/client-sns": "3.1068.0",
+    "@aws-sdk/client-sns": "3.1069.0",
     "@cloudflare/vite-plugin": "1.40.2",
     "@fontsource-variable/outfit": "5.2.8",
     "@sentry/tanstackstart-react": "10.58.0",
@@ -40,7 +40,7 @@
     "framer-motion": "12.40.0",
     "lucide-react": "1.18.0",
     "playwright": "1.61.0",
-    "radix-ui": "1.5.0",
+    "radix-ui": "1.6.0",
     "react": "19.2.7",
     "react-dom": "19.2.7",
     "react-dropzone": "15.0.0",
