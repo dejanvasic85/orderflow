@@ -4,6 +4,7 @@
   "compatibility_date": "2025-09-02",
   "compatibility_flags": ["nodejs_compat"],
   "main": "@tanstack/react-start/server-entry",
+  "routes": [{ "pattern": "bwow.vasic.com.au", "custom_domain": true }],
   "observability": {
     "enabled": false,
     "head_sampling_rate": 1,
@@ -14,7 +15,7 @@
       "invocation_logs": true,
     },
     "traces": {
-      "enabled": false,
+      "enabled": true,
       "persist": true,
       "head_sampling_rate": 1,
     },
@@ -22,7 +23,7 @@
   "vars": {
     "AWS_REGION": "ap-southeast-2",
     "SES_FROM_ADDRESS": "info@vasic.com.au",
-    "SITE_URL": "https://orderflow.team-manager.workers.dev",
+    "SITE_URL": "https://bwow.vasic.com.au",
     "R2_BUCKET_NAME": "orderflow-assets",
     "R2_PUBLIC_BASE_URL": "https://pub-8ed295401d494d38a2bf577dd8b8d502.r2.dev",
   },
