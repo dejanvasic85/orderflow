@@ -35,7 +35,45 @@ export async function changePassword(
     return err({ message: updateError.message });
   }
 
+  await recordPasswordChangedAt(supabase, user.id);
   await notifyPasswordChanged({ email: user.email });
 
   return ok();
+}
+
+async function recordPasswordChangedAt(
+  supabase: ReturnType<typeof createSupabaseServerClient>,
+  userId: string,
+): Promise<void> {
+  const { error } = await supabase
+    .from("users")
+    .update({ password_changed_at: new Date().toISOString() })
+    .eq("id", userId);
+  if (error) {
+    console.error("[auth] failed to record password_changed_at:", error);
+  }
+}
+
+export async function fetchPasswordChangedAt(): Promise<
+  Result<string | null, { message: string }>
+> {
+  const supabase = createSupabaseServerClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return err({ message: "Unauthorized" });
+  }
+
+  const { data, error } = await supabase
+    .from("users")
+    .select("password_changed_at")
+    .eq("id", user.id)
+    .single();
+  if (error) {
+    return err({ message: error.message });
+  }
+
+  return ok(data.password_changed_at);
 }
