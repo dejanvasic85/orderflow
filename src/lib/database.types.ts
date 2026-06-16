@@ -368,6 +368,7 @@ export type Database = {
           id: string
           name: string
           notification_preferences: Json
+          password_changed_at: string | null
           phone: string | null
           role: Database["public"]["Enums"]["user_role"]
           updated_at: string
@@ -378,6 +379,7 @@ export type Database = {
           id: string
           name: string
           notification_preferences?: Json
+          password_changed_at?: string | null
           phone?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string
@@ -388,6 +390,7 @@ export type Database = {
           id?: string
           name?: string
           notification_preferences?: Json
+          password_changed_at?: string | null
           phone?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string
@@ -416,6 +419,10 @@ export type Database = {
     Functions: {
       current_user_role: { Args: never; Returns: string }
       custom_access_token_hook: { Args: { event: Json }; Returns: Json }
+      get_own_role: {
+        Args: never
+        Returns: Database["public"]["Enums"]["user_role"]
+      }
       is_account_member: { Args: { p_account_id: string }; Returns: boolean }
     }
     Enums: {

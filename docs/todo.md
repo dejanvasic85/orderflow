@@ -43,7 +43,7 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Feature | Must | Manage template for Accounts in a new dedicated page
 - [x] Feature | Must | Manage users for Accounts in a new dedicated page
 - [x] Feature | Must | Manage accounts for users in the user drawer
-- [ ] Feature | Must | Invite for staff and admin should work seamlessly - at the moment only users have been tested!
+- [x] Feature | Must | Invite for staff and admin should work seamlessly - at the moment only users have been tested!
 - [x] Feature | Must | Email notification on order placed
 - [x] Feature | Must | SMS notifications (Phase 2)
 - [x] Feature | Must| Search users by email or name (server-side filter)
@@ -51,8 +51,10 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Feature | Must | Paging on accounts
 - [x] Feature | Must | Paging on orders
 - [x] Feature | Must | Product management
-- [ ] Feature | Must | Image upload and transformations
-- [ ] Feature | Must | Change password while logged in
+- [x] Feature | Must | Image upload and transformations
+- [x] Feature | Must | Change password while logged in
+- [ ] Feature | Must | Improved settings/profile menu
+- [ ] Feature | Must | Password strength indicator
 - [ ] Quality | Must | Unit testing the server functions
 - [ ] Quality | Must | Playwright tests improved and working locally
 - [ ] Quality | Must | Playwright custom container with Supabase so it is working properly in the pipeline

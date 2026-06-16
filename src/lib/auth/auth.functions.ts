@@ -5,6 +5,10 @@ import {
   verifyOtpToken,
   verifyResetTokenFromOtp,
 } from "./auth.server";
+import {
+  changePassword as changePasswordDb,
+  fetchPasswordChangedAt,
+} from "./changePassword.server";
 import { updatePassword } from "./setPassword.server";
 
 export const getSession = createServerFn({ method: "GET" }).handler(fetchSession);
@@ -22,3 +26,11 @@ export const verifyOtp = createServerFn({ method: "GET" })
 export const setPassword = createServerFn({ method: "POST" })
   .validator((data: { password: string }) => data)
   .handler(async ({ data }) => updatePassword(data.password));
+
+export const changePassword = createServerFn({ method: "POST" })
+  .validator((data: { currentPassword: string; newPassword: string }) => data)
+  .handler(async ({ data }) => changePasswordDb(data));
+
+export const getPasswordChangedAt = createServerFn({ method: "GET" }).handler(
+  fetchPasswordChangedAt,
+);
