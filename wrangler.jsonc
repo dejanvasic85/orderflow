@@ -27,4 +27,19 @@
     "R2_BUCKET_NAME": "orderflow-assets",
     "R2_PUBLIC_BASE_URL": "https://pub-8ed295401d494d38a2bf577dd8b8d502.r2.dev",
   },
+  // Custom domain is production-only — must not be inherited by preview deploys
+  // (preview overrides the worker name via --name, which does not isolate top-level config).
+  "env": {
+    "production": {
+      "name": "orderflow",
+      "routes": [{ "pattern": "bwow.vasic.com.au", "custom_domain": true }],
+      "vars": {
+        "AWS_REGION": "ap-southeast-2",
+        "SES_FROM_ADDRESS": "info@vasic.com.au",
+        "SITE_URL": "https://bwow.vasic.com.au",
+        "R2_BUCKET_NAME": "orderflow-assets",
+        "R2_PUBLIC_BASE_URL": "https://pub-8ed295401d494d38a2bf577dd8b8d502.r2.dev",
+      },
+    },
+  },
 }
