@@ -4,7 +4,6 @@
   "compatibility_date": "2025-09-02",
   "compatibility_flags": ["nodejs_compat"],
   "main": "@tanstack/react-start/server-entry",
-  "routes": [{ "pattern": "bwow.vasic.com.au", "custom_domain": true }],
   "observability": {
     "enabled": false,
     "head_sampling_rate": 1,
@@ -20,15 +19,20 @@
       "head_sampling_rate": 1,
     },
   },
+  // Top-level config is the default used by preview deploys (deployed via `--name`,
+  // without `CLOUDFLARE_ENV`). It intentionally has NO custom-domain route so previews
+  // resolve to their dynamic *.workers.dev URL instead of stealing the production domain.
+  // SITE_URL here is only a fallback — the deploy-preview workflow overrides it per-PR
+  // with the preview's own workers.dev URL via `--var`.
   "vars": {
     "AWS_REGION": "ap-southeast-2",
     "SES_FROM_ADDRESS": "info@vasic.com.au",
-    "SITE_URL": "https://bwow.vasic.com.au",
+    "SITE_URL": "https://orderflow.vasic-studio.workers.dev",
     "R2_BUCKET_NAME": "orderflow-assets",
     "R2_PUBLIC_BASE_URL": "https://pub-8ed295401d494d38a2bf577dd8b8d502.r2.dev",
   },
-  // Custom domain is production-only — must not be inherited by preview deploys
-  // (preview overrides the worker name via --name, which does not isolate top-level config).
+  // Production is selected with `CLOUDFLARE_ENV=production` at build + deploy time.
+  // The custom domain lives here only, so it can never leak into preview deploys.
   "env": {
     "production": {
       "name": "orderflow",

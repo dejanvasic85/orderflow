@@ -17,6 +17,11 @@ concurrency:
   group: deploy-preview-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
+env:
+  # Account's workers.dev subdomain — preview workers resolve to
+  # https://<worker-name>.<this>.workers.dev
+  workersSubdomain: vasic-studio
+
 jobs:
   deploy-preview:
     name: Deploy preview worker
@@ -55,20 +60,17 @@ jobs:
           worker_name=$(printf '%s' "$worker_name" | sed -E 's/-+$//')
           echo "worker_name=$worker_name" >> "$GITHUB_OUTPUT"
 
+          # The preview's workers.dev URL is deterministic from the worker name,
+          # so we can compute it up front and inject it as SITE_URL at deploy time.
+          deploy_url="https://${worker_name}.${workersSubdomain}.workers.dev"
+          echo "deploy_url=$deploy_url" >> "$GITHUB_OUTPUT"
+
       - name: Deploy preview
-        id: deploy
         run: |
           set -euo pipefail
-          output_file=$(mktemp)
-          vp exec wrangler deploy --name "${{ steps.meta.outputs.worker_name }}" 2>&1 | tee "$output_file"
-
-          deploy_url=$(grep -Eo 'https://[a-z0-9-]+\.[a-z0-9-]+\.workers\.dev' "$output_file" | tail -n 1 || true)
-          if [ -z "$deploy_url" ]; then
-            echo "Failed to determine workers.dev URL from wrangler output"
-            exit 1
-          fi
-
-          echo "deploy_url=$deploy_url" >> "$GITHUB_OUTPUT"
+          vp exec wrangler deploy \
+            --name "${{ steps.meta.outputs.worker_name }}" \
+            --var SITE_URL:"${{ steps.meta.outputs.deploy_url }}"
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -88,7 +90,7 @@ jobs:
       - name: Comment preview URL
         uses: actions/github-script@v9
         env:
-          PREVIEW_URL: ${{ steps.deploy.outputs.deploy_url }}
+          PREVIEW_URL: ${{ steps.meta.outputs.deploy_url }}
           PREVIEW_WORKER_NAME: ${{ steps.meta.outputs.worker_name }}
         with:
           script: |
