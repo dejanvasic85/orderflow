@@ -17,6 +17,7 @@ import { Route as AuthSetPasswordRouteImport } from './routes/auth/set-password'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
 import { Route as AuthConfirmRouteImport } from './routes/auth/confirm'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
+import { Route as ProtectedSettingsRouteImport } from './routes/_protected/settings'
 import { Route as ProtectedManageRouteImport } from './routes/_protected/manage'
 import { Route as ProtectedAccountRouteImport } from './routes/_protected/_account'
 import { Route as ProtectedAccountsIndexRouteImport } from './routes/_protected/accounts/index'
@@ -74,6 +75,11 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   id: '/auth/callback',
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ProtectedSettingsRoute = ProtectedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => ProtectedRoute,
 } as any)
 const ProtectedManageRoute = ProtectedManageRouteImport.update({
   id: '/manage',
@@ -183,6 +189,7 @@ export interface FileRoutesByFullPath {
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/manage': typeof ProtectedManageRouteWithChildren
+  '/settings': typeof ProtectedSettingsRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/confirm': typeof AuthConfirmRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -209,6 +216,7 @@ export interface FileRoutesByTo {
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/manage': typeof ProtectedManageRouteWithChildren
+  '/settings': typeof ProtectedSettingsRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/confirm': typeof AuthConfirmRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -237,6 +245,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/_protected/_account': typeof ProtectedAccountRouteWithChildren
   '/_protected/manage': typeof ProtectedManageRouteWithChildren
+  '/_protected/settings': typeof ProtectedSettingsRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/confirm': typeof AuthConfirmRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -265,6 +274,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/login'
     | '/manage'
+    | '/settings'
     | '/auth/callback'
     | '/auth/confirm'
     | '/auth/reset-password'
@@ -291,6 +301,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/login'
     | '/manage'
+    | '/settings'
     | '/auth/callback'
     | '/auth/confirm'
     | '/auth/reset-password'
@@ -318,6 +329,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/_protected/_account'
     | '/_protected/manage'
+    | '/_protected/settings'
     | '/auth/callback'
     | '/auth/confirm'
     | '/auth/reset-password'
@@ -408,6 +420,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth/callback'
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_protected/settings': {
+      id: '/_protected/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof ProtectedSettingsRouteImport
+      parentRoute: typeof ProtectedRoute
     }
     '/_protected/manage': {
       id: '/_protected/manage'
@@ -609,12 +628,14 @@ const ProtectedManageRouteWithChildren = ProtectedManageRoute._addFileChildren(
 interface ProtectedRouteChildren {
   ProtectedAccountRoute: typeof ProtectedAccountRouteWithChildren
   ProtectedManageRoute: typeof ProtectedManageRouteWithChildren
+  ProtectedSettingsRoute: typeof ProtectedSettingsRoute
   ProtectedAccountsIndexRoute: typeof ProtectedAccountsIndexRoute
 }
 
 const ProtectedRouteChildren: ProtectedRouteChildren = {
   ProtectedAccountRoute: ProtectedAccountRouteWithChildren,
   ProtectedManageRoute: ProtectedManageRouteWithChildren,
+  ProtectedSettingsRoute: ProtectedSettingsRoute,
   ProtectedAccountsIndexRoute: ProtectedAccountsIndexRoute,
 }
 

@@ -8,6 +8,7 @@ import { renderOrderPlacedSms } from "./templates/orderPlaced.sms";
 import { renderOrderPlacedAccount } from "./templates/OrderPlacedAccount";
 import { renderOrderPlacedPlacer } from "./templates/OrderPlacedPlacer";
 import { renderOrderPlacedStaff } from "./templates/OrderPlacedStaff";
+import { renderPasswordChanged } from "./templates/PasswordChanged";
 import type { OrderEmailInput } from "./templates/types";
 
 type NotifyOrderPlacedInput = Omit<OrderEmailInput, "orderUrl"> & {
@@ -182,4 +183,13 @@ export async function notifyOrderPlaced(input: NotifyOrderPlacedInput): Promise<
       return tasks;
     }),
   );
+}
+
+export async function notifyPasswordChanged(input: { email: string }): Promise<void> {
+  try {
+    const template = await renderPasswordChanged({ email: input.email });
+    await sendEmail({ to: input.email, subject: template.subject, html: template.html });
+  } catch (error) {
+    console.error("[notifications] password changed email send failed:", error);
+  }
 }
