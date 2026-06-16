@@ -54,6 +54,7 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Feature | Must | Image upload and transformations
 - [x] Feature | Must | Change password while logged in
 - [ ] Feature | Must | Improved settings/profile menu
+- [ ] Feature | Must | Password strength indicator
 - [ ] Quality | Must | Unit testing the server functions
 - [ ] Quality | Must | Playwright tests improved and working locally
 - [ ] Quality | Must | Playwright custom container with Supabase so it is working properly in the pipeline
