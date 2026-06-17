@@ -110,10 +110,11 @@ test("calls onSelectUser when a row is clicked", async () => {
   expect(onSelectUser).toHaveBeenCalledWith(adminUser);
 });
 
-test("calls onSelectUser when the Edit button is clicked", async () => {
+test("calls onSelectUser when the Edit menu item is clicked", async () => {
   renderList({ users: [adminUser] });
 
-  await user.click(screen.getByRole("button", { name: "Edit" }));
+  await user.click(screen.getByRole("button", { name: "User actions" }));
+  await user.click(screen.getByRole("menuitem", { name: "Edit" }));
 
   expect(onSelectUser).toHaveBeenCalledWith(adminUser);
 });

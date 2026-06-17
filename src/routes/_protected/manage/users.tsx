@@ -12,13 +12,15 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { SetUserPasswordPanel } from "@/components/users/SetUserPasswordPanel";
 import { UserEditPanel } from "@/components/users/UserEditPanel";
 import { UserList, type RoleFilter } from "@/components/users/UserList";
 import { useDelayedBoolean } from "@/hooks/use-delayed-boolean";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { listAccounts } from "@/lib/accounts/accounts.functions";
 import type { Account, PagedAccountsResult } from "@/lib/accounts/schema";
-import { asResult } from "@/lib/result";
+import { getSession } from "@/lib/auth/auth.functions";
+import { asResult, type Result } from "@/lib/result";
 import type { PagedUsersResult, UpdateUserAccountsInput, User } from "@/lib/users/schema";
 import { listUsersSearchSchema, userPageSize } from "@/lib/users/schema";
 import {
@@ -26,6 +28,8 @@ import {
   inviteUser,
   listUsers,
   resendInvite,
+  sendUserPasswordReset,
+  setUserPassword,
   updateUser,
   updateUserAccounts,
 } from "@/lib/users/users.functions";
@@ -34,26 +38,29 @@ export const Route = createFileRoute("/_protected/manage/users")({
   validateSearch: listUsersSearchSchema,
   loaderDeps: ({ search }) => ({ q: search.q, role: search.role, page: search.page }),
   loader: async ({ deps }) => {
-    const result = asResult<PagedUsersResult>(
-      await listUsers({ data: { q: deps.q, role: deps.role, page: deps.page } }),
-    );
+    const [usersResult, accountsResult, session] = await Promise.all([
+      listUsers({ data: { q: deps.q, role: deps.role, page: deps.page } }).then(
+        asResult<PagedUsersResult>,
+      ),
+      listAccounts({ data: {} }).then(asResult<PagedAccountsResult>),
+      getSession(),
+    ]);
 
-    if (!result.ok) throw new Error(result.error.message);
-
-    const accountsResult = asResult<PagedAccountsResult>(await listAccounts({ data: {} }));
+    if (!usersResult.ok) throw new Error(usersResult.error.message);
     if (!accountsResult.ok) throw new Error(accountsResult.error.message);
 
     return {
-      users: result.value.users,
-      total: result.value.total,
+      users: usersResult.value.users,
+      total: usersResult.value.total,
       accounts: accountsResult.value.accounts,
+      currentUserId: session?.id ?? "",
     };
   },
   component: UsersPage,
 });
 
 function UsersPage() {
-  const { users: loadedUsers, total, accounts } = Route.useLoaderData();
+  const { users: loadedUsers, total, accounts, currentUserId } = Route.useLoaderData();
   const search = Route.useSearch();
   const navigate = useNavigate();
   const routerLoading = useRouterState({ select: (s) => s.isLoading });
@@ -62,12 +69,14 @@ function UsersPage() {
   const [users, setUsers] = useState<User[]>(loadedUsers);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
+  const [passwordUserId, setPasswordUserId] = useState<string | null>(null);
 
   useEffect(() => {
     setUsers(loadedUsers);
   }, [loadedUsers]);
 
   const selectedUser = users.find((u) => u.id === selectedId) ?? null;
+  const passwordUser = users.find((u) => u.id === passwordUserId) ?? null;
   const isDesktop = useMediaQuery("(min-width: 640px)");
   const panelSide = isDesktop ? "right" : "bottom";
   const panelClassName = "overflow-y-auto p-0 sm:w-[50vw] sm:min-w-[800px]";
@@ -187,6 +196,43 @@ function UsersPage() {
     setCreating(false);
   }
 
+  function handleManagePassword(user: User) {
+    setSelectedId(null);
+    setCreating(false);
+    setPasswordUserId(user.id);
+  }
+
+  function handleClosePasswordPanel() {
+    setPasswordUserId(null);
+  }
+
+  async function handleSetPassword(password: string): Promise<Result<void, { message: string }>> {
+    if (!passwordUser) return { ok: false, error: { message: "No user selected" } };
+    const result = asResult<void>(
+      await setUserPassword({ data: { userId: passwordUser.id, password } }),
+    );
+    if (result.ok) {
+      toast.success(`Password set — ${passwordUser.name} must change it on next sign-in`);
+      setPasswordUserId(null);
+    } else {
+      toast.error(result.error.message);
+    }
+    return result;
+  }
+
+  async function handleSendPasswordReset(): Promise<Result<void, { message: string }>> {
+    if (!passwordUser) return { ok: false, error: { message: "No user selected" } };
+    const raw = await sendUserPasswordReset({ data: passwordUser.id });
+    const payload = raw as { success?: boolean; message?: string };
+    if (payload.success) {
+      toast.success(`Reset email sent to ${passwordUser.email}`);
+      return { ok: true, value: undefined };
+    }
+    const message = payload.message ?? "Failed to send reset email";
+    toast.error(message);
+    return { ok: false, error: { message } };
+  }
+
   return (
     <>
       <PageHeader title="Users" actions={<Button onClick={handleStartCreate}>+ New user</Button>} />
@@ -200,10 +246,12 @@ function UsersPage() {
           isLoading={isLoading}
           currentPage={currentPage}
           totalPages={totalPages}
+          currentUserId={currentUserId}
           onSelectUser={handleSelectUser}
           onRoleFilterChange={handleRoleFilterChange}
           onSearchChange={handleSearchChange}
           onPageChange={handlePageChange}
+          onManagePassword={handleManagePassword}
         />
 
         <Sheet open={!!selectedUser} onOpenChange={(open) => !open && handleDiscard()}>
@@ -245,6 +293,28 @@ function UsersPage() {
                   if (!result.ok) throw new Error(result.error.message);
                   return result.value;
                 }}
+              />
+            )}
+          </SheetContent>
+        </Sheet>
+
+        <Sheet open={!!passwordUser} onOpenChange={(open) => !open && handleClosePasswordPanel()}>
+          <SheetContent
+            side={panelSide}
+            className={panelClassName}
+            onInteractOutside={(e) => e.preventDefault()}
+          >
+            <SheetHeader className="sr-only">
+              <SheetTitle>Set password</SheetTitle>
+              <SheetDescription>Set a temporary password for the user</SheetDescription>
+            </SheetHeader>
+            {passwordUser && (
+              <SetUserPasswordPanel
+                key={passwordUser.id}
+                user={passwordUser}
+                onSetPassword={handleSetPassword}
+                onSendResetEmail={handleSendPasswordReset}
+                onClose={handleClosePasswordPanel}
               />
             )}
           </SheetContent>

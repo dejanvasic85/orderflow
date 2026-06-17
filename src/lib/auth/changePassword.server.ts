@@ -1,5 +1,6 @@
 import { notifyPasswordChanged } from "@/lib/notifications/notifications.server";
 import { err, ok, type Result } from "@/lib/result";
+import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
 
 export type ChangePasswordInput = {
@@ -37,6 +38,11 @@ export async function changePassword(
 
   await recordPasswordChangedAt(supabase, user.id);
   await notifyPasswordChanged({ email: user.email });
+
+  const admin = createSupabaseAdminClient();
+  await admin.auth.admin.updateUserById(user.id, {
+    user_metadata: { must_change_password: false },
+  });
 
   return ok();
 }

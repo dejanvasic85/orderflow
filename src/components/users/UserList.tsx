@@ -1,8 +1,15 @@
-import { Search } from "lucide-react";
+import { MoreHorizontal, Search } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Paging } from "@/components/Paging";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -29,10 +36,12 @@ type Props = {
   isLoading?: boolean;
   currentPage: number;
   totalPages: number;
+  currentUserId?: string;
   onSelectUser: (user: User) => void;
   onRoleFilterChange: (filter: RoleFilter) => void;
   onSearchChange: (q: string) => void;
   onPageChange: (page: number) => void;
+  onManagePassword?: (user: User) => void;
 };
 
 const roleLabelMap: Record<UserRole, string> = {
@@ -55,10 +64,12 @@ export function UserList({
   isLoading = false,
   currentPage,
   totalPages,
+  currentUserId,
   onSelectUser,
   onRoleFilterChange,
   onSearchChange,
   onPageChange,
+  onManagePassword,
 }: Props) {
   const [inputValue, setInputValue] = useState(searchQuery);
   const debouncedInput = useDebounce(inputValue, 300);
@@ -177,16 +188,40 @@ export function UserList({
                   />
                 </TableCell>
                 <TableCell>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onSelectUser(user);
-                    }}
-                  >
-                    Edit
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        aria-label="User actions"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <MoreHorizontal />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuGroup>
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onSelectUser(user);
+                          }}
+                        >
+                          Edit
+                        </DropdownMenuItem>
+                        {onManagePassword && currentUserId !== user.id && (
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onManagePassword(user);
+                            }}
+                          >
+                            Set password
+                          </DropdownMenuItem>
+                        )}
+                      </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </TableCell>
               </TableRow>
             ))}

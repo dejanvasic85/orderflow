@@ -4,9 +4,11 @@ import {
   createUserSchema,
   listUsersSearchSchema,
   type ListUsersSearch,
+  setUserPasswordSchema,
   updateUserSchema,
   updateUserAccountsSchema,
 } from "./schema";
+import { adminSendPasswordReset, adminSetUserPassword } from "./setUserPassword.server";
 import {
   checkEmail,
   fetchUser,
@@ -50,3 +52,14 @@ export const resendInvite = createServerFn({ method: "POST", strict: { output: f
 export const updateUserAccounts = createServerFn({ method: "POST", strict: { output: false } })
   .validator(updateUserAccountsSchema)
   .handler(async ({ data }) => patchUserAccounts(data));
+
+export const setUserPassword = createServerFn({ method: "POST", strict: { output: false } })
+  .validator(setUserPasswordSchema)
+  .handler(async ({ data }) => adminSetUserPassword(data));
+
+export const sendUserPasswordReset = createServerFn({ method: "POST", strict: { output: false } })
+  .validator((userId: string) => userId)
+  .handler(async ({ data: userId }) => {
+    const { SITE_URL } = getServerConfig();
+    return adminSendPasswordReset(userId, SITE_URL);
+  });
