@@ -62,6 +62,16 @@ export async function verifyResetTokenFromOtp(token_hash: string) {
   return { valid: false as const, error: error.message };
 }
 
+export async function sendPasswordReset(email: string, siteUrl: string) {
+  const supabase = createSupabaseServerClient();
+  const redirectTo = `${siteUrl}/auth/confirm?next=/auth/reset-password`;
+  const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
+  if (error) {
+    return { success: false as const, message: error.message };
+  }
+  return { success: true as const };
+}
+
 export async function verifyOtpToken(token_hash: string, type: string, next: string) {
   const supabase = createSupabaseServerClient();
   const { error } = await supabase.auth.verifyOtp({

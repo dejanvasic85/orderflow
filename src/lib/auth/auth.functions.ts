@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import {
   fetchSession,
   fetchSessionOrThrow,
+  sendPasswordReset,
   verifyOtpToken,
   verifyResetTokenFromOtp,
 } from "./auth.server";
@@ -14,6 +15,10 @@ import { updatePassword } from "./setPassword.server";
 export const getSession = createServerFn({ method: "GET" }).handler(fetchSession);
 
 export const ensureSession = createServerFn({ method: "GET" }).handler(fetchSessionOrThrow);
+
+export const requestPasswordReset = createServerFn({ method: "POST" })
+  .validator((data: { email: string; siteUrl: string }) => data)
+  .handler(async ({ data }) => sendPasswordReset(data.email, data.siteUrl));
 
 export const verifyResetToken = createServerFn({ method: "GET" })
   .validator((data: { token_hash: string; type: "recovery" }) => data)
