@@ -51,11 +51,11 @@ export function AccountUserSection({ accountId, readOnly = false, onUserCountCha
     queryKey: ["users", "user"],
     enabled: !readOnly,
     queryFn: async () => {
-      const result = asResult<{ id: string; name: string }[]>(
+      const result = asResult<{ users: { id: string; name: string }[]; total: number }>(
         await listUsers({ data: { role: "user" } }),
       );
       if (!result.ok) throw new Error(result.error.message);
-      return result.value;
+      return result.value.users;
     },
   });
 
