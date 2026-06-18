@@ -109,3 +109,5 @@ if (!productsResult.ok) throw new Error(productsResult.error.message);
 ```
 
 - [ ] Audit all the variable naming so they are camelCased
+
+- [ ] Local development has auth emails going to mailpit but only to console for transactional emails
