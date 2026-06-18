@@ -19,7 +19,6 @@ import { useDelayedBoolean } from "@/hooks/use-delayed-boolean";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { listAccounts } from "@/lib/accounts/accounts.functions";
 import type { Account, PagedAccountsResult } from "@/lib/accounts/schema";
-import { getSession } from "@/lib/auth/auth.functions";
 import { asResult, type Result } from "@/lib/result";
 import type { PagedUsersResult, UpdateUserAccountsInput, User } from "@/lib/users/schema";
 import { listUsersSearchSchema, userPageSize } from "@/lib/users/schema";
@@ -38,12 +37,11 @@ export const Route = createFileRoute("/_protected/manage/users")({
   validateSearch: listUsersSearchSchema,
   loaderDeps: ({ search }) => ({ q: search.q, role: search.role, page: search.page }),
   loader: async ({ deps }) => {
-    const [usersResult, accountsResult, session] = await Promise.all([
+    const [usersResult, accountsResult] = await Promise.all([
       listUsers({ data: { q: deps.q, role: deps.role, page: deps.page } }).then(
         asResult<PagedUsersResult>,
       ),
       listAccounts({ data: {} }).then(asResult<PagedAccountsResult>),
-      getSession(),
     ]);
 
     if (!usersResult.ok) throw new Error(usersResult.error.message);
@@ -53,14 +51,15 @@ export const Route = createFileRoute("/_protected/manage/users")({
       users: usersResult.value.users,
       total: usersResult.value.total,
       accounts: accountsResult.value.accounts,
-      currentUserId: session?.id ?? "",
     };
   },
   component: UsersPage,
 });
 
 function UsersPage() {
-  const { users: loadedUsers, total, accounts, currentUserId } = Route.useLoaderData();
+  const { user: currentUser } = Route.useRouteContext();
+  const { users: loadedUsers, total, accounts } = Route.useLoaderData();
+  const currentUserId = currentUser.id;
   const search = Route.useSearch();
   const navigate = useNavigate();
   const routerLoading = useRouterState({ select: (s) => s.isLoading });
