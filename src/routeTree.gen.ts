@@ -19,6 +19,7 @@ import { Route as AuthConfirmRouteImport } from './routes/auth/confirm'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
 import { Route as ProtectedSettingsRouteImport } from './routes/_protected/settings'
 import { Route as ProtectedManageRouteImport } from './routes/_protected/manage'
+import { Route as ProtectedChangePasswordRouteImport } from './routes/_protected/change-password'
 import { Route as ProtectedAccountRouteImport } from './routes/_protected/_account'
 import { Route as ProtectedAccountsIndexRouteImport } from './routes/_protected/accounts/index'
 import { Route as ProtectedManageUsersRouteImport } from './routes/_protected/manage/users'
@@ -84,6 +85,11 @@ const ProtectedSettingsRoute = ProtectedSettingsRouteImport.update({
 const ProtectedManageRoute = ProtectedManageRouteImport.update({
   id: '/manage',
   path: '/manage',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedChangePasswordRoute = ProtectedChangePasswordRouteImport.update({
+  id: '/change-password',
+  path: '/change-password',
   getParentRoute: () => ProtectedRoute,
 } as any)
 const ProtectedAccountRoute = ProtectedAccountRouteImport.update({
@@ -188,6 +194,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/change-password': typeof ProtectedChangePasswordRoute
   '/manage': typeof ProtectedManageRouteWithChildren
   '/settings': typeof ProtectedSettingsRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -215,6 +222,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/change-password': typeof ProtectedChangePasswordRoute
   '/manage': typeof ProtectedManageRouteWithChildren
   '/settings': typeof ProtectedSettingsRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -244,6 +252,7 @@ export interface FileRoutesById {
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/_protected/_account': typeof ProtectedAccountRouteWithChildren
+  '/_protected/change-password': typeof ProtectedChangePasswordRoute
   '/_protected/manage': typeof ProtectedManageRouteWithChildren
   '/_protected/settings': typeof ProtectedSettingsRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -273,6 +282,7 @@ export interface FileRouteTypes {
     | '/'
     | '/forgot-password'
     | '/login'
+    | '/change-password'
     | '/manage'
     | '/settings'
     | '/auth/callback'
@@ -300,6 +310,7 @@ export interface FileRouteTypes {
     | '/'
     | '/forgot-password'
     | '/login'
+    | '/change-password'
     | '/manage'
     | '/settings'
     | '/auth/callback'
@@ -328,6 +339,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/login'
     | '/_protected/_account'
+    | '/_protected/change-password'
     | '/_protected/manage'
     | '/_protected/settings'
     | '/auth/callback'
@@ -433,6 +445,13 @@ declare module '@tanstack/react-router' {
       path: '/manage'
       fullPath: '/manage'
       preLoaderRoute: typeof ProtectedManageRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/change-password': {
+      id: '/_protected/change-password'
+      path: '/change-password'
+      fullPath: '/change-password'
+      preLoaderRoute: typeof ProtectedChangePasswordRouteImport
       parentRoute: typeof ProtectedRoute
     }
     '/_protected/_account': {
@@ -627,6 +646,7 @@ const ProtectedManageRouteWithChildren = ProtectedManageRoute._addFileChildren(
 
 interface ProtectedRouteChildren {
   ProtectedAccountRoute: typeof ProtectedAccountRouteWithChildren
+  ProtectedChangePasswordRoute: typeof ProtectedChangePasswordRoute
   ProtectedManageRoute: typeof ProtectedManageRouteWithChildren
   ProtectedSettingsRoute: typeof ProtectedSettingsRoute
   ProtectedAccountsIndexRoute: typeof ProtectedAccountsIndexRoute
@@ -634,6 +654,7 @@ interface ProtectedRouteChildren {
 
 const ProtectedRouteChildren: ProtectedRouteChildren = {
   ProtectedAccountRoute: ProtectedAccountRouteWithChildren,
+  ProtectedChangePasswordRoute: ProtectedChangePasswordRoute,
   ProtectedManageRoute: ProtectedManageRouteWithChildren,
   ProtectedSettingsRoute: ProtectedSettingsRoute,
   ProtectedAccountsIndexRoute: ProtectedAccountsIndexRoute,

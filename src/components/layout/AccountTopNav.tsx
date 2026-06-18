@@ -87,7 +87,10 @@ export function AccountTopNav({
               </>
             )}
             <DropdownMenuItem asChild>
-              <Link to="/settings">Change password</Link>
+              <Link to="/settings">Settings</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/change-password">Change password</Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={onSignOut}>Sign out</DropdownMenuItem>

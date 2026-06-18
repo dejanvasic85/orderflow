@@ -4,6 +4,7 @@ import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import {
   userPageSize,
+  type UpdateOwnProfileInput,
   type UpdateUserAccountsInput,
   type User,
   type UserAccount,
@@ -208,6 +209,38 @@ export async function patchUser(data: {
     }
   }
 
+  return ok();
+}
+
+export async function fetchOwnProfile() {
+  const supabase = createSupabaseServerClient();
+  const sessionUser = await ensureSession();
+  const { data, error } = await supabase
+    .from("users")
+    .select("name, phone, notification_preferences")
+    .eq("id", sessionUser.id)
+    .single();
+  if (error) return err({ message: error.message });
+  return ok({
+    email: sessionUser.email ?? "",
+    name: data.name ?? "",
+    phone: data.phone ?? "",
+    notificationPreferences: parseNotificationPrefs(data.notification_preferences),
+  });
+}
+
+export async function patchOwnProfile(input: UpdateOwnProfileInput) {
+  const supabase = createSupabaseServerClient();
+  const sessionUser = await ensureSession();
+  const { error } = await supabase
+    .from("users")
+    .update({
+      name: input.name,
+      phone: input.phone ?? null,
+      notification_preferences: input.notificationPreferences,
+    })
+    .eq("id", sessionUser.id);
+  if (error) return err({ message: error.message });
   return ok();
 }
 

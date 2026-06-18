@@ -6,14 +6,17 @@ import {
   listUsersSearchSchema,
   type ListUsersSearch,
   setUserPasswordSchema,
+  updateOwnProfileSchema,
   updateUserSchema,
   updateUserAccountsSchema,
 } from "./schema";
 import { adminSendPasswordReset, adminSetUserPassword } from "./setUserPassword.server";
 import {
   checkEmail,
+  fetchOwnProfile,
   fetchUser,
   fetchUsers,
+  patchOwnProfile,
   patchUser,
   patchUserAccounts,
   resendUserInvite,
@@ -64,3 +67,11 @@ export const sendUserPasswordReset = createServerFn({ method: "POST", strict: { 
     const { SITE_URL } = getServerConfig();
     return adminSendPasswordReset(userId, SITE_URL);
   });
+
+export const getOwnProfile = createServerFn({ method: "GET", strict: { output: false } }).handler(
+  fetchOwnProfile,
+);
+
+export const updateOwnProfile = createServerFn({ method: "POST", strict: { output: false } })
+  .validator(updateOwnProfileSchema)
+  .handler(async ({ data }) => patchOwnProfile(data));
