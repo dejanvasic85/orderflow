@@ -19,9 +19,13 @@ export async function updatePassword(password: string): Promise<SetPasswordResul
   }
 
   const admin = createSupabaseAdminClient();
-  await admin.auth.admin.updateUserById(user.id, {
+  const { error: metaError } = await admin.auth.admin.updateUserById(user.id, {
     user_metadata: { must_change_password: false },
   });
+
+  if (metaError) {
+    return err({ message: metaError.message });
+  }
 
   return ok();
 }

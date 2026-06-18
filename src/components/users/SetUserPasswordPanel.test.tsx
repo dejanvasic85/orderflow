@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
 import { SetUserPasswordPanel } from "./SetUserPasswordPanel";
@@ -74,9 +74,7 @@ describe("SetUserPasswordPanel", () => {
     await user.type(screen.getByLabelText("Confirm password"), "different");
     await user.click(screen.getByRole("button", { name: /^set password$/i }));
 
-    await waitFor(() => {
-      expect(screen.getByText("Passwords do not match")).toBeInTheDocument();
-    });
+    expect(await screen.findByText("Passwords do not match")).toBeInTheDocument();
   });
 
   it("shows validation error when password is too short", async () => {
@@ -87,9 +85,7 @@ describe("SetUserPasswordPanel", () => {
     await user.type(screen.getByLabelText("Confirm password"), "abc");
     await user.click(screen.getByRole("button", { name: /^set password$/i }));
 
-    await waitFor(() => {
-      expect(screen.getByText("Password must be at least 6 characters")).toBeInTheDocument();
-    });
+    expect(await screen.findByText("Password must be at least 6 characters")).toBeInTheDocument();
   });
 
   it("opens confirm dialog when valid passwords are entered", async () => {
@@ -100,9 +96,7 @@ describe("SetUserPasswordPanel", () => {
     await user.type(screen.getByLabelText("Confirm password"), "newpass123");
     await user.click(screen.getByRole("button", { name: /^set password$/i }));
 
-    await waitFor(() => {
-      expect(screen.getByRole("alertdialog")).toBeInTheDocument();
-    });
+    expect(await screen.findByRole("alertdialog")).toBeInTheDocument();
     expect(screen.getByText(/Set password for Sam Taylor/)).toBeInTheDocument();
   });
 
@@ -114,15 +108,12 @@ describe("SetUserPasswordPanel", () => {
     await user.type(screen.getByLabelText("Confirm password"), "newpass123");
     await user.click(screen.getByRole("button", { name: /^set password$/i }));
 
-    await waitFor(() => {
-      expect(screen.getByRole("alertdialog")).toBeInTheDocument();
-    });
+    expect(await screen.findByRole("alertdialog")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: /^set password$/i, hidden: false }));
 
-    await waitFor(() => {
-      expect(onSetPassword).toHaveBeenCalledWith("newpass123");
-    });
+    expect(await vi.waitFor(() => onSetPassword.mock.calls.length > 0));
+    expect(onSetPassword).toHaveBeenCalledWith("newpass123");
   });
 
   it("calls onClose when Cancel button is clicked", async () => {

@@ -187,35 +187,20 @@ export function UserList({
                     }
                   />
                 </TableCell>
-                <TableCell>
+                <TableCell onClick={(e) => e.stopPropagation()}>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        aria-label="User actions"
-                        onClick={(e) => e.stopPropagation()}
-                      >
+                      <Button size="sm" variant="ghost" aria-label="User actions">
                         <MoreHorizontal />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuGroup>
-                        <DropdownMenuItem
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onSelectUser(user);
-                          }}
-                        >
+                        <DropdownMenuItem onSelect={() => onSelectUser(user)}>
                           Edit
                         </DropdownMenuItem>
                         {onManagePassword && currentUserId !== user.id && (
-                          <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onManagePassword(user);
-                            }}
-                          >
+                          <DropdownMenuItem onSelect={() => onManagePassword(user)}>
                             Set password
                           </DropdownMenuItem>
                         )}

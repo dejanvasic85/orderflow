@@ -40,9 +40,13 @@ export async function changePassword(
   await notifyPasswordChanged({ email: user.email });
 
   const admin = createSupabaseAdminClient();
-  await admin.auth.admin.updateUserById(user.id, {
+  const { error: metaError } = await admin.auth.admin.updateUserById(user.id, {
     user_metadata: { must_change_password: false },
   });
+
+  if (metaError) {
+    return err({ message: metaError.message });
+  }
 
   return ok();
 }

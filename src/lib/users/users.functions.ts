@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 import { getServerConfig } from "@/lib/config";
 import {
   createUserSchema,
@@ -58,7 +59,7 @@ export const setUserPassword = createServerFn({ method: "POST", strict: { output
   .handler(async ({ data }) => adminSetUserPassword(data));
 
 export const sendUserPasswordReset = createServerFn({ method: "POST", strict: { output: false } })
-  .validator((userId: string) => userId)
+  .validator((userId: string) => z.uuid().parse(userId))
   .handler(async ({ data: userId }) => {
     const { SITE_URL } = getServerConfig();
     return adminSendPasswordReset(userId, SITE_URL);

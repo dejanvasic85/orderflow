@@ -221,15 +221,13 @@ function UsersPage() {
 
   async function handleSendPasswordReset(): Promise<Result<void, { message: string }>> {
     if (!passwordUser) return { ok: false, error: { message: "No user selected" } };
-    const raw = await sendUserPasswordReset({ data: passwordUser.id });
-    const payload = raw as { success?: boolean; message?: string };
-    if (payload.success) {
+    const result = asResult<void>(await sendUserPasswordReset({ data: passwordUser.id }));
+    if (result.ok) {
       toast.success(`Reset email sent to ${passwordUser.email}`);
-      return { ok: true, value: undefined };
+    } else {
+      toast.error(result.error.message);
     }
-    const message = payload.message ?? "Failed to send reset email";
-    toast.error(message);
-    return { ok: false, error: { message } };
+    return result;
   }
 
   return (

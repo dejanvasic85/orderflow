@@ -4,6 +4,7 @@ import { isStaffOrAdmin, type UserRole, type UserWithEmailRow } from "@/lib/user
 import { parseNotificationPrefs } from "@/lib/users/users.server";
 import { sendEmail } from "./email";
 import { sendSms } from "./sms";
+import { renderAdminPasswordSet } from "./templates/AdminPasswordSet";
 import { renderOrderPlacedSms } from "./templates/orderPlaced.sms";
 import { renderOrderPlacedAccount } from "./templates/OrderPlacedAccount";
 import { renderOrderPlacedPlacer } from "./templates/OrderPlacedPlacer";
@@ -191,5 +192,17 @@ export async function notifyPasswordChanged(input: { email: string }): Promise<v
     await sendEmail({ to: input.email, subject: template.subject, html: template.html });
   } catch (error) {
     console.error("[notifications] password changed email send failed:", error);
+  }
+}
+
+export async function notifyAdminPasswordSet(input: {
+  email: string;
+  adminName: string;
+}): Promise<void> {
+  try {
+    const template = await renderAdminPasswordSet(input);
+    await sendEmail({ to: input.email, subject: template.subject, html: template.html });
+  } catch (error) {
+    console.error("[notifications] admin password set email send failed:", error);
   }
 }

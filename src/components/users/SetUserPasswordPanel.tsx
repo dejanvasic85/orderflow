@@ -74,8 +74,11 @@ export function SetUserPasswordPanel({ user, onSetPassword, onSendResetEmail, on
 
   async function handleSendResetEmail() {
     setResetSending(true);
-    await onSendResetEmail();
-    setResetSending(false);
+    try {
+      await onSendResetEmail();
+    } finally {
+      setResetSending(false);
+    }
   }
 
   return (
