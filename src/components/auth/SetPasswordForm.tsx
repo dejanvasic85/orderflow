@@ -1,20 +1,10 @@
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { setPasswordSchema } from "@/lib/auth/schema";
 import type { Result } from "@/lib/result";
-
-const setPasswordSchema = z
-  .object({
-    password: z.string().min(6, "Password must be at least 6 characters"),
-    confirmPassword: z.string().min(1, "Please confirm your password"),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  });
 
 export type SetPasswordResult = Result<void, { message: string }>;
 

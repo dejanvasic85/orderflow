@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { passwordSchema } from "@/lib/auth/schema";
 import type { Database } from "@/lib/database.types";
 
 export type UserRow = Database["public"]["Tables"]["users"]["Row"];
@@ -78,3 +79,8 @@ export const listUsersSearchSchema = z.object({
 export type ListUsersSearch = z.infer<typeof listUsersSearchSchema>;
 
 export type PagedUsersResult = { users: User[]; total: number };
+
+export const setUserPasswordSchema = z.object({
+  userId: z.uuid(),
+  password: passwordSchema,
+});
