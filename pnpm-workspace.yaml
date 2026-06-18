@@ -8,7 +8,7 @@ allowBuilds:
   workerd: true
 
 overrides:
-  vite: "npm:@voidzero-dev/vite-plus-core@0.1.24"
+  vite: "npm:@voidzero-dev/vite-plus-core@0.2.0"
   vitest: "npm:@voidzero-dev/vite-plus-test@0.1.24"
 
 peerDependencyRules:
