@@ -53,7 +53,7 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Feature | Must | Product management
 - [x] Feature | Must | Image upload and transformations
 - [x] Feature | Must | Change password while logged in
-- [ ] Feature | Must | Change my personal details and notification preferences
+- [x] Feature | Must | Change my personal details and notification preferences
 - [ ] Feature | Must | Improved settings/profile menu
 - [ ] Feature | Must | Password strength indicator
 - [ ] Security | Must | Ensure that staff have most readonly access to admin dashboard

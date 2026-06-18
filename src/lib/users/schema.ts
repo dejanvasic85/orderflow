@@ -84,3 +84,11 @@ export const setUserPasswordSchema = z.object({
   userId: z.uuid(),
   password: passwordSchema,
 });
+
+export const updateOwnProfileSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  phone: auPhoneSchema,
+  notificationPreferences: z.object({ email: z.boolean(), sms: z.boolean() }),
+});
+
+export type UpdateOwnProfileInput = z.infer<typeof updateOwnProfileSchema>;

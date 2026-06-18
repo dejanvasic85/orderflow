@@ -94,7 +94,10 @@ export function AppSidebar({ email, onSignOut }: AppSidebarProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent side="top" align="start" className="w-56">
                 <DropdownMenuItem asChild>
-                  <Link to="/settings">Change password</Link>
+                  <Link to="/settings">Settings</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/change-password">Change password</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={onSignOut}>Sign out</DropdownMenuItem>

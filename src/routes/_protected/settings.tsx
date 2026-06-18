@@ -1,49 +1,59 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { ChangePasswordForm, type ChangePasswordInput } from "@/components/auth/ChangePasswordForm";
 import { PageContent } from "@/components/layout/PageContent";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { changePassword, getPasswordChangedAt } from "@/lib/auth/auth.functions";
-import { getPostLoginRedirect } from "@/lib/auth/userRedirect";
-import { formatDateTime } from "@/lib/dates";
+import { EditProfileForm } from "@/components/users/EditProfileForm";
 import { asResult } from "@/lib/result";
+import type { UpdateOwnProfileInput } from "@/lib/users/schema";
+import { getOwnProfile, updateOwnProfile } from "@/lib/users/users.functions";
+
+type OwnProfile = {
+  email: string;
+  name: string;
+  phone: string;
+  notificationPreferences: { email: boolean; sms: boolean };
+};
 
 export const Route = createFileRoute("/_protected/settings")({
   loader: async () => {
-    const result = asResult<string | null>(await getPasswordChangedAt());
+    const result = asResult<OwnProfile>(await getOwnProfile());
     if (!result.ok) throw new Error(result.error.message);
-    return { passwordChangedAt: result.value };
+    return { profile: result.value };
   },
   component: SettingsPage,
 });
 
 function SettingsPage() {
-  const { user } = Route.useRouteContext();
-  const { passwordChangedAt } = Route.useLoaderData();
-  const navigate = useNavigate();
+  const { profile } = Route.useLoaderData();
 
-  async function handleChangePassword(input: ChangePasswordInput) {
-    const result = asResult<void>(await changePassword({ data: input }));
+  async function handleSaveProfile(input: UpdateOwnProfileInput) {
+    const result = asResult<void>(await updateOwnProfile({ data: input }));
     if (result.ok) {
-      toast.success("Password changed");
-      await navigate({ to: getPostLoginRedirect(user.user_role) });
+      toast.success("Details updated");
     }
     return result;
   }
 
+  const [firstName, ...rest] = profile.name.split(" ");
+  const lastName = rest.join(" ");
+
   return (
     <>
-      <PageHeader title="Account settings" description="Manage your account security" />
+      <PageHeader
+        title="Settings"
+        description="Manage your personal details and notification preferences"
+      />
       <PageContent className="mx-auto w-full max-w-md">
-        <div className="flex flex-col gap-0.5">
-          <h2 className="text-sm font-medium">Change password</h2>
-          <p className="text-sm text-muted-foreground">
-            {passwordChangedAt
-              ? `Last changed ${formatDateTime(passwordChangedAt)}`
-              : "Password never changed"}
-          </p>
-        </div>
-        <ChangePasswordForm onChangePassword={handleChangePassword} />
+        <EditProfileForm
+          defaultValues={{
+            firstName: firstName ?? "",
+            lastName,
+            email: profile.email,
+            phone: profile.phone,
+            notifications: profile.notificationPreferences,
+          }}
+          onSave={handleSaveProfile}
+        />
       </PageContent>
     </>
   );
