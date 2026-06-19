@@ -24,6 +24,39 @@ It contains the product vision, tech stack, and data model decisions.
   - Test files for `.server.ts` helpers must use plain `.test.ts` suffix (not `.server.test.ts`) to avoid the TanStack import-protection plugin stubbing them out in jsdom
 - Environment variables are documented in `.env.example` — never put env var lists in docs or README files
 
+### Server-side layering (repository / service / functions)
+
+We are migrating server modules away from a monolithic `.server.ts` toward a three-layer split.
+`orderRequests` is the reference implementation; apply this pattern to a module when you touch it
+(one module per PR). The split exists so business logic is unit-testable in isolation and portable
+to a future standalone API that mobile + web both call.
+
+- `src/lib/<entity>/<entity>.repository.ts` — **the only place that talks to Supabase.** Exports a
+  `<Entity>Repository` type plus a `create<Entity>Repository()` factory. Each method builds a
+  query, executes it, and returns a `Result` of raw rows. **No business rules here.** Not unit-tested
+  (covered by e2e).
+- `src/lib/<entity>/<entity>.service.ts` — **all business logic:** mappers, role-based decisions,
+  fan-out, authorization orchestration. **Pure / Supabase-free.** It receives its collaborators via a
+  `deps` argument: `{ repo, session, authorize, notify }`. **This is the layer we unit-test** — pass a
+  hand-built fake `repo` (a `vi.fn()` per method) and assert on outcomes. May import server-only
+  modules **as types only** (`import type`) — never at runtime.
+- `src/lib/<entity>/<entity>.functions.ts` — **transport adapter.** Constructs the real `deps`
+  (real repository, `fetchSessionOrThrow`, an `authorize` closure, real `notify`) and passes them to
+  the service. Keep `createServerFn` names/signatures stable so routes/components/e2e are unaffected.
+
+Rules:
+
+- DI is by **argument**, not module mocking: services take `deps`; tests build fakes. Do not
+  `vi.mock` the Supabase client.
+- Repositories return the existing `Result<T>` (`ok`/`err` from `@/lib/result`). Services map repo
+  errors to domain outcomes, also returning `Result`.
+- **Transactions:** supabase-js cannot run a multi-statement transaction across two `.from()` calls.
+  Atomicity requires a Postgres function called via `.rpc()`. Model any multi-write as a **single**
+  repository method (e.g. `createOrderWithItems`) so converting it to an atomic RPC later is a
+  one-method change. See the `TODO(atomicity)` marker in `orderRequests.repository.ts`.
+- **Future API extraction:** services are transport-agnostic by design. When we stand up a dedicated
+  API (for mobile), it calls the same `<entity>.service.ts` modules — no logic is rewritten.
+
 ## Local development
 
 Requires Docker running.

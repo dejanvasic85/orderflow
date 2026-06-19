@@ -2,6 +2,7 @@ import { ensureSession } from "@/lib/auth/auth.functions";
 import { err, ok } from "@/lib/result";
 import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
+import { parseNotificationPrefs } from "@/lib/users/notificationPrefs";
 import {
   userPageSize,
   type UpdateOwnProfileInput,
@@ -23,18 +24,7 @@ export const userListSelect = `
   account_users!user_id ( account:accounts ( id, name ) )
 ` as const;
 
-type NotificationPrefs = { email: boolean; sms: boolean };
-
-export function parseNotificationPrefs(raw: unknown): NotificationPrefs {
-  if (raw && typeof raw === "object" && !Array.isArray(raw)) {
-    const obj = raw as Record<string, unknown>;
-    return {
-      email: typeof obj.email === "boolean" ? obj.email : true,
-      sms: typeof obj.sms === "boolean" ? obj.sms : false,
-    };
-  }
-  return { email: true, sms: false };
-}
+export { parseNotificationPrefs };
 
 export type ListedRow = {
   id: string | null;
