@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { vi } from "vitest";
+import { vi } from "vite-plus/test";
 import { SetUserPasswordPanel } from "./SetUserPasswordPanel";
 
 const testUser = { id: "user-1", name: "Sam Taylor", email: "sam@bwow.com.au" };
