@@ -1,8 +1,14 @@
 import { getServerConfig } from "@/lib/config";
 import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
-import { isStaffOrAdmin, type UserRole, type UserWithEmailRow } from "@/lib/users/schema";
-import { parseNotificationPrefs } from "@/lib/users/users.server";
 import { sendEmail } from "./email";
+import {
+  dedupeById,
+  mapRecipients,
+  planNotifications,
+  type NotificationIntent,
+  type NotificationRecipient,
+  type RecipientRow,
+} from "./notifications.service";
 import { sendSms } from "./sms";
 import { renderAdminPasswordSet } from "./templates/AdminPasswordSet";
 import { renderOrderPlacedSms } from "./templates/orderPlaced.sms";
@@ -12,51 +18,11 @@ import { renderOrderPlacedStaff } from "./templates/OrderPlacedStaff";
 import { renderPasswordChanged } from "./templates/PasswordChanged";
 import type { OrderEmailInput } from "./templates/types";
 
-type NotifyOrderPlacedInput = Omit<OrderEmailInput, "orderUrl"> & {
+export type NotifyOrderPlacedInput = Omit<OrderEmailInput, "orderUrl"> & {
   orderId: string;
   accountId: string;
   placedById: string;
 };
-
-function buildOrderUrl(
-  siteUrl: string,
-  orderId: string,
-  accountId: string,
-  role: UserRole,
-): string {
-  if (isStaffOrAdmin(role)) {
-    return `${siteUrl}/manage/orders/${orderId}`;
-  }
-  return `${siteUrl}/accounts/${accountId}/orders/${orderId}`;
-}
-
-type NotificationRecipient = {
-  id: string;
-  email: string | null;
-  phone: string | null;
-  role: NonNullable<UserWithEmailRow["role"]>;
-  notificationPreferences: { email: boolean; sms: boolean };
-};
-
-type RecipientRow = Pick<
-  UserWithEmailRow,
-  "id" | "email" | "phone" | "role" | "notification_preferences"
->;
-
-function mapRecipients(users: RecipientRow[]): NotificationRecipient[] {
-  return users.flatMap((user) => {
-    if (!user.email && !user.phone) return [];
-    return [
-      {
-        id: user.id ?? "",
-        email: user.email ?? null,
-        phone: user.phone ?? null,
-        role: user.role ?? "user",
-        notificationPreferences: parseNotificationPrefs(user.notification_preferences),
-      },
-    ];
-  });
-}
 
 async function fetchOrderRecipients(accountId: string): Promise<NotificationRecipient[]> {
   const admin = createSupabaseAdminClient();
@@ -96,13 +62,7 @@ async function fetchOrderRecipients(accountId: string): Promise<NotificationReci
 
   const allUsers = [...(accountUsersData.data ?? []), ...(staffAdminResult.data ?? [])];
 
-  const seen = new Set<string>();
-  const uniqueUsers = allUsers.filter((u) => {
-    const key = u.id ?? "";
-    if (!key || seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
+  const uniqueUsers = dedupeById(allUsers);
 
   if (uniqueUsers.length === 0) {
     return [];
@@ -127,63 +87,50 @@ async function fetchOrderRecipients(accountId: string): Promise<NotificationReci
   return mapRecipients(withEmails);
 }
 
+const emailRenderers = {
+  staff: renderOrderPlacedStaff,
+  placer: renderOrderPlacedPlacer,
+  account: renderOrderPlacedAccount,
+} as const;
+
+function executeIntent(intent: NotificationIntent): Promise<void> {
+  if (intent.channel === "email") {
+    return emailRenderers[intent.template](intent.emailInput)
+      .then((template) =>
+        sendEmail({ to: intent.to, subject: template.subject, html: template.html }),
+      )
+      .catch((error) => console.error("[notifications] email send failed:", error));
+  }
+  return sendSms({ to: intent.to, body: renderOrderPlacedSms(intent.smsInput) }).catch((error) =>
+    console.error("[notifications] sms send failed:", error),
+  );
+}
+
 export async function notifyOrderPlaced(input: NotifyOrderPlacedInput): Promise<void> {
   const recipients = await fetchOrderRecipients(input.accountId);
   if (recipients.length === 0) {
-    console.log("WARN: notifyOrderPlaced: There are no recipients");
+    console.warn("[notifications] notifyOrderPlaced: no recipients");
     return;
   }
 
   const { SITE_URL: siteUrl } = getServerConfig();
 
-  const baseInput = {
-    orderRef: input.orderRef,
-    accountName: input.accountName,
-    placedByName: input.placedByName,
-    deliveryAddress: input.deliveryAddress,
-    items: input.items,
-  };
+  const intents = planNotifications({
+    recipients,
+    siteUrl,
+    orderId: input.orderId,
+    accountId: input.accountId,
+    placedById: input.placedById,
+    baseInput: {
+      orderRef: input.orderRef,
+      accountName: input.accountName,
+      placedByName: input.placedByName,
+      deliveryAddress: input.deliveryAddress,
+      items: input.items,
+    },
+  });
 
-  console.log("**** notifyOrderPlaced: baseInput", baseInput);
-
-  await Promise.allSettled(
-    recipients.flatMap((recipient) => {
-      const tasks: Promise<void>[] = [];
-      const orderUrl = buildOrderUrl(siteUrl, input.orderId, input.accountId, recipient.role);
-      const emailInput: OrderEmailInput = { ...baseInput, orderUrl };
-
-      console.log("*** Recipient...", recipient.email, recipient.notificationPreferences);
-
-      if (recipient.notificationPreferences.email && recipient.email) {
-        const isPlacer = recipient.id === input.placedById;
-
-        const templatePromise = isStaffOrAdmin(recipient.role)
-          ? renderOrderPlacedStaff(emailInput)
-          : isPlacer
-            ? renderOrderPlacedPlacer(emailInput)
-            : renderOrderPlacedAccount(emailInput);
-
-        tasks.push(
-          templatePromise
-            .then((template) =>
-              sendEmail({ to: recipient.email!, subject: template.subject, html: template.html }),
-            )
-            .catch((error) => console.error("[notifications] email send failed:", error)),
-        );
-      }
-
-      if (recipient.notificationPreferences.sms && recipient.phone) {
-        tasks.push(
-          sendSms({
-            to: recipient.phone,
-            body: renderOrderPlacedSms({ ...baseInput, orderUrl }),
-          }).catch((error) => console.error("[notifications] sms send failed:", error)),
-        );
-      }
-
-      return tasks;
-    }),
-  );
+  await Promise.allSettled(intents.map(executeIntent));
 }
 
 export async function notifyPasswordChanged(input: { email: string }): Promise<void> {

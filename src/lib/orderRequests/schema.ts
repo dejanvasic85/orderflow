@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { Database } from "@/lib/database.types";
 import type { ProductRow } from "@/lib/products/schema";
 import type { TemplateRow } from "@/lib/templates/schema";
+import type { UserRole } from "@/lib/users/schema";
 
 export type OrderRequestRow = Database["public"]["Tables"]["order_requests"]["Row"];
 export type OrderRequestItemRow = Database["public"]["Tables"]["order_request_items"]["Row"];
@@ -43,6 +44,19 @@ export type OrderHistoryItem = {
   total_bottles: number;
   total_boxes: number;
   account_name?: string;
+};
+
+export type PlacedByUser = { id: string; name: string; role: UserRole } | null;
+
+export type OrderHistoryRow = {
+  id: string;
+  order_number: number;
+  placed_by: string;
+  status: string;
+  created_at: string;
+  order_request_items: { boxes: number | null; extra_bottles: number | null }[];
+  users: unknown;
+  accounts?: unknown;
 };
 
 export const listOrdersSearchSchema = z.object({
