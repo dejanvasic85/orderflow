@@ -74,7 +74,6 @@
     "typescript": "6.0.3",
     "vite": "npm:@voidzero-dev/vite-plus-core@0.2.0",
     "vite-plus": "0.2.0",
-    "vitest": "npm:@voidzero-dev/vite-plus-test@0.1.24",
     "wrangler": "4.101.0"
   },
   "packageManager": "pnpm@11.7.0"
