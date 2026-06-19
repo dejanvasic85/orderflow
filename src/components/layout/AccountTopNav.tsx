@@ -1,9 +1,12 @@
 import { Link, useRouterState } from "@tanstack/react-router";
+import { KeyRoundIcon, LogOutIcon, RepeatIcon, SettingsIcon } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -77,23 +80,41 @@ export function AccountTopNav({
               </Avatar>
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent side="bottom" align="end" className="w-48">
-            {hasMultipleAccounts && (
-              <>
-                <DropdownMenuItem asChild>
-                  <Link to="/accounts">Change account</Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-              </>
-            )}
-            <DropdownMenuItem asChild>
-              <Link to="/settings">Settings</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to="/change-password">Change password</Link>
-            </DropdownMenuItem>
+          <DropdownMenuContent side="bottom" align="end" className="w-56">
+            <DropdownMenuLabel className="flex items-center gap-2 px-1 py-1.5">
+              <Avatar className="size-7">
+                <AvatarFallback className="text-xs">{getInitials(email)}</AvatarFallback>
+              </Avatar>
+              <span className="truncate text-xs font-medium">{email}</span>
+            </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={onSignOut}>Sign out</DropdownMenuItem>
+            <DropdownMenuGroup>
+              {hasMultipleAccounts && (
+                <DropdownMenuItem asChild>
+                  <Link to="/accounts">
+                    <RepeatIcon />
+                    Change account
+                  </Link>
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem asChild>
+                <Link to="/settings">
+                  <SettingsIcon />
+                  Settings
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/change-password">
+                  <KeyRoundIcon />
+                  Change password
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={onSignOut}>
+              <LogOutIcon />
+              Sign out
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
