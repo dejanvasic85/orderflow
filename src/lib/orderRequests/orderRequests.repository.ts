@@ -53,6 +53,8 @@ export function createOrderRequestRepository(): OrderRequestRepository {
         .eq("account_id", accountId)
         .order("created_at", { ascending: false });
       if (error) return err({ message: error.message });
+      // The PostgREST-inferred embedded-relation type is structurally close but not
+      // assignable to OrderRequestWithItems (subtle nullability on nested relations).
       return ok((data ?? []) as OrderRequestWithItems[]);
     },
 
@@ -75,7 +77,7 @@ export function createOrderRequestRepository(): OrderRequestRepository {
         .eq("account_id", accountId)
         .order("created_at", { ascending: false });
       if (error) return err({ message: error.message });
-      return ok((data ?? []) as OrderHistoryRow[]);
+      return ok(data ?? []);
     },
 
     async findAllOrderHistory(filter) {
@@ -94,7 +96,7 @@ export function createOrderRequestRepository(): OrderRequestRepository {
 
       const { data, error, count } = await query;
       if (error) return err({ message: error.message });
-      return ok({ rows: (data ?? []) as OrderHistoryRow[], total: count ?? 0 });
+      return ok({ rows: data ?? [], total: count ?? 0 });
     },
 
     async createOrderWithItems(input, placedById) {
