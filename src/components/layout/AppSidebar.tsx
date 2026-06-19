@@ -1,9 +1,12 @@
 import { Link, useRouterState } from "@tanstack/react-router";
+import { KeyRoundIcon, LogOutIcon, SettingsIcon } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -93,14 +96,34 @@ export function AppSidebar({ email, onSignOut }: AppSidebarProps) {
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent side="top" align="start" className="w-56">
-                <DropdownMenuItem asChild>
-                  <Link to="/settings">Settings</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/change-password">Change password</Link>
-                </DropdownMenuItem>
+                <DropdownMenuLabel className="flex items-center gap-2 px-1 py-1.5">
+                  <Avatar className="size-7 rounded-lg">
+                    <AvatarFallback className="rounded-lg text-xs">
+                      {getInitials(email)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="truncate text-xs font-medium">{email}</span>
+                </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={onSignOut}>Sign out</DropdownMenuItem>
+                <DropdownMenuGroup>
+                  <DropdownMenuItem asChild>
+                    <Link to="/settings">
+                      <SettingsIcon />
+                      Settings
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/change-password">
+                      <KeyRoundIcon />
+                      Change password
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={onSignOut}>
+                  <LogOutIcon />
+                  Sign out
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </SidebarMenuItem>
