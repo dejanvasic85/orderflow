@@ -130,9 +130,15 @@ jobs:
         env:
           CI: true
 
-      - name: Stop Supabase
-        if: always()
-        run: supabase stop
+      - name: Dump GoTrue (auth) logs on failure
+        if: failure()
+        run: |
+          # The app's inviteUser returns 200 but no email lands in Mailpit, while a
+          # direct auth-API invite does deliver. GoTrue's own logs are the only place
+          # that says why it skipped the send for the app's call.
+          CID=$(docker ps --filter "name=supabase_auth" --format '{{.Names}}' | head -1)
+          echo "auth container: $CID"
+          docker logs "$CID" 2>&1 | tail -120
 
       - name: Upload Playwright report
         if: always()
