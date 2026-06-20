@@ -2,16 +2,6 @@ import { useForm } from "@tanstack/react-form";
 import { Eye, EyeOff, Info, Mail } from "lucide-react";
 import { useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import {
@@ -43,7 +33,6 @@ export function SetUserPasswordPanel({ user, onSetPassword, onSendResetEmail, on
   const [showConfirm, setShowConfirm] = useState(false);
   const [resetSending, setResetSending] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const form = useForm({
     defaultValues: { password: "", confirmPassword: "" },
@@ -56,21 +45,6 @@ export function SetUserPasswordPanel({ user, onSetPassword, onSendResetEmail, on
       }
     },
   });
-
-  async function handleRequestConfirm() {
-    const values = form.state.values;
-    const parsed = setPasswordSchema.safeParse(values);
-    if (parsed.success) {
-      setConfirmOpen(true);
-    } else {
-      void form.validate("submit");
-    }
-  }
-
-  async function handleConfirmedSubmit() {
-    setConfirmOpen(false);
-    await form.handleSubmit();
-  }
 
   async function handleSendResetEmail() {
     setResetSending(true);
@@ -135,7 +109,7 @@ export function SetUserPasswordPanel({ user, onSetPassword, onSendResetEmail, on
           className="flex flex-col gap-4"
           onSubmit={(e) => {
             e.preventDefault();
-            void handleRequestConfirm();
+            void form.handleSubmit();
           }}
         >
           <FieldGroup>
@@ -214,24 +188,6 @@ export function SetUserPasswordPanel({ user, onSetPassword, onSendResetEmail, on
           </form.Subscribe>
         </form>
       </div>
-
-      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Set password for {user.name}?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will override their current password. They will be required to set a new one the
-              next time they sign in.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => void handleConfirmedSubmit()}>
-              Set password
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 }
