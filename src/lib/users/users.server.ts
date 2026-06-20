@@ -1,4 +1,5 @@
 import { ensureSession } from "@/lib/auth/auth.functions";
+import { getServerConfig } from "@/lib/config";
 import { err, ok } from "@/lib/result";
 import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
@@ -259,12 +260,24 @@ export async function sendInvite(data: {
   await assertAdmin(supabaseServer);
 
   const admin = createSupabaseAdminClient();
+  console.error(
+    "[invite-debug] siteUrl=",
+    data.siteUrl,
+    "supabaseUrl=",
+    getServerConfig().VITE_SUPABASE_URL,
+  );
   const { data: invited, error: inviteError } = await admin.auth.admin.inviteUserByEmail(
     data.email,
     {
       data: { name: data.name },
       redirectTo: `${data.siteUrl}/auth/callback`,
     },
+  );
+  console.error(
+    "[invite-debug] inviteError=",
+    inviteError?.message ?? "none",
+    "userId=",
+    invited?.user?.id,
   );
   if (inviteError) {
     console.error("Failed to send invite:", inviteError);
