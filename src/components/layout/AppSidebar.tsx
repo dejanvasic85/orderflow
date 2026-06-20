@@ -60,14 +60,14 @@ export function AppSidebar({ email, onSignOut }: AppSidebarProps) {
       </SidebarHeader>
 
       <SidebarContent className="px-2">
-        <SidebarMenu>
+        <SidebarMenu className="gap-1">
           {adminNavItemsValue.map(({ label, to, icon: Icon }) => (
             <SidebarMenuItem key={to}>
               <SidebarMenuButton
                 asChild
                 tooltip={label}
                 isActive={pathname === to}
-                className="text-sidebar-foreground/60 hover:bg-transparent hover:text-sidebar-foreground data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-foreground"
+                className="h-10 rounded-lg font-medium text-sidebar-foreground/60 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground data-[active=true]:bg-sidebar-primary data-[active=true]:font-semibold data-[active=true]:text-sidebar-primary-foreground data-[active=true]:shadow-sm data-[active=true]:hover:bg-sidebar-primary data-[active=true]:hover:text-sidebar-primary-foreground"
               >
                 <Link to={to}>
                   <Icon />
