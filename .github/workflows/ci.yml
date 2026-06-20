@@ -131,6 +131,17 @@ jobs:
           JS
           vp exec node diag_invite.mjs
           rm -f diag_invite.mjs
+
+          echo "--- rate-limit probe: 5 sequential invites ---"
+          SR=$(supabase status --output json | python3 -c "import sys,json; print(json.load(sys.stdin)['SECRET_KEY'])")
+          for i in 1 2 3 4 5; do
+            curl -s -o /dev/null -w "rate-probe $i: HTTP %{http_code}\n" \
+              -X POST "http://127.0.0.1:54321/auth/v1/invite?redirect_to=${SITE_URL}/auth/callback" \
+              -H "apikey: $SR" -H "Authorization: Bearer $SR" -H "Content-Type: application/json" \
+              -d "{\"email\":\"rateprobe_${i}@bwow.com.au\"}"
+          done
+          sleep 3
+          curl -s "http://127.0.0.1:54324/api/v1/messages" | python3 -c "import sys,json; d=json.load(sys.stdin); print('rateprobe emails delivered:', sum(1 for m in d.get('messages',[]) for t in m.get('To',[]) if 'rateprobe' in t.get('Address','')))"
           curl -s -X DELETE "http://127.0.0.1:54324/api/v1/messages" >/dev/null
 
       - name: Run e2e tests
