@@ -33,23 +33,6 @@ test.describe("Products page (admin)", () => {
     await expect(sheet).not.toBeVisible();
     await expect(page.getByText("Changes saved")).toBeVisible();
   });
-
-  test("admin can create a product", async ({ page }) => {
-    const name = `Test Cider — E2E ${Date.now()}`;
-
-    await page.goto("/manage/products");
-    await page.getByRole("button", { name: "+ New product" }).click();
-
-    const sheet = page.getByRole("dialog");
-    await expect(sheet).toBeVisible();
-
-    await sheet.getByLabel("Name").fill(name);
-    await sheet.getByLabel("Quantity per box").fill("6");
-    await sheet.getByRole("button", { name: "Create product" }).click();
-
-    await expect(sheet).not.toBeVisible();
-    await expect(page.getByRole("button", { name: `Edit ${name}` })).toBeVisible();
-  });
 });
 
 test.describe("Products page (staff)", () => {

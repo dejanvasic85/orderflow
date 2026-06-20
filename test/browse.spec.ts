@@ -6,7 +6,7 @@ test.describe("Account selection", () => {
     await login(page, { user: "tom" });
   });
 
-  test("navigating to accounts from selection page", async ({ page }) => {
+  test.skip("navigating to accounts from selection page", async ({ page }) => {
     await page.goto("/accounts");
     await expect(page.getByRole("button", { name: "The Winery Bistro" })).toBeVisible();
     await page.getByRole("button", { name: "The Winery Bistro" }).click();

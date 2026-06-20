@@ -40,7 +40,7 @@ async function deleteAllMailpitMessages() {
   await fetch(`${mailpitUrl}/api/v1/messages`, { method: "DELETE" });
 }
 
-test.describe("Accept invite", () => {
+test.describe("Invite management", () => {
   test.beforeEach(async () => {
     await deleteAllMailpitMessages();
   });
