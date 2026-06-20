@@ -10,7 +10,7 @@ type MailpitMessage = {
   To: { Address: string }[];
 };
 
-async function getInviteLink(toEmail: string, timeoutMs = 30000): Promise<string> {
+async function getInviteLink(toEmail: string, timeoutMs = 15000): Promise<string> {
   const deadline = Date.now() + timeoutMs;
 
   while (Date.now() < deadline) {
