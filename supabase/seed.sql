@@ -246,7 +246,8 @@ INSERT INTO public.account_users (account_id, user_id) VALUES
   ('b2c3d4e5-f6a7-4b8c-9d0e-000000000a01', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000003'),
   ('b2c3d4e5-f6a7-4b8c-9d0e-000000000a02', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000003'),
   ('b2c3d4e5-f6a7-4b8c-9d0e-000000000a04', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000003'),
-  ('b2c3d4e5-f6a7-4b8c-9d0e-000000000a03', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000004')
+  ('b2c3d4e5-f6a7-4b8c-9d0e-000000000a03', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000004'),
+  ('b2c3d4e5-f6a7-4b8c-9d0e-000000000a05', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000006')
 ON CONFLICT DO NOTHING;
 
 -- ============================================================
