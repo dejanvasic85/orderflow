@@ -88,29 +88,13 @@ describe("SetUserPasswordPanel", () => {
     expect(await screen.findByText("Password must be at least 6 characters")).toBeInTheDocument();
   });
 
-  it("opens confirm dialog when valid passwords are entered", async () => {
-    const user = userEvent.setup();
-    renderPanel();
-
-    await user.type(screen.getByLabelText("New password"), "newpass123");
-    await user.type(screen.getByLabelText("Confirm password"), "newpass123");
-    await user.click(screen.getByRole("button", { name: /^set password$/i }));
-
-    expect(await screen.findByRole("alertdialog")).toBeInTheDocument();
-    expect(screen.getByText(/Set password for Sam Taylor/)).toBeInTheDocument();
-  });
-
-  it("calls onSetPassword with the entered password after confirm", async () => {
+  it("calls onSetPassword with the entered password when form is submitted", async () => {
     const user = userEvent.setup();
     const { onSetPassword } = renderPanel();
 
     await user.type(screen.getByLabelText("New password"), "newpass123");
     await user.type(screen.getByLabelText("Confirm password"), "newpass123");
     await user.click(screen.getByRole("button", { name: /^set password$/i }));
-
-    expect(await screen.findByRole("alertdialog")).toBeInTheDocument();
-
-    await user.click(screen.getByRole("button", { name: /^set password$/i, hidden: false }));
 
     expect(await vi.waitFor(() => onSetPassword.mock.calls.length > 0));
     expect(onSetPassword).toHaveBeenCalledWith("newpass123");

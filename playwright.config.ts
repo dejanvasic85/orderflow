@@ -1,4 +1,17 @@
+import { readFileSync } from "node:fs";
+import { parseEnv } from "node:util";
 import { defineConfig, devices } from "@playwright/test";
+
+function loadEnvFile(path: string): Record<string, string | undefined> {
+  try {
+    return parseEnv(readFileSync(path, "utf-8"));
+  } catch {
+    return {};
+  }
+}
+
+const localEnv = loadEnvFile(".env.local");
+const baseURL = localEnv["SITE_URL"] ?? "http://localhost:3344";
 
 export default defineConfig({
   testDir: "./test",
@@ -9,7 +22,7 @@ export default defineConfig({
   reporter: "html",
   outputDir: "test-results",
   use: {
-    baseURL: "http://localhost:3344",
+    baseURL,
     trace: "on-first-retry",
     screenshot: "only-on-failure",
     actionTimeout: 10000,
@@ -23,7 +36,7 @@ export default defineConfig({
   ],
   webServer: {
     command: "vp dev",
-    url: "http://localhost:3344",
+    url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
   },
