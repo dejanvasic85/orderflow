@@ -70,21 +70,27 @@ jobs:
       - name: Reset database (migrations + seed)
         run: supabase db reset --local
 
-      - name: Export Supabase env vars
+      - name: Write .env.local for the dev server
         run: |
+          # The dev server (vp dev) resolves server-side env from .env.local, not the
+          # process env Playwright passes through. Without this file, every server fn
+          # that calls getServerConfig() (e.g. inviteUser via supabaseAdmin) fails its
+          # Zod parse with "expected string, received undefined". R2 vars are required
+          # by the schema but not exercised by the e2e happy-paths, so dummy values suffice.
           SUPABASE_JSON=$(supabase status --output json)
-          echo "VITE_SUPABASE_URL=http://localhost:54321" >> $GITHUB_ENV
-          echo "VITE_SUPABASE_ANON_KEY=$(echo $SUPABASE_JSON | python3 -c "import sys,json; print(json.load(sys.stdin)['ANON_KEY'])")" >> $GITHUB_ENV
-          echo "SUPABASE_SECRET_KEY=$(echo $SUPABASE_JSON | python3 -c "import sys,json; print(json.load(sys.stdin)['SERVICE_ROLE_KEY'])")" >> $GITHUB_ENV
-          echo "SITE_URL=http://localhost:3344" >> $GITHUB_ENV
-          # R2 credentials are required by getServerConfig() but not exercised by the
-          # e2e happy-paths (no file uploads). Provide dummy values so the Zod parse in
-          # server functions (e.g. inviteUser via supabaseAdmin) doesn't throw.
-          echo "R2_ACCOUNT_ID=test" >> $GITHUB_ENV
-          echo "R2_ACCESS_KEY_ID=test" >> $GITHUB_ENV
-          echo "R2_SECRET_ACCESS_KEY=test" >> $GITHUB_ENV
-          echo "R2_BUCKET_NAME=test" >> $GITHUB_ENV
-          echo "R2_PUBLIC_BASE_URL=http://localhost:54321/r2" >> $GITHUB_ENV
+          ANON_KEY=$(echo "$SUPABASE_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin)['ANON_KEY'])")
+          SERVICE_ROLE_KEY=$(echo "$SUPABASE_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin)['SERVICE_ROLE_KEY'])")
+          cat > .env.local <<EOF
+          VITE_SUPABASE_URL=http://localhost:54321
+          VITE_SUPABASE_ANON_KEY=$ANON_KEY
+          SUPABASE_SECRET_KEY=$SERVICE_ROLE_KEY
+          SITE_URL=http://localhost:3344
+          R2_ACCOUNT_ID=test
+          R2_ACCESS_KEY_ID=test
+          R2_SECRET_ACCESS_KEY=test
+          R2_BUCKET_NAME=test
+          R2_PUBLIC_BASE_URL=http://localhost:54321/r2
+          EOF
 
       - name: Run e2e tests
         run: vp exec playwright test
