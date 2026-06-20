@@ -24,7 +24,6 @@ function makeOrder(overrides: Partial<DashboardOrderRow> = {}): DashboardOrderRo
   return {
     id: "order-1",
     order_number: 1,
-    status: "submitted",
     created_at: "2026-06-01T10:00:00Z",
     account_id: "acc-1",
     placed_by: "user-1",
@@ -362,7 +361,6 @@ describe("buildRecentActivity", () => {
   it("maps the order fields correctly", () => {
     const row = makeOrder({
       order_number: 7,
-      status: "submitted",
       created_at: "2026-06-15T10:00:00Z",
       accounts: { id: "acc-1", name: "Acme Wines" },
       users: { id: "u-1", name: "Tom Reynolds", role: "user" },
