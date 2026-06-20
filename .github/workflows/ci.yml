@@ -99,23 +99,29 @@ jobs:
 
       - name: Diagnose Mailpit email delivery
         run: |
-          # Sanity-check that GoTrue delivers invite emails to Mailpit in CI before
-          # the e2e suite relies on it. Sends an invite via the auth API and polls
-          # Mailpit; prints timing so we can see delivery latency / failures.
+          # Compare an invite WITHOUT redirectTo vs WITH the app's redirectTo. The app's
+          # inviteUser always passes redirectTo=${SITE_URL}/auth/callback; if GoTrue
+          # rejects that redirect it returns non-200 (or 200 with no email). Dump the
+          # response bodies + whether each lands in Mailpit.
           SUPABASE_JSON=$(supabase status --output json)
           SR=$(echo "$SUPABASE_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin)['SERVICE_ROLE_KEY'])")
-          echo "Sending diagnostic invite..."
-          curl -sS -o /dev/null -w "invite HTTP %{http_code}\n" \
+          echo "SITE_URL=$SITE_URL"
+
+          echo "--- invite WITHOUT redirectTo ---"
+          curl -sS -w "\nHTTP %{http_code}\n" \
             -X POST "http://127.0.0.1:54321/auth/v1/invite" \
-            -H "apikey: $SR" -H "Authorization: Bearer $SR" \
-            -H "Content-Type: application/json" \
-            -d '{"email":"diag_warmup@bwow.com.au"}'
-          for i in $(seq 1 60); do
-            COUNT=$(curl -s "http://127.0.0.1:54324/api/v1/messages" | python3 -c "import sys,json; print(json.load(sys.stdin).get('messages_count', json.load(sys.stdin).get('total', 0)))" 2>/dev/null || echo 0)
-            FOUND=$(curl -s "http://127.0.0.1:54324/api/v1/messages" | python3 -c "import sys,json; d=json.load(sys.stdin); print(any('diag_warmup' in t.get('Address','') for m in d.get('messages',[]) for t in m.get('To',[])))")
-            if [ "$FOUND" = "True" ]; then echo "diagnostic email arrived after ${i}x500ms"; break; fi
-            sleep 0.5
-          done
+            -H "apikey: $SR" -H "Authorization: Bearer $SR" -H "Content-Type: application/json" \
+            -d '{"email":"diag_noredir@bwow.com.au"}'
+
+          echo "--- invite WITH redirectTo=${SITE_URL}/auth/callback ---"
+          curl -sS -w "\nHTTP %{http_code}\n" \
+            -X POST "http://127.0.0.1:54321/auth/v1/invite?redirect_to=${SITE_URL}/auth/callback" \
+            -H "apikey: $SR" -H "Authorization: Bearer $SR" -H "Content-Type: application/json" \
+            -d '{"email":"diag_redir@bwow.com.au"}'
+
+          sleep 3
+          echo "--- Mailpit contents ---"
+          curl -s "http://127.0.0.1:54324/api/v1/messages" | python3 -c "import sys,json; d=json.load(sys.stdin); print('addresses:', [t['Address'] for m in d.get('messages',[]) for t in m.get('To',[])])"
           curl -s -X DELETE "http://127.0.0.1:54324/api/v1/messages" >/dev/null
           echo "cleared mailpit"
 
