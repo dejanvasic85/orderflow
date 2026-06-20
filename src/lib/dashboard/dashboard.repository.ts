@@ -4,7 +4,6 @@ import { createSupabaseServerClient } from "@/lib/supabaseServer";
 export type DashboardOrderRow = {
   id: string;
   order_number: number;
-  status: string;
   created_at: string;
   account_id: string;
   placed_by: string;
@@ -19,7 +18,7 @@ export type DashboardOrderRow = {
 };
 
 const ordersWithItemsSelect =
-  "id, order_number, status, created_at, account_id, placed_by, order_request_items(product_id, boxes, extra_bottles, products(id, name, qty_per_box)), accounts(id, name), users!order_requests_placed_by_fkey(id, name, role)" as const;
+  "id, order_number, created_at, account_id, placed_by, order_request_items(product_id, boxes, extra_bottles, products(id, name, qty_per_box)), accounts(id, name), users!order_requests_placed_by_fkey(id, name, role)" as const;
 
 export type DashboardRepository = {
   // TODO(scale): at high order/item volumes, replace with .rpc("dashboard_stats", { since })

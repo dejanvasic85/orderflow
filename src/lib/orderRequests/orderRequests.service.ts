@@ -35,7 +35,6 @@ export function mapOrderHistoryRow(row: OrderHistoryRow): OrderHistoryItem {
     placed_by: row.placed_by,
     placedByName,
     ...(placedByOrgName ? { placedByOrgName } : {}),
-    status: row.status,
     created_at: row.created_at,
     total_boxes: rowItems.reduce((sum, i) => sum + (i.boxes ?? 0), 0),
     total_bottles: rowItems.reduce((sum, i) => sum + (i.extra_bottles ?? 0), 0),

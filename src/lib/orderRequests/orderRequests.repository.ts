@@ -5,13 +5,13 @@ import type { CreateOrderRequestInput, OrderHistoryRow, OrderRequestWithItems } 
 import { orderPageSize } from "./schema";
 
 const orderRequestWithItemsSelect =
-  "id, order_number, account_id, placed_by, template_id, delivery_address, delivery_instructions, status, created_at, updated_at, order_request_items(id, product_id, boxes, extra_bottles, created_at, products(id, name, qty_per_box)), templates(id, name), users!order_requests_placed_by_fkey(id, name), accounts(id, name)" as const;
+  "id, order_number, account_id, placed_by, template_id, delivery_address, delivery_instructions, created_at, updated_at, order_request_items(id, product_id, boxes, extra_bottles, created_at, products(id, name, qty_per_box)), templates(id, name), users!order_requests_placed_by_fkey(id, name), accounts(id, name)" as const;
 
 const orderHistorySelect =
-  "id, order_number, placed_by, status, created_at, order_request_items(boxes, extra_bottles), users!order_requests_placed_by_fkey(id, name, role)" as const;
+  "id, order_number, placed_by, created_at, order_request_items(boxes, extra_bottles), users!order_requests_placed_by_fkey(id, name, role)" as const;
 
 const allOrderHistorySelect =
-  "id, order_number, placed_by, status, created_at, order_request_items(boxes, extra_bottles), users!order_requests_placed_by_fkey(id, name, role), accounts(id, name)" as const;
+  "id, order_number, placed_by, created_at, order_request_items(boxes, extra_bottles), users!order_requests_placed_by_fkey(id, name, role), accounts(id, name)" as const;
 
 export type CreatedOrder = { id: string; order_number: number };
 

@@ -161,7 +161,6 @@ export type Database = {
           id: string
           order_number: number
           placed_by: string
-          status: string
           template_id: string | null
           updated_at: string
         }
@@ -173,7 +172,6 @@ export type Database = {
           id?: string
           order_number?: number
           placed_by: string
-          status?: string
           template_id?: string | null
           updated_at?: string
         }
@@ -185,7 +183,6 @@ export type Database = {
           id?: string
           order_number?: number
           placed_by?: string
-          status?: string
           template_id?: string | null
           updated_at?: string
         }
