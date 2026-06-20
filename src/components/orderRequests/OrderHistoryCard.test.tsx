@@ -8,7 +8,6 @@ const baseOrder: OrderHistoryItem = {
   order_number: 42,
   placed_by: "user-1",
   placedByName: "Alice Smith",
-  status: "submitted",
   created_at: "2024-06-15T12:00:00Z",
   total_boxes: 3,
   total_bottles: 5,

@@ -39,7 +39,6 @@ export type OrderHistoryItem = {
   placed_by: string;
   placedByName: string;
   placedByOrgName?: string;
-  status: string;
   created_at: string;
   total_bottles: number;
   total_boxes: number;
@@ -52,7 +51,6 @@ export type OrderHistoryRow = {
   id: string;
   order_number: number;
   placed_by: string;
-  status: string;
   created_at: string;
   order_request_items: { boxes: number | null; extra_bottles: number | null }[];
   users: unknown;
