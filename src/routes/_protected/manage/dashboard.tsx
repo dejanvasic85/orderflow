@@ -1,18 +1,27 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { DashboardView } from "@/components/dashboard/DashboardView";
 import { PageContent } from "@/components/layout/PageContent";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { company } from "@/lib/config";
+import { getDashboardStats } from "@/lib/dashboard/dashboard.functions";
+import type { DashboardData } from "@/lib/dashboard/schema";
+import { asResult } from "@/lib/result";
 
 export const Route = createFileRoute("/_protected/manage/dashboard")({
+  loader: async () => {
+    const result = asResult<DashboardData>(await getDashboardStats());
+    if (!result.ok) throw new Error(result.error.message);
+    return result.value;
+  },
   component: DashboardPage,
 });
 
 function DashboardPage() {
+  const data = Route.useLoaderData();
   return (
     <>
       <PageHeader title="Dashboard" />
       <PageContent>
-        <p className="text-muted-foreground">Welcome to {company.name}.</p>
+        <DashboardView data={data} />
       </PageContent>
     </>
   );

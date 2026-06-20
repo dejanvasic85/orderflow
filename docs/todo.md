@@ -54,7 +54,7 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Feature | Must | Image upload and transformations
 - [x] Feature | Must | Change password while logged in
 - [x] Feature | Must | Change my personal details and notification preferences
-- [ ] Feature | Must | Improved settings/profile menu
+- [x] Feature | Must | Improved settings/profile menu
 - [ ] Feature | Must | Password strength indicator
 - [ ] Security | Must | Ensure that staff have most readonly access to admin dashboard
 - [ ] Quality | Must | Unit testing the server functions
@@ -72,9 +72,7 @@ Priorities: `Must` · `Should` · `Nice`
 - [ ] Productionising | Must | Configure production domain in Supabase (currently https://orderflow.team-manager.workers.dev)
 - [ ] Productionising | Must | Configure production env vars in GitHub
 - [ ] Productionising | Must | Logging and monitoring (Supabase + Cloudflare — consider unifying in Cloudflare logs) sender
-- [ ] Feature | Nice | Homepage dashboard — reporting / summary tiles (Phase 4, quoted separately)
-- [ ] Cleanup | Nice | Remove hardcoded routes and API endpoints
-- [ ] Quality | Nice | Question architecture direction and whether we are heading in the right direction - https://claude.ai/code/session_01FuB3evNxHRJvTYkVDEod2n
+- [x] Feature | Nice | Homepage dashboard — reporting / summary tiles (Phase 4, quoted separately)
 
 ---
 
