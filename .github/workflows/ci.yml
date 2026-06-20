@@ -39,7 +39,11 @@ jobs:
     name: E2E Tests
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    if: false
+    # config.toml resolves auth.site_url from env(SITE_URL). It must be set BEFORE
+    # `supabase start` reads the config; otherwise GoTrue's site_url is empty and it
+    # silently skips sending invite emails (returns 200 but nothing lands in Mailpit).
+    env:
+      SITE_URL: http://localhost:3344
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -52,6 +56,16 @@ jobs:
       - name: Install dependencies
         run: vp install --frozen-lockfile
 
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-1.61.0
+
+      - name: Install Playwright browsers
+        run: vp exec playwright install --with-deps chromium
+
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v2
 
@@ -61,22 +75,37 @@ jobs:
       - name: Reset database (migrations + seed)
         run: supabase db reset --local
 
-      - name: Export Supabase env vars
+      - name: Write .env.local for the dev server
         run: |
+          # The dev server (vp dev) resolves server-side env from .env.local, not the
+          # process env Playwright passes through. Without this file, every server fn
+          # that calls getServerConfig() (e.g. inviteUser via supabaseAdmin) fails its
+          # Zod parse with "expected string, received undefined". R2 vars are required
+          # by the schema but not exercised by the e2e happy-paths, so dummy values suffice.
+          # Use the NEW-format API keys (sb_publishable_* / sb_secret_*), not the legacy
+          # JWT ANON_KEY / SERVICE_ROLE_KEY. The app uses the new key format; with a legacy
+          # service_role JWT, GoTrue does not treat inviteUserByEmail as a privileged invite
+          # — it creates the user and returns 200 but sends NO email, which is exactly why
+          # the invite e2e failed only in CI (local .env.local already uses sb_secret_*).
           SUPABASE_JSON=$(supabase status --output json)
-          echo "VITE_SUPABASE_URL=http://localhost:54321" >> $GITHUB_ENV
-          echo "VITE_SUPABASE_ANON_KEY=$(echo $SUPABASE_JSON | python3 -c "import sys,json; print(json.load(sys.stdin)['ANON_KEY'])")" >> $GITHUB_ENV
-          echo "SUPABASE_SECRET_KEY=$(echo $SUPABASE_JSON | python3 -c "import sys,json; print(json.load(sys.stdin)['SERVICE_ROLE_KEY'])")" >> $GITHUB_ENV
-          echo "SITE_URL=http://localhost:3344" >> $GITHUB_ENV
+          PUBLISHABLE_KEY=$(echo "$SUPABASE_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin)['PUBLISHABLE_KEY'])")
+          SECRET_KEY=$(echo "$SUPABASE_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin)['SECRET_KEY'])")
+          cat > .env.local <<EOF
+          VITE_SUPABASE_URL=http://localhost:54321
+          VITE_SUPABASE_ANON_KEY=$PUBLISHABLE_KEY
+          SUPABASE_SECRET_KEY=$SECRET_KEY
+          SITE_URL=http://localhost:3344
+          R2_ACCOUNT_ID=test
+          R2_ACCESS_KEY_ID=test
+          R2_SECRET_ACCESS_KEY=test
+          R2_BUCKET_NAME=test
+          R2_PUBLIC_BASE_URL=http://localhost:54321/r2
+          EOF
 
       - name: Run e2e tests
         run: vp exec playwright test
         env:
           CI: true
-
-      - name: Stop Supabase
-        if: always()
-        run: supabase stop
 
       - name: Upload Playwright report
         if: always()

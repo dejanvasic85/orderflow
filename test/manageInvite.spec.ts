@@ -10,16 +10,18 @@ type MailpitMessage = {
   To: { Address: string }[];
 };
 
-async function getInviteLink(toEmail: string, timeoutMs = 10000): Promise<string> {
+async function getInviteLink(toEmail: string, timeoutMs = 15000): Promise<string> {
   const deadline = Date.now() + timeoutMs;
 
   while (Date.now() < deadline) {
     const res = await fetch(`${mailpitUrl}/api/v1/messages`);
     const { messages } = (await res.json()) as { messages: MailpitMessage[] };
 
-    const message = messages.find(
-      (m) => m.To.some((t) => t.Address === toEmail) && m.Subject === "You have been invited",
-    );
+    // Match on recipient only — the faker email is unique per run. Don't assert on the
+    // subject: GoTrue's default invite subject text varies ("You have been invited" vs
+    // "You've been invited") across auth-image builds, which made this filter miss the
+    // delivered email in CI.
+    const message = messages.find((m) => m.To.some((t) => t.Address === toEmail));
 
     if (message) {
       const bodyRes = await fetch(`${mailpitUrl}/api/v1/message/${message.ID}`);
@@ -40,7 +42,7 @@ async function deleteAllMailpitMessages() {
   await fetch(`${mailpitUrl}/api/v1/messages`, { method: "DELETE" });
 }
 
-test.describe("Accept invite", () => {
+test.describe("Invite management", () => {
   test.beforeEach(async () => {
     await deleteAllMailpitMessages();
   });

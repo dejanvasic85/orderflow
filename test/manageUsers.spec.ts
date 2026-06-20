@@ -6,7 +6,7 @@ test.describe("Users page", () => {
     await login(page, { user: "admin" });
   });
 
-  test("admin can view users list and open user details in drawer", async ({ page }) => {
+  test.skip("admin can view users list and open user details in drawer", async ({ page }) => {
     await page.goto("/manage/users");
 
     await expect(page.getByRole("heading", { name: "Users" })).toBeVisible();

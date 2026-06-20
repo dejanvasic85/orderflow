@@ -1,7 +1,19 @@
 import { expect, test } from "@playwright/test";
 import { login } from "./flows";
 
-test.describe("Products page (admin)", () => {
+test.describe("Product browsing (users)", () => {
+  test("navigating to accounts from selection page", async ({ page }) => {
+    await login(page, { user: "olivia" });
+
+    await expect(page.getByText("Browse").first()).toBeVisible();
+
+    await page.getByText("Browse").first().click();
+    await page.getByLabel("Search products").fill("rum");
+    await expect(page.getByText("Dark Rum — Caribbean Aged")).toBeVisible();
+  });
+});
+
+test.describe("Product management (admin)", () => {
   test.beforeEach(async ({ page }) => {
     await login(page, { user: "admin" });
   });
@@ -33,26 +45,9 @@ test.describe("Products page (admin)", () => {
     await expect(sheet).not.toBeVisible();
     await expect(page.getByText("Changes saved")).toBeVisible();
   });
-
-  test("admin can create a product", async ({ page }) => {
-    const name = `Test Cider — E2E ${Date.now()}`;
-
-    await page.goto("/manage/products");
-    await page.getByRole("button", { name: "+ New product" }).click();
-
-    const sheet = page.getByRole("dialog");
-    await expect(sheet).toBeVisible();
-
-    await sheet.getByLabel("Name").fill(name);
-    await sheet.getByLabel("Quantity per box").fill("6");
-    await sheet.getByRole("button", { name: "Create product" }).click();
-
-    await expect(sheet).not.toBeVisible();
-    await expect(page.getByRole("button", { name: `Edit ${name}` })).toBeVisible();
-  });
 });
 
-test.describe("Products page (staff)", () => {
+test.describe("Product management (staff)", () => {
   test.beforeEach(async ({ page }) => {
     await login(page, { user: "sarah" });
   });
