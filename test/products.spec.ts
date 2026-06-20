@@ -1,7 +1,19 @@
 import { expect, test } from "@playwright/test";
 import { login } from "./flows";
 
-test.describe("Products page (admin)", () => {
+test.describe("Product browsing (users)", () => {
+  test("navigating to accounts from selection page", async ({ page }) => {
+    await login(page, { user: "olivia" });
+
+    await expect(page.getByText("Browse").first()).toBeVisible();
+
+    await page.getByText("Browse").first().click();
+    await page.getByLabel("Search products").fill("rum");
+    await expect(page.getByText("Dark Rum — Caribbean Aged")).toBeVisible();
+  });
+});
+
+test.describe("Product management (admin)", () => {
   test.beforeEach(async ({ page }) => {
     await login(page, { user: "admin" });
   });
@@ -35,7 +47,7 @@ test.describe("Products page (admin)", () => {
   });
 });
 
-test.describe("Products page (staff)", () => {
+test.describe("Product management (staff)", () => {
   test.beforeEach(async ({ page }) => {
     await login(page, { user: "sarah" });
   });
