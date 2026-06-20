@@ -15,3 +15,6 @@ dev.db
 coverage/
 test-results/
 playwright-report/
+
+# Playwright downloaded artifacts
+playwright-test-results/
