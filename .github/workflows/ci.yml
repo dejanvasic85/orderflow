@@ -39,6 +39,11 @@ jobs:
     name: E2E Tests
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    # config.toml resolves auth.site_url from env(SITE_URL). It must be set BEFORE
+    # `supabase start` reads the config; otherwise GoTrue's site_url is empty and it
+    # silently skips sending invite emails (returns 200 but nothing lands in Mailpit).
+    env:
+      SITE_URL: http://localhost:3344
     steps:
       - name: Checkout
         uses: actions/checkout@v7
