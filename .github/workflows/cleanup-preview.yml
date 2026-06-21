@@ -22,6 +22,14 @@ jobs:
         with:
           cache: true
 
+      - name: Install dependencies
+        run: vp install --frozen-lockfile
+
+      - name: Verify required secrets
+        run: vp exec tsx deployment/verifyEnv.ts cleanup
+        env:
+          SECRETS_JSON: ${{ toJSON(secrets) }}
+
       - name: Compute preview worker name
         id: meta
         env:

@@ -102,6 +102,16 @@ jobs:
           R2_PUBLIC_BASE_URL=http://localhost:54321/r2
           EOF
 
+      - name: Verify dev server env
+        # The dev server reads these from .env.local (not process env), so source it and
+        # verify presence before the costly e2e run. The required set is derived from the
+        # "e2e" context in deployment/env.manifest.ts.
+        run: |
+          set -a
+          source .env.local
+          set +a
+          vp exec tsx deployment/verifyEnv.ts e2e --from-env
+
       - name: Run e2e tests
         run: vp exec playwright test
         env:

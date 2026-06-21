@@ -27,6 +27,19 @@ jobs:
         with:
           ref: ${{ inputs.ref }}
 
+      - name: Setup Vite+
+        uses: voidzero-dev/setup-vp@v1
+        with:
+          cache: true
+
+      - name: Install dependencies
+        run: vp install --frozen-lockfile
+
+      - name: Verify required secrets
+        run: vp exec tsx deployment/verifyEnv.ts migrate
+        env:
+          SECRETS_JSON: ${{ toJSON(secrets) }}
+
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v2
 
