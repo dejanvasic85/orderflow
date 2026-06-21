@@ -29,7 +29,7 @@ test("shows validation errors when submitting empty form", async () => {
   await user.click(screen.getByRole("button", { name: "Change password" }));
 
   expect(await screen.findByText("Enter your current password")).toBeInTheDocument();
-  expect(screen.getByText("Password must be at least 6 characters")).toBeInTheDocument();
+  expect(screen.getByText("Password must be at least 8 characters")).toBeInTheDocument();
   expect(screen.getByText("Please confirm your password")).toBeInTheDocument();
   expect(onChangePassword).not.toHaveBeenCalled();
 });
@@ -38,8 +38,8 @@ test("shows validation error when new passwords do not match", async () => {
   render(<ChangePasswordForm onChangePassword={onChangePassword} />);
 
   await user.type(screen.getByLabelText("Current password"), "oldsecret");
-  await user.type(screen.getByLabelText("New password"), "newsecret1");
-  await user.type(screen.getByLabelText("Confirm new password"), "newsecret2");
+  await user.type(screen.getByLabelText("New password"), "Newsecret1");
+  await user.type(screen.getByLabelText("Confirm new password"), "Newsecret2");
   await user.click(screen.getByRole("button", { name: "Change password" }));
 
   expect(await screen.findByText("Passwords do not match")).toBeInTheDocument();
@@ -49,9 +49,9 @@ test("shows validation error when new passwords do not match", async () => {
 test("shows validation error when new password matches current password", async () => {
   render(<ChangePasswordForm onChangePassword={onChangePassword} />);
 
-  await user.type(screen.getByLabelText("Current password"), "samesecret");
-  await user.type(screen.getByLabelText("New password"), "samesecret");
-  await user.type(screen.getByLabelText("Confirm new password"), "samesecret");
+  await user.type(screen.getByLabelText("Current password"), "Samesecret1");
+  await user.type(screen.getByLabelText("New password"), "Samesecret1");
+  await user.type(screen.getByLabelText("Confirm new password"), "Samesecret1");
   await user.click(screen.getByRole("button", { name: "Change password" }));
 
   expect(
@@ -65,14 +65,14 @@ test("calls onChangePassword with current and new password on valid submit", asy
   render(<ChangePasswordForm onChangePassword={onChangePassword} />);
 
   await user.type(screen.getByLabelText("Current password"), "oldsecret");
-  await user.type(screen.getByLabelText("New password"), "newsecret1");
-  await user.type(screen.getByLabelText("Confirm new password"), "newsecret1");
+  await user.type(screen.getByLabelText("New password"), "Newsecret1");
+  await user.type(screen.getByLabelText("Confirm new password"), "Newsecret1");
   await user.click(screen.getByRole("button", { name: "Change password" }));
 
   await vi.waitFor(() => {
     expect(onChangePassword).toHaveBeenCalledWith({
       currentPassword: "oldsecret",
-      newPassword: "newsecret1",
+      newPassword: "Newsecret1",
     });
   });
 });
@@ -85,8 +85,8 @@ test("shows the error returned from onChangePassword", async () => {
   render(<ChangePasswordForm onChangePassword={onChangePassword} />);
 
   await user.type(screen.getByLabelText("Current password"), "wrongsecret");
-  await user.type(screen.getByLabelText("New password"), "newsecret1");
-  await user.type(screen.getByLabelText("Confirm new password"), "newsecret1");
+  await user.type(screen.getByLabelText("New password"), "Newsecret1");
+  await user.type(screen.getByLabelText("Confirm new password"), "Newsecret1");
   await user.click(screen.getByRole("button", { name: "Change password" }));
 
   expect(await screen.findByText("Current password is incorrect")).toBeInTheDocument();

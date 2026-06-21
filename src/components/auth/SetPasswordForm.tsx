@@ -1,5 +1,6 @@
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
+import { PasswordStrengthMeter } from "@/components/auth/PasswordStrengthMeter";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -48,6 +49,7 @@ export function SetPasswordForm({ onSetPassword }: SetPasswordFormProps) {
               onChange={(e) => field.handleChange(e.target.value)}
               onBlur={field.handleBlur}
             />
+            <PasswordStrengthMeter password={field.state.value} />
             <FieldError errors={field.state.meta.errors} />
           </Field>
         )}

@@ -1,6 +1,7 @@
 import { useForm } from "@tanstack/react-form";
 import { Eye, EyeOff, Info, Mail } from "lucide-react";
 import { useState } from "react";
+import { PasswordStrengthMeter } from "@/components/auth/PasswordStrengthMeter";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
@@ -137,6 +138,7 @@ export function SetUserPasswordPanel({ user, onSetPassword, onSendResetEmail, on
                       </InputGroupButton>
                     </InputGroupAddon>
                   </InputGroup>
+                  <PasswordStrengthMeter password={field.state.value} />
                   <FieldError errors={toFieldErrors(field.state.meta.errors)} />
                 </Field>
               )}

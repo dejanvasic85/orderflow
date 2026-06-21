@@ -70,8 +70,8 @@ describe("SetUserPasswordPanel", () => {
     const user = userEvent.setup();
     renderPanel();
 
-    await user.type(screen.getByLabelText("New password"), "secret1");
-    await user.type(screen.getByLabelText("Confirm password"), "different");
+    await user.type(screen.getByLabelText("New password"), "Mysecret1");
+    await user.type(screen.getByLabelText("Confirm password"), "Mysecret2");
     await user.click(screen.getByRole("button", { name: /^set password$/i }));
 
     expect(await screen.findByText("Passwords do not match")).toBeInTheDocument();
@@ -85,19 +85,19 @@ describe("SetUserPasswordPanel", () => {
     await user.type(screen.getByLabelText("Confirm password"), "abc");
     await user.click(screen.getByRole("button", { name: /^set password$/i }));
 
-    expect(await screen.findByText("Password must be at least 6 characters")).toBeInTheDocument();
+    expect(await screen.findByText("Password must be at least 8 characters")).toBeInTheDocument();
   });
 
   it("calls onSetPassword with the entered password when form is submitted", async () => {
     const user = userEvent.setup();
     const { onSetPassword } = renderPanel();
 
-    await user.type(screen.getByLabelText("New password"), "newpass123");
-    await user.type(screen.getByLabelText("Confirm password"), "newpass123");
+    await user.type(screen.getByLabelText("New password"), "Newpass123");
+    await user.type(screen.getByLabelText("Confirm password"), "Newpass123");
     await user.click(screen.getByRole("button", { name: /^set password$/i }));
 
     expect(await vi.waitFor(() => onSetPassword.mock.calls.length > 0));
-    expect(onSetPassword).toHaveBeenCalledWith("newpass123");
+    expect(onSetPassword).toHaveBeenCalledWith("Newpass123");
   });
 
   it("calls onClose when Cancel button is clicked", async () => {

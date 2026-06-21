@@ -1,13 +1,15 @@
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import { z } from "zod";
+import { PasswordStrengthMeter } from "@/components/auth/PasswordStrengthMeter";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { passwordSchema } from "@/lib/auth/schema";
 
 const resetPasswordSchema = z
   .object({
-    password: z.string().min(6, "Password must be at least 6 characters"),
+    password: passwordSchema,
     confirmPassword: z.string().min(1, "Please confirm your password"),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -57,6 +59,7 @@ export function ResetPasswordForm({ onReset }: ResetPasswordFormProps) {
               onChange={(e) => field.handleChange(e.target.value)}
               onBlur={field.handleBlur}
             />
+            <PasswordStrengthMeter password={field.state.value} />
             <FieldError errors={field.state.meta.errors} />
           </Field>
         )}

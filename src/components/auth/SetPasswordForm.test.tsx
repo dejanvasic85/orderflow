@@ -23,7 +23,7 @@ test("shows validation errors when submitting empty form", async () => {
 
   await user.click(screen.getByRole("button", { name: "Set password" }));
 
-  expect(await screen.findByText("Password must be at least 6 characters")).toBeInTheDocument();
+  expect(await screen.findByText("Password must be at least 8 characters")).toBeInTheDocument();
   expect(screen.getByText("Please confirm your password")).toBeInTheDocument();
   expect(onSetPassword).not.toHaveBeenCalled();
 });
@@ -31,8 +31,8 @@ test("shows validation errors when submitting empty form", async () => {
 test("shows validation error when passwords do not match", async () => {
   render(<SetPasswordForm onSetPassword={onSetPassword} />);
 
-  await user.type(screen.getByLabelText("Password"), "secret1");
-  await user.type(screen.getByLabelText("Confirm password"), "secret2");
+  await user.type(screen.getByLabelText("Password"), "Mysecret1");
+  await user.type(screen.getByLabelText("Confirm password"), "Mysecret2");
   await user.click(screen.getByRole("button", { name: "Set password" }));
 
   expect(await screen.findByText("Passwords do not match")).toBeInTheDocument();
@@ -43,12 +43,12 @@ test("calls onSetPassword with the password value on valid submit", async () => 
   onSetPassword.mockResolvedValue({ ok: true, value: undefined } as SetPasswordResult);
   render(<SetPasswordForm onSetPassword={onSetPassword} />);
 
-  await user.type(screen.getByLabelText("Password"), "mysecret");
-  await user.type(screen.getByLabelText("Confirm password"), "mysecret");
+  await user.type(screen.getByLabelText("Password"), "Mysecret1");
+  await user.type(screen.getByLabelText("Confirm password"), "Mysecret1");
   await user.click(screen.getByRole("button", { name: "Set password" }));
 
   await vi.waitFor(() => {
-    expect(onSetPassword).toHaveBeenCalledWith("mysecret");
+    expect(onSetPassword).toHaveBeenCalledWith("Mysecret1");
   });
 });
 
@@ -56,8 +56,8 @@ test("shows the error returned from onSetPassword", async () => {
   onSetPassword.mockResolvedValue({ ok: false, error: { message: "Password is too weak" } });
   render(<SetPasswordForm onSetPassword={onSetPassword} />);
 
-  await user.type(screen.getByLabelText("Password"), "mysecret");
-  await user.type(screen.getByLabelText("Confirm password"), "mysecret");
+  await user.type(screen.getByLabelText("Password"), "Mysecret1");
+  await user.type(screen.getByLabelText("Confirm password"), "Mysecret1");
   await user.click(screen.getByRole("button", { name: "Set password" }));
 
   expect(await screen.findByText("Password is too weak")).toBeInTheDocument();
