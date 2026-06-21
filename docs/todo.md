@@ -55,7 +55,7 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Feature | Must | Change password while logged in
 - [x] Feature | Must | Change my personal details and notification preferences
 - [x] Feature | Must | Improved settings/profile menu
-- [ ] Feature | Must | Password strength indicator
+- [x] Feature | Must | Password strength indicator
 - [ ] Security | Must | Ensure that staff have most readonly access to admin dashboard
 - [ ] Quality | Must | Unit testing the server functions
 - [ ] Quality | Must | Playwright tests improved and working locally
