@@ -37,8 +37,8 @@ test("shows success screen after password is reset", async () => {
   const onReset = vi.fn().mockResolvedValue(undefined);
   renderWithRouter(<ResetPasswordView valid={true} onReset={onReset} />);
 
-  await user.type(await screen.findByLabelText("New password"), "newpassword1");
-  await user.type(screen.getByLabelText("Confirm new password"), "newpassword1");
+  await user.type(await screen.findByLabelText("New password"), "Newpassword1");
+  await user.type(screen.getByLabelText("Confirm new password"), "Newpassword1");
   await user.click(screen.getByRole("button", { name: "Reset password" }));
 
   expect(await screen.findByRole("heading", { name: "Password updated" })).toBeInTheDocument();
@@ -50,8 +50,8 @@ test("stays on form when onReset returns an error", async () => {
   const onReset = vi.fn().mockResolvedValue({ error: "Session expired" });
   renderWithRouter(<ResetPasswordView valid={true} onReset={onReset} />);
 
-  await user.type(await screen.findByLabelText("New password"), "newpassword1");
-  await user.type(screen.getByLabelText("Confirm new password"), "newpassword1");
+  await user.type(await screen.findByLabelText("New password"), "Newpassword1");
+  await user.type(screen.getByLabelText("Confirm new password"), "Newpassword1");
   await user.click(screen.getByRole("button", { name: "Reset password" }));
 
   expect(await screen.findByText("Session expired")).toBeInTheDocument();
