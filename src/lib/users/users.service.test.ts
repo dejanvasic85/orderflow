@@ -52,7 +52,7 @@ function makeRepo(overrides: Partial<UserRepository> = {}): UserRepository {
     deleteAuthUser: vi.fn().mockResolvedValue(ok()),
     resendInvite: vi.fn().mockResolvedValue(ok()),
     setPassword: vi.fn().mockResolvedValue(ok()),
-    findAccountNames: vi.fn().mockResolvedValue([]),
+    findAccountNames: vi.fn().mockResolvedValue(ok([])),
     ...overrides,
   };
 }
@@ -170,6 +170,28 @@ describe("listUsers", () => {
 });
 
 describe("getUser", () => {
+  it("calls authorizeStaff before fetching user", async () => {
+    const authorizeStaff = vi.fn().mockResolvedValue(undefined);
+    const findUserById = vi.fn().mockResolvedValue(ok({ id: "u-42" }));
+    const deps = makeDeps({ repo: makeRepo({ findUserById }), authorizeStaff });
+
+    await getUser(deps, "u-42");
+
+    expect(authorizeStaff).toHaveBeenCalledTimes(1);
+    expect(findUserById).toHaveBeenCalledTimes(1);
+  });
+
+  it("throws without calling repo when authorizeStaff rejects", async () => {
+    const findUserById = vi.fn();
+    const deps = makeDeps({
+      repo: makeRepo({ findUserById }),
+      authorizeStaff: vi.fn().mockRejectedValue(new Error("Forbidden")),
+    });
+
+    await expect(getUser(deps, "u-42")).rejects.toThrow("Forbidden");
+    expect(findUserById).not.toHaveBeenCalled();
+  });
+
   it("delegates to repo.findUserById with the correct id", async () => {
     const rawUser = { id: "u-42", name: "Bob", role: "user" };
     const findUserById = vi.fn().mockResolvedValue(ok(rawUser));
@@ -254,12 +276,12 @@ describe("updateOwnProfile", () => {
 });
 
 describe("updateUser — active flag path", () => {
-  it("calls authorize before updating when active changes", async () => {
+  it("calls authorize for all update paths", async () => {
     const authorize = vi.fn().mockResolvedValue(undefined);
     const updateUserFn = vi.fn().mockResolvedValue(ok());
     const deps = makeDeps({ repo: makeRepo({ updateUser: updateUserFn }), authorize });
 
-    await updateUser(deps, { id: "u-1", active: false });
+    await updateUser(deps, { id: "u-1", name: "New Name" });
 
     expect(authorize).toHaveBeenCalledTimes(1);
     expect(updateUserFn).toHaveBeenCalledTimes(1);
@@ -355,7 +377,7 @@ describe("inviteUser", () => {
   it("calls authorize before any repo operations", async () => {
     const authorize = vi.fn().mockResolvedValue(undefined);
     const inviteUserByEmail = vi.fn().mockResolvedValue(ok({ userId: "u-new" }));
-    const findAccountNames = vi.fn().mockResolvedValue([{ id: "acc-1", name: "Wines" }]);
+    const findAccountNames = vi.fn().mockResolvedValue(ok([{ id: "acc-1", name: "Wines" }]));
     const deps = makeDeps({ repo: makeRepo({ inviteUserByEmail, findAccountNames }), authorize });
 
     await inviteUser(deps, inviteData);
@@ -397,7 +419,7 @@ describe("inviteUser", () => {
   });
 
   it("returns an assembled User object on success", async () => {
-    const findAccountNames = vi.fn().mockResolvedValue([{ id: "acc-1", name: "Wines Co" }]);
+    const findAccountNames = vi.fn().mockResolvedValue(ok([{ id: "acc-1", name: "Wines Co" }]));
     const deps = makeDeps({ repo: makeRepo({ findAccountNames }) });
 
     const result = await inviteUser(deps, inviteData);
@@ -410,6 +432,15 @@ describe("inviteUser", () => {
       expect(result.value.accounts).toEqual([{ id: "acc-1", name: "Wines Co" }]);
       expect(result.value.active).toBe(true);
     }
+  });
+
+  it("propagates a repo error from findAccountNames", async () => {
+    const findAccountNames = vi.fn().mockResolvedValue(err({ message: "accounts lookup failed" }));
+    const deps = makeDeps({ repo: makeRepo({ findAccountNames }) });
+
+    const result = await inviteUser(deps, inviteData);
+
+    expect(result).toEqual(err({ message: "accounts lookup failed" }));
   });
 });
 

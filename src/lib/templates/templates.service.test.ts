@@ -2,12 +2,14 @@ import { err, ok } from "@/lib/result";
 import type { TemplateRepository } from "./templates.repository";
 import {
   addTemplateItem,
+  createTemplate,
   ensureTemplateId,
   getTemplate,
   getTemplateForAccount,
   removeTemplateItem,
   saveTemplateItems,
   type TemplateServiceDeps,
+  updateTemplate,
 } from "./templates.service";
 
 const existingTemplate = {
@@ -196,6 +198,52 @@ describe("getTemplate", () => {
 
     expect(result).toEqual(ok(existingTemplate));
     expect(findTemplateById).toHaveBeenCalledWith("tmpl-1");
+  });
+});
+
+describe("createTemplate", () => {
+  it("delegates to repo.createTemplate", async () => {
+    const row = { id: "tmpl-new", name: "My Template" } as never;
+    const createTemplateFn = vi.fn().mockResolvedValue(ok(row));
+    const deps = makeDeps({ repo: makeRepo({ createTemplate: createTemplateFn }) });
+    const input = { account_id: "acc-1", name: "My Template" };
+
+    const result = await createTemplate(deps, input);
+
+    expect(result).toEqual(ok(row));
+    expect(createTemplateFn).toHaveBeenCalledWith(input);
+  });
+
+  it("propagates a repo error", async () => {
+    const createTemplateFn = vi.fn().mockResolvedValue(err({ message: "insert failed" }));
+    const deps = makeDeps({ repo: makeRepo({ createTemplate: createTemplateFn }) });
+
+    const result = await createTemplate(deps, { account_id: "acc-1", name: "My Template" });
+
+    expect(result).toEqual(err({ message: "insert failed" }));
+  });
+});
+
+describe("updateTemplate", () => {
+  it("delegates to repo.updateTemplate", async () => {
+    const updated = { ...existingTemplate, name: "Renamed" } as never;
+    const updateTemplateFn = vi.fn().mockResolvedValue(ok(updated));
+    const deps = makeDeps({ repo: makeRepo({ updateTemplate: updateTemplateFn }) });
+    const input = { id: "tmpl-1", name: "Renamed" };
+
+    const result = await updateTemplate(deps, input);
+
+    expect(result).toEqual(ok(updated));
+    expect(updateTemplateFn).toHaveBeenCalledWith(input);
+  });
+
+  it("propagates a repo error", async () => {
+    const updateTemplateFn = vi.fn().mockResolvedValue(err({ message: "update failed" }));
+    const deps = makeDeps({ repo: makeRepo({ updateTemplate: updateTemplateFn }) });
+
+    const result = await updateTemplate(deps, { id: "tmpl-1", name: "Renamed" });
+
+    expect(result).toEqual(err({ message: "update failed" }));
   });
 });
 

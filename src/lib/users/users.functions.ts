@@ -50,7 +50,7 @@ export const listUsers = createServerFn({ method: "GET", strict: { output: false
   .handler(async ({ data: filters }) => listUsersSvc(deps, filters));
 
 export const getUser = createServerFn({ method: "GET", strict: { output: false } })
-  .validator((id: string) => id)
+  .validator((id: string) => z.string().uuid().parse(id))
   .handler(async ({ data: id }) => getUserSvc(deps, id));
 
 export const updateUser = createServerFn({ method: "POST", strict: { output: false } })
@@ -58,7 +58,7 @@ export const updateUser = createServerFn({ method: "POST", strict: { output: fal
   .handler(async ({ data }) => updateUserSvc(deps, data));
 
 export const checkEmailExists = createServerFn({ method: "GET", strict: { output: false } })
-  .validator((email: string) => email)
+  .validator((email: string) => z.string().email().parse(email))
   .handler(async ({ data: email }) => checkEmailExistsSvc(deps, email));
 
 export const inviteUser = createServerFn({ method: "POST", strict: { output: false } })
@@ -69,7 +69,7 @@ export const inviteUser = createServerFn({ method: "POST", strict: { output: fal
   });
 
 export const resendInvite = createServerFn({ method: "POST", strict: { output: false } })
-  .validator((id: string) => id)
+  .validator((id: string) => z.string().uuid().parse(id))
   .handler(async ({ data: id }) => {
     const { SITE_URL } = getServerConfig();
     return resendUserInviteSvc(deps, id, SITE_URL);

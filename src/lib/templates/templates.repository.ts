@@ -101,6 +101,7 @@ export function createTemplateRepository(): TemplateRepository {
           ? supabase
               .from("template_items")
               .delete()
+              .eq("template_id", templateId)
               .in("id", toRemove)
               .then((r) => r.error)
           : Promise.resolve(null),
@@ -110,6 +111,7 @@ export function createTemplateRepository(): TemplateRepository {
                 supabase
                   .from("template_items")
                   .update({ box_count, bottle_count })
+                  .eq("template_id", templateId)
                   .eq("id", id)
                   .then((r) => r.error),
               ),

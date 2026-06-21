@@ -97,7 +97,7 @@ export type UserRepository = {
   resendInvite(email: string, redirectTo: string): Promise<Result<void>>;
   setPassword(userId: string, password: string): Promise<Result<void>>;
 
-  findAccountNames(accountIds: string[]): Promise<UserAccount[]>;
+  findAccountNames(accountIds: string[]): Promise<Result<UserAccount[]>>;
 };
 
 export function createUserRepository(): UserRepository {
@@ -112,8 +112,10 @@ export function createUserRepository(): UserRepository {
         .order("name", { ascending: true });
 
       if (filters.q) {
-        const safe = filters.q.replace(/[%_()]/g, "");
-        query = query.or(`name.ilike.%${safe}%,email.ilike.%${safe}%`);
+        const safe = filters.q.replace(/[,%_()]/g, "").trim();
+        if (safe.length > 0) {
+          query = query.or(`name.ilike.%${safe}%,email.ilike.%${safe}%`);
+        }
       }
       if (filters.role) {
         query = query.eq("role", filters.role);
@@ -305,16 +307,14 @@ export function createUserRepository(): UserRepository {
     },
 
     async findAccountNames(accountIds) {
+      if (accountIds.length === 0) return ok([]);
       const supabase = createSupabaseServerClient();
       const { data, error } = await supabase
         .from("accounts")
         .select("id, name")
         .in("id", accountIds);
-      if (error) {
-        console.error("Failed to resolve account names:", error);
-        return accountIds.map((id) => ({ id, name: id }));
-      }
-      return (data ?? []).map((a) => ({ id: a.id, name: a.name }));
+      if (error) return err({ message: error.message });
+      return ok((data ?? []).map((a) => ({ id: a.id, name: a.name })));
     },
   };
 }

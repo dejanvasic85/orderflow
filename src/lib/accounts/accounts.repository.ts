@@ -64,14 +64,15 @@ export function createAccountRepository(): AccountRepository {
         .order("name", { ascending: true });
 
       if (filters.q) {
-        const safe = filters.q.replace(/[%_()]/g, "");
-        query = query.ilike("name", `%${safe}%`);
+        const safe = filters.q.replace(/[,%_()]/g, "").trim();
+        if (safe.length > 0) {
+          query = query.ilike("name", `%${safe}%`);
+        }
       }
 
-      if (filters.page !== undefined) {
-        const from = (filters.page - 1) * accountPageSize;
-        query = query.range(from, from + accountPageSize - 1);
-      }
+      const page = filters.page ?? 1;
+      const from = (page - 1) * accountPageSize;
+      query = query.range(from, from + accountPageSize - 1);
 
       const { data, error, count } = await query;
       if (error) return err({ message: error.message });

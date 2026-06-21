@@ -43,8 +43,10 @@ export function createProductRepository(): ProductRepository {
       if (!filters.includeInactive) query = query.eq("active", true);
 
       if (filters.q) {
-        const safe = filters.q.replace(/[%_()]/g, "");
-        query = query.or(`name.ilike.%${safe}%,description.ilike.%${safe}%`);
+        const safe = filters.q.replace(/[,%_()]/g, "").trim();
+        if (safe.length > 0) {
+          query = query.or(`name.ilike.%${safe}%,description.ilike.%${safe}%`);
+        }
       }
 
       const page = filters.page ?? 1;

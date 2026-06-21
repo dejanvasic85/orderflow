@@ -56,6 +56,7 @@ export async function listUsers(
 }
 
 export async function getUser(deps: UserServiceDeps, id: string): Promise<Result<RawUserRow>> {
+  await deps.authorizeStaff();
   return deps.repo.findUserById(id);
 }
 
@@ -94,15 +95,13 @@ export async function updateUser(
   deps: UserServiceDeps,
   data: UpdateUserInput,
 ): Promise<Result<void>> {
+  await deps.authorize();
+
   const { id, accountIds, notificationPreferences, active, ...rest } = data;
 
   const patch = notificationPreferences
     ? { ...rest, active, notification_preferences: notificationPreferences }
     : { ...rest, active };
-
-  if (active !== undefined) {
-    await deps.authorize();
-  }
 
   const updateResult = await deps.repo.updateUser(id, patch);
   if (!updateResult.ok) return updateResult;
@@ -168,8 +167,12 @@ export async function inviteUser(
     }
   }
 
-  const accounts: UserAccount[] =
-    data.accountIds.length > 0 ? await deps.repo.findAccountNames(data.accountIds) : [];
+  let accounts: UserAccount[] = [];
+  if (data.accountIds.length > 0) {
+    const accountsResult = await deps.repo.findAccountNames(data.accountIds);
+    if (!accountsResult.ok) return accountsResult;
+    accounts = accountsResult.value;
+  }
 
   const now = new Date().toISOString();
   return ok({
