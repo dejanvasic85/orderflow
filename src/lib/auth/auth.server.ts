@@ -86,3 +86,31 @@ export async function verifyOtpToken(token_hash: string, type: string, next: str
 
   return { success: true as const, next };
 }
+
+export async function assertAdmin(supabase: ReturnType<typeof createSupabaseServerClient>) {
+  const sessionUser = await fetchSessionOrThrow();
+  const { data: profile, error: profileError } = await supabase
+    .from("users")
+    .select("role")
+    .eq("id", sessionUser.id)
+    .single();
+  if (profileError) {
+    console.error("Failed to fetch user profile for admin check:", profileError);
+    throw new Error("Unauthorized");
+  }
+  if (profile.role !== "admin") throw new Error("Forbidden");
+}
+
+export async function assertAdminOrStaff(supabase: ReturnType<typeof createSupabaseServerClient>) {
+  const sessionUser = await fetchSessionOrThrow();
+  const { data: profile, error: profileError } = await supabase
+    .from("users")
+    .select("role")
+    .eq("id", sessionUser.id)
+    .single();
+  if (profileError) {
+    console.error("Failed to fetch user profile for role check:", profileError);
+    throw new Error("Unauthorized");
+  }
+  if (profile.role !== "admin" && profile.role !== "staff") throw new Error("Forbidden");
+}

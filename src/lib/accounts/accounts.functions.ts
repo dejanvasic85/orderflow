@@ -1,14 +1,17 @@
 import { createServerFn } from "@tanstack/react-start";
+import { fetchSessionOrThrow } from "@/lib/auth/auth.server";
+import { createAccountRepository } from "./accounts.repository";
 import {
-  deleteAccountUser,
-  fetchAccount,
-  fetchAccountUsers,
-  fetchAccounts,
-  fetchAccountsForCurrentUser,
-  insertAccount,
-  insertAccountUser,
-  patchAccount,
-} from "./accounts.server";
+  assignUser,
+  createAccount as createAccountSvc,
+  getAccount as getAccountSvc,
+  listAccounts as listAccountsSvc,
+  listAccountsForCurrentUser as listAccountsForCurrentUserSvc,
+  listAccountUsers as listAccountUsersSvc,
+  type AccountServiceDeps,
+  unassignUser,
+  updateAccount as updateAccountSvc,
+} from "./accounts.service";
 import {
   assignSchema,
   createAccountSchema,
@@ -16,38 +19,43 @@ import {
   updateAccountSchema,
 } from "./schema";
 
+const deps: AccountServiceDeps = {
+  repo: createAccountRepository(),
+  session: fetchSessionOrThrow,
+};
+
 export const listAccounts = createServerFn({ method: "GET", strict: { output: false } })
   .validator(listAccountsSearchSchema)
-  .handler(async ({ data }) => fetchAccounts(data));
+  .handler(async ({ data }) => listAccountsSvc(deps, data));
 
 export const listAccountsForCurrentUser = createServerFn({
   method: "GET",
   strict: { output: false },
-}).handler(fetchAccountsForCurrentUser);
+}).handler(() => listAccountsForCurrentUserSvc(deps));
 
 export const getAccount = createServerFn({ method: "GET", strict: { output: false } })
   .validator((id: string) => id)
-  .handler(async ({ data: id }) => fetchAccount(id));
+  .handler(async ({ data: id }) => getAccountSvc(deps, id));
 
 export const listAccountUsers = createServerFn({ method: "GET", strict: { output: false } })
   .validator((accountId: string) => accountId)
-  .handler(async ({ data: accountId }) => fetchAccountUsers(accountId));
+  .handler(async ({ data: accountId }) => listAccountUsersSvc(deps, accountId));
 
 export const createAccount = createServerFn({ method: "POST", strict: { output: false } })
   .validator(createAccountSchema)
-  .handler(async ({ data }) => insertAccount(data));
+  .handler(async ({ data }) => createAccountSvc(deps, data));
 
 export const updateAccount = createServerFn({ method: "POST", strict: { output: false } })
   .validator(updateAccountSchema)
-  .handler(async ({ data }) => patchAccount(data));
+  .handler(async ({ data }) => updateAccountSvc(deps, data));
 
 export const assignUserToAccount = createServerFn({ method: "POST", strict: { output: false } })
   .validator(assignSchema)
-  .handler(async ({ data }) => insertAccountUser(data));
+  .handler(async ({ data }) => assignUser(deps, data));
 
 export const unassignUserFromAccount = createServerFn({
   method: "POST",
   strict: { output: false },
 })
   .validator(assignSchema)
-  .handler(async ({ data }) => deleteAccountUser(data));
+  .handler(async ({ data }) => unassignUser(deps, data));

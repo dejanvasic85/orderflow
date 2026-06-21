@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
+import { assertAdminOrStaff } from "@/lib/auth/auth.server";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
-import { assertAdminOrStaff } from "@/lib/users/users.server";
 import { createDashboardRepository } from "./dashboard.repository";
 import { getDashboardData, type DashboardServiceDeps } from "./dashboard.service";
 

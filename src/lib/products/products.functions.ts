@@ -1,11 +1,15 @@
 import { createServerFn } from "@tanstack/react-start";
+import { assertAdminOrStaff } from "@/lib/auth/auth.server";
+import { createSupabaseServerClient } from "@/lib/supabaseServer";
+import { createProductRepository } from "./products.repository";
 import {
-  fetchPagedProducts,
-  fetchProduct,
-  fetchProducts,
-  insertProduct,
-  patchProduct,
-} from "./products.server";
+  createProduct as createProductSvc,
+  getProduct as getProductSvc,
+  listActiveProducts as listActiveProductsSvc,
+  listPagedProducts as listPagedProductsSvc,
+  type ProductServiceDeps,
+  updateProduct as updateProductSvc,
+} from "./products.service";
 import {
   createProductSchema,
   type ListProductsFilters,
@@ -13,22 +17,27 @@ import {
   updateProductSchema,
 } from "./schema";
 
+const deps: ProductServiceDeps = {
+  repo: createProductRepository(),
+  authorize: () => assertAdminOrStaff(createSupabaseServerClient()),
+};
+
 export const listProducts = createServerFn({ method: "GET", strict: { output: false } }).handler(
-  fetchProducts,
+  () => listActiveProductsSvc(deps),
 );
 
 export const listPagedProducts = createServerFn({ method: "GET", strict: { output: false } })
   .validator((filters: ListProductsFilters = {}) => listProductsFiltersSchema.parse(filters))
-  .handler(async ({ data }) => fetchPagedProducts(data));
+  .handler(async ({ data }) => listPagedProductsSvc(deps, data));
 
 export const getProduct = createServerFn({ method: "GET", strict: { output: false } })
   .validator((id: string) => id)
-  .handler(async ({ data: id }) => fetchProduct(id));
+  .handler(async ({ data: id }) => getProductSvc(deps, id));
 
 export const createProduct = createServerFn({ method: "POST", strict: { output: false } })
   .validator(createProductSchema)
-  .handler(async ({ data }) => insertProduct(data));
+  .handler(async ({ data }) => createProductSvc(deps, data));
 
 export const updateProduct = createServerFn({ method: "POST", strict: { output: false } })
   .validator(updateProductSchema)
-  .handler(async ({ data }) => patchProduct(data));
+  .handler(async ({ data }) => updateProductSvc(deps, data));
