@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { PageContent } from "@/components/layout/PageContent";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -25,6 +25,7 @@ export const Route = createFileRoute("/_protected/settings")({
 
 function SettingsPage() {
   const { profile } = Route.useLoaderData();
+  const router = useRouter();
 
   async function handleSaveProfile(input: UpdateOwnProfileInput) {
     const result = asResult<void>(await updateOwnProfile({ data: input }));
@@ -42,6 +43,7 @@ function SettingsPage() {
       <PageHeader
         title="Settings"
         description="Manage your personal details and notification preferences"
+        onBack={() => router.history.back()}
       />
       <PageContent className="mx-auto w-full max-w-md">
         <EditProfileForm
