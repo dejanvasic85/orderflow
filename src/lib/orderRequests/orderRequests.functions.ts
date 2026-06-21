@@ -1,8 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { fetchSessionOrThrow } from "@/lib/auth/auth.server";
+import { assertAdminOrStaff } from "@/lib/auth/auth.server";
 import { notifyOrderPlaced } from "@/lib/notifications/notifications.server";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
-import { assertAdminOrStaff } from "@/lib/users/users.server";
 import { createOrderRequestRepository } from "./orderRequests.repository";
 import {
   getOrderRequest as getOrderRequestSvc,
