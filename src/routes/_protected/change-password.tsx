@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { ChangePasswordForm, type ChangePasswordInput } from "@/components/auth/ChangePasswordForm";
 import { PageContent } from "@/components/layout/PageContent";
@@ -21,6 +21,7 @@ function ChangePasswordPage() {
   const { user } = Route.useRouteContext();
   const { passwordChangedAt } = Route.useLoaderData();
   const navigate = useNavigate();
+  const router = useRouter();
 
   async function handleChangePassword(input: ChangePasswordInput) {
     const result = asResult<void>(await changePassword({ data: input }));
@@ -33,7 +34,11 @@ function ChangePasswordPage() {
 
   return (
     <>
-      <PageHeader title="Change password" description="Update your account password" />
+      <PageHeader
+        title="Change password"
+        description="Update your account password"
+        onBack={() => router.history.back()}
+      />
       <PageContent className="mx-auto w-full max-w-md">
         <div className="flex flex-col gap-0.5">
           <p className="text-sm text-muted-foreground">

@@ -54,8 +54,8 @@ test("does not show Change account when hasMultipleAccounts is false", async () 
 
   await user.click(await screen.findByRole("button", { name: "Open account menu" }));
 
-  expect(screen.queryByRole("menuitem", { name: "Change account" })).not.toBeInTheDocument();
-  expect(screen.getByRole("menuitem", { name: "Sign out" })).toBeInTheDocument();
+  expect(screen.queryByRole("link", { name: "Change account" })).not.toBeInTheDocument();
+  expect(await screen.findByRole("button", { name: "Sign out" })).toBeInTheDocument();
 });
 
 test("shows Change account when hasMultipleAccounts is true", async () => {
@@ -64,8 +64,28 @@ test("shows Change account when hasMultipleAccounts is true", async () => {
 
   await user.click(await screen.findByRole("button", { name: "Open account menu" }));
 
-  expect(await screen.findByRole("menuitem", { name: "Change account" })).toBeInTheDocument();
-  expect(screen.getByRole("menuitem", { name: "Sign out" })).toBeInTheDocument();
+  expect(await screen.findByRole("link", { name: "Change account" })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Sign out" })).toBeInTheDocument();
+});
+
+test("shows Change password link to /change-password", async () => {
+  const user = userEvent.setup();
+  renderNav();
+
+  await user.click(await screen.findByRole("button", { name: "Open account menu" }));
+
+  const link = await screen.findByRole("link", { name: "Change password" });
+  expect(link).toHaveAttribute("href", "/change-password");
+});
+
+test("shows Settings link to /settings", async () => {
+  const user = userEvent.setup();
+  renderNav();
+
+  await user.click(await screen.findByRole("button", { name: "Open account menu" }));
+
+  const link = await screen.findByRole("link", { name: "Settings" });
+  expect(link).toHaveAttribute("href", "/settings");
 });
 
 test("calls onSignOut when Sign out is clicked", async () => {
@@ -73,7 +93,7 @@ test("calls onSignOut when Sign out is clicked", async () => {
   renderNav();
 
   await user.click(await screen.findByRole("button", { name: "Open account menu" }));
-  await user.click(await screen.findByRole("menuitem", { name: "Sign out" }));
+  await user.click(await screen.findByRole("button", { name: "Sign out" }));
 
   expect(onSignOut).toHaveBeenCalledTimes(1);
 });
