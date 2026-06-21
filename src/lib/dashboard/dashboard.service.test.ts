@@ -187,14 +187,14 @@ describe("buildOrderTimeSeries", () => {
   it("returns a continuous zero-filled series of correct length for 7d", () => {
     const result = buildOrderTimeSeries([], "7d", fixedNow);
 
-    expect(result).toHaveLength(7);
+    expect(result).toHaveLength(8);
     expect(result.every((p) => p.count === 0)).toBe(true);
   });
 
   it("returns a continuous zero-filled series of correct length for 30d", () => {
     const result = buildOrderTimeSeries([], "30d", fixedNow);
 
-    expect(result).toHaveLength(30);
+    expect(result).toHaveLength(31);
   });
 
   it("increments count for orders on the same day", () => {
@@ -207,6 +207,15 @@ describe("buildOrderTimeSeries", () => {
     const bucket = result.find((p) => p.date === "2026-06-15");
 
     expect(bucket?.count).toBe(2);
+  });
+
+  it("includes orders placed today (the last bucket)", () => {
+    const rows = [makeOrder({ id: "o-today", created_at: "2026-06-20T08:00:00Z" })];
+
+    const result = buildOrderTimeSeries(rows, "30d", fixedNow);
+    const todayBucket = result.find((p) => p.date === "2026-06-20");
+
+    expect(todayBucket?.count).toBe(1);
   });
 
   it("excludes orders outside the window", () => {

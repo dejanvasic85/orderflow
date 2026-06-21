@@ -30,8 +30,8 @@ export function orderBottleVolume(row: DashboardOrderRow): number {
 export function startOfWindow(now: Date, range: DashboardRange): Date {
   const days = rangeWindowDaysValue[range];
   const d = new Date(now);
-  d.setDate(d.getDate() - days);
-  d.setHours(0, 0, 0, 0);
+  d.setUTCDate(d.getUTCDate() - days);
+  d.setUTCHours(0, 0, 0, 0);
   return d;
 }
 
@@ -51,12 +51,12 @@ export function buildKpiSummary(
   now: Date,
 ): KpiSummary {
   const priorStart = new Date(now);
-  priorStart.setDate(priorStart.getDate() - 60);
-  priorStart.setHours(0, 0, 0, 0);
+  priorStart.setUTCDate(priorStart.getUTCDate() - 60);
+  priorStart.setUTCHours(0, 0, 0, 0);
 
   const currentStart = new Date(now);
-  currentStart.setDate(currentStart.getDate() - 30);
-  currentStart.setHours(0, 0, 0, 0);
+  currentStart.setUTCDate(currentStart.getUTCDate() - 30);
+  currentStart.setUTCHours(0, 0, 0, 0);
 
   const currentRows = rows.filter((r) => new Date(r.created_at) >= currentStart);
   const priorRows = rows.filter(
@@ -107,22 +107,22 @@ export function buildOrderTimeSeries(
     const weekBuckets = new Map<string, { count: number; label: string }>();
 
     let cursor = new Date(since);
-    cursor.setDate(cursor.getDate() - cursor.getDay());
-    cursor.setHours(0, 0, 0, 0);
+    cursor.setUTCDate(cursor.getUTCDate() - cursor.getUTCDay());
+    cursor.setUTCHours(0, 0, 0, 0);
 
     const nowTime = now.getTime();
     while (cursor.getTime() <= nowTime) {
       const key = toDateKey(cursor);
       weekBuckets.set(key, { count: 0, label: formatWeekLabel(cursor) });
       cursor = new Date(cursor);
-      cursor.setDate(cursor.getDate() + 7);
+      cursor.setUTCDate(cursor.getUTCDate() + 7);
     }
 
     for (const row of windowRows) {
       const d = new Date(row.created_at);
       const weekStart = new Date(d);
-      weekStart.setDate(weekStart.getDate() - weekStart.getDay());
-      weekStart.setHours(0, 0, 0, 0);
+      weekStart.setUTCDate(weekStart.getUTCDate() - weekStart.getUTCDay());
+      weekStart.setUTCHours(0, 0, 0, 0);
       const key = toDateKey(weekStart);
       const bucket = weekBuckets.get(key);
       if (bucket) bucket.count += 1;
@@ -136,9 +136,9 @@ export function buildOrderTimeSeries(
   const days = rangeWindowDaysValue[range];
   const dailyBuckets = new Map<string, { count: number; label: string }>();
 
-  for (let i = 0; i < days; i++) {
+  for (let i = 0; i <= days; i++) {
     const d = new Date(since);
-    d.setDate(d.getDate() + i);
+    d.setUTCDate(d.getUTCDate() + i);
     const key = toDateKey(d);
     dailyBuckets.set(key, { count: 0, label: formatAxisLabel(d) });
   }
