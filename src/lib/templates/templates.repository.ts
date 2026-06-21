@@ -93,6 +93,7 @@ export function createTemplateRepository(): TemplateRepository {
       return ok();
     },
 
+    // TODO(atomicity): replace with a single supabase.rpc() call backed by a Postgres function
     async saveTemplateItemBatch({ templateId, toRemove, toUpdate, toAdd }) {
       const supabase = createSupabaseServerClient();
 
