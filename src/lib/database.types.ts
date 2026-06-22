@@ -362,7 +362,10 @@ export type Database = {
         Row: {
           active: boolean
           created_at: string
+          email: string | null
           id: string
+          invite_accepted_at: string | null
+          invited_at: string | null
           name: string
           notification_preferences: Json
           password_changed_at: string | null
@@ -373,7 +376,10 @@ export type Database = {
         Insert: {
           active?: boolean
           created_at?: string
+          email?: string | null
           id: string
+          invite_accepted_at?: string | null
+          invited_at?: string | null
           name: string
           notification_preferences?: Json
           password_changed_at?: string | null
@@ -384,7 +390,10 @@ export type Database = {
         Update: {
           active?: boolean
           created_at?: string
+          email?: string | null
           id?: string
+          invite_accepted_at?: string | null
+          invited_at?: string | null
           name?: string
           notification_preferences?: Json
           password_changed_at?: string | null
