@@ -51,7 +51,7 @@ export function MobileBottomNav({
   return (
     <>
       <nav className="fixed bottom-0 inset-x-0 z-40 md:hidden border-t bg-sidebar text-sidebar-foreground">
-        <div className="flex items-center justify-around h-16 px-2">
+        <div className="flex items-center justify-around h-16 px-3">
           {navItems.map(({ label, to, icon: Icon }) => {
             const isActive = pathname === to;
             return (
@@ -59,14 +59,17 @@ export function MobileBottomNav({
                 key={to}
                 to={to}
                 className={cn(
-                  "flex flex-col items-center gap-1 flex-1 py-2 text-xs transition-colors",
+                  "relative flex flex-col items-center gap-1 flex-1 py-2 text-xs transition-all duration-200",
                   isActive
-                    ? "text-sidebar-foreground"
+                    ? "text-sidebar-primary-foreground"
                     : "text-sidebar-foreground/50 hover:text-sidebar-foreground",
                 )}
               >
+                {isActive && (
+                  <span className="absolute inset-x-1 inset-y-0.5 -z-10 rounded-xl bg-sidebar-primary shadow-[0_4px_14px_0_oklch(0.205_0_0/0.35)] shadow-black/30" />
+                )}
                 <Icon className="size-5" />
-                <span>{label}</span>
+                <span className={cn("font-medium", isActive && "font-semibold")}>{label}</span>
               </Link>
             );
           })}
