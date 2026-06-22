@@ -56,13 +56,11 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Feature | Must | Change my personal details and notification preferences
 - [x] Feature | Must | Improved settings/profile menu
 - [x] Feature | Must | Password strength indicator
-- [ ] Security | Must | Ensure that staff have most readonly access to admin dashboard
-- [ ] Quality | Must | Unit testing the server functions
-- [ ] Quality | Must | Playwright tests improved and working locally
-- [ ] Quality | Must | Playwright custom container with Supabase so it is working properly in the pipeline
+- [ ] Security | Must | Ensure that staff have most readonly access to admin dashboard and other admin functions
+- [x] Quality | Must | Unit testing the server functions
+- [x] Quality | Must | Playwright tests improved and working locally and CI
 - [ ] Feature | Must | PWA — manifest, service worker, install prompt, offline app shell
-- [ ] Feature | Must | Notification preferences UI — users edit their own email/SMS preferences
-- [ ] Feature | Must | Staff role surface — read-only view of all order requests
+- [x] Feature | Must | Notification preferences UI — users edit their own email/SMS preferences
 - [ ] Productionising | Must | Fix the publicly available view users_with_email - see email for warning from supabase
 - [ ] Feature | Must | CSV import for products and accounts (incl. MYOB import back into our system)
 - [ ] Feature | Must | MYOB CSV export — orders out of our system into MYOB
@@ -70,9 +68,24 @@ Priorities: `Must` · `Should` · `Nice`
 - [ ] Productionising | Must | SMTP server (AWS SES) for email notifications — configure in Supabase, verify `vasic.com.au` for DKIM as interim
 - [ ] Productionising | Must | Email templates
 - [ ] Productionising | Must | Configure production domain in Supabase (currently https://orderflow.team-manager.workers.dev)
-- [ ] Productionising | Must | Configure production env vars in GitHub
+- [x] Productionising | Must | Configure production env vars in GitHub
 - [ ] Productionising | Must | Logging and monitoring (Supabase + Cloudflare — consider unifying in Cloudflare logs) sender
 - [x] Feature | Nice | Homepage dashboard — reporting / summary tiles (Phase 4, quoted separately)
+
+---
+
+Change requests and bugs:
+22 June 2026
+
+- [ ] Link for accepting an invite is not working
+- [ ] Allow typing of qty rather than plus / minus
+- [ ] Use the word Units in the email
+- [ ] Change all wording from bottles to units because sometimes it's not really bottles it's actually cans
+- [ ] Users should be able to order again but they should also have ability to edit the items
+- [ ] The order needs an image for the product instead of just text
+- [ ] Description for the product isn't required
+- [ ] Add descriptions in the Role dropdown for the User mangaement to explain what roles are capable of what
+- [ ] Users are getting "active" automatically instead of staying pending until they accept
 
 ---
 
