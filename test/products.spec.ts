@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { login } from "./flows";
+import { goto, login } from "./flows";
 
 test.describe("Product browsing (users)", () => {
   test("navigating to accounts from selection page", async ({ page }) => {
@@ -19,7 +19,7 @@ test.describe("Product management (admin)", () => {
   });
 
   test("admin can browse and search products", async ({ page }) => {
-    await page.goto("/manage/products");
+    await goto(page, "/manage/products");
 
     await expect(page.getByRole("heading", { name: "Products" })).toBeVisible();
     await expect(page.getByText("Rosé — Provence")).toBeVisible();
@@ -31,7 +31,7 @@ test.describe("Product management (admin)", () => {
   });
 
   test("admin can edit a product in the sheet", async ({ page }) => {
-    await page.goto("/manage/products");
+    await goto(page, "/manage/products");
 
     await page.getByRole("button", { name: "Edit Rosé — Provence" }).click();
 
@@ -53,7 +53,7 @@ test.describe("Product management (staff)", () => {
   });
 
   test("staff sees a read-only catalog", async ({ page }) => {
-    await page.goto("/manage/products");
+    await goto(page, "/manage/products");
 
     await expect(page.getByRole("heading", { name: "Products" })).toBeVisible();
     await expect(page.getByText("Rosé — Provence")).toBeVisible();

@@ -1,13 +1,12 @@
 import { test, expect } from "@playwright/test";
-import { login } from "./flows";
+import { goto, login } from "./flows";
 
-test.describe("Account selection", () => {
-  test.beforeEach(async ({ page }) => {
+test.describe("Accounts", () => {
+  test("navigating to accounts from selection page by a user assigned to multiple accounts", async ({
+    page,
+  }) => {
     await login(page, { user: "tom" });
-  });
-
-  test("navigating to accounts from selection page", async ({ page }) => {
-    await page.goto("/accounts");
+    await goto(page, "/accounts");
 
     await expect(page.getByText(/select an account/i)).toBeVisible();
     await expect(page.getByText(/which account are you ordering for/i)).toBeVisible();

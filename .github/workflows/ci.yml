@@ -95,6 +95,7 @@ jobs:
           VITE_SUPABASE_ANON_KEY=$PUBLISHABLE_KEY
           SUPABASE_SECRET_KEY=$SECRET_KEY
           SITE_URL=http://localhost:3344
+          MAILPIT_API_URL=http://localhost:54324
           R2_ACCOUNT_ID=test
           R2_ACCESS_KEY_ID=test
           R2_SECRET_ACCESS_KEY=test

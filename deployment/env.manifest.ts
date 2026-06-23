@@ -60,6 +60,13 @@ export const envManifest = [
     roles: ["configVar"],
   },
   {
+    name: "MAILPIT_API_URL",
+    // Routes app emails to Mailpit's HTTP send API so the order-notification e2e can
+    // assert delivery. Local/e2e only — production uses SES, never this var.
+    requiredIn: ["e2e"],
+    roles: ["configVar"],
+  },
+  {
     name: "R2_ACCOUNT_ID",
     requiredIn: ["e2e"],
     // For deploy contexts, R2_ACCOUNT_ID is produced via the workerAlias on CLOUDFLARE_ACCOUNT_ID
