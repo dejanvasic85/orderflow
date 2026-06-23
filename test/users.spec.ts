@@ -1,13 +1,13 @@
 import { test, expect } from "@playwright/test";
-import { login } from "./flows";
+import { goto, login } from "./flows";
 
-test.describe("Users page", () => {
+test.describe("Users management", () => {
   test.beforeEach(async ({ page }) => {
     await login(page, { user: "admin" });
   });
 
-  test.skip("admin can view users list and open user details in drawer", async ({ page }) => {
-    await page.goto("/manage/users");
+  test("admin can edit user details in the drawer", async ({ page }) => {
+    await goto(page, "/manage/users");
 
     await expect(page.getByRole("heading", { name: "Users" })).toBeVisible();
 
@@ -16,7 +16,8 @@ test.describe("Users page", () => {
     await expect(row.getByText("sarah@bwow.com.au")).toBeVisible();
     await expect(row.getByText("Staff")).toBeVisible();
 
-    await row.click();
+    await row.getByRole("button", { name: "User actions" }).click();
+    await page.getByRole("menuitem", { name: "Edit" }).click();
 
     const drawer = page.getByRole("dialog");
     await expect(drawer).toBeVisible();

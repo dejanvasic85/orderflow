@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker";
 import { test, expect } from "@playwright/test";
-import { login } from "./flows";
+import { goto, login } from "./flows";
 
 const mailpitUrl = "http://localhost:54324";
 
@@ -56,8 +56,7 @@ test.describe("Invite management", () => {
 
     // Step 1 — login as admin and send invite
     await login(page, { user: "admin" });
-    await page.goto("/manage/users");
-    await page.waitForSelector("html[data-hydrated]");
+    await goto(page, "/manage/users");
     await page.getByRole("button", { name: "+ New user" }).click();
 
     const drawer = page.getByRole("dialog");
@@ -79,7 +78,7 @@ test.describe("Invite management", () => {
     const inviteLink = await getInviteLink(invitedEmail);
     const inviteContext = await browser.newContext();
     const invitePage = await inviteContext.newPage();
-    await invitePage.goto(inviteLink);
+    await goto(invitePage, inviteLink);
 
     // Step 3 — should land on set-password after verifying
     await expect(invitePage.getByRole("heading", { name: "Set your password" })).toBeVisible({
