@@ -34,6 +34,7 @@ type Props = {
   onSelectAccount: (account: Account) => void;
   onSearchChange: (q: string) => void;
   onPageChange: (page: number) => void;
+  readOnly?: boolean;
 };
 
 export function AccountList({
@@ -47,6 +48,7 @@ export function AccountList({
   onSelectAccount,
   onSearchChange,
   onPageChange,
+  readOnly,
 }: Props) {
   const [inputValue, setInputValue] = useState(searchQuery);
   const debouncedInput = useDebounce(inputValue, 300);
@@ -165,7 +167,7 @@ export function AccountList({
                           }}
                         >
                           <PencilLine className="size-4" />
-                          Edit
+                          {readOnly ? "View" : "Edit"}
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>

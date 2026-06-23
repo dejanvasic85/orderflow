@@ -33,6 +33,7 @@ function makeDeps(overrides: Partial<AccountServiceDeps> = {}): AccountServiceDe
   return {
     repo: makeRepo(),
     session: vi.fn().mockResolvedValue({ id: "user-1" }),
+    authorize: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   };
 }
@@ -199,50 +200,108 @@ describe("getAccount", () => {
 });
 
 describe("assignUser", () => {
-  it("delegates to repo.assignUserToAccount", async () => {
+  it("calls authorize then delegates to repo.assignUserToAccount", async () => {
     const assignUserToAccount = vi.fn().mockResolvedValue(ok());
-    const deps = makeDeps({ repo: makeRepo({ assignUserToAccount }) });
+    const authorize = vi.fn().mockResolvedValue(undefined);
+    const deps = makeDeps({ repo: makeRepo({ assignUserToAccount }), authorize });
 
     const result = await assignUser(deps, { account_id: "acc-1", user_id: "u-1" });
 
+    expect(authorize).toHaveBeenCalledTimes(1);
     expect(result).toEqual(ok());
     expect(assignUserToAccount).toHaveBeenCalledWith({ account_id: "acc-1", user_id: "u-1" });
+  });
+
+  it("throws without calling repo when authorize rejects", async () => {
+    const assignUserToAccount = vi.fn();
+    const deps = makeDeps({
+      repo: makeRepo({ assignUserToAccount }),
+      authorize: vi.fn().mockRejectedValue(new Error("Forbidden")),
+    });
+
+    await expect(assignUser(deps, { account_id: "acc-1", user_id: "u-1" })).rejects.toThrow(
+      "Forbidden",
+    );
+    expect(assignUserToAccount).not.toHaveBeenCalled();
   });
 });
 
 describe("unassignUser", () => {
-  it("delegates to repo.unassignUserFromAccount", async () => {
+  it("calls authorize then delegates to repo.unassignUserFromAccount", async () => {
     const unassignUserFromAccount = vi.fn().mockResolvedValue(ok());
-    const deps = makeDeps({ repo: makeRepo({ unassignUserFromAccount }) });
+    const authorize = vi.fn().mockResolvedValue(undefined);
+    const deps = makeDeps({ repo: makeRepo({ unassignUserFromAccount }), authorize });
 
     const result = await unassignUser(deps, { account_id: "acc-1", user_id: "u-1" });
 
+    expect(authorize).toHaveBeenCalledTimes(1);
     expect(result).toEqual(ok());
     expect(unassignUserFromAccount).toHaveBeenCalledWith({ account_id: "acc-1", user_id: "u-1" });
+  });
+
+  it("throws without calling repo when authorize rejects", async () => {
+    const unassignUserFromAccount = vi.fn();
+    const deps = makeDeps({
+      repo: makeRepo({ unassignUserFromAccount }),
+      authorize: vi.fn().mockRejectedValue(new Error("Forbidden")),
+    });
+
+    await expect(unassignUser(deps, { account_id: "acc-1", user_id: "u-1" })).rejects.toThrow(
+      "Forbidden",
+    );
+    expect(unassignUserFromAccount).not.toHaveBeenCalled();
   });
 });
 
 describe("createAccount", () => {
-  it("delegates to repo.createAccount", async () => {
+  it("calls authorize then delegates to repo.createAccount", async () => {
     const created = { id: "acc-new", name: "New Wines" } as never;
     const createAccountFn = vi.fn().mockResolvedValue(ok(created));
-    const deps = makeDeps({ repo: makeRepo({ createAccount: createAccountFn }) });
+    const authorize = vi.fn().mockResolvedValue(undefined);
+    const deps = makeDeps({ repo: makeRepo({ createAccount: createAccountFn }), authorize });
 
     const result = await createAccount(deps, { name: "New Wines" });
 
+    expect(authorize).toHaveBeenCalledTimes(1);
     expect(result).toEqual(ok(created));
+  });
+
+  it("throws without calling repo when authorize rejects", async () => {
+    const createAccountFn = vi.fn();
+    const deps = makeDeps({
+      repo: makeRepo({ createAccount: createAccountFn }),
+      authorize: vi.fn().mockRejectedValue(new Error("Forbidden")),
+    });
+
+    await expect(createAccount(deps, { name: "New Wines" })).rejects.toThrow("Forbidden");
+    expect(createAccountFn).not.toHaveBeenCalled();
   });
 });
 
 describe("updateAccount", () => {
-  it("delegates to repo.updateAccount", async () => {
+  it("calls authorize then delegates to repo.updateAccount", async () => {
     const updated = { id: "acc-1", name: "Renamed Wines" } as never;
     const updateAccountFn = vi.fn().mockResolvedValue(ok(updated));
-    const deps = makeDeps({ repo: makeRepo({ updateAccount: updateAccountFn }) });
+    const authorize = vi.fn().mockResolvedValue(undefined);
+    const deps = makeDeps({ repo: makeRepo({ updateAccount: updateAccountFn }), authorize });
 
     const result = await updateAccount(deps, { id: "acc-1", name: "Renamed Wines" });
 
+    expect(authorize).toHaveBeenCalledTimes(1);
     expect(result).toEqual(ok(updated));
+  });
+
+  it("throws without calling repo when authorize rejects", async () => {
+    const updateAccountFn = vi.fn();
+    const deps = makeDeps({
+      repo: makeRepo({ updateAccount: updateAccountFn }),
+      authorize: vi.fn().mockRejectedValue(new Error("Forbidden")),
+    });
+
+    await expect(updateAccount(deps, { id: "acc-1", name: "Renamed Wines" })).rejects.toThrow(
+      "Forbidden",
+    );
+    expect(updateAccountFn).not.toHaveBeenCalled();
   });
 });
 

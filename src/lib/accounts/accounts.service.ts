@@ -12,6 +12,7 @@ import type {
 export type AccountServiceDeps = {
   repo: AccountRepository;
   session: () => Promise<{ id: string }>;
+  authorize: () => Promise<void>;
 };
 
 export function mapAccount(row: AccountListedRow): Account {
@@ -54,6 +55,7 @@ export async function createAccount(
   deps: AccountServiceDeps,
   data: CreateAccountInput,
 ): Promise<Result<AccountRow>> {
+  await deps.authorize();
   return deps.repo.createAccount(data);
 }
 
@@ -61,6 +63,7 @@ export async function updateAccount(
   deps: AccountServiceDeps,
   data: UpdateAccountInput,
 ): Promise<Result<AccountRow>> {
+  await deps.authorize();
   return deps.repo.updateAccount(data);
 }
 
@@ -68,6 +71,7 @@ export async function assignUser(
   deps: AccountServiceDeps,
   data: AssignAccountUserInput,
 ): Promise<Result<void>> {
+  await deps.authorize();
   return deps.repo.assignUserToAccount(data);
 }
 
@@ -75,5 +79,6 @@ export async function unassignUser(
   deps: AccountServiceDeps,
   data: AssignAccountUserInput,
 ): Promise<Result<void>> {
+  await deps.authorize();
   return deps.repo.unassignUserFromAccount(data);
 }

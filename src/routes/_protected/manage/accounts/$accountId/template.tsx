@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { TemplateEditor } from "@/components/templates/TemplateEditor";
 import type { TemplateEditorPayload } from "@/components/templates/TemplateEditor";
 import { getAccount } from "@/lib/accounts/accounts.functions";
+import { can, permissions } from "@/lib/permissions";
 import { listProducts } from "@/lib/products/products.functions";
 import type { ProductRow } from "@/lib/products/schema";
 import { asResult } from "@/lib/result";
@@ -36,7 +37,7 @@ export const Route = createFileRoute("/_protected/manage/accounts/$accountId/tem
 function AccountTemplatePage() {
   const { account, template, products } = Route.useLoaderData();
   const { user } = Route.useRouteContext() as { user: { user_role?: string } };
-  const isAdmin = user.user_role === "admin";
+  const canWriteTemplates = can(user.user_role, permissions.templates.write);
 
   async function handleSave(payload: TemplateEditorPayload) {
     const result = asResult(await saveTemplateItems({ data: payload }));
@@ -55,7 +56,7 @@ function AccountTemplatePage() {
           account={account}
           template={template}
           products={products}
-          readOnly={!isAdmin}
+          readOnly={!canWriteTemplates}
           onSave={handleSave}
         />
       </PageContent>

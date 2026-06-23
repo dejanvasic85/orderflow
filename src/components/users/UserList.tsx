@@ -37,11 +37,12 @@ type Props = {
   currentPage: number;
   totalPages: number;
   currentUserId?: string;
-  onSelectUser: (user: User) => void;
+  onSelectUser?: (user: User) => void;
   onRoleFilterChange: (filter: RoleFilter) => void;
   onSearchChange: (q: string) => void;
   onPageChange: (page: number) => void;
   onManagePassword?: (user: User) => void;
+  readOnly?: boolean;
 };
 
 const roleLabelMap: Record<UserRole, string> = {
@@ -70,6 +71,7 @@ export function UserList({
   onSearchChange,
   onPageChange,
   onManagePassword,
+  readOnly,
 }: Props) {
   const [inputValue, setInputValue] = useState(searchQuery);
   const debouncedInput = useDebounce(inputValue, 300);
@@ -169,8 +171,8 @@ export function UserList({
               <TableRow
                 key={user.id}
                 data-state={selectedId === user.id ? "selected" : undefined}
-                className="cursor-pointer"
-                onClick={() => onSelectUser(user)}
+                className={onSelectUser ? "cursor-pointer" : undefined}
+                onClick={() => onSelectUser?.(user)}
               >
                 <TableCell className="font-medium">{user.name}</TableCell>
                 <TableCell className="text-muted-foreground">{user.email}</TableCell>
@@ -196,9 +198,11 @@ export function UserList({
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuGroup>
-                        <DropdownMenuItem onSelect={() => onSelectUser(user)}>
-                          Edit
-                        </DropdownMenuItem>
+                        {onSelectUser && (
+                          <DropdownMenuItem onSelect={() => onSelectUser(user)}>
+                            {readOnly ? "View" : "Edit"}
+                          </DropdownMenuItem>
+                        )}
                         {onManagePassword && currentUserId !== user.id && (
                           <DropdownMenuItem onSelect={() => onManagePassword(user)}>
                             Set password

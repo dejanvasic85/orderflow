@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { assertAdminOrStaff } from "@/lib/auth/auth.server";
+import { assertAdmin, assertAdminOrStaff } from "@/lib/auth/auth.server";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import { createProductRepository } from "./products.repository";
 import {
@@ -20,6 +20,7 @@ import {
 const deps: ProductServiceDeps = {
   repo: createProductRepository(),
   authorize: () => assertAdminOrStaff(createSupabaseServerClient()),
+  authorizeAdmin: () => assertAdmin(createSupabaseServerClient()),
 };
 
 export const listProducts = createServerFn({ method: "GET", strict: { output: false } }).handler(

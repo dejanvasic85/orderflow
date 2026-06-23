@@ -10,6 +10,7 @@ import type {
 export type ProductServiceDeps = {
   repo: ProductRepository;
   authorize: () => Promise<void>;
+  authorizeAdmin: () => Promise<void>;
 };
 
 export async function listActiveProducts(deps: ProductServiceDeps): Promise<Result<ProductRow[]>> {
@@ -35,6 +36,7 @@ export async function createProduct(
   deps: ProductServiceDeps,
   data: CreateProductInput,
 ): Promise<Result<ProductRow>> {
+  await deps.authorizeAdmin();
   return deps.repo.createProduct(data);
 }
 
@@ -42,5 +44,6 @@ export async function updateProduct(
   deps: ProductServiceDeps,
   data: UpdateProductInput,
 ): Promise<Result<ProductRow>> {
+  await deps.authorizeAdmin();
   return deps.repo.updateProduct(data);
 }
