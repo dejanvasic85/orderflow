@@ -7,13 +7,22 @@ This file defines the baseline engineering conventions for agents working in thi
 Read `docs/project-context.md` before making any changes.
 It contains the product vision, tech stack, and data model decisions.
 
+## Security
+
+**Read `docs/security.md` before any change that touches authentication, roles,
+RLS policies, or data access** — including adding a table, a server function that
+reads/writes data, or a new role. It explains how identity flows from browser to
+database, the three security layers, and a per-table RLS coverage matrix. RLS is
+the security boundary; app-layer `assert*` checks are convenience only. Keep the
+matrix and "Known gaps" section in `docs/security.md` in sync with any policy change.
+
 ## Key conventions
 
 - PREFER functional approach over object oriented and imperative
 - Functions shouldn't be doing too much - try and ensure they do one thing
 - Use `vp` (Vite Plus) for all dev/build/test/lint workflows — not raw `pnpm` or `vite`
 - Path alias `@/*` maps to `./src/*` — prefer it over relative imports
-- Auth is handled by Supabase Auth; use `getSession` / `ensureSession` from `src/lib/auth/auth.functions.ts`
+- Auth is handled by Supabase Auth; use `getSession` / `ensureSession` from `src/lib/auth/auth.functions.ts` (see `docs/security.md` for the full model)
 - Server-side Supabase access: `createSupabaseServerClient()` from `src/lib/supabaseServer.ts` (used inside `.server.ts` helpers)
 - Browser-side Supabase access: `supabase` singleton from `src/lib/supabase.ts`
 - **Server-side code layout** (TanStack Start file-naming convention):
