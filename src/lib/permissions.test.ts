@@ -99,5 +99,13 @@ describe("can", () => {
     it("returns false for unknown role", () => {
       expect(can("superuser", permissions.users.write)).toBe(false);
     });
+
+    it("returns false for __proto__ to prevent prototype pollution", () => {
+      expect(can("__proto__", permissions.users.write)).toBe(false);
+    });
+
+    it("returns false for constructor to prevent prototype pollution", () => {
+      expect(can("constructor", permissions.users.write)).toBe(false);
+    });
   });
 });

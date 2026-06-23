@@ -1,4 +1,10 @@
-import { createFileRoute, useNavigate, useRouter, useRouterState } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  useNavigate,
+  useRouteContext,
+  useRouter,
+  useRouterState,
+} from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { WhenAllowed } from "@/components/auth/WhenAllowed";
@@ -47,9 +53,7 @@ function ProductsPage() {
   const router = useRouter();
   const routerLoading = useRouterState({ select: (s) => s.isLoading });
   const isLoading = useDelayedBoolean(routerLoading);
-  const { user } = Route.useRouteContext() as unknown as {
-    user: { user_role?: string };
-  };
+  const { user } = useRouteContext({ from: "/_protected" });
   const canWriteProducts = can(user.user_role, permissions.products.write);
 
   const [products, setProducts] = useState<ProductRow[]>(loadedProducts);

@@ -142,7 +142,7 @@ Vite+ automatically detects and wraps the underlying package manager through `pa
 - Avoid magic numbers/strings; introduce well-named constants
 - Use camelCase naming for constants — never SCREAMING_CASE
 - Group related constants into a single `as const` object rather than many individual `const` declarations
-- Avoid casting with Typescript "as", only use it when absolutely necessary
+- Avoid casting with TypeScript `as` — never use `as unknown as` or escape hatches; they hide runtime errors and defeat the type system. Fix the root type instead (e.g. use `from:` on `useRouteContext`, add a proper type guard with `Object.hasOwn`, or export the correct type from the source). The only acceptable `as` usages are narrowing a known-safe union (e.g. `value as ConcreteType` after an `if` check) or satisfying an external library whose types are wrong.
 - Object constants should end with `Value` suffix (for example: `defaultConfigValue`, `sidebarConfigValue`)
 - Place shared constants in a `constants.ts` file co-located with the module that owns them; only extract to `src/lib/constants.ts` if used across multiple domains
 - Avoid unnecessary comments; add short comments only for non-obvious intent

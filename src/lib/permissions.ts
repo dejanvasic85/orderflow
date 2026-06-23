@@ -43,9 +43,11 @@ const rolePermissions: Record<UserRole, Permission[]> = {
   user: [permissions.orders.place],
 };
 
+function isUserRole(role: string): role is UserRole {
+  return Object.hasOwn(rolePermissions, role);
+}
+
 export function can(role: string | undefined, permission: Permission): boolean {
-  if (!role) return false;
-  const allowed = rolePermissions[role as UserRole];
-  if (!allowed) return false;
-  return allowed.includes(permission);
+  if (!role || !isUserRole(role)) return false;
+  return rolePermissions[role].includes(permission);
 }

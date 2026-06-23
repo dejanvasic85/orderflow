@@ -1,4 +1,4 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute, notFound, useRouteContext } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { PageContent } from "@/components/layout/PageContent";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -36,7 +36,7 @@ export const Route = createFileRoute("/_protected/manage/accounts/$accountId/tem
 
 function AccountTemplatePage() {
   const { account, template, products } = Route.useLoaderData();
-  const { user } = Route.useRouteContext() as { user: { user_role?: string } };
+  const { user } = useRouteContext({ from: "/_protected" });
   const canWriteTemplates = can(user.user_role, permissions.templates.write);
 
   async function handleSave(payload: TemplateEditorPayload) {

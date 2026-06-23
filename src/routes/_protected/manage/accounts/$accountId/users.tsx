@@ -1,4 +1,4 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute, notFound, useRouteContext } from "@tanstack/react-router";
 import { AccountUserSection } from "@/components/accounts/AccountUserSection";
 import { PageContent } from "@/components/layout/PageContent";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -17,7 +17,7 @@ export const Route = createFileRoute("/_protected/manage/accounts/$accountId/use
 
 function AccountUsersPage() {
   const { account } = Route.useLoaderData();
-  const { user } = Route.useRouteContext() as { user: { user_role?: string } };
+  const { user } = useRouteContext({ from: "/_protected" });
   const canManageUsers = can(user.user_role, permissions.accounts.manageUsers);
 
   return (
