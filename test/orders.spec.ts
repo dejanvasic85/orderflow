@@ -1,7 +1,12 @@
 import { expect, test } from "@playwright/test";
 import { login } from "./flows";
+import { deleteAllMailpitMessages, waitForMessageTo } from "./mailpit";
 
 test.describe("Orders", () => {
+  test.beforeEach(async () => {
+    await deleteAllMailpitMessages();
+  });
+
   test("placing an order by a regular user assigned to a single account", async ({ page }) => {
     await login(page, { user: "priya" });
 
@@ -23,5 +28,12 @@ test.describe("Orders", () => {
     await expect(
       page.getByText(/your order has been received and is being processed/i),
     ).toBeVisible();
+
+    const placerEmail = await waitForMessageTo("priya@bwow.com.au");
+    expect(placerEmail.Subject).toContain("has been submitted");
+
+    const staffEmail = await waitForMessageTo("admin@bwow.com.au");
+    expect(staffEmail.Subject).toContain("New order");
+    expect(staffEmail.Subject).toContain("Harvest Table");
   });
 });
