@@ -56,15 +56,15 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Feature | Must | Change my personal details and notification preferences
 - [x] Feature | Must | Improved settings/profile menu
 - [x] Feature | Must | Password strength indicator
-- [ ] Security | Must | Ensure that staff have most readonly access to admin dashboard and other admin functions
+- [x] Security | Must | Ensure that staff have most readonly access to admin dashboard and other admin functions
 - [x] Quality | Must | Unit testing the server functions
 - [x] Quality | Must | Playwright tests improved and working locally and CI
 - [ ] Feature | Must | PWA — manifest, service worker, install prompt, offline app shell
 - [x] Feature | Must | Notification preferences UI — users edit their own email/SMS preferences
-- [ ] Productionising | Must | Fix the publicly available view users_with_email - see email for warning from supabase
+- [x] Productionising | Must | Fix the publicly available view users_with_email - see email for warning from supabase
 - [ ] Feature | Must | CSV import for products and accounts (incl. MYOB import back into our system)
 - [ ] Feature | Must | MYOB CSV export — orders out of our system into MYOB
-- [ ] Productionising | Must | Set up production domain (orders.bwow.com.au) — confirm access with Sam or register new
+- [ ] Productionising | Must | Set up production domain (app.bwow.com) — confirm access with Sam or register new
 - [ ] Productionising | Must | SMTP server (AWS SES) for email notifications — configure in Supabase, verify `vasic.com.au` for DKIM as interim
 - [ ] Productionising | Must | Email templates
 - [ ] Productionising | Must | Configure production domain in Supabase (currently https://orderflow.team-manager.workers.dev)
