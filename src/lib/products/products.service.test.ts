@@ -24,6 +24,7 @@ function makeDeps(overrides: Partial<ProductServiceDeps> = {}): ProductServiceDe
   return {
     repo: makeRepo(),
     authorize: vi.fn().mockResolvedValue(undefined),
+    authorizeAdmin: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   };
 }
@@ -124,29 +125,59 @@ describe("getProduct", () => {
 });
 
 describe("createProduct", () => {
-  it("delegates to repo.createProduct and returns the created row", async () => {
+  it("calls authorizeAdmin then delegates to repo.createProduct", async () => {
     const newProduct = { id: "p-new", name: "Shiraz", qty_per_box: 6 } as never;
     const createProductFn = vi.fn().mockResolvedValue(ok(newProduct));
-    const deps = makeDeps({ repo: makeRepo({ createProduct: createProductFn }) });
+    const authorizeAdmin = vi.fn().mockResolvedValue(undefined);
+    const deps = makeDeps({ repo: makeRepo({ createProduct: createProductFn }), authorizeAdmin });
     const input = { name: "Shiraz", qty_per_box: 6 };
 
     const result = await createProduct(deps, input);
 
+    expect(authorizeAdmin).toHaveBeenCalledTimes(1);
     expect(result).toEqual(ok(newProduct));
     expect(createProductFn).toHaveBeenCalledWith(input);
+  });
+
+  it("throws without calling repo when authorizeAdmin rejects", async () => {
+    const createProductFn = vi.fn();
+    const deps = makeDeps({
+      repo: makeRepo({ createProduct: createProductFn }),
+      authorizeAdmin: vi.fn().mockRejectedValue(new Error("Forbidden")),
+    });
+
+    await expect(createProduct(deps, { name: "Shiraz", qty_per_box: 6 })).rejects.toThrow(
+      "Forbidden",
+    );
+    expect(createProductFn).not.toHaveBeenCalled();
   });
 });
 
 describe("updateProduct", () => {
-  it("delegates to repo.updateProduct and returns the updated row", async () => {
+  it("calls authorizeAdmin then delegates to repo.updateProduct", async () => {
     const updated = { id: "p-1", name: "Shiraz Reserve", qty_per_box: 12 } as never;
     const updateProductFn = vi.fn().mockResolvedValue(ok(updated));
-    const deps = makeDeps({ repo: makeRepo({ updateProduct: updateProductFn }) });
+    const authorizeAdmin = vi.fn().mockResolvedValue(undefined);
+    const deps = makeDeps({ repo: makeRepo({ updateProduct: updateProductFn }), authorizeAdmin });
     const input = { id: "p-1", name: "Shiraz Reserve" };
 
     const result = await updateProduct(deps, input);
 
+    expect(authorizeAdmin).toHaveBeenCalledTimes(1);
     expect(result).toEqual(ok(updated));
     expect(updateProductFn).toHaveBeenCalledWith(input);
+  });
+
+  it("throws without calling repo when authorizeAdmin rejects", async () => {
+    const updateProductFn = vi.fn();
+    const deps = makeDeps({
+      repo: makeRepo({ updateProduct: updateProductFn }),
+      authorizeAdmin: vi.fn().mockRejectedValue(new Error("Forbidden")),
+    });
+
+    await expect(updateProduct(deps, { id: "p-1", name: "Shiraz Reserve" })).rejects.toThrow(
+      "Forbidden",
+    );
+    expect(updateProductFn).not.toHaveBeenCalled();
   });
 });

@@ -28,6 +28,7 @@ type BaseProps = {
   onCheckEmailExists?: (email: string) => Promise<boolean>;
   onResendInvite?: () => Promise<void>;
   allAccounts?: { id: string; name: string }[];
+  readOnly?: boolean;
 };
 
 type Props =
@@ -73,7 +74,7 @@ function toFieldErrors(errors: unknown[]): { message?: string }[] {
 }
 
 export function UserEditPanel(props: Props) {
-  const { onSave, onDiscard, onCheckEmailExists, onResendInvite, allAccounts } = props;
+  const { onSave, onDiscard, onCheckEmailExists, onResendInvite, allAccounts, readOnly } = props;
   const mode = props.mode ?? "edit";
   const isCreate = mode === "create";
   const user = props.user ?? blankUser;
@@ -155,6 +156,7 @@ export function UserEditPanel(props: Props) {
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
                   onBlur={field.handleBlur}
+                  disabled={readOnly}
                 />
                 <FieldError errors={toFieldErrors(field.state.meta.errors)} />
               </Field>
@@ -170,6 +172,7 @@ export function UserEditPanel(props: Props) {
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
                   onBlur={field.handleBlur}
+                  disabled={readOnly}
                 />
                 <FieldError errors={toFieldErrors(field.state.meta.errors)} />
               </Field>
@@ -202,7 +205,7 @@ export function UserEditPanel(props: Props) {
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
                   onBlur={field.handleBlur}
-                  disabled={!isCreate}
+                  disabled={!isCreate || readOnly}
                 />
                 {!isCreate && (
                   <button
@@ -240,6 +243,7 @@ export function UserEditPanel(props: Props) {
                 value={field.state.value}
                 onChange={(e) => field.handleChange(e.target.value)}
                 onBlur={field.handleBlur}
+                disabled={readOnly}
               />
               <FieldError errors={toFieldErrors(field.state.meta.errors)} />
             </Field>
@@ -253,6 +257,7 @@ export function UserEditPanel(props: Props) {
               <Select
                 value={field.state.value}
                 onValueChange={(v) => field.handleChange(v as UserEditValues["role"])}
+                disabled={readOnly}
               >
                 <SelectTrigger id="role" className="w-full">
                   <SelectValue />
@@ -282,6 +287,7 @@ export function UserEditPanel(props: Props) {
                   id="notif-email"
                   checked={field.state.value}
                   onCheckedChange={(v) => field.handleChange(!!v)}
+                  disabled={readOnly}
                 />
                 <Label htmlFor="notif-email" className="font-normal">
                   Email notifications
@@ -297,6 +303,7 @@ export function UserEditPanel(props: Props) {
                   id="notif-sms"
                   checked={field.state.value}
                   onCheckedChange={(v) => field.handleChange(!!v)}
+                  disabled={readOnly}
                 />
                 <Label htmlFor="notif-sms" className="font-normal">
                   SMS notifications
@@ -320,6 +327,7 @@ export function UserEditPanel(props: Props) {
                       id="active"
                       checked={field.state.value}
                       onCheckedChange={(v) => field.handleChange(v)}
+                      disabled={readOnly}
                     />
                     <Label htmlFor="active" className="font-normal">
                       Active
@@ -351,7 +359,7 @@ export function UserEditPanel(props: Props) {
 
         {/* Actions */}
         <div className="flex items-center gap-2">
-          <Button type="submit">{submitLabel}</Button>
+          {!readOnly && <Button type="submit">{submitLabel}</Button>}
           <Button
             type="button"
             variant="ghost"
@@ -360,7 +368,7 @@ export function UserEditPanel(props: Props) {
               onDiscard();
             }}
           >
-            Discard
+            {readOnly ? "Close" : "Discard"}
           </Button>
         </div>
       </form>

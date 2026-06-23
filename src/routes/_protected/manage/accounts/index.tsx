@@ -1,8 +1,14 @@
-import { createFileRoute, useNavigate, useRouterState } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  useNavigate,
+  useRouteContext,
+  useRouterState,
+} from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AccountEditPanel } from "@/components/accounts/AccountEditPanel";
 import { AccountList } from "@/components/accounts/AccountList";
+import { WhenAllowed } from "@/components/auth/WhenAllowed";
 import { PageContent } from "@/components/layout/PageContent";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -18,6 +24,7 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import { createAccount, listAccounts, updateAccount } from "@/lib/accounts/accounts.functions";
 import type { Account, AccountRow, PagedAccountsResult } from "@/lib/accounts/schema";
 import { accountPageSize, listAccountsSearchSchema } from "@/lib/accounts/schema";
+import { can, permissions } from "@/lib/permissions";
 import { asResult } from "@/lib/result";
 
 export const Route = createFileRoute("/_protected/manage/accounts/")({
@@ -39,10 +46,8 @@ function AccountsPage() {
   const navigate = useNavigate();
   const routerLoading = useRouterState({ select: (s) => s.isLoading });
   const isLoading = useDelayedBoolean(routerLoading);
-  const { user } = Route.useRouteContext() as unknown as {
-    user: { user_role?: string };
-  };
-  const isAdmin = user.user_role === "admin";
+  const { user } = useRouteContext({ from: "/_protected" });
+  const canWriteAccounts = can(user.user_role, permissions.accounts.write);
 
   const [accounts, setAccounts] = useState<Account[]>(loadedAccounts);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -148,7 +153,11 @@ function AccountsPage() {
     <>
       <PageHeader
         title="Accounts"
-        actions={isAdmin ? <Button onClick={handleStartCreate}>+ New account</Button> : undefined}
+        actions={
+          <WhenAllowed permission={permissions.accounts.write}>
+            <Button onClick={handleStartCreate}>+ New account</Button>
+          </WhenAllowed>
+        }
       />
       <PageContent>
         <AccountList
@@ -159,6 +168,7 @@ function AccountsPage() {
           isLoading={isLoading}
           currentPage={currentPage}
           totalPages={totalPages}
+          readOnly={!canWriteAccounts}
           onSelectAccount={handleSelectAccount}
           onSearchChange={handleSearchChange}
           onPageChange={handlePageChange}
@@ -174,7 +184,7 @@ function AccountsPage() {
               <AccountEditPanel
                 key={selectedAccount.id}
                 account={selectedAccount}
-                readOnly={!isAdmin}
+                readOnly={!canWriteAccounts}
                 onSave={handleSave}
                 onDiscard={handleDiscard}
               />

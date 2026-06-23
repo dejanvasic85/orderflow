@@ -1,6 +1,13 @@
-import { createFileRoute, useNavigate, useRouter, useRouterState } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  useNavigate,
+  useRouteContext,
+  useRouter,
+  useRouterState,
+} from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { WhenAllowed } from "@/components/auth/WhenAllowed";
 import { PageContent } from "@/components/layout/PageContent";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { ProductCatalog } from "@/components/products/ProductCatalog";
@@ -15,6 +22,7 @@ import {
 } from "@/components/ui/sheet";
 import { useDelayedBoolean } from "@/hooks/use-delayed-boolean";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { can, permissions } from "@/lib/permissions";
 import { createProduct, listPagedProducts, updateProduct } from "@/lib/products/products.functions";
 import type {
   CreateProductInput,
@@ -45,10 +53,8 @@ function ProductsPage() {
   const router = useRouter();
   const routerLoading = useRouterState({ select: (s) => s.isLoading });
   const isLoading = useDelayedBoolean(routerLoading);
-  const { user } = Route.useRouteContext() as unknown as {
-    user: { user_role?: string };
-  };
-  const isAdmin = user.user_role === "admin";
+  const { user } = useRouteContext({ from: "/_protected" });
+  const canWriteProducts = can(user.user_role, permissions.products.write);
 
   const [products, setProducts] = useState<ProductRow[]>(loadedProducts);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -124,7 +130,11 @@ function ProductsPage() {
     <>
       <PageHeader
         title="Products"
-        actions={isAdmin ? <Button onClick={handleStartCreate}>+ New product</Button> : undefined}
+        actions={
+          <WhenAllowed permission={permissions.products.write}>
+            <Button onClick={handleStartCreate}>+ New product</Button>
+          </WhenAllowed>
+        }
       />
       <PageContent>
         <ProductCatalog
@@ -136,7 +146,7 @@ function ProductsPage() {
           isLoading={isLoading}
           onSearchChange={handleSearchChange}
           onPageChange={handlePageChange}
-          onSelectProduct={isAdmin ? handleSelectProduct : undefined}
+          onSelectProduct={canWriteProducts ? handleSelectProduct : undefined}
         />
 
         <Sheet open={!!selectedProduct} onOpenChange={(open) => !open && handleDiscard()}>

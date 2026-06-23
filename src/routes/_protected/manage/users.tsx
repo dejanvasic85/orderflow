@@ -2,6 +2,7 @@ import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { WhenAllowed } from "@/components/auth/WhenAllowed";
 import { PageContent } from "@/components/layout/PageContent";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ import { useDelayedBoolean } from "@/hooks/use-delayed-boolean";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { listAccounts } from "@/lib/accounts/accounts.functions";
 import type { Account, PagedAccountsResult } from "@/lib/accounts/schema";
+import { can, permissions } from "@/lib/permissions";
 import { asResult, type Result } from "@/lib/result";
 import type { PagedUsersResult, UpdateUserAccountsInput, User } from "@/lib/users/schema";
 import { listUsersSearchSchema, userPageSize } from "@/lib/users/schema";
@@ -57,9 +59,13 @@ export const Route = createFileRoute("/_protected/manage/users")({
 });
 
 function UsersPage() {
-  const { user: currentUser } = Route.useRouteContext();
+  const { user: currentUser } = Route.useRouteContext() as {
+    user: { id: string; user_role?: string };
+  };
   const { users: loadedUsers, total, accounts } = Route.useLoaderData();
   const currentUserId = currentUser.id;
+  const canWriteUsers = can(currentUser.user_role, permissions.users.write);
+  const canChangePassword = can(currentUser.user_role, permissions.users.changePassword);
   const search = Route.useSearch();
   const navigate = useNavigate();
   const routerLoading = useRouterState({ select: (s) => s.isLoading });
@@ -232,7 +238,14 @@ function UsersPage() {
 
   return (
     <>
-      <PageHeader title="Users" actions={<Button onClick={handleStartCreate}>+ New user</Button>} />
+      <PageHeader
+        title="Users"
+        actions={
+          <WhenAllowed permission={permissions.users.invite}>
+            <Button onClick={handleStartCreate}>+ New user</Button>
+          </WhenAllowed>
+        }
+      />
       <PageContent>
         <UserList
           users={users}
@@ -244,11 +257,12 @@ function UsersPage() {
           currentPage={currentPage}
           totalPages={totalPages}
           currentUserId={currentUserId}
+          readOnly={!canWriteUsers}
           onSelectUser={handleSelectUser}
           onRoleFilterChange={handleRoleFilterChange}
           onSearchChange={handleSearchChange}
           onPageChange={handlePageChange}
-          onManagePassword={handleManagePassword}
+          onManagePassword={canChangePassword ? handleManagePassword : undefined}
         />
 
         <Sheet open={!!selectedUser} onOpenChange={(open) => !open && handleDiscard()}>
@@ -265,6 +279,7 @@ function UsersPage() {
               <UserEditPanel
                 key={selectedUser.id}
                 user={selectedUser}
+                readOnly={!canWriteUsers}
                 onSave={handleSave}
                 onDiscard={handleDiscard}
                 onResendInvite={() => handleResendInvite(selectedUser.id)}

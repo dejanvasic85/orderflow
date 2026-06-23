@@ -1,8 +1,9 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute, notFound, useRouteContext } from "@tanstack/react-router";
 import { AccountUserSection } from "@/components/accounts/AccountUserSection";
 import { PageContent } from "@/components/layout/PageContent";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { getAccount } from "@/lib/accounts/accounts.functions";
+import { can, permissions } from "@/lib/permissions";
 
 export const Route = createFileRoute("/_protected/manage/accounts/$accountId/users")({
   loader: async ({ params }) => {
@@ -16,8 +17,8 @@ export const Route = createFileRoute("/_protected/manage/accounts/$accountId/use
 
 function AccountUsersPage() {
   const { account } = Route.useLoaderData();
-  const { user } = Route.useRouteContext();
-  const isAdmin = user.user_role === "admin";
+  const { user } = useRouteContext({ from: "/_protected" });
+  const canManageUsers = can(user.user_role, permissions.accounts.manageUsers);
 
   return (
     <>
@@ -26,7 +27,7 @@ function AccountUsersPage() {
         description="Manage which users have access to this account."
       />
       <PageContent>
-        <AccountUserSection accountId={account.id} readOnly={!isAdmin} />
+        <AccountUserSection accountId={account.id} readOnly={!canManageUsers} />
       </PageContent>
     </>
   );

@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
-import { fetchSessionOrThrow } from "@/lib/auth/auth.server";
+import { assertAdmin, fetchSessionOrThrow } from "@/lib/auth/auth.server";
+import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import { createAccountRepository } from "./accounts.repository";
 import {
   assignUser,
@@ -22,6 +23,7 @@ import {
 const deps: AccountServiceDeps = {
   repo: createAccountRepository(),
   session: fetchSessionOrThrow,
+  authorize: () => assertAdmin(createSupabaseServerClient()),
 };
 
 export const listAccounts = createServerFn({ method: "GET", strict: { output: false } })
