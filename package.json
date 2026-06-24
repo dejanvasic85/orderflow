@@ -16,17 +16,17 @@
     "db:gentypes": "supabase gen types typescript --local > src/lib/database.types.ts"
   },
   "dependencies": {
-    "@aws-sdk/client-sns": "3.1074.0",
-    "@cloudflare/vite-plugin": "1.42.1",
+    "@aws-sdk/client-sns": "3.1075.0",
+    "@cloudflare/vite-plugin": "1.42.2",
     "@fontsource-variable/outfit": "5.2.8",
-    "@sentry/tanstackstart-react": "10.59.0",
+    "@sentry/tanstackstart-react": "10.60.0",
     "@supabase/ssr": "0.12.0",
     "@supabase/supabase-js": "2.108.2",
     "@tailwindcss/vite": "4.3.1",
     "@tanstack/react-devtools": "0.10.7",
     "@tanstack/react-form": "1.33.0",
-    "@tanstack/react-query": "5.101.0",
-    "@tanstack/react-query-devtools": "5.101.0",
+    "@tanstack/react-query": "5.101.1",
+    "@tanstack/react-query-devtools": "5.101.1",
     "@tanstack/react-router": "1.170.16",
     "@tanstack/react-router-devtools": "1.167.0",
     "@tanstack/react-router-ssr-query": "1.167.1",
@@ -37,7 +37,7 @@
     "clsx": "2.1.1",
     "cmdk": "1.1.1",
     "dotenv-cli": "11.0.0",
-    "framer-motion": "12.40.0",
+    "framer-motion": "12.41.0",
     "lucide-react": "1.21.0",
     "playwright": "1.61.0",
     "radix-ui": "1.6.0",
@@ -46,7 +46,7 @@
     "react-dropzone": "15.0.0",
     "react-easy-crop": "6.0.2",
     "react-email": "6.6.4",
-    "recharts": "3.8.1",
+    "recharts": "3.9.0",
     "shadcn": "4.11.0",
     "sonner": "2.0.7",
     "tailwind-merge": "3.6.0",
@@ -65,7 +65,7 @@
     "@types/node": "26.0.0",
     "@types/react": "19.2.17",
     "@types/react-dom": "19.2.3",
-    "@vitejs/plugin-react": "6.0.2",
+    "@vitejs/plugin-react": "6.0.3",
     "@vitest/coverage-v8": "4.1.9",
     "dotenv": "17.4.2",
     "jsdom": "29.1.1",
@@ -75,7 +75,7 @@
     "typescript": "6.0.3",
     "vite": "npm:@voidzero-dev/vite-plus-core@0.2.1",
     "vite-plus": "0.2.1",
-    "wrangler": "4.103.0"
+    "wrangler": "4.104.0"
   },
-  "packageManager": "pnpm@11.8.0"
+  "packageManager": "pnpm@11.9.0"
 }
