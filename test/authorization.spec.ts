@@ -52,3 +52,21 @@ test.describe("Authorization — regular user blocked from /manage/*", () => {
     await expect(page).not.toHaveURL(/\/manage/);
   });
 });
+
+test.describe("Authorization — user denied access to an unassigned account", () => {
+  // Priya is assigned only to "Harvest Table". The Winery Bistro (…a01) is not hers,
+  // so RLS makes the row invisible: the account loader query returns no row and the
+  // route renders its error boundary. She must never see the account name.
+  const unassignedAccountId = "b2c3d4e5-f6a7-4b8c-9d0e-000000000a01";
+
+  test("cannot view an account she is not assigned to", async ({ page }) => {
+    await login(page, { user: "priya" });
+
+    // Navigate directly rather than via the `goto` helper: the error boundary page
+    // never sets html[data-hydrated], so waiting for hydration would hang.
+    await page.goto(`/accounts/${unassignedAccountId}`);
+
+    await expect(page.getByText("Something went wrong!")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "The Winery Bistro" })).not.toBeVisible();
+  });
+});
