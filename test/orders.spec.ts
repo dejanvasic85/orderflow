@@ -2,6 +2,11 @@ import { expect, test } from "@playwright/test";
 import { goto, login } from "./flows";
 import { deleteAllMailpitMessages, waitForMessageTo } from "./mailpit";
 
+// Serial: these tests share one Mailpit inbox and each clears it in beforeEach,
+// so they must not interleave — otherwise one order's notification email is asserted
+// against another's expected subject.
+test.describe.configure({ mode: "serial" });
+
 test.describe("Orders", () => {
   test.beforeEach(async () => {
     await deleteAllMailpitMessages();
@@ -58,5 +63,26 @@ test.describe("Orders", () => {
     await page.waitForURL("**/manage/orders/**");
     await expect(page.getByRole("heading", { name: /^ORD-\d{4}$/ }).first()).toBeVisible();
     await expect(page.getByText("The Winery Bistro")).toBeVisible();
+  });
+
+  test("staff places an order on behalf of an account via the combobox", async ({ page }) => {
+    await login(page, { user: "marcus" });
+    // `goto` waits for hydration; the AccountCombobox popover won't open on click
+    // until React has hydrated the page.
+    await goto(page, "/manage/orders/new");
+
+    await expect(page.getByRole("heading", { name: "New order" })).toBeVisible();
+
+    // Cellar Door Co. has a template, so the order form pre-fills its items.
+    await page.getByRole("combobox").click();
+    await page.getByPlaceholder("Search accounts...").fill("Cellar");
+    await page.getByRole("option", { name: "Cellar Door Co." }).click();
+
+    await expect(page.getByRole("button", { name: /submit order/i })).toBeVisible();
+    await page.getByRole("button", { name: /submit order/i }).click();
+
+    await page.waitForURL("**/manage/orders/**");
+    await expect(page.getByRole("heading", { name: /^ORD-\d{4}$/ }).first()).toBeVisible();
+    await expect(page.getByText("Cellar Door Co.")).toBeVisible();
   });
 });
