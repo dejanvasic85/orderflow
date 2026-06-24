@@ -32,7 +32,7 @@ Priorities: `Must` · `Should` · `Nice`
 ### Order lifecycle beyond the simplest case
 
 - [ ] Must | `orders.spec.ts` | Admin/staff placing an order **on behalf** of an account via `/manage/orders/new` (`AccountCombobox`)
-- [ ] Must | `orders.spec.ts` | Template-driven order: change quantities (boxes / extra bottles) and verify totals
+- [x] Must | `orders.spec.ts` | Template-driven order: change quantities (boxes / extra bottles) and verify totals
 - [ ] Should | `orders.spec.ts` | Validation failure — submitting an order with zero items (`items.min(1)`) shows an error
 - [ ] Should | `orders.spec.ts` | Open an order from the management list (`/manage/orders`) and verify its details (`/manage/orders/$orderId`)
 
