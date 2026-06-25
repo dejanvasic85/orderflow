@@ -52,3 +52,23 @@ test.describe("Authorization — regular user blocked from /manage/*", () => {
     await expect(page).not.toHaveURL(/\/manage/);
   });
 });
+
+test.describe("Authorization — unauthenticated access redirects to /login", () => {
+  // No login: each test runs in a fresh, unauthenticated browser context. The
+  // _protected guard redirects to /login?redirect=<original path>.
+  test("redirected to /login from a protected admin route", async ({ page }) => {
+    await page.goto("/manage/dashboard");
+
+    await page.waitForURL("**/login**");
+    await expect(page).toHaveURL(/\/login/);
+    await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
+  });
+
+  test("redirected to /login from a protected account route", async ({ page }) => {
+    await page.goto("/accounts");
+
+    await page.waitForURL("**/login**");
+    await expect(page).toHaveURL(/\/login/);
+    await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
+  });
+});
