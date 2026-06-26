@@ -25,7 +25,7 @@ Priorities: `Must` · `Should` · `Nice`
 ### Authorization / access-control negatives (the security boundary — highest value)
 
 - [x] Must | `authorization.spec.ts` | A `user` (priya/olivia) navigating directly to `/manage/*` (dashboard, users, products, orders, accounts) is blocked/redirected
-- [ ] Must | `authorization.spec.ts` | A `user` accessing an account they are **not** assigned to (`/accounts/$otherAccountId`) is denied by RLS
+- [x] Must | `authorization.spec.ts` | A `user` accessing an account they are **not** assigned to (`/accounts/$otherAccountId`) is denied by RLS
 - [x] Must | `authorization.spec.ts` | Unauthenticated access to any `_protected` route redirects to `/login`
 - [ ] Should | `authorization.spec.ts` | Staff (`marcus`/`sarah`) attempting a write that should be denied fails (beyond the existing "no edit button" check)
 
