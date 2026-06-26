@@ -70,3 +70,23 @@ test.describe("Authorization — user denied access to an unassigned account", (
     await expect(page.getByRole("heading", { name: "The Winery Bistro" })).not.toBeVisible();
   });
 });
+
+test.describe("Authorization — unauthenticated access redirects to /login", () => {
+  // No login: each test runs in a fresh, unauthenticated browser context. The
+  // _protected guard redirects to /login?redirect=<original path>.
+  test("redirected to /login from a protected admin route", async ({ page }) => {
+    await page.goto("/manage/dashboard");
+
+    await page.waitForURL("**/login**");
+    await expect(page).toHaveURL(/\/login/);
+    await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
+  });
+
+  test("redirected to /login from a protected account route", async ({ page }) => {
+    await page.goto("/accounts");
+
+    await page.waitForURL("**/login**");
+    await expect(page).toHaveURL(/\/login/);
+    await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
+  });
+});
