@@ -1,7 +1,7 @@
 export type OrderEmailItem = {
   productName: string;
   boxes: number;
-  extraBottles: number;
+  extraUnits: number;
 };
 
 export type OrderEmailInput = {

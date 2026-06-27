@@ -29,8 +29,8 @@ const merlot: ProductRow = {
 const products = [chardonnay, merlot];
 
 const items: OrderRequestItemInput[] = [
-  { product_id: "prod-1", boxes: 2, extra_bottles: 0 },
-  { product_id: "prod-2", boxes: 1, extra_bottles: 3 },
+  { product_id: "prod-1", boxes: 2, extra_units: 0 },
+  { product_id: "prod-2", boxes: 1, extra_units: 3 },
 ];
 
 const onUpdate = vi.fn();

@@ -11,7 +11,7 @@ import type {
 } from "./schema";
 
 const templateWithItemsSelect =
-  "id, account_id, name, created_by, created_at, updated_at, template_items(id, product_id, box_count, bottle_count, created_by, created_at, products(id, name, qty_per_box))" as const;
+  "id, account_id, name, created_by, created_at, updated_at, template_items(id, product_id, box_count, unit_count, created_by, created_at, products(id, name, qty_per_box))" as const;
 
 type SaveBatchItem = SaveTemplateItemsInput["toAdd"][number];
 type UpdateBatchItem = SaveTemplateItemsInput["toUpdate"][number];
@@ -108,10 +108,10 @@ export function createTemplateRepository(): TemplateRepository {
           : Promise.resolve(null),
         toUpdate.length > 0
           ? Promise.all(
-              toUpdate.map(({ id, box_count, bottle_count }) =>
+              toUpdate.map(({ id, box_count, unit_count }) =>
                 supabase
                   .from("template_items")
-                  .update({ box_count, bottle_count })
+                  .update({ box_count, unit_count })
                   .eq("template_id", templateId)
                   .eq("id", id)
                   .then((r) => r.error),

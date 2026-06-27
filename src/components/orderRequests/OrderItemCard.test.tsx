@@ -13,38 +13,38 @@ beforeEach(() => {
 
 describe("read-only mode", () => {
   test("renders the product name", () => {
-    render(<OrderItemCard readOnly name="Pinot Noir" qtyPerBox={12} boxes={2} bottles={3} />);
+    render(<OrderItemCard readOnly name="Pinot Noir" qtyPerBox={12} boxes={2} units={3} />);
 
     expect(screen.getByText("Pinot Noir")).toBeInTheDocument();
   });
 
   test("renders qty_per_box subtitle", () => {
-    render(<OrderItemCard readOnly name="Pinot Noir" qtyPerBox={12} boxes={2} bottles={3} />);
+    render(<OrderItemCard readOnly name="Pinot Noir" qtyPerBox={12} boxes={2} units={3} />);
 
     expect(screen.getByText("12 per box")).toBeInTheDocument();
   });
 
   test("renders box count", () => {
-    render(<OrderItemCard readOnly name="Pinot Noir" qtyPerBox={12} boxes={2} bottles={3} />);
+    render(<OrderItemCard readOnly name="Pinot Noir" qtyPerBox={12} boxes={2} units={3} />);
 
     expect(screen.getByText("2")).toBeInTheDocument();
   });
 
-  test("renders bottle count", () => {
-    render(<OrderItemCard readOnly name="Pinot Noir" qtyPerBox={12} boxes={2} bottles={3} />);
+  test("renders unit count", () => {
+    render(<OrderItemCard readOnly name="Pinot Noir" qtyPerBox={12} boxes={2} units={3} />);
 
     expect(screen.getByText("3")).toBeInTheDocument();
   });
 
-  test("renders computed total (boxes × qty_per_box + bottles)", () => {
-    render(<OrderItemCard readOnly name="Pinot Noir" qtyPerBox={12} boxes={2} bottles={3} />);
+  test("renders computed total (boxes × qty_per_box + units)", () => {
+    render(<OrderItemCard readOnly name="Pinot Noir" qtyPerBox={12} boxes={2} units={3} />);
 
     // 2 × 12 + 3 = 27
     expect(screen.getByText("27")).toBeInTheDocument();
   });
 
   test("does not render stepper buttons", () => {
-    render(<OrderItemCard readOnly name="Pinot Noir" qtyPerBox={12} boxes={2} bottles={3} />);
+    render(<OrderItemCard readOnly name="Pinot Noir" qtyPerBox={12} boxes={2} units={3} />);
 
     expect(screen.queryByRole("button", { name: /increase|decrease/i })).not.toBeInTheDocument();
   });
@@ -57,7 +57,7 @@ describe("editable mode", () => {
         name="Chardonnay"
         qtyPerBox={6}
         boxes={2}
-        bottles={3}
+        units={3}
         onUpdate={onUpdate}
         onRemove={onRemove}
       />,
@@ -72,7 +72,7 @@ describe("editable mode", () => {
         name="Chardonnay"
         qtyPerBox={6}
         boxes={2}
-        bottles={3}
+        units={3}
         onUpdate={onUpdate}
         onRemove={onRemove}
       />,
@@ -81,13 +81,13 @@ describe("editable mode", () => {
     expect(screen.getByText("6 per box")).toBeInTheDocument();
   });
 
-  test("renders computed total (boxes × qty_per_box + bottles)", () => {
+  test("renders computed total (boxes × qty_per_box + units)", () => {
     render(
       <OrderItemCard
         name="Chardonnay"
         qtyPerBox={6}
         boxes={2}
-        bottles={3}
+        units={3}
         onUpdate={onUpdate}
         onRemove={onRemove}
       />,
@@ -103,7 +103,7 @@ describe("editable mode", () => {
         name="Chardonnay"
         qtyPerBox={6}
         boxes={2}
-        bottles={3}
+        units={3}
         onUpdate={onUpdate}
         onRemove={onRemove}
       />,
@@ -120,7 +120,7 @@ describe("editable mode", () => {
         name="Chardonnay"
         qtyPerBox={6}
         boxes={2}
-        bottles={3}
+        units={3}
         onUpdate={onUpdate}
         onRemove={onRemove}
       />,
@@ -137,7 +137,7 @@ describe("editable mode", () => {
         name="Chardonnay"
         qtyPerBox={6}
         boxes={0}
-        bottles={3}
+        units={3}
         onUpdate={onUpdate}
         onRemove={onRemove}
       />,
@@ -148,55 +148,55 @@ describe("editable mode", () => {
     expect(onUpdate).toHaveBeenCalledWith({ boxes: 0 });
   });
 
-  test("clicking Increase bottles calls onUpdate with extra_bottles + 1", async () => {
+  test("clicking Increase units calls onUpdate with extra_units + 1", async () => {
     render(
       <OrderItemCard
         name="Chardonnay"
         qtyPerBox={6}
         boxes={2}
-        bottles={3}
+        units={3}
         onUpdate={onUpdate}
         onRemove={onRemove}
       />,
     );
 
-    await user.click(screen.getByRole("button", { name: "Increase bottles" }));
+    await user.click(screen.getByRole("button", { name: "Increase units" }));
 
-    expect(onUpdate).toHaveBeenCalledWith({ extra_bottles: 4 });
+    expect(onUpdate).toHaveBeenCalledWith({ extra_units: 4 });
   });
 
-  test("clicking Decrease bottles calls onUpdate with extra_bottles - 1", async () => {
+  test("clicking Decrease units calls onUpdate with extra_units - 1", async () => {
     render(
       <OrderItemCard
         name="Chardonnay"
         qtyPerBox={6}
         boxes={2}
-        bottles={3}
+        units={3}
         onUpdate={onUpdate}
         onRemove={onRemove}
       />,
     );
 
-    await user.click(screen.getByRole("button", { name: "Decrease bottles" }));
+    await user.click(screen.getByRole("button", { name: "Decrease units" }));
 
-    expect(onUpdate).toHaveBeenCalledWith({ extra_bottles: 2 });
+    expect(onUpdate).toHaveBeenCalledWith({ extra_units: 2 });
   });
 
-  test("clicking Decrease bottles does not go below 0", async () => {
+  test("clicking Decrease units does not go below 0", async () => {
     render(
       <OrderItemCard
         name="Chardonnay"
         qtyPerBox={6}
         boxes={2}
-        bottles={0}
+        units={0}
         onUpdate={onUpdate}
         onRemove={onRemove}
       />,
     );
 
-    await user.click(screen.getByRole("button", { name: "Decrease bottles" }));
+    await user.click(screen.getByRole("button", { name: "Decrease units" }));
 
-    expect(onUpdate).toHaveBeenCalledWith({ extra_bottles: 0 });
+    expect(onUpdate).toHaveBeenCalledWith({ extra_units: 0 });
   });
 
   test("clicking remove calls onRemove", async () => {
@@ -205,7 +205,7 @@ describe("editable mode", () => {
         name="Chardonnay"
         qtyPerBox={6}
         boxes={2}
-        bottles={3}
+        units={3}
         onUpdate={onUpdate}
         onRemove={onRemove}
       />,

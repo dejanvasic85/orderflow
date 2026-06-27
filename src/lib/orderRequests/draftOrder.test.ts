@@ -3,8 +3,8 @@ import { clearDraft, loadDraft, saveDraft } from "./draftOrder";
 const accountA = "account-aaa";
 const accountB = "account-bbb";
 
-const item1 = { product_id: "prod-1", boxes: 2, extra_bottles: 0 };
-const item2 = { product_id: "prod-2", boxes: 0, extra_bottles: 3 };
+const item1 = { product_id: "prod-1", boxes: 2, extra_units: 0 };
+const item2 = { product_id: "prod-2", boxes: 0, extra_units: 3 };
 
 beforeEach(() => {
   localStorage.clear();

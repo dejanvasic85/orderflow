@@ -78,25 +78,22 @@ Change requests and bugs:
 22 June 2026
 
 - [ ] Link for accepting an invite is not working
+- [x] Change all wording from bottles to units because sometimes it's not really bottles it's actually cans
 - [ ] Allow typing of qty rather than plus / minus
 - [ ] Use the word Units in the email
-- [ ] Change all wording from bottles to units because sometimes it's not really bottles it's actually cans
 - [ ] Users should be able to order again but they should also have ability to edit the items
 - [ ] The order needs an image for the product instead of just text
 - [ ] Description for the product isn't required
-- [ ] Add descriptions in the Role dropdown for the User mangaement to explain what roles are capable of what
+- [ ] Add descriptions in the Role dropdown for the User management to explain what roles are capable of what
 - [ ] Users are getting "active" automatically instead of staying pending until they accept
 
 ---
 
-## Code Cleanup
+## Code Cleanup - Post release
 
-- [ ] We need a much better and cleaner pattern for Authz
-
-- [ ] The .server.ts files have too much logic in them or all database operations should be somewhere else
-
+- [x] We need a much better and cleaner pattern for Authz
+- [x] The .server.ts files have too much logic in them or all database operations should be somewhere else
 - [ ] Replace all the deprecated API's like `inputValidator` on the tanstack lib
-
 - [ ] Cleanup | Casting and typescript needs general cleanup
 
 ```ts

@@ -19,12 +19,12 @@ export type DashboardServiceDeps = {
   now?: () => Date;
 };
 
-export function itemBottleVolume(item: DashboardOrderRow["order_request_items"][number]): number {
-  return (item.boxes ?? 0) * (item.products?.qty_per_box ?? 0) + (item.extra_bottles ?? 0);
+export function itemUnitVolume(item: DashboardOrderRow["order_request_items"][number]): number {
+  return (item.boxes ?? 0) * (item.products?.qty_per_box ?? 0) + (item.extra_units ?? 0);
 }
 
-export function orderBottleVolume(row: DashboardOrderRow): number {
-  return row.order_request_items.reduce((sum, item) => sum + itemBottleVolume(item), 0);
+export function orderUnitVolume(row: DashboardOrderRow): number {
+  return row.order_request_items.reduce((sum, item) => sum + itemUnitVolume(item), 0);
 }
 
 export function startOfWindow(now: Date, range: DashboardRange): Date {
@@ -64,12 +64,12 @@ export function buildKpiSummary(
   );
 
   const totalOrders = rows.length;
-  const totalVolume = rows.reduce((sum, r) => sum + orderBottleVolume(r), 0);
+  const totalVolume = rows.reduce((sum, r) => sum + orderUnitVolume(r), 0);
 
   const currentOrderCount = currentRows.length;
   const priorOrderCount = priorRows.length;
-  const currentVolume = currentRows.reduce((sum, r) => sum + orderBottleVolume(r), 0);
-  const priorVolume = priorRows.reduce((sum, r) => sum + orderBottleVolume(r), 0);
+  const currentVolume = currentRows.reduce((sum, r) => sum + orderUnitVolume(r), 0);
+  const priorVolume = priorRows.reduce((sum, r) => sum + orderUnitVolume(r), 0);
 
   return {
     totalOrders,
@@ -164,7 +164,7 @@ export function buildTopProducts(
     for (const item of row.order_request_items) {
       if (!item.products) continue;
       const existing = volumeByProduct.get(item.product_id);
-      const vol = itemBottleVolume(item);
+      const vol = itemUnitVolume(item);
       if (existing) {
         existing.volume += vol;
       } else {
@@ -197,7 +197,7 @@ export function buildRecentActivity(
       orderRef: formatOrderRef(row.order_number),
       accountName: row.accounts?.name ?? "Unknown",
       placedByName,
-      volume: orderBottleVolume(row),
+      volume: orderUnitVolume(row),
       createdAt: row.created_at,
     };
   });

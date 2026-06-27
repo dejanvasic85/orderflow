@@ -213,7 +213,7 @@ INSERT INTO public.templates (id, account_id, name, created_by) VALUES
   -- The Cork Room (a05) intentionally has no template
 ON CONFLICT DO NOTHING;
 
-INSERT INTO public.template_items (template_id, product_id, box_count, bottle_count) VALUES
+INSERT INTO public.template_items (template_id, product_id, box_count, unit_count) VALUES
   -- Weekly Wine Pack (The Winery Bistro)
   ('d4e5f6a7-b8c9-4d0e-9f2a-000000000001', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000001', 2, 0),  -- Rosé
   ('d4e5f6a7-b8c9-4d0e-9f2a-000000000001', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000002', 1, 0),  -- Pinot Noir
@@ -287,7 +287,7 @@ INSERT INTO public.order_requests (id, account_id, placed_by, delivery_address, 
   ('e5f6a7b8-0025-4c9d-8e1f-000000000025', 'b2c3d4e5-f6a7-4b8c-9d0e-000000000a01', 'a1b2c3d4-e5f6-4a7b-8c9d-000000000003', '12 Vineyard Lane, McLaren Vale SA 5171', now() - interval '12 days')
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO public.order_request_items (order_request_id, product_id, boxes, extra_bottles) VALUES
+INSERT INTO public.order_request_items (order_request_id, product_id, boxes, extra_units) VALUES
   -- order 1: Rosé x2, Pinot Noir x1
   ('e5f6a7b8-0001-4c9d-8e1f-000000000001', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000001', 2, 0),
   ('e5f6a7b8-0001-4c9d-8e1f-000000000001', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000002', 1, 0),
@@ -295,7 +295,7 @@ INSERT INTO public.order_request_items (order_request_id, product_id, boxes, ext
   ('e5f6a7b8-0002-4c9d-8e1f-000000000002', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000003', 2, 0),
   ('e5f6a7b8-0002-4c9d-8e1f-000000000002', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000004', 1, 0),
   ('e5f6a7b8-0002-4c9d-8e1f-000000000002', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000012', 1, 0),
-  -- order 3: Rosé x3, Prosecco x1, extra 6 bottles
+  -- order 3: Rosé x3, Prosecco x1, extra 6 units
   ('e5f6a7b8-0003-4c9d-8e1f-000000000003', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000001', 3, 0),
   ('e5f6a7b8-0003-4c9d-8e1f-000000000003', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000006', 1, 6),
   -- order 4: Pinot Noir x2, Shiraz x1
@@ -308,7 +308,7 @@ INSERT INTO public.order_request_items (order_request_id, product_id, boxes, ext
   ('e5f6a7b8-0006-4c9d-8e1f-000000000006', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000001', 2, 0),
   ('e5f6a7b8-0006-4c9d-8e1f-000000000006', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000003', 2, 0),
   ('e5f6a7b8-0006-4c9d-8e1f-000000000006', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000002', 1, 0),
-  -- order 7: Prosecco x2, Sauv Blanc x1, extra 12 bottles
+  -- order 7: Prosecco x2, Sauv Blanc x1, extra 12 units
   ('e5f6a7b8-0007-4c9d-8e1f-000000000007', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000006', 2, 12),
   ('e5f6a7b8-0007-4c9d-8e1f-000000000007', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000004', 1, 0),
   -- order 8: Shiraz x2, Pinot Noir x2
@@ -330,7 +330,7 @@ INSERT INTO public.order_request_items (order_request_id, product_id, boxes, ext
   -- order 13: Sauv Blanc x2, Rosé x2
   ('e5f6a7b8-0013-4c9d-8e1f-000000000013', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000004', 2, 0),
   ('e5f6a7b8-0013-4c9d-8e1f-000000000013', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000001', 2, 0),
-  -- order 14: Prosecco x3, extra 6 bottles
+  -- order 14: Prosecco x3, extra 6 units
   ('e5f6a7b8-0014-4c9d-8e1f-000000000014', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000006', 3, 6),
   -- order 15: Pinot Noir x2, Chardonnay x1, Sparkling Water x2
   ('e5f6a7b8-0015-4c9d-8e1f-000000000015', 'c3d4e5f6-a7b8-4c9d-8e1f-000000000002', 2, 0),

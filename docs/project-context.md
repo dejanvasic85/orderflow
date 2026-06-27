@@ -60,7 +60,7 @@ Replaces SMS/email ordering with a centralised order request management system f
 - **products** — name, description, image, qty per box (no prices for now)
 - **templates** — one per account; contain product lines with suggested quantities
 - **order_requests** — linked to account + placed-by user; has optional note + delivery override
-- **order_request_items** — products on a request with boxes + extra bottle quantities
+- **order_request_items** — products on a request with boxes + extra unit quantities
 
 ---
 

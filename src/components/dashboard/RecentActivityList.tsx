@@ -36,7 +36,7 @@ export function RecentActivityList({ items }: RecentActivityListProps) {
               <th className="hidden pb-2 text-left font-medium text-muted-foreground md:table-cell">
                 Placed by
               </th>
-              <th className="pb-2 text-right font-medium text-muted-foreground">Bottles</th>
+              <th className="pb-2 text-right font-medium text-muted-foreground">Units</th>
               <th className="pb-2 text-right font-medium text-muted-foreground">When</th>
             </tr>
           </thead>

@@ -114,7 +114,7 @@ export type Database = {
         Row: {
           boxes: number
           created_at: string
-          extra_bottles: number
+          extra_units: number
           id: string
           order_request_id: string
           product_id: string
@@ -122,7 +122,7 @@ export type Database = {
         Insert: {
           boxes?: number
           created_at?: string
-          extra_bottles?: number
+          extra_units?: number
           id?: string
           order_request_id: string
           product_id: string
@@ -130,7 +130,7 @@ export type Database = {
         Update: {
           boxes?: number
           created_at?: string
-          extra_bottles?: number
+          extra_units?: number
           id?: string
           order_request_id?: string
           product_id?: string
@@ -252,7 +252,7 @@ export type Database = {
       }
       template_items: {
         Row: {
-          bottle_count: number
+          unit_count: number
           box_count: number
           created_at: string
           created_by: string | null
@@ -261,7 +261,7 @@ export type Database = {
           template_id: string
         }
         Insert: {
-          bottle_count?: number
+          unit_count?: number
           box_count?: number
           created_at?: string
           created_by?: string | null
@@ -270,7 +270,7 @@ export type Database = {
           template_id: string
         }
         Update: {
-          bottle_count?: number
+          unit_count?: number
           box_count?: number
           created_at?: string
           created_by?: string | null

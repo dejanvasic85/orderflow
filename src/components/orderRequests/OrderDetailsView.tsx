@@ -14,10 +14,7 @@ type OrderDetailsViewProps = {
 
 export function OrderDetailsView({ order, placedByName, onBack }: OrderDetailsViewProps) {
   const totalBoxes = order.order_request_items.reduce((sum, i) => sum + (i.boxes ?? 0), 0);
-  const totalBottles = order.order_request_items.reduce(
-    (sum, i) => sum + (i.extra_bottles ?? 0),
-    0,
-  );
+  const totalUnits = order.order_request_items.reduce((sum, i) => sum + (i.extra_units ?? 0), 0);
 
   return (
     <div className="flex flex-col gap-6">
@@ -53,8 +50,8 @@ export function OrderDetailsView({ order, placedByName, onBack }: OrderDetailsVi
         />
         <MetaTile
           icon={<Package className="h-4 w-4" />}
-          label="Extra bottles"
-          value={String(totalBottles)}
+          label="Extra units"
+          value={String(totalUnits)}
         />
         <MetaTile
           icon={<Calendar className="h-4 w-4" />}
@@ -91,7 +88,7 @@ export function OrderDetailsView({ order, placedByName, onBack }: OrderDetailsVi
               name={item.products?.name ?? "Unknown product"}
               qtyPerBox={item.products?.qty_per_box ?? 0}
               boxes={item.boxes ?? 0}
-              bottles={item.extra_bottles ?? 0}
+              units={item.extra_units ?? 0}
             />
           ))}
         </div>

@@ -8,21 +8,21 @@ type OrderItemCardProps =
       name: string;
       qtyPerBox: number;
       boxes: number;
-      bottles: number;
+      units: number;
     }
   | {
       readOnly?: false;
       name: string;
       qtyPerBox: number;
       boxes: number;
-      bottles: number;
-      onUpdate: (patch: { boxes?: number; extra_bottles?: number }) => void;
+      units: number;
+      onUpdate: (patch: { boxes?: number; extra_units?: number }) => void;
       onRemove: () => void;
     };
 
 export function OrderItemCard(props: OrderItemCardProps) {
-  const { name, qtyPerBox, boxes, bottles } = props;
-  const total = boxes * qtyPerBox + bottles;
+  const { name, qtyPerBox, boxes, units } = props;
+  const total = boxes * qtyPerBox + units;
 
   return (
     <Card className={props.readOnly ? "border-border/60" : "border-primary/30"}>
@@ -86,9 +86,9 @@ export function OrderItemCard(props: OrderItemCardProps) {
             )}
           </div>
           <div className="flex flex-col gap-1">
-            <p className="text-xs text-muted-foreground">Bottles</p>
+            <p className="text-xs text-muted-foreground">Units</p>
             {props.readOnly ? (
-              <p className="text-sm font-medium">{bottles}</p>
+              <p className="text-sm font-medium">{units}</p>
             ) : (
               <div className="flex items-center gap-1">
                 <Button
@@ -96,19 +96,19 @@ export function OrderItemCard(props: OrderItemCardProps) {
                   variant="ghost"
                   size="icon"
                   className="h-6 w-6"
-                  aria-label="Decrease bottles"
-                  onClick={() => props.onUpdate({ extra_bottles: Math.max(0, bottles - 1) })}
+                  aria-label="Decrease units"
+                  onClick={() => props.onUpdate({ extra_units: Math.max(0, units - 1) })}
                 >
                   <Minus className="h-3 w-3" />
                 </Button>
-                <span className="w-5 text-center text-sm font-medium">{bottles}</span>
+                <span className="w-5 text-center text-sm font-medium">{units}</span>
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon"
                   className="h-6 w-6"
-                  aria-label="Increase bottles"
-                  onClick={() => props.onUpdate({ extra_bottles: bottles + 1 })}
+                  aria-label="Increase units"
+                  onClick={() => props.onUpdate({ extra_units: units + 1 })}
                 >
                   <Plus className="h-3 w-3" />
                 </Button>

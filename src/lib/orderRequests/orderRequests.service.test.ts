@@ -43,15 +43,15 @@ describe("resolvePlacedByName", () => {
 });
 
 describe("mapOrderHistoryRow", () => {
-  it("sums boxes and bottles and resolves the placed-by name", () => {
+  it("sums boxes and units and resolves the placed-by name", () => {
     const result = mapOrderHistoryRow({
       id: "order-1",
       order_number: 7,
       placed_by: "u-1",
       created_at: "2024-01-01T00:00:00Z",
       order_request_items: [
-        { boxes: 2, extra_bottles: 1 },
-        { boxes: 3, extra_bottles: 4 },
+        { boxes: 2, extra_units: 1 },
+        { boxes: 3, extra_units: 4 },
       ],
       users: { id: "u-1", name: "Jane Smith", role: "user" },
     });
@@ -63,7 +63,7 @@ describe("mapOrderHistoryRow", () => {
       placedByName: "Jane Smith",
       created_at: "2024-01-01T00:00:00Z",
       total_boxes: 5,
-      total_bottles: 5,
+      total_units: 5,
     });
   });
 
@@ -81,18 +81,18 @@ describe("mapOrderHistoryRow", () => {
     expect(result.account_name).toBe("Acme Wines");
   });
 
-  it("treats null box and bottle counts as zero", () => {
+  it("treats null box and unit counts as zero", () => {
     const result = mapOrderHistoryRow({
       id: "order-1",
       order_number: 7,
       placed_by: "u-1",
       created_at: "2024-01-01T00:00:00Z",
-      order_request_items: [{ boxes: null, extra_bottles: null }],
+      order_request_items: [{ boxes: null, extra_units: null }],
       users: null,
     });
 
     expect(result.total_boxes).toBe(0);
-    expect(result.total_bottles).toBe(0);
+    expect(result.total_units).toBe(0);
   });
 });
 
@@ -130,7 +130,7 @@ function makeRepo(overrides: Partial<OrderRequestRepository> = {}): OrderRequest
 
 const orderInput = {
   account_id: "acc-1",
-  items: [{ product_id: "p-1", boxes: 2, extra_bottles: 1 }],
+  items: [{ product_id: "p-1", boxes: 2, extra_units: 1 }],
   delivery_address: "1 Vine St",
 };
 
@@ -215,7 +215,7 @@ describe("placeOrder", () => {
       accountName: "Acme Wines",
       placedByName: "Jane Smith",
       deliveryAddress: "1 Vine St",
-      items: [{ productName: "Shiraz", boxes: 2, extraBottles: 1 }],
+      items: [{ productName: "Shiraz", boxes: 2, extraUnits: 1 }],
     });
   });
 });
@@ -296,7 +296,7 @@ describe("listAllOrderHistory", () => {
               order_number: 7,
               placed_by: "u-1",
               created_at: "2024-01-01T00:00:00Z",
-              order_request_items: [{ boxes: 2, extra_bottles: 1 }],
+              order_request_items: [{ boxes: 2, extra_units: 1 }],
               users: { id: "u-1", name: "Jane Smith", role: "user" },
             },
           ],
@@ -324,7 +324,7 @@ describe("listAllOrderHistory", () => {
             placedByName: "Jane Smith",
             created_at: "2024-01-01T00:00:00Z",
             total_boxes: 2,
-            total_bottles: 1,
+            total_units: 1,
           },
         ],
         total: 1,

@@ -22,7 +22,7 @@ export function ItemsTable({ items }: Props) {
           <Text style={{ ...styles.headerText, textAlign: "center" }}>Boxes</Text>
         </Column>
         <Column style={{ width: "20%" }}>
-          <Text style={{ ...styles.headerText, textAlign: "center" }}>Extra bottles</Text>
+          <Text style={{ ...styles.headerText, textAlign: "center" }}>Extra units</Text>
         </Column>
       </Row>
       {items.map((item, i) => (
@@ -34,7 +34,7 @@ export function ItemsTable({ items }: Props) {
             <Text style={styles.cellTextCenter}>{item.boxes}</Text>
           </Column>
           <Column style={{ width: "20%" }}>
-            <Text style={styles.cellTextCenter}>{item.extraBottles}</Text>
+            <Text style={styles.cellTextCenter}>{item.extraUnits}</Text>
           </Column>
         </Row>
       ))}

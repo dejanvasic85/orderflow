@@ -10,7 +10,7 @@ export type DashboardOrderRow = {
   order_request_items: {
     product_id: string;
     boxes: number | null;
-    extra_bottles: number | null;
+    extra_units: number | null;
     products: { id: string; name: string; qty_per_box: number } | null;
   }[];
   accounts: { id: string; name: string } | null;
@@ -18,7 +18,7 @@ export type DashboardOrderRow = {
 };
 
 const ordersWithItemsSelect =
-  "id, order_number, created_at, account_id, placed_by, order_request_items(product_id, boxes, extra_bottles, products(id, name, qty_per_box)), accounts(id, name), users!order_requests_placed_by_fkey(id, name, role)" as const;
+  "id, order_number, created_at, account_id, placed_by, order_request_items(product_id, boxes, extra_units, products(id, name, qty_per_box)), accounts(id, name), users!order_requests_placed_by_fkey(id, name, role)" as const;
 
 export type DashboardRepository = {
   // TODO(scale): at high order/item volumes, replace with .rpc("dashboard_stats", { since })

@@ -17,14 +17,14 @@ type TemplateItemState = {
   id: string | null;
   product_id: string;
   boxes: number;
-  extra_bottles: number;
+  extra_units: number;
   kind: ItemChangeKind;
 };
 
 type TemplateEditorPayload = {
   account_id: string;
-  toAdd: { product_id: string; box_count: number; bottle_count: number }[];
-  toUpdate: { id: string; box_count: number; bottle_count: number }[];
+  toAdd: { product_id: string; box_count: number; unit_count: number }[];
+  toUpdate: { id: string; box_count: number; unit_count: number }[];
   toRemove: string[];
 };
 
@@ -39,20 +39,20 @@ type TemplateEditorProps = {
 type ItemsAction =
   | { type: "add"; productId: string }
   | { type: "remove"; productId: string }
-  | { type: "update"; productId: string; patch: { boxes?: number; extra_bottles?: number } };
+  | { type: "update"; productId: string; patch: { boxes?: number; extra_units?: number } };
 
 function templateItemsToState(template: TemplateWithItems | null): TemplateItemState[] {
   return (template?.template_items ?? []).map((item) => ({
     id: item.id,
     product_id: item.product_id,
     boxes: item.box_count,
-    extra_bottles: item.bottle_count,
+    extra_units: item.unit_count,
     kind: "existing" as const,
   }));
 }
 
 function toOrderRequestInput(item: TemplateItemState): OrderRequestItemInput {
-  return { product_id: item.product_id, boxes: item.boxes, extra_bottles: item.extra_bottles };
+  return { product_id: item.product_id, boxes: item.boxes, extra_units: item.extra_units };
 }
 
 function buildPayload(accountId: string, items: TemplateItemState[]): TemplateEditorPayload {
@@ -60,17 +60,17 @@ function buildPayload(accountId: string, items: TemplateItemState[]): TemplateEd
     account_id: accountId,
     toAdd: items
       .filter((i) => i.kind === "added")
-      .map(({ product_id, boxes, extra_bottles }) => ({
+      .map(({ product_id, boxes, extra_units }) => ({
         product_id,
         box_count: boxes,
-        bottle_count: extra_bottles,
+        unit_count: extra_units,
       })),
     toUpdate: items
       .filter((i) => i.kind === "updated" && i.id !== null)
-      .map(({ id, boxes, extra_bottles }) => ({
+      .map(({ id, boxes, extra_units }) => ({
         id: id as string,
         box_count: boxes,
-        bottle_count: extra_bottles,
+        unit_count: extra_units,
       })),
     toRemove: items.filter((i) => i.kind === "removed" && i.id !== null).map((i) => i.id as string),
   };
@@ -81,7 +81,7 @@ function itemsReducer(state: TemplateItemState[], action: ItemsAction): Template
     case "add":
       return [
         ...state,
-        { id: null, product_id: action.productId, boxes: 1, extra_bottles: 0, kind: "added" },
+        { id: null, product_id: action.productId, boxes: 1, extra_units: 0, kind: "added" },
       ];
     case "remove":
       return state.map((item) =>
@@ -118,7 +118,7 @@ export function TemplateEditor({
     dispatch({ type: "remove", productId });
   }
 
-  function handleUpdateItem(productId: string, patch: { boxes?: number; extra_bottles?: number }) {
+  function handleUpdateItem(productId: string, patch: { boxes?: number; extra_units?: number }) {
     dispatch({ type: "update", productId, patch });
   }
 
@@ -227,7 +227,7 @@ function ReadOnlyItemsList({ items, products }: ReadOnlyItemsListProps) {
             name={product?.name ?? item.product_id}
             qtyPerBox={product?.qty_per_box ?? 1}
             boxes={item.boxes}
-            bottles={item.extra_bottles}
+            units={item.extra_units}
           />
         );
       })}

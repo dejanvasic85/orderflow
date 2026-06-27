@@ -10,7 +10,7 @@ const baseOrder: OrderHistoryItem = {
   placedByName: "Alice Smith",
   created_at: "2024-06-15T12:00:00Z",
   total_boxes: 3,
-  total_bottles: 5,
+  total_units: 5,
 };
 
 const externalOrder: OrderHistoryItem = {
@@ -39,11 +39,11 @@ describe("OrderHistoryCard", () => {
     expect(screen.getByText("boxes")).toBeInTheDocument();
   });
 
-  it("renders total bottles count", () => {
+  it("renders total units count", () => {
     render(<OrderHistoryCard order={baseOrder} />);
 
     expect(screen.getByText("5")).toBeInTheDocument();
-    expect(screen.getByText("bottles")).toBeInTheDocument();
+    expect(screen.getByText("units")).toBeInTheDocument();
   });
 
   it("renders the date as an amber pill", () => {

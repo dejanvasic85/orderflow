@@ -44,7 +44,7 @@ function NewOrderPage() {
   }: {
     templateId: string | null;
     deliveryInstructions: string | null;
-    items: { product_id: string; boxes: number; extra_bottles: number }[];
+    items: { product_id: string; boxes: number; extra_units: number }[];
   }) {
     const result = await createOrderRequest({
       data: {

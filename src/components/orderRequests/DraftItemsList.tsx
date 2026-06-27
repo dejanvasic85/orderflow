@@ -6,7 +6,7 @@ import { OrderItemCard } from "./OrderItemCard";
 type DraftItemsListProps = {
   items: OrderRequestItemInput[];
   products: ProductRow[];
-  onUpdate: (productId: string, patch: { boxes?: number; extra_bottles?: number }) => void;
+  onUpdate: (productId: string, patch: { boxes?: number; extra_units?: number }) => void;
   onRemove: (productId: string) => void;
 };
 
@@ -32,7 +32,7 @@ export function DraftItemsList({ items, products, onUpdate, onRemove }: DraftIte
                 name={product?.name ?? item.product_id}
                 qtyPerBox={product?.qty_per_box ?? 1}
                 boxes={item.boxes}
-                bottles={item.extra_bottles}
+                units={item.extra_units}
                 onUpdate={(patch) => onUpdate(item.product_id, patch)}
                 onRemove={() => onRemove(item.product_id)}
               />

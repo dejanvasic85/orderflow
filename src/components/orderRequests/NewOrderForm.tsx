@@ -59,7 +59,7 @@ export function NewOrderForm({
 
   function handleAddDraftItem(productId: string) {
     if (draftItems.some((i) => i.product_id === productId)) return;
-    updateDraft([...draftItems, { product_id: productId, boxes: 1, extra_bottles: 0 }]);
+    updateDraft([...draftItems, { product_id: productId, boxes: 1, extra_units: 0 }]);
   }
 
   function handleRemoveDraftItem(productId: string) {
@@ -68,7 +68,7 @@ export function NewOrderForm({
 
   function handleUpdateDraftItem(
     productId: string,
-    patch: { boxes?: number; extra_bottles?: number },
+    patch: { boxes?: number; extra_units?: number },
   ) {
     updateDraft(draftItems.map((i) => (i.product_id === productId ? { ...i, ...patch } : i)));
   }
@@ -78,7 +78,7 @@ export function NewOrderForm({
       template?.template_items.map((item) => ({
         product_id: item.product_id,
         boxes: item.box_count,
-        extra_bottles: item.bottle_count,
+        extra_units: item.unit_count,
       })) ?? [];
 
     const items = [...templateItems, ...draftItems];

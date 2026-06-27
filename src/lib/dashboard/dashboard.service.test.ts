@@ -6,8 +6,8 @@ import {
   buildRecentActivity,
   buildTopProducts,
   getDashboardData,
-  itemBottleVolume,
-  orderBottleVolume,
+  itemUnitVolume,
+  orderUnitVolume,
   type DashboardServiceDeps,
 } from "./dashboard.service";
 
@@ -36,13 +36,13 @@ function makeOrder(overrides: Partial<DashboardOrderRow> = {}): DashboardOrderRo
 
 const fixedNow = new Date("2026-06-20T12:00:00Z");
 
-describe("itemBottleVolume", () => {
-  it("calculates boxes times qty_per_box plus extra_bottles", () => {
+describe("itemUnitVolume", () => {
+  it("calculates boxes times qty_per_box plus extra_units", () => {
     expect(
-      itemBottleVolume({
+      itemUnitVolume({
         product_id: "p-1",
         boxes: 2,
-        extra_bottles: 3,
+        extra_units: 3,
         products: { id: "p-1", name: "Shiraz", qty_per_box: 6 },
       }),
     ).toBe(15);
@@ -50,57 +50,55 @@ describe("itemBottleVolume", () => {
 
   it("treats null boxes as zero", () => {
     expect(
-      itemBottleVolume({
+      itemUnitVolume({
         product_id: "p-1",
         boxes: null,
-        extra_bottles: 4,
+        extra_units: 4,
         products: { id: "p-1", name: "Shiraz", qty_per_box: 6 },
       }),
     ).toBe(4);
   });
 
-  it("treats null extra_bottles as zero", () => {
+  it("treats null extra_units as zero", () => {
     expect(
-      itemBottleVolume({
+      itemUnitVolume({
         product_id: "p-1",
         boxes: 2,
-        extra_bottles: null,
+        extra_units: null,
         products: { id: "p-1", name: "Shiraz", qty_per_box: 6 },
       }),
     ).toBe(12);
   });
 
   it("treats missing products join as zero qty_per_box", () => {
-    expect(
-      itemBottleVolume({ product_id: "p-1", boxes: 3, extra_bottles: 2, products: null }),
-    ).toBe(2);
+    expect(itemUnitVolume({ product_id: "p-1", boxes: 3, extra_units: 2, products: null })).toBe(2);
   });
 });
 
-describe("orderBottleVolume", () => {
+describe("orderUnitVolume", () => {
   it("sums volumes across all items", () => {
     const row = makeOrder({
       order_request_items: [
         {
           product_id: "p-1",
           boxes: 2,
-          extra_bottles: 0,
+          extra_units: 0,
           products: { id: "p-1", name: "Shiraz", qty_per_box: 6 },
         },
         {
           product_id: "p-2",
           boxes: 1,
-          extra_bottles: 3,
+          extra_units: 3,
           products: { id: "p-2", name: "Pinot", qty_per_box: 12 },
         },
       ],
     });
 
-    expect(orderBottleVolume(row)).toBe(27);
+    expect(orderUnitVolume(row)).toBe(27);
   });
 
   it("returns zero for an order with no items", () => {
-    expect(orderBottleVolume(makeOrder({ order_request_items: [] }))).toBe(0);
+    expect(orderUnitVolume(makeOrder({ order_request_items: [] }))).toBe(0);
   });
 });
 
@@ -122,7 +120,7 @@ describe("buildKpiSummary", () => {
           {
             product_id: "p-1",
             boxes: 2,
-            extra_bottles: 0,
+            extra_units: 0,
             products: { id: "p-1", name: "Shiraz", qty_per_box: 6 },
           },
         ],
@@ -134,7 +132,7 @@ describe("buildKpiSummary", () => {
           {
             product_id: "p-2",
             boxes: 1,
-            extra_bottles: 0,
+            extra_units: 0,
             products: { id: "p-2", name: "Pinot", qty_per_box: 12 },
           },
         ],
@@ -253,20 +251,20 @@ describe("buildTopProducts", () => {
     expect(buildTopProducts([])).toEqual([]);
   });
 
-  it("ranks products by descending bottle volume", () => {
+  it("ranks products by descending unit volume", () => {
     const rows = [
       makeOrder({
         order_request_items: [
           {
             product_id: "p-1",
             boxes: 1,
-            extra_bottles: 0,
+            extra_units: 0,
             products: { id: "p-1", name: "Shiraz", qty_per_box: 6 },
           },
           {
             product_id: "p-2",
             boxes: 2,
-            extra_bottles: 0,
+            extra_units: 0,
             products: { id: "p-2", name: "Pinot", qty_per_box: 12 },
           },
         ],
@@ -289,7 +287,7 @@ describe("buildTopProducts", () => {
           {
             product_id: "p-1",
             boxes: 1,
-            extra_bottles: 0,
+            extra_units: 0,
             products: { id: "p-1", name: "Shiraz", qty_per_box: 6 },
           },
         ],
@@ -300,7 +298,7 @@ describe("buildTopProducts", () => {
           {
             product_id: "p-1",
             boxes: 2,
-            extra_bottles: 0,
+            extra_units: 0,
             products: { id: "p-1", name: "Shiraz", qty_per_box: 6 },
           },
         ],
@@ -320,13 +318,13 @@ describe("buildTopProducts", () => {
           {
             product_id: "p-b",
             boxes: 1,
-            extra_bottles: 0,
+            extra_units: 0,
             products: { id: "p-b", name: "Zinfandel", qty_per_box: 6 },
           },
           {
             product_id: "p-a",
             boxes: 1,
-            extra_bottles: 0,
+            extra_units: 0,
             products: { id: "p-a", name: "Albariño", qty_per_box: 6 },
           },
         ],
@@ -343,7 +341,7 @@ describe("buildTopProducts", () => {
     const items = Array.from({ length: 8 }, (_, i) => ({
       product_id: `p-${i}`,
       boxes: 1,
-      extra_bottles: 0,
+      extra_units: 0,
       products: { id: `p-${i}`, name: `Product ${i}`, qty_per_box: 6 },
     }));
     const rows = [makeOrder({ order_request_items: items })];
@@ -354,7 +352,7 @@ describe("buildTopProducts", () => {
   it("skips items with no products join", () => {
     const rows = [
       makeOrder({
-        order_request_items: [{ product_id: "p-1", boxes: 2, extra_bottles: 0, products: null }],
+        order_request_items: [{ product_id: "p-1", boxes: 2, extra_units: 0, products: null }],
       }),
     ];
 
@@ -377,7 +375,7 @@ describe("buildRecentActivity", () => {
         {
           product_id: "p-1",
           boxes: 1,
-          extra_bottles: 0,
+          extra_units: 0,
           products: { id: "p-1", name: "Shiraz", qty_per_box: 6 },
         },
       ],
