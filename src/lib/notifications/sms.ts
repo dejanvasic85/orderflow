@@ -1,5 +1,6 @@
 import { SNSClient, PublishCommand } from "@aws-sdk/client-sns";
 import { getServerConfig } from "@/lib/config";
+import { log } from "@/lib/log/logger";
 
 type SendSmsInput = {
   to: string;
@@ -10,7 +11,7 @@ export async function sendSms(input: SendSmsInput): Promise<void> {
   const { AWS_REGION: region } = getServerConfig();
 
   if (!region) {
-    console.log("[sms] AWS not configured — would send to:", input.to, "| body:", input.body);
+    log.debug("notify.sms", "skipped — AWS not configured", { to: input.to });
     return;
   }
 

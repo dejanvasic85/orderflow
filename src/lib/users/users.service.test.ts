@@ -57,12 +57,15 @@ function makeRepo(overrides: Partial<UserRepository> = {}): UserRepository {
   };
 }
 
+const fakeLog = { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() };
+
 function makeDeps(overrides: Partial<UserServiceDeps> = {}): UserServiceDeps {
   return {
     repo: makeRepo(),
     session: vi.fn().mockResolvedValue({ id: "session-user", email: "admin@example.com" }),
     authorize: vi.fn().mockResolvedValue(undefined),
     authorizeStaff: vi.fn().mockResolvedValue(undefined),
+    log: fakeLog,
     notify: {
       passwordSet: vi.fn().mockResolvedValue(undefined),
       passwordReset: vi.fn().mockResolvedValue({ success: true }),
@@ -306,6 +309,10 @@ describe("updateUser — active flag path", () => {
     expect(result).toEqual(err({ message: "Failed to update user login access" }));
     expect(updateUserFn).toHaveBeenCalledTimes(2);
     expect(updateUserFn).toHaveBeenLastCalledWith("u-1", { active: true });
+    expect(fakeLog.error).toHaveBeenCalledWith("user.ban", "sync failed, rolled back active flag", {
+      userId: "u-1",
+      error: "ban failed",
+    });
   });
 
   it("does not call syncAuthBanStatus when active is not in the update", async () => {
@@ -401,6 +408,11 @@ describe("inviteUser", () => {
 
     expect(result).toEqual(err({ message: "Unable to complete user invitation" }));
     expect(deleteAuthUser).toHaveBeenCalledWith("u-new");
+    expect(fakeLog.error).toHaveBeenCalledWith(
+      "invite",
+      "db update failed, rolled back auth user",
+      { error: "db error" },
+    );
   });
 
   it("calls deleteAuthUser when account assignment fails (rollback)", async () => {
@@ -416,6 +428,11 @@ describe("inviteUser", () => {
 
     expect(result).toEqual(err({ message: "Unable to complete user invitation" }));
     expect(deleteAuthUser).toHaveBeenCalledWith("u-new");
+    expect(fakeLog.error).toHaveBeenCalledWith(
+      "invite",
+      "account assignment failed, rolled back auth user",
+      { error: "assign error" },
+    );
   });
 
   it("returns an assembled User object on success", async () => {
@@ -536,7 +553,7 @@ describe("setUserPassword", () => {
     expect(result).toEqual(err({ message: "Target user not found" }));
   });
 
-  it("calls notify.passwordSet after successfully setting the password", async () => {
+  it("calls notify.passwordSet and logs after successfully setting the password", async () => {
     const passwordSet = vi.fn().mockResolvedValue(undefined);
     const deps = makeDeps({
       session: vi.fn().mockResolvedValue({ id: "admin-1" }),
@@ -552,6 +569,10 @@ describe("setUserPassword", () => {
     expect(passwordSet).toHaveBeenCalledWith({
       email: "target@example.com",
       adminName: "Admin Joe",
+    });
+    expect(fakeLog.info).toHaveBeenCalledWith("admin.password", "set for user", {
+      userId: "u-target",
+      actorId: "admin-1",
     });
   });
 

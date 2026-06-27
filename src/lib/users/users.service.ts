@@ -1,3 +1,4 @@
+import type { Logger } from "@/lib/log/logger";
 import { err, ok, type Result } from "@/lib/result";
 import { parseNotificationPrefs } from "./notificationPrefs";
 import type {
@@ -17,6 +18,7 @@ export type UserServiceDeps = {
   session: () => Promise<SessionUser>;
   authorize: () => Promise<void>;
   authorizeStaff: () => Promise<void>;
+  log: Logger;
   notify: {
     passwordSet: (input: { email: string; adminName: string }) => Promise<void>;
     passwordReset: (
@@ -109,7 +111,10 @@ export async function updateUser(
   if (active !== undefined) {
     const banResult = await deps.repo.syncAuthBanStatus(id, active);
     if (!banResult.ok) {
-      console.error("Failed to sync auth ban status, rolling back active flag:", banResult.error);
+      deps.log.error("user.ban", "sync failed, rolled back active flag", {
+        userId: id,
+        error: banResult.error.message,
+      });
       await deps.repo.updateUser(id, { active: !active });
       return err({ message: "Failed to update user login access" });
     }
@@ -150,7 +155,9 @@ export async function inviteUser(
     notification_preferences: data.notificationPreferences,
   });
   if (!updateResult.ok) {
-    console.error("Post-invite DB update failed, rolling back auth user:", updateResult.error);
+    deps.log.error("invite", "db update failed, rolled back auth user", {
+      error: updateResult.error.message,
+    });
     await deps.repo.deleteAuthUser(newUserId);
     return err({ message: "Unable to complete user invitation" });
   }
@@ -158,10 +165,9 @@ export async function inviteUser(
   if (data.accountIds.length > 0) {
     const assignResult = await deps.repo.addUserToAccounts(newUserId, data.accountIds);
     if (!assignResult.ok) {
-      console.error(
-        "Post-invite account assignment failed, rolling back auth user:",
-        assignResult.error,
-      );
+      deps.log.error("invite", "account assignment failed, rolled back auth user", {
+        error: assignResult.error.message,
+      });
       await deps.repo.deleteAuthUser(newUserId);
       return err({ message: "Unable to complete user invitation" });
     }
@@ -248,7 +254,7 @@ export async function setUserPassword(
   if (!passwordResult.ok) return passwordResult;
 
   const adminName = nameResult.ok ? (nameResult.value ?? "An administrator") : "An administrator";
-  console.info("[admin] password set for user", data.userId, "by", sessionUser.id);
+  deps.log.info("admin.password", "set for user", { userId: data.userId, actorId: sessionUser.id });
   await deps.notify.passwordSet({ email: emailResult.value, adminName });
 
   return ok();

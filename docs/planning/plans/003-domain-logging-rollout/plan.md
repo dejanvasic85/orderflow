@@ -1,7 +1,7 @@
 ---
 title: "Domain logging rollout: Execution Plan"
 number: "003"
-status: planning
+status: done
 created: "2026-06-27"
 updated: "2026-06-27"
 idea: "2026-06-27-production-logging-tracing.md"
