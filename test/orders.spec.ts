@@ -86,7 +86,7 @@ test.describe("Orders", () => {
     await expect(page.getByText("Cellar Door Co.")).toBeVisible();
   });
 
-  test("editing a draft item's box and bottle quantities updates its total", async ({ page }) => {
+  test("editing a draft item's box and unit quantities updates its total", async ({ page }) => {
     await login(page, { user: "priya" });
 
     await expect(page.getByRole("heading", { name: "Harvest Table" })).toBeVisible();
@@ -113,17 +113,17 @@ test.describe("Orders", () => {
       .last();
     const ginTotal = () => ginCard.getByText("Total").locator("xpath=following-sibling::*[1]");
 
-    // New draft items start at 1 box, 0 bottles → total = 1 * 6 + 0 = 6.
+    // New draft items start at 1 box, 0 units → total = 1 * 6 + 0 = 6.
     await expect(ginTotal()).toHaveText("6");
 
     // Increase boxes to 2 → total = 2 * 6 + 0 = 12.
     await ginCard.getByRole("button", { name: "Increase boxes" }).click();
     await expect(ginTotal()).toHaveText("12");
 
-    // Add 3 extra bottles → total = 2 * 6 + 3 = 15.
-    await ginCard.getByRole("button", { name: "Increase bottles" }).click();
-    await ginCard.getByRole("button", { name: "Increase bottles" }).click();
-    await ginCard.getByRole("button", { name: "Increase bottles" }).click();
+    // Add 3 extra units → total = 2 * 6 + 3 = 15.
+    await ginCard.getByRole("button", { name: "Increase units" }).click();
+    await ginCard.getByRole("button", { name: "Increase units" }).click();
+    await ginCard.getByRole("button", { name: "Increase units" }).click();
     await expect(ginTotal()).toHaveText("15");
   });
 });
