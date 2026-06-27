@@ -81,7 +81,7 @@ export async function verifyOtpToken(token_hash: string, type: string, next: str
   });
 
   if (error) {
-    log.error("auth.otp", "verify failed", { type, error });
+    log.error("auth.otp", "verify failed", { type, error: error.message });
     return { success: false as const };
   }
 

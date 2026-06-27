@@ -31,7 +31,7 @@ export async function verifyCallback({
       minDelay(),
     ]);
     if (error) {
-      log.error("auth.callback", "set session failed", { error });
+      log.error("auth.callback", "set session failed", { error: error.message });
       return err({ message: error.message });
     }
     log.info("auth.callback", "verified", { type: effectiveType });
@@ -45,7 +45,7 @@ export async function verifyCallback({
 
   const [{ error }] = await Promise.all([supabase.auth.exchangeCodeForSession(code), minDelay()]);
   if (error) {
-    log.error("auth.callback", "code exchange failed", { error });
+    log.error("auth.callback", "code exchange failed", { error: error.message });
     return err({ message: error.message });
   }
 

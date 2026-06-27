@@ -5,6 +5,11 @@ import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import type { UserAccount, UserRole } from "./schema";
 import { userPageSize } from "./schema";
 
+function maskEmail(email: string): string {
+  const [local, domain] = email.split("@");
+  return `${local[0]}***@${domain}`;
+}
+
 export const userListSelect = `
   id, name, email, phone, active, invite_accepted_at, invited_at, role, notification_preferences, created_at, updated_at,
   account_users!user_id ( account:accounts ( id, name ) )
@@ -257,10 +262,10 @@ export function createUserRepository(): UserRepository {
         redirectTo: `${options.redirectTo}/auth/callback`,
       });
       if (error) {
-        log.error("invite", "send failed", { email, error });
+        log.error("invite", "send failed", { email: maskEmail(email), error: error.message });
         return err({ message: "Unable to send user invitation" });
       }
-      log.info("invite", "sent", { email });
+      log.info("invite", "sent", { email: maskEmail(email) });
       return ok({ userId: data.user.id });
     },
 
@@ -292,10 +297,10 @@ export function createUserRepository(): UserRepository {
         redirectTo: `${redirectTo}/auth/callback`,
       });
       if (error) {
-        log.error("invite", "resend failed", { email, error });
+        log.error("invite", "resend failed", { email: maskEmail(email), error: error.message });
         return err({ message: "Unable to resend invitation" });
       }
-      log.info("invite", "resent", { email });
+      log.info("invite", "resent", { email: maskEmail(email) });
       return ok();
     },
 
