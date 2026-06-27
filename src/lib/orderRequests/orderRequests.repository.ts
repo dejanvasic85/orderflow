@@ -1,3 +1,4 @@
+import { log } from "@/lib/log/logger";
 import { err, ok, type Result } from "@/lib/result";
 import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
@@ -52,7 +53,10 @@ export function createOrderRequestRepository(): OrderRequestRepository {
         .select(orderRequestWithItemsSelect)
         .eq("account_id", accountId)
         .order("created_at", { ascending: false });
-      if (error) return err({ message: error.message });
+      if (error) {
+        log.error("order.db", "fetch orders failed", { error: error.message });
+        return err({ message: error.message });
+      }
       // The PostgREST-inferred embedded-relation type is structurally close but not
       // assignable to OrderRequestWithItems (subtle nullability on nested relations).
       return ok((data ?? []) as OrderRequestWithItems[]);
@@ -65,7 +69,10 @@ export function createOrderRequestRepository(): OrderRequestRepository {
         .select(orderRequestWithItemsSelect)
         .eq("id", id)
         .single();
-      if (error) return err({ message: error.message });
+      if (error) {
+        log.error("order.db", "fetch order failed", { error: error.message });
+        return err({ message: error.message });
+      }
       return ok(data as OrderRequestWithItems);
     },
 
@@ -76,7 +83,10 @@ export function createOrderRequestRepository(): OrderRequestRepository {
         .select(orderHistorySelect)
         .eq("account_id", accountId)
         .order("created_at", { ascending: false });
-      if (error) return err({ message: error.message });
+      if (error) {
+        log.error("order.db", "fetch history failed", { error: error.message });
+        return err({ message: error.message });
+      }
       return ok(data ?? []);
     },
 
@@ -95,7 +105,10 @@ export function createOrderRequestRepository(): OrderRequestRepository {
       query = query.range(from, from + orderPageSize - 1);
 
       const { data, error, count } = await query;
-      if (error) return err({ message: error.message });
+      if (error) {
+        log.error("order.db", "fetch all history failed", { error: error.message });
+        return err({ message: error.message });
+      }
       return ok({ rows: data ?? [], total: count ?? 0 });
     },
 
@@ -114,11 +127,17 @@ export function createOrderRequestRepository(): OrderRequestRepository {
         .insert({ ...orderData, placed_by: placedById })
         .select("id, order_number")
         .single();
-      if (orderError) return err({ message: orderError.message });
+      if (orderError) {
+        log.error("order.db", "create order failed", { error: orderError.message });
+        return err({ message: orderError.message });
+      }
 
       const itemRows = items.map((item) => ({ ...item, order_request_id: order.id }));
       const { error: itemsError } = await supabase.from("order_request_items").insert(itemRows);
-      if (itemsError) return err({ message: itemsError.message });
+      if (itemsError) {
+        log.error("order.db", "insert items failed", { error: itemsError.message });
+        return err({ message: itemsError.message });
+      }
 
       return ok(order);
     },

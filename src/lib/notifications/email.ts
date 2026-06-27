@@ -1,5 +1,6 @@
 import { AwsClient } from "aws4fetch";
 import { company, getServerConfig } from "@/lib/config";
+import { log } from "@/lib/log/logger";
 
 type SendEmailInput = {
   to: string;
@@ -88,10 +89,5 @@ export async function sendEmail(input: SendEmailInput): Promise<void> {
     return;
   }
 
-  console.log(
-    "[email] no transport configured — would send to:",
-    input.to,
-    "| subject:",
-    input.subject,
-  );
+  log.debug("notify.email", "skipped — no transport configured", { to: input.to });
 }

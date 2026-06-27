@@ -7,6 +7,7 @@ import {
   sendPasswordReset,
 } from "@/lib/auth/auth.server";
 import { getServerConfig } from "@/lib/config";
+import { log } from "@/lib/log/logger";
 import { notifyAdminPasswordSet } from "@/lib/notifications/notifications.server";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import {
@@ -39,6 +40,7 @@ const deps: UserServiceDeps = {
   session: fetchSessionOrThrow,
   authorize: () => assertAdmin(createSupabaseServerClient()),
   authorizeStaff: () => assertAdminOrStaff(createSupabaseServerClient()),
+  log,
   notify: {
     passwordSet: notifyAdminPasswordSet,
     passwordReset: sendPasswordReset,

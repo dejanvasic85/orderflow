@@ -1,3 +1,4 @@
+import type { Logger } from "@/lib/log/logger";
 import type { NotifyOrderPlacedInput } from "@/lib/notifications/notifications.server";
 import { ok, type Result } from "@/lib/result";
 import { isStaffOrAdmin, type UserRole } from "@/lib/users/schema";
@@ -65,6 +66,7 @@ export type OrderRequestServiceDeps = {
   session: () => Promise<SessionUser>;
   authorize: () => Promise<void>;
   notify: (input: NotifyOrderPlacedInput) => Promise<void>;
+  log: Logger;
 };
 
 export async function listOrderRequestsForAccount(
@@ -122,8 +124,16 @@ export async function placeOrder(
   const user = await deps.session();
 
   const result = await deps.repo.createOrderWithItems(input, user.id);
-  if (!result.ok) return result;
+  if (!result.ok) {
+    deps.log.warn("order.placed", "failed", { userId: user.id });
+    return result;
+  }
 
+  deps.log.info("order.placed", "created", {
+    orderId: result.value.id,
+    userId: user.id,
+    accountId: input.account_id,
+  });
   await fireOrderNotification(deps, result.value, input, user.id);
   return result;
 }
@@ -133,6 +143,8 @@ export async function placeOrderOnBehalf(
   input: CreateOrderRequestInput,
 ): Promise<Result<CreatedOrder>> {
   await deps.authorize();
+  const user = await deps.session();
+  deps.log.info("order.placed", "on behalf", { actorId: user.id });
   return placeOrder(deps, input);
 }
 

@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { fetchSessionOrThrow } from "@/lib/auth/auth.server";
 import { assertAdminOrStaff } from "@/lib/auth/auth.server";
+import { log } from "@/lib/log/logger";
 import { notifyOrderPlaced } from "@/lib/notifications/notifications.server";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import { createOrderRequestRepository } from "./orderRequests.repository";
@@ -21,6 +22,7 @@ const deps: OrderRequestServiceDeps = {
   session: fetchSessionOrThrow,
   authorize: () => assertAdminOrStaff(createSupabaseServerClient()),
   notify: notifyOrderPlaced,
+  log,
 };
 
 export const listOrderRequestsForAccount = createServerFn({

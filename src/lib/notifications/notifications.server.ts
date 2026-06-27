@@ -1,4 +1,5 @@
 import { getServerConfig } from "@/lib/config";
+import { log } from "@/lib/log/logger";
 import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
 import { sendEmail } from "./email";
 import {
@@ -36,12 +37,16 @@ async function fetchOrderRecipients(accountId: string): Promise<NotificationReci
   ]);
 
   if (accountUsersResult.error) {
-    console.error("[notifications] failed to fetch account_users:", accountUsersResult.error);
+    log.error("notify.recipients", "account_users fetch failed", {
+      error: accountUsersResult.error.message,
+    });
     return [];
   }
 
   if (staffAdminResult.error) {
-    console.error("[notifications] failed to fetch staff/admin users:", staffAdminResult.error);
+    log.error("notify.recipients", "staff/admin fetch failed", {
+      error: staffAdminResult.error.message,
+    });
     return [];
   }
 
@@ -56,7 +61,9 @@ async function fetchOrderRecipients(accountId: string): Promise<NotificationReci
       : { data: [], error: null };
 
   if (accountUsersData.error) {
-    console.error("[notifications] failed to fetch account user details:", accountUsersData.error);
+    log.error("notify.recipients", "account user details fetch failed", {
+      error: accountUsersData.error.message,
+    });
     return [];
   }
 
@@ -71,7 +78,7 @@ async function fetchOrderRecipients(accountId: string): Promise<NotificationReci
   const userIds = uniqueUsers.map((u) => u.id);
   const { data: authUsers, error: authError } = await admin.auth.admin.listUsers({ perPage: 1000 });
   if (authError) {
-    console.error("[notifications] failed to fetch auth users:", authError);
+    log.error("notify.recipients", "auth users fetch failed", { error: authError.message });
     return [];
   }
 
@@ -99,17 +106,24 @@ function executeIntent(intent: NotificationIntent): Promise<void> {
       .then((template) =>
         sendEmail({ to: intent.to, subject: template.subject, html: template.html }),
       )
-      .catch((error) => console.error("[notifications] email send failed:", error));
+      .catch((error: unknown) =>
+        log.error("notify.email", "send failed", {
+          error: error instanceof Error ? error.message : String(error),
+        }),
+      );
   }
-  return sendSms({ to: intent.to, body: renderOrderPlacedSms(intent.smsInput) }).catch((error) =>
-    console.error("[notifications] sms send failed:", error),
+  return sendSms({ to: intent.to, body: renderOrderPlacedSms(intent.smsInput) }).catch(
+    (error: unknown) =>
+      log.error("notify.sms", "send failed", {
+        error: error instanceof Error ? error.message : String(error),
+      }),
   );
 }
 
 export async function notifyOrderPlaced(input: NotifyOrderPlacedInput): Promise<void> {
   const recipients = await fetchOrderRecipients(input.accountId);
   if (recipients.length === 0) {
-    console.warn("[notifications] notifyOrderPlaced: no recipients");
+    log.warn("notify", "no recipients", { accountId: input.accountId });
     return;
   }
 
@@ -137,8 +151,10 @@ export async function notifyPasswordChanged(input: { email: string }): Promise<v
   try {
     const template = await renderPasswordChanged({ email: input.email });
     await sendEmail({ to: input.email, subject: template.subject, html: template.html });
-  } catch (error) {
-    console.error("[notifications] password changed email send failed:", error);
+  } catch (error: unknown) {
+    log.error("notify.email", "password changed send failed", {
+      error: error instanceof Error ? error.message : String(error),
+    });
   }
 }
 
@@ -149,7 +165,9 @@ export async function notifyAdminPasswordSet(input: {
   try {
     const template = await renderAdminPasswordSet(input);
     await sendEmail({ to: input.email, subject: template.subject, html: template.html });
-  } catch (error) {
-    console.error("[notifications] admin password set email send failed:", error);
+  } catch (error: unknown) {
+    log.error("notify.email", "admin password set send failed", {
+      error: error instanceof Error ? error.message : String(error),
+    });
   }
 }

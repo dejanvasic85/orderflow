@@ -134,6 +134,8 @@ const orderInput = {
   delivery_address: "1 Vine St",
 };
 
+const fakeLog = { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() };
+
 describe("placeOrder", () => {
   it("creates the order with the session user's id", async () => {
     const createOrderWithItems = vi.fn().mockResolvedValue(ok({ id: "order-1", order_number: 7 }));
@@ -142,11 +144,52 @@ describe("placeOrder", () => {
       session: vi.fn().mockResolvedValue({ id: "u-1" }),
       authorize: vi.fn(),
       notify: vi.fn().mockResolvedValue(undefined),
+      log: fakeLog,
     };
 
     await placeOrder(deps, orderInput);
 
     expect(createOrderWithItems).toHaveBeenCalledWith(orderInput, "u-1");
+  });
+
+  it("logs order.placed created on success", async () => {
+    const deps: OrderRequestServiceDeps = {
+      repo: makeRepo({
+        createOrderWithItems: vi.fn().mockResolvedValue(ok({ id: "order-1", order_number: 7 })),
+      }),
+      session: vi.fn().mockResolvedValue({ id: "u-1" }),
+      authorize: vi.fn(),
+      notify: vi.fn().mockResolvedValue(undefined),
+      log: fakeLog,
+    };
+
+    await placeOrder(deps, orderInput);
+
+    expect(fakeLog.info).toHaveBeenCalledWith("order.placed", "created", {
+      orderId: "order-1",
+      userId: "u-1",
+      accountId: "acc-1",
+    });
+  });
+
+  it("logs order.placed failed and does not notify when the write fails", async () => {
+    const repo = makeRepo({
+      createOrderWithItems: vi.fn().mockResolvedValue(err({ message: "insert failed" })),
+    });
+    const notify = vi.fn();
+    const deps: OrderRequestServiceDeps = {
+      repo,
+      session: vi.fn().mockResolvedValue({ id: "u-1" }),
+      authorize: vi.fn(),
+      notify,
+      log: fakeLog,
+    };
+
+    const result = await placeOrder(deps, orderInput);
+
+    expect(result).toEqual(err({ message: "insert failed" }));
+    expect(notify).not.toHaveBeenCalled();
+    expect(fakeLog.warn).toHaveBeenCalledWith("order.placed", "failed", { userId: "u-1" });
   });
 
   it("notifies with the resolved order details after a successful write", async () => {
@@ -159,6 +202,7 @@ describe("placeOrder", () => {
       session: vi.fn().mockResolvedValue({ id: "u-1" }),
       authorize: vi.fn(),
       notify,
+      log: fakeLog,
     };
 
     await placeOrder(deps, orderInput);
@@ -174,24 +218,6 @@ describe("placeOrder", () => {
       items: [{ productName: "Shiraz", boxes: 2, extraBottles: 1 }],
     });
   });
-
-  it("does not notify when the write fails", async () => {
-    const repo = makeRepo({
-      createOrderWithItems: vi.fn().mockResolvedValue(err({ message: "insert failed" })),
-    });
-    const notify = vi.fn();
-    const deps: OrderRequestServiceDeps = {
-      repo,
-      session: vi.fn().mockResolvedValue({ id: "u-1" }),
-      authorize: vi.fn(),
-      notify,
-    };
-
-    const result = await placeOrder(deps, orderInput);
-
-    expect(result).toEqual(err({ message: "insert failed" }));
-    expect(notify).not.toHaveBeenCalled();
-  });
 });
 
 describe("placeOrderOnBehalf", () => {
@@ -203,12 +229,29 @@ describe("placeOrderOnBehalf", () => {
       session: vi.fn().mockResolvedValue({ id: "u-1" }),
       authorize,
       notify: vi.fn().mockResolvedValue(undefined),
+      log: fakeLog,
     };
 
     await placeOrderOnBehalf(deps, orderInput);
 
     expect(authorize).toHaveBeenCalledTimes(1);
     expect(createOrderWithItems).toHaveBeenCalledWith(orderInput, "u-1");
+  });
+
+  it("logs on behalf info when placing on behalf", async () => {
+    const deps: OrderRequestServiceDeps = {
+      repo: makeRepo({
+        createOrderWithItems: vi.fn().mockResolvedValue(ok({ id: "order-1", order_number: 7 })),
+      }),
+      session: vi.fn().mockResolvedValue({ id: "u-1" }),
+      authorize: vi.fn().mockResolvedValue(undefined),
+      notify: vi.fn().mockResolvedValue(undefined),
+      log: fakeLog,
+    };
+
+    await placeOrderOnBehalf(deps, orderInput);
+
+    expect(fakeLog.info).toHaveBeenCalledWith("order.placed", "on behalf", { actorId: "u-1" });
   });
 
   it("does not place the order when authorization throws", async () => {
@@ -218,6 +261,7 @@ describe("placeOrderOnBehalf", () => {
       session: vi.fn(),
       authorize: vi.fn().mockRejectedValue(new Error("Forbidden")),
       notify: vi.fn(),
+      log: fakeLog,
     };
 
     await expect(placeOrderOnBehalf(deps, orderInput)).rejects.toThrow("Forbidden");
@@ -233,6 +277,7 @@ describe("listAllOrderHistory", () => {
       session: vi.fn(),
       authorize: vi.fn().mockResolvedValue(undefined),
       notify: vi.fn(),
+      log: fakeLog,
     };
 
     const result = await listAllOrderHistory(deps, { q: "no digits" });
@@ -264,6 +309,7 @@ describe("listAllOrderHistory", () => {
       session: vi.fn(),
       authorize: vi.fn().mockResolvedValue(undefined),
       notify: vi.fn(),
+      log: fakeLog,
     };
 
     const result = await listAllOrderHistory(deps, {});
@@ -295,6 +341,7 @@ describe("listAllOrderHistory", () => {
       session: vi.fn(),
       authorize: vi.fn().mockResolvedValue(undefined),
       notify: vi.fn(),
+      log: fakeLog,
     };
 
     const result = await listAllOrderHistory(deps, {});
