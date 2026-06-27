@@ -6,9 +6,12 @@ const serverFnPrefix = "/_serverFn/";
 export function prettyRequestPath(pathname: string): string {
   if (!pathname.startsWith(serverFnPrefix)) return pathname;
 
-  const encoded = pathname.slice(serverFnPrefix.length);
+  const segment = pathname.slice(serverFnPrefix.length);
   try {
-    const decoded = JSON.parse(atob(encoded)) as { file?: string; export?: string };
+    // In the Workers runtime the segment arrives percent-encoded; decode it before
+    // atob. Also normalise URL-safe base64 (-/_ -> +//) so atob doesn't reject it.
+    const base64 = decodeURIComponent(segment).replace(/-/g, "+").replace(/_/g, "/");
+    const decoded = JSON.parse(atob(base64)) as { file?: string; export?: string };
     const name = serverFnName(decoded.export);
     return name ? `serverFn:${name}` : "serverFn";
   } catch {

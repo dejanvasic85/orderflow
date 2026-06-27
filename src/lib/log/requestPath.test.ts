@@ -16,6 +16,18 @@ describe("prettyRequestPath", () => {
     expect(prettyRequestPath(`/_serverFn/${encoded}`)).toBe("serverFn:getSession");
   });
 
+  it("decodes a percent-encoded blob (as it arrives in the Workers runtime)", () => {
+    const base64 = btoa(
+      JSON.stringify({
+        file: "/src/lib/products/products.functions.ts?tss-serverfn-split",
+        export: "listProducts_createServerFn_handler",
+      }),
+    );
+    const percentEncoded = encodeURIComponent(base64);
+
+    expect(prettyRequestPath(`/_serverFn/${percentEncoded}`)).toBe("serverFn:listProducts");
+  });
+
   it("falls back to serverFn when the blob is not decodable", () => {
     expect(prettyRequestPath("/_serverFn/not-valid-base64-json")).toBe("serverFn");
   });
