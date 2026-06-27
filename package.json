@@ -19,7 +19,6 @@
     "@aws-sdk/client-sns": "3.1075.0",
     "@cloudflare/vite-plugin": "1.42.3",
     "@fontsource-variable/outfit": "5.2.8",
-    "@sentry/tanstackstart-react": "10.61.0",
     "@supabase/ssr": "0.12.0",
     "@supabase/supabase-js": "2.108.2",
     "@tailwindcss/vite": "4.3.1",
