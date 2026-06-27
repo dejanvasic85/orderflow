@@ -6,9 +6,17 @@ const adminUsers: UserPreset[] = ["admin", "sarah", "marcus"];
 
 type LoginOptions = { user: UserPreset };
 
-export async function goto(page: Page, path: string) {
+type GotoOptions = { waitForHydration?: boolean };
+
+export async function goto(
+  page: Page,
+  path: string,
+  { waitForHydration = true }: GotoOptions = {},
+) {
   await page.goto(path);
-  await page.waitForSelector("html[data-hydrated]");
+  if (waitForHydration) {
+    await page.waitForSelector("html[data-hydrated]");
+  }
 }
 
 export async function login(page: Page, { user }: LoginOptions) {
