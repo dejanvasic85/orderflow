@@ -1,3 +1,4 @@
+import { log } from "@/lib/log/logger";
 import { notifyPasswordChanged } from "@/lib/notifications/notifications.server";
 import { err, ok, type Result } from "@/lib/result";
 import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
@@ -60,7 +61,7 @@ async function recordPasswordChangedAt(
     .update({ password_changed_at: new Date().toISOString() })
     .eq("id", userId);
   if (error) {
-    console.error("[auth] failed to record password_changed_at:", error);
+    log.error("auth.password", "record changed-at failed", { error });
   }
 }
 

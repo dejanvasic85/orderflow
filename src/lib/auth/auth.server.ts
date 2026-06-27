@@ -1,4 +1,5 @@
 import type { EmailOtpType } from "@supabase/supabase-js";
+import { log } from "@/lib/log/logger";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
 
 export async function fetchSession() {
@@ -80,7 +81,7 @@ export async function verifyOtpToken(token_hash: string, type: string, next: str
   });
 
   if (error) {
-    console.error("Failed to verify OTP", error);
+    log.error("auth.otp", "verify failed", { type, error });
     return { success: false as const };
   }
 
@@ -95,7 +96,7 @@ export async function assertAdmin(supabase: ReturnType<typeof createSupabaseServ
     .eq("id", sessionUser.id)
     .single();
   if (profileError) {
-    console.error("Failed to fetch user profile for admin check:", profileError);
+    log.error("auth.role", "profile fetch failed", { error: profileError });
     throw new Error("Unauthorized");
   }
   if (profile.role !== "admin") throw new Error("Forbidden");
@@ -109,7 +110,7 @@ export async function assertAdminOrStaff(supabase: ReturnType<typeof createSupab
     .eq("id", sessionUser.id)
     .single();
   if (profileError) {
-    console.error("Failed to fetch user profile for role check:", profileError);
+    log.error("auth.role", "profile fetch failed", { error: profileError });
     throw new Error("Unauthorized");
   }
   if (profile.role !== "admin" && profile.role !== "staff") throw new Error("Forbidden");

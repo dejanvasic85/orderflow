@@ -1,3 +1,4 @@
+import { log } from "@/lib/log/logger";
 import { err, ok, type Result } from "@/lib/result";
 import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
@@ -256,9 +257,10 @@ export function createUserRepository(): UserRepository {
         redirectTo: `${options.redirectTo}/auth/callback`,
       });
       if (error) {
-        console.error("Failed to send invite:", error);
+        log.error("invite", "send failed", { email, error });
         return err({ message: "Unable to send user invitation" });
       }
+      log.info("invite", "sent", { email });
       return ok({ userId: data.user.id });
     },
 
@@ -290,9 +292,10 @@ export function createUserRepository(): UserRepository {
         redirectTo: `${redirectTo}/auth/callback`,
       });
       if (error) {
-        console.error("Failed to resend invite:", error);
+        log.error("invite", "resend failed", { email, error });
         return err({ message: "Unable to resend invitation" });
       }
+      log.info("invite", "resent", { email });
       return ok();
     },
 

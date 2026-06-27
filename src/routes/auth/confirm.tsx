@@ -1,6 +1,7 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { z } from "zod";
 import { verifyOtp } from "@/lib/auth/auth.functions";
+import { log } from "@/lib/log/logger";
 
 const confirmSearchSchema = z.object({
   token_hash: z.string().optional(),
@@ -17,6 +18,10 @@ export const Route = createFileRoute("/auth/confirm")({
   }),
   loader: async ({ deps }) => {
     if (!deps.token_hash || !deps.type) {
+      log.warn("auth.confirm", "missing token or type", {
+        hasToken: !!deps.token_hash,
+        type: deps.type,
+      });
       throw redirect({ to: "/login" });
     }
 
@@ -25,9 +30,11 @@ export const Route = createFileRoute("/auth/confirm")({
     });
 
     if (!result.success) {
+      log.warn("auth.confirm", "otp verification failed", { type: deps.type });
       throw redirect({ to: "/login" });
     }
 
+    log.info("auth.confirm", "verified", { type: deps.type, next: deps.next });
     throw redirect({ to: result.next as "/" });
   },
 });

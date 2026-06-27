@@ -2,8 +2,8 @@
 
 | #   | Plan                                                         | Status   | Depends on | Summary                                                                                               |
 | --- | ------------------------------------------------------------ | -------- | ---------- | ----------------------------------------------------------------------------------------------------- |
-| 001 | [Logging foundation](001-logging-foundation/plan.md)         | planning | —          | Logger util (pretty dev / JSON prod), CF observability on, request middleware, remove dead Sentry dep |
-| 002 | [Auth & invite logging](002-auth-invite-logging/plan.md)     | planning | 001        | Instrument auth/confirm + invite flow — diagnoses the Sam invite/reset bug                            |
+| 001 | [Logging foundation](001-logging-foundation/plan.md)         | done     | —          | Logger util (pretty dev / JSON prod), CF observability on, request middleware, remove dead Sentry dep |
+| 002 | [Auth & invite logging](002-auth-invite-logging/plan.md)     | done     | 001        | Instrument auth/confirm + invite flow — diagnoses the Sam invite/reset bug                            |
 | 003 | [Domain logging rollout](003-domain-logging-rollout/plan.md) | planning | 002        | Convert remaining `console.*`, add audit events across orders/users/notifications                     |
 
 ## Epic: Production logging & tracing

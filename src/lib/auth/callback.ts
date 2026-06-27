@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { log } from "@/lib/log/logger";
 import { err, ok, type Result } from "@/lib/result";
 
 const minDelay = () => new Promise((resolve) => setTimeout(resolve, 3000));
@@ -30,23 +31,25 @@ export async function verifyCallback({
       minDelay(),
     ]);
     if (error) {
-      console.error("An error occurred setting the session in supabase", error);
+      log.error("auth.callback", "set session failed", { error });
       return err({ message: error.message });
     }
+    log.info("auth.callback", "verified", { type: effectiveType });
     return ok({ path: resolveRedirectPath(effectiveType) });
   }
 
   if (!code) {
-    console.error("Invalid or missing verification code. The link may have expired.");
+    log.warn("auth.callback", "missing verification code");
     return err({ message: "Invalid or missing verification code. The link may have expired." });
   }
 
   const [{ error }] = await Promise.all([supabase.auth.exchangeCodeForSession(code), minDelay()]);
   if (error) {
-    console.error("Failed to exchange code for session", error);
+    log.error("auth.callback", "code exchange failed", { error });
     return err({ message: error.message });
   }
 
+  log.info("auth.callback", "verified", { type: effectiveType });
   return ok({ path: resolveRedirectPath(effectiveType) });
 }
 

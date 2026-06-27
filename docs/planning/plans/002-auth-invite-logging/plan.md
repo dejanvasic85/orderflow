@@ -1,7 +1,7 @@
 ---
 title: "Auth & invite logging: Execution Plan"
 number: "002"
-status: planning
+status: done
 created: "2026-06-27"
 updated: "2026-06-27"
 idea: "2026-06-27-production-logging-tracing.md"
