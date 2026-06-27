@@ -62,9 +62,7 @@ test.describe("Authorization — user denied access to an unassigned account", (
   test("cannot view an account she is not assigned to", async ({ page }) => {
     await login(page, { user: "priya" });
 
-    // Navigate directly rather than via the `goto` helper: the error boundary page
-    // never sets html[data-hydrated], so waiting for hydration would hang.
-    await page.goto(`/accounts/${unassignedAccountId}`);
+    await goto(page, `/accounts/${unassignedAccountId}`, { waitForHydration: false });
 
     await expect(page.getByText("Something went wrong!")).toBeVisible();
     await expect(page.getByRole("heading", { name: "The Winery Bistro" })).not.toBeVisible();
