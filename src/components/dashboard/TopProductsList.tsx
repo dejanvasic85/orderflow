@@ -26,7 +26,7 @@ export function TopProductsList({ products }: TopProductsListProps) {
     <div className="flex flex-col gap-4 rounded-xl bg-card p-6 ring-1 ring-foreground/10">
       <div>
         <p className="font-medium">Top products</p>
-        <p className="text-sm text-muted-foreground">By bottles ordered, last 3 months</p>
+        <p className="text-sm text-muted-foreground">By units ordered, last 3 months</p>
       </div>
       <ol className="flex flex-col gap-3">
         {products.map((product, index) => (

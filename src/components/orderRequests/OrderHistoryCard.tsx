@@ -53,8 +53,8 @@ export function OrderHistoryCard({ order, viewHref }: OrderHistoryCardProps) {
           <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
             <Package className="h-3.5 w-3.5 shrink-0" />
             <span>
-              <span className="font-medium text-foreground">{order.total_bottles}</span>
-              {" bottles"}
+              <span className="font-medium text-foreground">{order.total_units}</span>
+              {" units"}
             </span>
           </div>
         </div>

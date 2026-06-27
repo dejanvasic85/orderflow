@@ -99,8 +99,8 @@ describe("saveTemplateItems", () => {
   const validInput = {
     account_id: "acc-1",
     toRemove: ["item-old"],
-    toUpdate: [{ id: "item-2", box_count: 3, bottle_count: 0 }],
-    toAdd: [{ product_id: "prod-1", box_count: 2, bottle_count: 0 }],
+    toUpdate: [{ id: "item-2", box_count: 3, unit_count: 0 }],
+    toAdd: [{ product_id: "prod-1", box_count: 2, unit_count: 0 }],
   };
 
   it("calls authorize before any repo operations", async () => {
@@ -252,7 +252,7 @@ describe("addTemplateItem", () => {
     const item = { id: "item-1", product_id: "prod-1" } as never;
     const createTemplateItem = vi.fn().mockResolvedValue(ok(item));
     const deps = makeDeps({ repo: makeRepo({ createTemplateItem }) });
-    const input = { template_id: "tmpl-1", product_id: "prod-1", box_count: 2, bottle_count: 0 };
+    const input = { template_id: "tmpl-1", product_id: "prod-1", box_count: 2, unit_count: 0 };
 
     const result = await addTemplateItem(deps, input);
 

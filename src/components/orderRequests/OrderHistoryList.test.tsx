@@ -9,7 +9,7 @@ const orderOne: OrderHistoryItem = {
   placedByName: "Alice Smith",
   created_at: "2024-06-01T08:00:00Z",
   total_boxes: 2,
-  total_bottles: 0,
+  total_units: 0,
 };
 
 const orderTwo: OrderHistoryItem = {
@@ -19,7 +19,7 @@ const orderTwo: OrderHistoryItem = {
   placedByName: "Bob Jones",
   created_at: "2024-06-02T09:00:00Z",
   total_boxes: 5,
-  total_bottles: 3,
+  total_units: 3,
 };
 
 describe("OrderHistoryList", () => {

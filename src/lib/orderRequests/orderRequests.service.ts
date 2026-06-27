@@ -38,7 +38,7 @@ export function mapOrderHistoryRow(row: OrderHistoryRow): OrderHistoryItem {
     ...(placedByOrgName ? { placedByOrgName } : {}),
     created_at: row.created_at,
     total_boxes: rowItems.reduce((sum, i) => sum + (i.boxes ?? 0), 0),
-    total_bottles: rowItems.reduce((sum, i) => sum + (i.extra_bottles ?? 0), 0),
+    total_units: rowItems.reduce((sum, i) => sum + (i.extra_units ?? 0), 0),
     ...(account?.name ? { account_name: account.name } : {}),
   };
 }
@@ -170,7 +170,7 @@ async function fireOrderNotification(
   const items = input.items.map((item) => ({
     productName: productMap.get(item.product_id) ?? item.product_id,
     boxes: item.boxes,
-    extraBottles: item.extra_bottles,
+    extraUnits: item.extra_units,
   }));
 
   await deps.notify({

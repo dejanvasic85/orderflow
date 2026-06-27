@@ -56,7 +56,7 @@ const template: TemplateWithItems = {
       template_id: "d4e5f6a7-b8c9-4d0e-9f2a-000000000001",
       product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001",
       box_count: 2,
-      bottle_count: 0,
+      unit_count: 0,
       created_by: null,
       created_at: "2024-01-01T00:00:00Z",
       products: { id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", name: "Rosé", qty_per_box: 6 },
@@ -66,7 +66,7 @@ const template: TemplateWithItems = {
       template_id: "d4e5f6a7-b8c9-4d0e-9f2a-000000000001",
       product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000002",
       box_count: 1,
-      bottle_count: 3,
+      unit_count: 3,
       created_by: null,
       created_at: "2024-01-01T00:00:00Z",
       products: { id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000002", name: "Pinot Noir", qty_per_box: 12 },
@@ -130,7 +130,7 @@ test("renders correct total for each item", async () => {
 
   // Rosé: 2 boxes × 6 = 12
   expect(await screen.findByText("12")).toBeInTheDocument();
-  // Pinot Noir: 1 box × 12 + 3 bottles = 15
+  // Pinot Noir: 1 box × 12 + 3 units = 15
   expect(screen.getByText("15")).toBeInTheDocument();
 });
 
@@ -143,8 +143,8 @@ test("calls onSubmit with mapped payload when submitted with no delivery instruc
     templateId: "d4e5f6a7-b8c9-4d0e-9f2a-000000000001",
     deliveryInstructions: null,
     items: [
-      { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 2, extra_bottles: 0 },
-      { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000002", boxes: 1, extra_bottles: 3 },
+      { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 2, extra_units: 0 },
+      { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000002", boxes: 1, extra_units: 3 },
     ],
   });
 });
@@ -258,7 +258,7 @@ test("removing a draft item removes it from the section", async () => {
   const storedItem: OrderRequestItemInput = {
     product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003",
     boxes: 1,
-    extra_bottles: 0,
+    extra_units: 0,
   };
   loadDraftMock.mockReturnValue([storedItem]);
 
@@ -284,7 +284,7 @@ test("onSubmit is called with both template items and draft items merged", async
   const storedItem: OrderRequestItemInput = {
     product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003",
     boxes: 3,
-    extra_bottles: 1,
+    extra_units: 1,
   };
   loadDraftMock.mockReturnValue([storedItem]);
 
@@ -295,8 +295,8 @@ test("onSubmit is called with both template items and draft items merged", async
   expect(onSubmit).toHaveBeenCalledWith(
     expect.objectContaining({
       items: expect.arrayContaining([
-        { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 2, extra_bottles: 0 },
-        { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003", boxes: 3, extra_bottles: 1 },
+        { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 2, extra_units: 0 },
+        { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003", boxes: 3, extra_units: 1 },
       ]),
     }),
   );
@@ -306,7 +306,7 @@ test("draft items are loaded from localStorage on mount", async () => {
   const storedItem: OrderRequestItemInput = {
     product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003",
     boxes: 2,
-    extra_bottles: 0,
+    extra_units: 0,
   };
   loadDraftMock.mockReturnValue([storedItem]);
 
@@ -331,7 +331,7 @@ test("saveDraft is called when an item is added", async () => {
   await user.click(addButtons[0]);
 
   expect(saveDraftMock).toHaveBeenCalledWith(accountId, [
-    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003", boxes: 1, extra_bottles: 0 },
+    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003", boxes: 1, extra_units: 0 },
   ]);
 });
 
@@ -339,7 +339,7 @@ test("does not load draft from localStorage when persistDraft is false", async (
   const storedItem: OrderRequestItemInput = {
     product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003",
     boxes: 2,
-    extra_bottles: 0,
+    extra_units: 0,
   };
   loadDraftMock.mockReturnValue([storedItem]);
 

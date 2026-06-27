@@ -85,7 +85,7 @@ test("shows 'Add' button for products not in template and not in draftItems", ()
 
 test("shows 'Remove' button for products in draftItems", () => {
   renderDrawer(true, {
-    draftItems: [{ product_id: "prod-2", boxes: 1, extra_bottles: 0 }],
+    draftItems: [{ product_id: "prod-2", boxes: 1, extra_units: 0 }],
   });
 
   expect(screen.getByRole("button", { name: "Remove" })).toBeInTheDocument();
@@ -102,7 +102,7 @@ test("clicking 'Add' calls onAdd with correct productId", async () => {
 
 test("clicking 'Remove' calls onRemove with correct productId", async () => {
   renderDrawer(true, {
-    draftItems: [{ product_id: "prod-2", boxes: 1, extra_bottles: 0 }],
+    draftItems: [{ product_id: "prod-2", boxes: 1, extra_units: 0 }],
   });
 
   await user.click(screen.getByRole("button", { name: "Remove" }));

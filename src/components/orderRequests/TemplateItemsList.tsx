@@ -21,7 +21,7 @@ export function TemplateItemsList({ template }: TemplateItemsListProps) {
           name={item.products.name}
           qtyPerBox={item.products.qty_per_box}
           boxes={item.box_count}
-          bottles={item.bottle_count}
+          units={item.unit_count}
         />
       ))}
     </div>

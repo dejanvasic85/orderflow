@@ -115,7 +115,7 @@ const baseInput = {
   accountName: "Acme Wines",
   placedByName: "Jane Smith",
   deliveryAddress: "1 Vine St",
-  items: [{ productName: "Shiraz", boxes: 2, extraBottles: 1 }],
+  items: [{ productName: "Shiraz", boxes: 2, extraUnits: 1 }],
 };
 
 function recipient(overrides: Partial<NotificationRecipient> = {}): NotificationRecipient {

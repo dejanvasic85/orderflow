@@ -19,7 +19,7 @@ export type OrderRequestWithItems = OrderRequestRow & {
 export const orderRequestItemInputSchema = z.object({
   product_id: z.uuid(),
   boxes: z.number().int().min(0),
-  extra_bottles: z.number().int().min(0),
+  extra_units: z.number().int().min(0),
 });
 
 export const createOrderRequestSchema = z.object({
@@ -40,7 +40,7 @@ export type OrderHistoryItem = {
   placedByName: string;
   placedByOrgName?: string;
   created_at: string;
-  total_bottles: number;
+  total_units: number;
   total_boxes: number;
   account_name?: string;
 };
@@ -52,7 +52,7 @@ export type OrderHistoryRow = {
   order_number: number;
   placed_by: string;
   created_at: string;
-  order_request_items: { boxes: number | null; extra_bottles: number | null }[];
+  order_request_items: { boxes: number | null; extra_units: number | null }[];
   users: unknown;
   accounts?: unknown;
 };

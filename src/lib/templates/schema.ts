@@ -24,7 +24,7 @@ export const addTemplateItemSchema = z.object({
   template_id: z.uuid(),
   product_id: z.uuid(),
   box_count: z.number().int().min(0).optional(),
-  bottle_count: z.number().int().min(0).optional(),
+  unit_count: z.number().int().min(0).optional(),
 });
 
 export const removeTemplateItemSchema = z.object({ id: z.uuid() });
@@ -35,14 +35,14 @@ export const saveTemplateItemsSchema = z.object({
     z.object({
       product_id: z.uuid(),
       box_count: z.number().int().min(0),
-      bottle_count: z.number().int().min(0),
+      unit_count: z.number().int().min(0),
     }),
   ),
   toUpdate: z.array(
     z.object({
       id: z.uuid(),
       box_count: z.number().int().min(0),
-      bottle_count: z.number().int().min(0),
+      unit_count: z.number().int().min(0),
     }),
   ),
   toRemove: z.array(z.uuid()),

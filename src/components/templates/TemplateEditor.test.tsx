@@ -79,7 +79,7 @@ const templateWithOneItem: TemplateWithItems = {
       template_id: "tmpl-1",
       product_id: "prod-1",
       box_count: 2,
-      bottle_count: 3,
+      unit_count: 3,
       created_by: null,
       created_at: "2024-01-01T00:00:00Z",
       products: { id: "prod-1", name: "Chardonnay", qty_per_box: 6 },
@@ -147,7 +147,7 @@ test("save after increment sends item in toUpdate", async () => {
     expect(onSave).toHaveBeenCalledWith({
       account_id: "acc-1",
       toAdd: [],
-      toUpdate: [{ id: "item-1", box_count: 3, bottle_count: 3 }],
+      toUpdate: [{ id: "item-1", box_count: 3, unit_count: 3 }],
       toRemove: [],
     });
   });
@@ -163,14 +163,14 @@ test("save after decrement sends item in toUpdate", async () => {
     />,
   );
 
-  await user.click(screen.getByRole("button", { name: "Decrease bottles" }));
+  await user.click(screen.getByRole("button", { name: "Decrease units" }));
   await user.click(screen.getByRole("button", { name: /save template/i }));
 
   await vi.waitFor(() => {
     expect(onSave).toHaveBeenCalledWith({
       account_id: "acc-1",
       toAdd: [],
-      toUpdate: [{ id: "item-1", box_count: 2, bottle_count: 2 }],
+      toUpdate: [{ id: "item-1", box_count: 2, unit_count: 2 }],
       toRemove: [],
     });
   });
@@ -224,7 +224,7 @@ test("save after adding a new product sends item in toAdd", async () => {
   await vi.waitFor(() => {
     expect(onSave).toHaveBeenCalledWith({
       account_id: "acc-1",
-      toAdd: [{ product_id: "prod-2", box_count: 1, bottle_count: 0 }],
+      toAdd: [{ product_id: "prod-2", box_count: 1, unit_count: 0 }],
       toUpdate: [],
       toRemove: [],
     });

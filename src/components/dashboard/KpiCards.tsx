@@ -61,7 +61,7 @@ export function KpiCards({ kpis }: KpiCardsProps) {
       <KpiCard
         label="Total volume"
         value={kpis.totalVolume.toLocaleString()}
-        sub="Bottles ordered"
+        sub="Units ordered"
         delta={kpis.totalVolumeDelta}
       />
       <KpiCard
