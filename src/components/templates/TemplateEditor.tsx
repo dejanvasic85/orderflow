@@ -224,6 +224,7 @@ function ReadOnlyItemsList({ items, products }: ReadOnlyItemsListProps) {
             key={item.product_id}
             readOnly
             name={product?.name ?? item.product_id}
+            imageUrl={product?.image_url ?? null}
             qtyPerBox={product?.qty_per_box ?? 1}
             boxes={item.boxes}
             units={item.extra_units}

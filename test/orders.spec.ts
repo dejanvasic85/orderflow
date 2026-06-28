@@ -101,19 +101,19 @@ test.describe("Orders", () => {
       .filter({ has: page.getByText(/Rosé/i) })
       .filter({ has: page.getByRole("button", { name: "Increase boxes" }) })
       .last();
-    const roseTotal = () => roseCard.getByText("Total").locator("xpath=following-sibling::*[1]");
 
-    await expect(roseTotal()).toHaveText("6");
+    // The total renders as an animated, per-digit element labelled "Total N".
+    await expect(roseCard.getByLabel("Total 6")).toBeVisible();
 
     // Increase boxes to 2 → total = 2 × 6 + 0 = 12.
     await roseCard.getByRole("button", { name: "Increase boxes" }).click();
-    await expect(roseTotal()).toHaveText("12");
+    await expect(roseCard.getByLabel("Total 12")).toBeVisible();
 
     // Add 3 extra units → total = 2 × 6 + 3 = 15.
     await roseCard.getByRole("button", { name: "Increase units" }).click();
     await roseCard.getByRole("button", { name: "Increase units" }).click();
     await roseCard.getByRole("button", { name: "Increase units" }).click();
-    await expect(roseTotal()).toHaveText("15");
+    await expect(roseCard.getByLabel("Total 15")).toBeVisible();
   });
 
   test("removing a template item from the order and submitting without it", async ({ page }) => {

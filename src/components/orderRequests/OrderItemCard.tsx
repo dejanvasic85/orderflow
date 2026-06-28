@@ -1,11 +1,15 @@
-import { Minus, Package, Plus, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { AnimatedTotal } from "./AnimatedTotal";
+import { ProductThumbnail } from "./ProductThumbnail";
+import { QuantityStepper } from "./QuantityStepper";
 
 type OrderItemCardProps =
   | {
       readOnly: true;
       name: string;
+      imageUrl: string | null;
       qtyPerBox: number;
       boxes: number;
       units: number;
@@ -13,6 +17,7 @@ type OrderItemCardProps =
   | {
       readOnly?: false;
       name: string;
+      imageUrl: string | null;
       qtyPerBox: number;
       boxes: number;
       units: number;
@@ -20,104 +25,73 @@ type OrderItemCardProps =
       onRemove: () => void;
     };
 
+function ReadOnlyStat({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="flex flex-col gap-0.5">
+      <span className="text-xs text-muted-foreground">{label}</span>
+      <span className="text-sm font-medium tabular-nums">{value}</span>
+    </div>
+  );
+}
+
 export function OrderItemCard(props: OrderItemCardProps) {
-  const { name, qtyPerBox, boxes, units } = props;
+  const { name, imageUrl, qtyPerBox, boxes, units } = props;
   const total = boxes * qtyPerBox + units;
 
   return (
     <Card className={props.readOnly ? "border-border/60" : "border-primary/30"}>
-      <CardContent className="px-4 py-2">
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex min-w-0 items-start gap-3">
-            <div
-              className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md ${props.readOnly ? "bg-muted" : "bg-primary/10"}`}
-            >
-              <Package
-                className={`h-4 w-4 ${props.readOnly ? "text-muted-foreground" : "text-primary"}`}
-              />
-            </div>
-            <div className="min-w-0">
-              <p className="truncate font-medium leading-snug">{name}</p>
-              <p className="mt-0.5 text-xs text-muted-foreground">{qtyPerBox} per box</p>
-            </div>
+      <CardContent className="flex flex-col gap-4 px-4 py-3">
+        <div className="flex items-start gap-3">
+          <ProductThumbnail
+            imageUrl={imageUrl}
+            name={name}
+            className={props.readOnly ? "size-11" : "size-14"}
+          />
+          <div className="min-w-0 flex-1">
+            <p className="truncate font-medium leading-snug">{name}</p>
+            <p className="mt-0.5 text-xs text-muted-foreground">{qtyPerBox} per box</p>
           </div>
           {!props.readOnly && (
             <Button
               type="button"
               variant="ghost"
               size="icon"
-              className="h-6 w-6 shrink-0 text-muted-foreground hover:text-destructive"
+              className="size-8 shrink-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
               aria-label={`Remove ${name}`}
               onClick={props.onRemove}
             >
-              <Trash2 className="h-3.5 w-3.5" />
+              <Trash2 />
             </Button>
           )}
         </div>
-        <div className="mt-3 flex w-full items-center justify-between">
-          <div className="flex flex-col gap-1">
-            <p className="text-xs text-muted-foreground">Boxes</p>
-            {props.readOnly ? (
-              <p className="text-sm font-medium">{boxes}</p>
-            ) : (
-              <div className="flex items-center gap-1">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="h-6 w-6"
-                  aria-label="Decrease boxes"
-                  onClick={() => props.onUpdate({ boxes: Math.max(0, boxes - 1) })}
-                >
-                  <Minus className="h-3 w-3" />
-                </Button>
-                <span className="w-5 text-center text-sm font-medium">{boxes}</span>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="h-6 w-6"
-                  aria-label="Increase boxes"
-                  onClick={() => props.onUpdate({ boxes: boxes + 1 })}
-                >
-                  <Plus className="h-3 w-3" />
-                </Button>
-              </div>
-            )}
-          </div>
-          <div className="flex flex-col gap-1">
-            <p className="text-xs text-muted-foreground">Units</p>
-            {props.readOnly ? (
-              <p className="text-sm font-medium">{units}</p>
-            ) : (
-              <div className="flex items-center gap-1">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="h-6 w-6"
-                  aria-label="Decrease units"
-                  onClick={() => props.onUpdate({ extra_units: Math.max(0, units - 1) })}
-                >
-                  <Minus className="h-3 w-3" />
-                </Button>
-                <span className="w-5 text-center text-sm font-medium">{units}</span>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="h-6 w-6"
-                  aria-label="Increase units"
-                  onClick={() => props.onUpdate({ extra_units: units + 1 })}
-                >
-                  <Plus className="h-3 w-3" />
-                </Button>
-              </div>
-            )}
-          </div>
-          <div className="flex flex-col gap-1">
-            <p className="text-xs text-muted-foreground">Total</p>
-            <p className="pt-1 text-sm font-semibold">{total}</p>
+
+        <div className="flex items-end justify-between gap-3">
+          {props.readOnly ? (
+            <div className="flex items-end gap-6">
+              <ReadOnlyStat label="Boxes" value={boxes} />
+              <ReadOnlyStat label="Units" value={units} />
+            </div>
+          ) : (
+            <div className="flex flex-wrap items-end gap-3">
+              <QuantityStepper
+                label="Boxes"
+                value={boxes}
+                onChange={(next) => props.onUpdate({ boxes: next })}
+              />
+              <QuantityStepper
+                label="Units"
+                value={units}
+                onChange={(next) => props.onUpdate({ extra_units: next })}
+              />
+            </div>
+          )}
+          <div className="flex flex-col items-end gap-0.5">
+            <span className="text-xs text-muted-foreground">Total</span>
+            <AnimatedTotal
+              value={total}
+              aria-label={`Total ${total}`}
+              className="text-lg font-semibold tabular-nums"
+            />
           </div>
         </div>
       </CardContent>
