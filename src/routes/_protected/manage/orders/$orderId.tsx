@@ -24,6 +24,14 @@ function AdminOrderDetailsPage() {
     void navigate({ to: "/manage/orders" });
   }
 
+  function handleReorder() {
+    if (!order.accounts?.id) return;
+    void navigate({
+      to: "/manage/orders/new",
+      search: { accountId: order.accounts.id, fromOrderId: order.id },
+    });
+  }
+
   const placedByName = order.users?.name ?? "Unknown";
   const accountName = order.accounts?.name;
 
@@ -31,7 +39,12 @@ function AdminOrderDetailsPage() {
     <>
       <PageHeader title={formatOrderRef(order.order_number)} description={accountName} />
       <PageContent>
-        <OrderDetailsView order={order} placedByName={placedByName} onBack={handleBack} />
+        <OrderDetailsView
+          order={order}
+          placedByName={placedByName}
+          onBack={handleBack}
+          onReorder={order.accounts?.id ? handleReorder : undefined}
+        />
       </PageContent>
     </>
   );

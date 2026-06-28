@@ -1,4 +1,4 @@
-import { ArrowLeft, Box, Calendar, MapPin, Package, User2 } from "lucide-react";
+import { ArrowLeft, Box, Calendar, MapPin, Package, RefreshCw, User2 } from "lucide-react";
 import { OrderItemCard } from "@/components/orderRequests/OrderItemCard";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -10,9 +10,15 @@ type OrderDetailsViewProps = {
   order: OrderRequestWithItems;
   placedByName: string;
   onBack: () => void;
+  onReorder?: () => void;
 };
 
-export function OrderDetailsView({ order, placedByName, onBack }: OrderDetailsViewProps) {
+export function OrderDetailsView({
+  order,
+  placedByName,
+  onBack,
+  onReorder,
+}: OrderDetailsViewProps) {
   const totalBoxes = order.order_request_items.reduce((sum, i) => sum + (i.boxes ?? 0), 0);
   const totalUnits = order.order_request_items.reduce((sum, i) => sum + (i.extra_units ?? 0), 0);
 
@@ -28,6 +34,12 @@ export function OrderDetailsView({ order, placedByName, onBack }: OrderDetailsVi
           <ArrowLeft className="h-4 w-4" />
           Back
         </Button>
+        {onReorder && (
+          <Button variant="outline" size="sm" onClick={onReorder} className="gap-1.5 ml-auto">
+            <RefreshCw className="h-4 w-4" />
+            Re-order
+          </Button>
+        )}
       </div>
 
       <div className="flex flex-col gap-1.5">

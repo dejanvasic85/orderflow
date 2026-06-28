@@ -134,4 +134,74 @@ test.describe("Orders", () => {
     await page.waitForURL("**/success");
     await expect(page.getByRole("heading", { name: "Order submitted" })).toBeVisible();
   });
+
+  test("admin can re-order from the orders list", async ({ page }) => {
+    await login(page, { user: "admin" });
+    await goto(page, "/manage/orders");
+
+    // At least one order is seeded — click its Re-order link.
+    const reorderLink = page.getByRole("link", { name: /re-order/i }).first();
+    await expect(reorderLink).toBeVisible();
+    await reorderLink.click();
+
+    await page.waitForURL("**/manage/orders/new**");
+    await expect(page.getByRole("heading", { name: "New order" }).first()).toBeVisible();
+
+    // Form should be pre-filled with items from the source order.
+    await expect(page.getByRole("button", { name: /submit order/i })).not.toBeDisabled();
+    await page.getByRole("button", { name: /submit order/i }).click();
+
+    // After submit, lands on the created order's detail page.
+    await expect(page.getByRole("heading", { name: /^ORD-\d{4}$/ }).first()).toBeVisible({
+      timeout: 15000,
+    });
+  });
+
+  test("admin can re-order from the order detail page", async ({ page }) => {
+    await login(page, { user: "admin" });
+    // Navigate directly to a seeded order detail page.
+    await goto(page, "/manage/orders/e5f6a7b8-0001-4c9d-8e1f-000000000001");
+
+    await expect(page.getByRole("heading", { name: /^ORD-\d{4}$/ }).first()).toBeVisible();
+
+    const reorderButton = page.getByRole("button", { name: /re-order/i });
+    await expect(reorderButton).toBeVisible();
+    await reorderButton.click();
+
+    await page.waitForURL("**/manage/orders/new**");
+    await expect(page.getByRole("heading", { name: "New order" }).first()).toBeVisible();
+
+    // Form should be pre-filled — Rosé and Pinot Noir were in order 1.
+    await expect(page.getByText(/Rosé/i)).toBeVisible();
+    await expect(page.getByText(/Pinot Noir/i)).toBeVisible();
+
+    await page.getByRole("button", { name: /submit order/i }).click();
+    await expect(page.getByRole("heading", { name: /^ORD-\d{4}$/ }).first()).toBeVisible({
+      timeout: 15000,
+    });
+  });
+
+  test("account user can re-order from the order history list", async ({ page }) => {
+    await login(page, { user: "priya" });
+
+    // Place an initial order so there's something to re-order from.
+    await page.getByRole("button", { name: /new order/i }).click();
+    await page.waitForURL("**/orders/new");
+    await page.getByRole("button", { name: /submit order/i }).click();
+    await page.waitForURL("**/success");
+
+    // Go back to the account page which shows order history.
+    await page.getByRole("link", { name: /back to orders/i }).click();
+    await page.waitForURL("**/accounts/**");
+
+    // Re-order link should now be visible.
+    const reorderLink = page.getByRole("link", { name: /re-order/i }).first();
+    await expect(reorderLink).toBeVisible();
+    await reorderLink.click();
+
+    // Re-order form loads with items pre-filled from the previous order.
+    await page.waitForURL("**/orders/new**");
+    await expect(page.getByRole("heading", { name: "New order" }).first()).toBeVisible();
+    await expect(page.getByRole("button", { name: /submit order/i })).not.toBeDisabled();
+  });
 });

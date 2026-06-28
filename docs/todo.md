@@ -71,6 +71,7 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Productionising | Must | Configure production env vars in GitHub
 - [x] Productionising | Must | Logging and monitoring (Supabase + Cloudflare — consider unifying in Cloudflare logs) sender
 - [x] Feature | Nice | Homepage dashboard — reporting / summary tiles (Phase 4, quoted separately)
+- [ ] Feature | Must | Favicon for the browser and App on the phones
 
 ---
 
@@ -82,10 +83,11 @@ Change requests and bugs:
 - [x] Allow typing of qty rather than plus / minus
 - [x] Use the word Units in the email
 - [x] The order needs an image for the product instead of just text
-- [ ] Users should be able to order again but they should also have ability to edit the items
+- [x] Users should be able to order again but they should also have ability to edit the items
 - [ ] Description for the product isn't required
 - [ ] Add descriptions in the Role dropdown for the User management to explain what roles are capable of what
 - [ ] Users are getting "active" automatically instead of staying pending until they accept
+- [ ] Address details and delivery details should both appear and not cancel each other out
 
 ---
 

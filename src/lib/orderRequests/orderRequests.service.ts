@@ -40,6 +40,7 @@ export function mapOrderHistoryRow(row: OrderHistoryRow): OrderHistoryItem {
     total_boxes: rowItems.reduce((sum, i) => sum + (i.boxes ?? 0), 0),
     total_units: rowItems.reduce((sum, i) => sum + (i.extra_units ?? 0), 0),
     ...(account?.name ? { account_name: account.name } : {}),
+    ...(account?.id ? { account_id: account.id } : {}),
   };
 }
 

@@ -54,6 +54,9 @@ function AccountPage() {
           <OrderHistoryList
             orders={orders}
             buildViewHref={(orderId) => `/accounts/${accountId}/orders/${orderId}`}
+            buildReorderHref={(order) =>
+              `/accounts/${accountId}/orders/new?fromOrderId=${order.id}`
+            }
           />
         </div>
       </PageContent>

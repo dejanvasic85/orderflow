@@ -45,6 +45,7 @@ export type OrderHistoryItem = {
   total_units: number;
   total_boxes: number;
   account_name?: string;
+  account_id?: string;
 };
 
 export type PlacedByUser = { id: string; name: string; role: UserRole } | null;

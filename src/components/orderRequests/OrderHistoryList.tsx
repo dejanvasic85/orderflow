@@ -10,6 +10,7 @@ type OrderHistoryListProps = {
   orders: OrderHistoryItem[];
   total?: number;
   buildViewHref?: (orderId: string) => string;
+  buildReorderHref?: (order: OrderHistoryItem) => string;
   searchQuery?: string;
   currentPage?: number;
   totalPages?: number;
@@ -22,6 +23,7 @@ export function OrderHistoryList({
   orders,
   total,
   buildViewHref,
+  buildReorderHref,
   searchQuery = "",
   currentPage = 1,
   totalPages = 1,
@@ -91,7 +93,12 @@ export function OrderHistoryList({
       ) : (
         <div className="flex flex-col gap-2">
           {orders.map((order) => (
-            <OrderHistoryCard key={order.id} order={order} viewHref={buildViewHref?.(order.id)} />
+            <OrderHistoryCard
+              key={order.id}
+              order={order}
+              viewHref={buildViewHref?.(order.id)}
+              reorderHref={buildReorderHref?.(order)}
+            />
           ))}
         </div>
       )}
