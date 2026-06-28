@@ -2,16 +2,16 @@ import type { OrderRequestItemInput } from "./schema";
 
 const draftKey = (accountId: string) => `draft:${accountId}`;
 
-export function loadDraft(accountId: string): OrderRequestItemInput[] {
-  if (typeof window === "undefined") return [];
+export function loadDraft(accountId: string): OrderRequestItemInput[] | null {
+  if (typeof window === "undefined") return null;
   try {
     const raw = window.localStorage.getItem(draftKey(accountId));
-    if (!raw) return [];
+    if (!raw) return null;
     const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
+    if (!Array.isArray(parsed)) return null;
     return parsed as OrderRequestItemInput[];
   } catch {
-    return [];
+    return null;
   }
 }
 

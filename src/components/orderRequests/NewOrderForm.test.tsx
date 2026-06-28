@@ -107,7 +107,7 @@ let user: ReturnType<typeof userEvent.setup>;
 beforeEach(() => {
   onSubmit.mockResolvedValue(undefined);
   user = userEvent.setup();
-  loadDraftMock.mockReturnValue([]);
+  loadDraftMock.mockReturnValue(null);
 });
 
 function renderForm(overrides?: Partial<React.ComponentProps<typeof NewOrderForm>>) {
@@ -281,12 +281,13 @@ test("adding a product via drawer renders it in the order items section", async 
 });
 
 test("removing an item removes it from the list", async () => {
-  const storedItem: OrderRequestItemInput = {
-    product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003",
-    boxes: 1,
-    extra_units: 0,
-  };
-  loadDraftMock.mockReturnValue([storedItem]);
+  // Saved draft includes both template items and an extra catalog item — the draft
+  // is the full source of truth, so all three appear on load.
+  const savedDraft: OrderRequestItemInput[] = [
+    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 2, extra_units: 0 }, // Rosé (template)
+    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003", boxes: 1, extra_units: 0 }, // Chardonnay (catalog)
+  ];
+  loadDraftMock.mockReturnValue(savedDraft);
 
   renderForm({ products: allProducts });
 
@@ -309,13 +310,13 @@ test("submit enabled when only draft items exist (no template)", async () => {
   expect(await screen.findByRole("button", { name: "Submit order" })).not.toBeDisabled();
 });
 
-test("onSubmit is called with both template items and draft items merged", async () => {
-  const storedItem: OrderRequestItemInput = {
-    product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003",
-    boxes: 3,
-    extra_units: 1,
-  };
-  loadDraftMock.mockReturnValue([storedItem]);
+test("onSubmit uses the saved draft as the complete item list", async () => {
+  // Draft is the full source of truth: template item at modified quantity + extra catalog item.
+  const savedDraft: OrderRequestItemInput[] = [
+    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 5, extra_units: 0 }, // Rosé — user changed from 2→5
+    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003", boxes: 3, extra_units: 1 }, // Chardonnay — catalog item
+  ];
+  loadDraftMock.mockReturnValue(savedDraft);
 
   renderForm();
 
@@ -323,10 +324,10 @@ test("onSubmit is called with both template items and draft items merged", async
 
   expect(onSubmit).toHaveBeenCalledWith(
     expect.objectContaining({
-      items: expect.arrayContaining([
-        { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 2, extra_units: 0 },
+      items: [
+        { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 5, extra_units: 0 },
         { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003", boxes: 3, extra_units: 1 },
-      ]),
+      ],
     }),
   );
 });

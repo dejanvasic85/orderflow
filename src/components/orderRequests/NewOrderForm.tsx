@@ -33,15 +33,15 @@ function buildInitialItems(
   persistDraft: boolean,
   accountId: string,
 ): OrderRequestItemInput[] {
-  const templateItems = (template?.template_items ?? []).map((i) => ({
+  if (persistDraft) {
+    const draft = loadDraft(accountId);
+    if (draft !== null) return draft;
+  }
+  return (template?.template_items ?? []).map((i) => ({
     product_id: i.product_id,
     boxes: i.box_count,
     extra_units: i.unit_count,
   }));
-  const draft = persistDraft ? loadDraft(accountId) : [];
-  const templateIds = new Set(templateItems.map((i) => i.product_id));
-  const extraDraft = draft.filter((i) => !templateIds.has(i.product_id));
-  return [...templateItems, ...extraDraft];
 }
 
 export function NewOrderForm({

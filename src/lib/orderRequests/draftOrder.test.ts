@@ -10,8 +10,8 @@ beforeEach(() => {
   localStorage.clear();
 });
 
-it("loadDraft returns [] when key is absent", () => {
-  expect(loadDraft(accountA)).toEqual([]);
+it("loadDraft returns null when key is absent", () => {
+  expect(loadDraft(accountA)).toBeNull();
 });
 
 it("loadDraft returns stored items after saveDraft", () => {
@@ -20,16 +20,16 @@ it("loadDraft returns stored items after saveDraft", () => {
   expect(loadDraft(accountA)).toEqual([item1, item2]);
 });
 
-it("loadDraft returns [] when localStorage contains invalid JSON", () => {
+it("loadDraft returns null when localStorage contains invalid JSON", () => {
   localStorage.setItem("draft:account-aaa", "not-json{{{");
 
-  expect(loadDraft(accountA)).toEqual([]);
+  expect(loadDraft(accountA)).toBeNull();
 });
 
-it("loadDraft returns [] when stored value is not an array", () => {
+it("loadDraft returns null when stored value is not an array", () => {
   localStorage.setItem("draft:account-aaa", JSON.stringify({ foo: "bar" }));
 
-  expect(loadDraft(accountA)).toEqual([]);
+  expect(loadDraft(accountA)).toBeNull();
 });
 
 it("saveDraft overwrites previous draft for the same accountId", () => {
@@ -39,11 +39,11 @@ it("saveDraft overwrites previous draft for the same accountId", () => {
   expect(loadDraft(accountA)).toEqual([item2]);
 });
 
-it("clearDraft removes the key so loadDraft returns []", () => {
+it("clearDraft removes the key so loadDraft returns null", () => {
   saveDraft(accountA, [item1]);
   clearDraft(accountA);
 
-  expect(loadDraft(accountA)).toEqual([]);
+  expect(loadDraft(accountA)).toBeNull();
 });
 
 it("keys for different accountIds are independent", () => {
@@ -55,6 +55,6 @@ it("keys for different accountIds are independent", () => {
 
   clearDraft(accountA);
 
-  expect(loadDraft(accountA)).toEqual([]);
+  expect(loadDraft(accountA)).toBeNull();
   expect(loadDraft(accountB)).toEqual([item2]);
 });
