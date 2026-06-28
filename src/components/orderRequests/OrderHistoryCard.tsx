@@ -1,4 +1,4 @@
-import { ArrowRight, Box, Building2, Package, User2 } from "lucide-react";
+import { ArrowRight, Box, Building2, Package, RefreshCw, User2 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { formatShortDate } from "@/lib/dates";
 import type { OrderHistoryItem } from "@/lib/orderRequests/schema";
@@ -7,9 +7,10 @@ import { formatOrderRef } from "@/lib/orderRequests/schema";
 type OrderHistoryCardProps = {
   order: OrderHistoryItem;
   viewHref?: string;
+  reorderHref?: string;
 };
 
-export function OrderHistoryCard({ order, viewHref }: OrderHistoryCardProps) {
+export function OrderHistoryCard({ order, viewHref, reorderHref }: OrderHistoryCardProps) {
   return (
     <div className="group relative flex flex-col gap-3 rounded-xl border border-border/60 bg-card p-4 shadow-sm transition-all duration-200 hover:border-border hover:shadow-md sm:flex-row sm:items-center sm:gap-4">
       <div className="flex items-center gap-3 sm:w-32 sm:shrink-0 sm:flex-col sm:items-start sm:gap-1">
@@ -60,15 +61,26 @@ export function OrderHistoryCard({ order, viewHref }: OrderHistoryCardProps) {
         </div>
       </div>
 
-      {viewHref && (
-        <div className="flex justify-end sm:shrink-0">
-          <a
-            href={viewHref}
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground"
-          >
-            View order
-            <ArrowRight className="h-3.5 w-3.5 transition-transform duration-150 group-hover:translate-x-0.5" />
-          </a>
+      {(viewHref || reorderHref) && (
+        <div className="flex items-center justify-end gap-3 sm:shrink-0">
+          {reorderHref && (
+            <a
+              href={reorderHref}
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground"
+            >
+              <RefreshCw className="h-3.5 w-3.5" />
+              Re-order
+            </a>
+          )}
+          {viewHref && (
+            <a
+              href={viewHref}
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground"
+            >
+              View order
+              <ArrowRight className="h-3.5 w-3.5 transition-transform duration-150 group-hover:translate-x-0.5" />
+            </a>
+          )}
         </div>
       )}
     </div>

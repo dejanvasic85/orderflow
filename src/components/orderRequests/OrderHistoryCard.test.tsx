@@ -78,4 +78,32 @@ describe("OrderHistoryCard", () => {
     expect(screen.getByText("bwow")).toBeInTheDocument();
     expect(screen.queryByText("Alice Smith")).not.toBeInTheDocument();
   });
+
+  it("does not render a Re-order link when reorderHref is not provided", () => {
+    render(<OrderHistoryCard order={baseOrder} />);
+
+    expect(screen.queryByRole("link", { name: /re-order/i })).not.toBeInTheDocument();
+  });
+
+  it("renders a Re-order link with the correct href when reorderHref is provided", () => {
+    render(
+      <OrderHistoryCard order={baseOrder} reorderHref="/manage/orders/new?fromOrderId=order-abc" />,
+    );
+
+    const link = screen.getByRole("link", { name: /re-order/i });
+    expect(link).toHaveAttribute("href", "/manage/orders/new?fromOrderId=order-abc");
+  });
+
+  it("renders both View order and Re-order links when both hrefs are provided", () => {
+    render(
+      <OrderHistoryCard
+        order={baseOrder}
+        viewHref="/orders/order-abc"
+        reorderHref="/manage/orders/new?fromOrderId=order-abc"
+      />,
+    );
+
+    expect(screen.getByRole("link", { name: /view order/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /re-order/i })).toBeInTheDocument();
+  });
 });

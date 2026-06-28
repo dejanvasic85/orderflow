@@ -7,7 +7,11 @@ import { AccountCombobox } from "@/components/orderRequests/AccountCombobox";
 import { NewOrderForm } from "@/components/orderRequests/NewOrderForm";
 import { getAccount, listAccounts } from "@/lib/accounts/accounts.functions";
 import type { PagedAccountsResult } from "@/lib/accounts/schema";
-import { createOrderRequestOnBehalf } from "@/lib/orderRequests/orderRequests.functions";
+import {
+  createOrderRequestOnBehalf,
+  getOrderRequestAsAdminOrStaff,
+} from "@/lib/orderRequests/orderRequests.functions";
+import type { OrderRequestItemInput } from "@/lib/orderRequests/schema";
 import { listProducts } from "@/lib/products/products.functions";
 import type { ProductRow } from "@/lib/products/schema";
 import { asResult } from "@/lib/result";
@@ -16,11 +20,12 @@ import { getTemplateForAccount } from "@/lib/templates/templates.functions";
 
 const searchSchema = z.object({
   accountId: z.string().optional(),
+  fromOrderId: z.string().optional(),
 });
 
 export const Route = createFileRoute("/_protected/manage/orders/new")({
   validateSearch: searchSchema,
-  loaderDeps: ({ search }) => ({ accountId: search.accountId }),
+  loaderDeps: ({ search }) => ({ accountId: search.accountId, fromOrderId: search.fromOrderId }),
   loader: async ({ deps }) => {
     const [accountsResult, productsResult] = await Promise.all([
       listAccounts({ data: {} }).then((r) => asResult<PagedAccountsResult>(r)),
@@ -29,7 +34,30 @@ export const Route = createFileRoute("/_protected/manage/orders/new")({
     if (!accountsResult.ok) throw new Error(accountsResult.error.message);
     if (!productsResult.ok) throw new Error(productsResult.error.message);
 
-    if (!deps.accountId) {
+    let sourceOrderItems: OrderRequestItemInput[] | undefined;
+    let resolvedAccountId = deps.accountId;
+
+    if (deps.fromOrderId) {
+      const sourceOrderResult = await getOrderRequestAsAdminOrStaff({ data: deps.fromOrderId });
+      if (!sourceOrderResult.ok) throw new Error(sourceOrderResult.error.message);
+      if (!sourceOrderResult.value) throw new Error("Source order not found");
+      const sourceOrder = sourceOrderResult.value;
+      if (
+        resolvedAccountId &&
+        sourceOrder.account_id &&
+        resolvedAccountId !== sourceOrder.account_id
+      ) {
+        throw new Error("accountId does not match the source order's account");
+      }
+      resolvedAccountId = resolvedAccountId ?? sourceOrder.account_id;
+      sourceOrderItems = sourceOrder.order_request_items.map((i) => ({
+        product_id: i.product_id,
+        boxes: i.boxes ?? 0,
+        extra_units: i.extra_units ?? 0,
+      }));
+    }
+
+    if (!resolvedAccountId) {
       return {
         accounts: accountsResult.value.accounts,
         products: productsResult.value,
@@ -38,8 +66,10 @@ export const Route = createFileRoute("/_protected/manage/orders/new")({
     }
 
     const [accountResult, templateResult] = await Promise.all([
-      getAccount({ data: deps.accountId }),
-      getTemplateForAccount({ data: deps.accountId }),
+      getAccount({ data: resolvedAccountId }),
+      deps.fromOrderId
+        ? Promise.resolve({ ok: true as const, value: null })
+        : getTemplateForAccount({ data: resolvedAccountId }),
     ]);
     if (!accountResult.ok) throw new Error(accountResult.error.message);
     if (!templateResult.ok) throw new Error(templateResult.error.message);
@@ -51,6 +81,7 @@ export const Route = createFileRoute("/_protected/manage/orders/new")({
         ? {
             account: accountResult.value,
             template: templateResult.value as TemplateWithItems | null,
+            initialItems: sourceOrderItems,
           }
         : null,
     };
@@ -60,6 +91,7 @@ export const Route = createFileRoute("/_protected/manage/orders/new")({
 
 function ManageNewOrderPage() {
   const { accounts, products, selected } = Route.useLoaderData();
+  const search = Route.useSearch();
   const navigate = useNavigate();
 
   function handleSelectAccount(accountId: string) {
@@ -108,11 +140,12 @@ function ManageNewOrderPage() {
 
         {selected && (
           <NewOrderForm
-            key={selected.account.id}
+            key={`${selected.account.id}:${search.fromOrderId ?? ""}`}
             accountId={selected.account.id}
             accountName={selected.account.name}
             defaultDeliveryInstructions={selected.account.delivery_instructions ?? null}
             template={selected.template}
+            initialItems={selected.initialItems}
             products={products}
             persistDraft={false}
             onBack={() => void navigate({ to: "/manage/orders" })}

@@ -37,13 +37,26 @@ function OrderDetailsPage() {
     void navigate({ to: "/accounts/$accountId", params: { accountId } });
   }
 
+  function handleReorder() {
+    void navigate({
+      to: "/accounts/$accountId/orders/new",
+      params: { accountId },
+      search: { fromOrderId: order.id },
+    });
+  }
+
   const placedByName = order.users?.name ?? "Unknown";
 
   return (
     <>
       <PageHeader title={formatOrderRef(order.order_number)} description={account.name} />
       <PageContent>
-        <OrderDetailsView order={order} placedByName={placedByName} onBack={handleBack} />
+        <OrderDetailsView
+          order={order}
+          placedByName={placedByName}
+          onBack={handleBack}
+          onReorder={handleReorder}
+        />
       </PageContent>
     </>
   );

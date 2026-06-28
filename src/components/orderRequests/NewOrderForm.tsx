@@ -22,6 +22,7 @@ type NewOrderFormProps = {
   accountName: string;
   defaultDeliveryInstructions: string | null;
   template: TemplateWithItems | null;
+  initialItems?: OrderRequestItemInput[];
   products: ProductRow[];
   persistDraft?: boolean;
   onBack: () => void;
@@ -32,7 +33,9 @@ function buildInitialItems(
   template: TemplateWithItems | null,
   persistDraft: boolean,
   accountId: string,
+  initialItems?: OrderRequestItemInput[],
 ): OrderRequestItemInput[] {
+  if (initialItems !== undefined) return initialItems;
   if (persistDraft) {
     const draft = loadDraft(accountId);
     if (draft !== null) return draft;
@@ -49,13 +52,14 @@ export function NewOrderForm({
   accountName,
   defaultDeliveryInstructions,
   template,
+  initialItems,
   products,
   persistDraft = true,
   onBack,
   onSubmit,
 }: NewOrderFormProps) {
   const [items, setItems] = useState<OrderRequestItemInput[]>(() =>
-    buildInitialItems(template, persistDraft, accountId),
+    buildInitialItems(template, persistDraft, accountId, initialItems),
   );
   const [pickerOpen, setPickerOpen] = useState(false);
   const [deliveryInstructions, setDeliveryInstructions] = useState(

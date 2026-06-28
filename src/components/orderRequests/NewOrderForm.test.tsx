@@ -390,3 +390,39 @@ test("does not call saveDraft when persistDraft is false and an item is added", 
   expect(screen.getByLabelText(/Remove Rosé/i)).toBeInTheDocument();
   expect(saveDraftMock).not.toHaveBeenCalled();
 });
+
+// --- initialItems (re-order) tests ---
+
+test("initialItems overrides template items", async () => {
+  const initialItems: OrderRequestItemInput[] = [
+    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003", boxes: 3, extra_units: 1 },
+  ];
+
+  renderForm({ initialItems });
+
+  // Template items (Rosé, Pinot Noir) should NOT appear
+  await screen.findByRole("heading", { name: "New order" });
+  expect(screen.queryByText("Rosé")).not.toBeInTheDocument();
+  expect(screen.queryByText("Pinot Noir")).not.toBeInTheDocument();
+  // The re-order item (Chardonnay) should appear
+  expect(screen.getByLabelText(/Remove Chardonnay/i)).toBeInTheDocument();
+});
+
+test("initialItems overrides a saved draft", async () => {
+  const savedDraft: OrderRequestItemInput[] = [
+    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 5, extra_units: 0 },
+  ];
+  loadDraftMock.mockReturnValue(savedDraft);
+
+  const initialItems: OrderRequestItemInput[] = [
+    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003", boxes: 2, extra_units: 0 },
+  ];
+
+  renderForm({ initialItems });
+
+  // Draft item (Rosé) should NOT appear
+  await screen.findByRole("heading", { name: "New order" });
+  expect(screen.queryByText("Rosé")).not.toBeInTheDocument();
+  // Re-order item (Chardonnay) should appear
+  expect(screen.getByLabelText(/Remove Chardonnay/i)).toBeInTheDocument();
+});

@@ -67,7 +67,7 @@ describe("mapOrderHistoryRow", () => {
     });
   });
 
-  it("includes the account name when an account is present", () => {
+  it("includes the account name and id when an account is present", () => {
     const result = mapOrderHistoryRow({
       id: "order-1",
       order_number: 7,
@@ -79,6 +79,7 @@ describe("mapOrderHistoryRow", () => {
     });
 
     expect(result.account_name).toBe("Acme Wines");
+    expect(result.account_id).toBe("acc-1");
   });
 
   it("treats null box and unit counts as zero", () => {

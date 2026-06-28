@@ -1,20 +1,30 @@
 import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
+import { z } from "zod";
 import { NewOrderForm } from "@/components/orderRequests/NewOrderForm";
 import { getAccount } from "@/lib/accounts/accounts.functions";
 import { clearDraft } from "@/lib/orderRequests/draftOrder";
-import { createOrderRequest } from "@/lib/orderRequests/orderRequests.functions";
+import { createOrderRequest, getOrderRequest } from "@/lib/orderRequests/orderRequests.functions";
+import type { OrderRequestItemInput } from "@/lib/orderRequests/schema";
 import { listProducts } from "@/lib/products/products.functions";
 import type { ProductRow } from "@/lib/products/schema";
 import { asResult } from "@/lib/result";
 import type { TemplateWithItems } from "@/lib/templates/schema";
 import { getTemplateForAccount } from "@/lib/templates/templates.functions";
 
+const searchSchema = z.object({
+  fromOrderId: z.string().optional(),
+});
+
 export const Route = createFileRoute("/_protected/_account/accounts/$accountId/orders/new")({
-  loader: async ({ params }) => {
+  validateSearch: searchSchema,
+  loaderDeps: ({ search }) => ({ fromOrderId: search.fromOrderId }),
+  loader: async ({ params, deps }) => {
     const [accountResult, templateResult, productsResult] = await Promise.all([
       getAccount({ data: params.accountId }),
-      getTemplateForAccount({ data: params.accountId }),
+      deps.fromOrderId
+        ? Promise.resolve({ ok: true as const, value: null })
+        : getTemplateForAccount({ data: params.accountId }),
       listProducts().then((r) => asResult<ProductRow[]>(r)),
     ]);
 
@@ -23,18 +33,33 @@ export const Route = createFileRoute("/_protected/_account/accounts/$accountId/o
     if (!templateResult.ok) throw new Error(templateResult.error.message);
     if (!productsResult.ok) throw new Error(productsResult.error.message);
 
+    let initialItems: OrderRequestItemInput[] | undefined;
+    if (deps.fromOrderId) {
+      const sourceOrderResult = await getOrderRequest({ data: deps.fromOrderId });
+      if (!sourceOrderResult.ok) throw new Error(sourceOrderResult.error.message);
+      if (!sourceOrderResult.value) throw notFound();
+      if (sourceOrderResult.value.account_id !== params.accountId) throw notFound();
+      initialItems = sourceOrderResult.value.order_request_items.map((i) => ({
+        product_id: i.product_id,
+        boxes: i.boxes ?? 0,
+        extra_units: i.extra_units ?? 0,
+      }));
+    }
+
     return {
       account: accountResult.value,
       template: templateResult.value as TemplateWithItems | null,
       products: productsResult.value,
+      initialItems,
     };
   },
   component: NewOrderPage,
 });
 
 function NewOrderPage() {
-  const { account, template, products } = Route.useLoaderData();
+  const { account, template, products, initialItems } = Route.useLoaderData();
   const { accountId } = Route.useParams();
+  const search = Route.useSearch();
   const navigate = useNavigate();
 
   async function handleSubmit({
@@ -65,10 +90,12 @@ function NewOrderPage() {
 
   return (
     <NewOrderForm
+      key={`${accountId}:${search.fromOrderId ?? ""}`}
       accountId={accountId}
       accountName={account.name}
       defaultDeliveryInstructions={account.delivery_instructions ?? null}
       template={template}
+      initialItems={initialItems}
       products={products}
       onBack={() => void navigate({ to: "/accounts/$accountId", params: { accountId } })}
       onSubmit={handleSubmit}
