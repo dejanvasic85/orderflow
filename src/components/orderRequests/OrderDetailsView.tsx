@@ -86,6 +86,7 @@ export function OrderDetailsView({ order, placedByName, onBack }: OrderDetailsVi
               key={item.id}
               readOnly
               name={item.products?.name ?? "Unknown product"}
+              imageUrl={item.products?.image_url ?? null}
               qtyPerBox={item.products?.qty_per_box ?? 0}
               boxes={item.boxes ?? 0}
               units={item.extra_units ?? 0}

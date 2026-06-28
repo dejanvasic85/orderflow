@@ -79,10 +79,10 @@ Change requests and bugs:
 
 - [ ] Link for accepting an invite is not working
 - [x] Change all wording from bottles to units because sometimes it's not really bottles it's actually cans
-- [ ] Allow typing of qty rather than plus / minus
-- [ ] Use the word Units in the email
+- [x] Allow typing of qty rather than plus / minus
+- [x] Use the word Units in the email
+- [x] The order needs an image for the product instead of just text
 - [ ] Users should be able to order again but they should also have ability to edit the items
-- [ ] The order needs an image for the product instead of just text
 - [ ] Description for the product isn't required
 - [ ] Add descriptions in the Role dropdown for the User management to explain what roles are capable of what
 - [ ] Users are getting "active" automatically instead of staying pending until they accept

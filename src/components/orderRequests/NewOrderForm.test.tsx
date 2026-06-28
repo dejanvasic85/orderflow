@@ -155,9 +155,9 @@ test("renders correct total for each item", async () => {
   renderForm();
 
   // Rosé: 2 boxes × 6 = 12
-  expect(await screen.findByText("12")).toBeInTheDocument();
+  expect(await screen.findByLabelText("Total 12")).toBeInTheDocument();
   // Pinot Noir: 1 box × 12 + 3 units = 15
-  expect(screen.getByText("15")).toBeInTheDocument();
+  expect(screen.getByLabelText("Total 15")).toBeInTheDocument();
 });
 
 test("calls onSubmit with mapped payload when submitted with no delivery instructions", async () => {

@@ -9,7 +9,9 @@ export type OrderRequestItemRow = Database["public"]["Tables"]["order_request_it
 
 export type OrderRequestWithItems = OrderRequestRow & {
   order_request_items: Array<
-    OrderRequestItemRow & { products: Pick<ProductRow, "id" | "name" | "qty_per_box"> }
+    OrderRequestItemRow & {
+      products: Pick<ProductRow, "id" | "name" | "qty_per_box" | "image_url">;
+    }
   >;
   templates: Pick<TemplateRow, "id" | "name"> | null;
   users: { id: string; name: string } | null;

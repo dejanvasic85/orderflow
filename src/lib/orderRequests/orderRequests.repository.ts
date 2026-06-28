@@ -6,7 +6,7 @@ import type { CreateOrderRequestInput, OrderHistoryRow, OrderRequestWithItems } 
 import { orderPageSize } from "./schema";
 
 const orderRequestWithItemsSelect =
-  "id, order_number, account_id, placed_by, template_id, delivery_address, delivery_instructions, created_at, updated_at, order_request_items(id, product_id, boxes, extra_units, created_at, products(id, name, qty_per_box)), templates(id, name), users!order_requests_placed_by_fkey(id, name), accounts(id, name)" as const;
+  "id, order_number, account_id, placed_by, template_id, delivery_address, delivery_instructions, created_at, updated_at, order_request_items(id, product_id, boxes, extra_units, created_at, products(id, name, qty_per_box, image_url)), templates(id, name), users!order_requests_placed_by_fkey(id, name), accounts(id, name)" as const;
 
 const orderHistorySelect =
   "id, order_number, placed_by, created_at, order_request_items(boxes, extra_units), users!order_requests_placed_by_fkey(id, name, role)" as const;
