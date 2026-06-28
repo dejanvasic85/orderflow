@@ -35,7 +35,13 @@ beforeEach(() => {
   user = userEvent.setup();
 });
 
-function renderDrawer(open: boolean, itemProductIds: Set<string> = noItemIds) {
+function renderDrawer({
+  open,
+  itemProductIds = noItemIds,
+}: {
+  open: boolean;
+  itemProductIds?: Set<string>;
+}) {
   return render(
     <CatalogPickerDrawer
       open={open}
@@ -49,33 +55,33 @@ function renderDrawer(open: boolean, itemProductIds: Set<string> = noItemIds) {
 }
 
 test("does not render content when open is false", () => {
-  renderDrawer(false);
+  renderDrawer({ open: false });
 
   expect(screen.queryByText("Add item")).not.toBeInTheDocument();
 });
 
 test("renders product list when open is true", () => {
-  renderDrawer(true);
+  renderDrawer({ open: true });
 
   expect(screen.getByText("Add item")).toBeInTheDocument();
   expect(screen.getByText("Sparkling Water")).toBeInTheDocument();
 });
 
 test("shows 'Add' button for products not in the order", () => {
-  renderDrawer(true);
+  renderDrawer({ open: true });
 
   const addButtons = screen.getAllByRole("button", { name: "Add" });
   expect(addButtons).toHaveLength(3);
 });
 
 test("shows 'Remove' button for products already in the order", () => {
-  renderDrawer(true, new Set(["prod-2"]));
+  renderDrawer({ open: true, itemProductIds: new Set(["prod-2"]) });
 
   expect(screen.getByRole("button", { name: "Remove" })).toBeInTheDocument();
 });
 
 test("shows 'Add' for products not in the order and 'Remove' for products that are", () => {
-  renderDrawer(true, new Set(["prod-1"]));
+  renderDrawer({ open: true, itemProductIds: new Set(["prod-1"]) });
 
   expect(screen.getByRole("button", { name: "Remove" })).toBeInTheDocument();
   const addButtons = screen.getAllByRole("button", { name: "Add" });
@@ -83,7 +89,7 @@ test("shows 'Add' for products not in the order and 'Remove' for products that a
 });
 
 test("clicking 'Add' calls onAdd with correct productId", async () => {
-  renderDrawer(true);
+  renderDrawer({ open: true });
 
   const addButtons = screen.getAllByRole("button", { name: "Add" });
   await user.click(addButtons[0]);
@@ -92,7 +98,7 @@ test("clicking 'Add' calls onAdd with correct productId", async () => {
 });
 
 test("clicking 'Remove' calls onRemove with correct productId", async () => {
-  renderDrawer(true, new Set(["prod-2"]));
+  renderDrawer({ open: true, itemProductIds: new Set(["prod-2"]) });
 
   await user.click(screen.getByRole("button", { name: "Remove" }));
 
@@ -100,7 +106,7 @@ test("clicking 'Remove' calls onRemove with correct productId", async () => {
 });
 
 test("clicking 'Add' does not call onOpenChange (drawer stays open)", async () => {
-  renderDrawer(true);
+  renderDrawer({ open: true });
 
   const addButtons = screen.getAllByRole("button", { name: "Add" });
   await user.click(addButtons[0]);
@@ -109,7 +115,7 @@ test("clicking 'Add' does not call onOpenChange (drawer stays open)", async () =
 });
 
 test("search filters products by name (case-insensitive)", async () => {
-  renderDrawer(true);
+  renderDrawer({ open: true });
 
   await user.type(screen.getByRole("textbox", { name: "Search products" }), "water");
 
@@ -119,7 +125,7 @@ test("search filters products by name (case-insensitive)", async () => {
 });
 
 test("shows empty state when search matches nothing", async () => {
-  renderDrawer(true);
+  renderDrawer({ open: true });
 
   await user.type(screen.getByRole("textbox", { name: "Search products" }), "xyz123");
 
