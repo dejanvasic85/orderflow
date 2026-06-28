@@ -10,7 +10,7 @@ type OrderHistoryListProps = {
   orders: OrderHistoryItem[];
   total?: number;
   buildViewHref?: (orderId: string) => string;
-  buildReorderHref?: (order: OrderHistoryItem) => string;
+  buildReorderHref?: (order: OrderHistoryItem) => string | undefined;
   searchQuery?: string;
   currentPage?: number;
   totalPages?: number;

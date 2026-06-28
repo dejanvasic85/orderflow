@@ -25,10 +25,10 @@ function AdminOrderDetailsPage() {
   }
 
   function handleReorder() {
-    if (!order.accounts?.id) return;
+    if (!order.account_id) return;
     void navigate({
       to: "/manage/orders/new",
-      search: { accountId: order.accounts.id, fromOrderId: order.id },
+      search: { accountId: order.account_id, fromOrderId: order.id },
     });
   }
 
@@ -43,7 +43,7 @@ function AdminOrderDetailsPage() {
           order={order}
           placedByName={placedByName}
           onBack={handleBack}
-          onReorder={order.accounts?.id ? handleReorder : undefined}
+          onReorder={order.account_id ? handleReorder : undefined}
         />
       </PageContent>
     </>

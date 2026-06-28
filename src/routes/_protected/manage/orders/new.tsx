@@ -42,6 +42,13 @@ export const Route = createFileRoute("/_protected/manage/orders/new")({
       if (!sourceOrderResult.ok) throw new Error(sourceOrderResult.error.message);
       if (!sourceOrderResult.value) throw new Error("Source order not found");
       const sourceOrder = sourceOrderResult.value;
+      if (
+        resolvedAccountId &&
+        sourceOrder.account_id &&
+        resolvedAccountId !== sourceOrder.account_id
+      ) {
+        throw new Error("accountId does not match the source order's account");
+      }
       resolvedAccountId = resolvedAccountId ?? sourceOrder.account_id;
       sourceOrderItems = sourceOrder.order_request_items.map((i) => ({
         product_id: i.product_id,
