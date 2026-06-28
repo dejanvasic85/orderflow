@@ -86,7 +86,7 @@ test.describe("Orders", () => {
     await expect(page.getByText("Cellar Door Co.")).toBeVisible();
   });
 
-  test("editing a draft item's box and unit quantities updates its total", async ({ page }) => {
+  test("editing a template item's box and unit quantities updates its total", async ({ page }) => {
     await login(page, { user: "priya" });
 
     await expect(page.getByRole("heading", { name: "Harvest Table" })).toBeVisible();
@@ -94,36 +94,44 @@ test.describe("Orders", () => {
     await page.waitForURL("**/orders/new");
     await expect(page.getByRole("heading", { name: "New order" })).toBeVisible();
 
-    // Template items are read-only; add a catalog item (Gin, 6 per box, not in the
-    // Harvest Table template) to get the one editable quantity card. Because it's the
-    // only editable item, its quantity controls and Total are unambiguous on the page.
-    await page.getByRole("button", { name: /add item/i }).click();
-    await page.getByLabel("Search products").fill("Gin");
-    await page.getByRole("button", { name: "Add", exact: true }).click();
-    await page.getByLabel("Search products").press("Escape");
-
-    await expect(page.getByRole("heading", { name: "Additional items" })).toBeVisible();
-
-    // Scope to the editable Gin card (template items also show a "Total", so the
-    // assertion must be card-scoped). The card is the one containing the product name.
-    const ginCard = page
+    // Template items are now pre-filled and editable directly — no need to add from
+    // the catalog. Scope to the Rosé card (1 box × 6 per box = 6 total on load).
+    const roseCard = page
       .locator("div")
-      .filter({ has: page.getByText("Gin — Australian Botanical") })
+      .filter({ has: page.getByText(/Rosé/i) })
       .filter({ has: page.getByRole("button", { name: "Increase boxes" }) })
       .last();
-    const ginTotal = () => ginCard.getByText("Total").locator("xpath=following-sibling::*[1]");
+    const roseTotal = () => roseCard.getByText("Total").locator("xpath=following-sibling::*[1]");
 
-    // New draft items start at 1 box, 0 units → total = 1 * 6 + 0 = 6.
-    await expect(ginTotal()).toHaveText("6");
+    await expect(roseTotal()).toHaveText("6");
 
-    // Increase boxes to 2 → total = 2 * 6 + 0 = 12.
-    await ginCard.getByRole("button", { name: "Increase boxes" }).click();
-    await expect(ginTotal()).toHaveText("12");
+    // Increase boxes to 2 → total = 2 × 6 + 0 = 12.
+    await roseCard.getByRole("button", { name: "Increase boxes" }).click();
+    await expect(roseTotal()).toHaveText("12");
 
-    // Add 3 extra units → total = 2 * 6 + 3 = 15.
-    await ginCard.getByRole("button", { name: "Increase units" }).click();
-    await ginCard.getByRole("button", { name: "Increase units" }).click();
-    await ginCard.getByRole("button", { name: "Increase units" }).click();
-    await expect(ginTotal()).toHaveText("15");
+    // Add 3 extra units → total = 2 × 6 + 3 = 15.
+    await roseCard.getByRole("button", { name: "Increase units" }).click();
+    await roseCard.getByRole("button", { name: "Increase units" }).click();
+    await roseCard.getByRole("button", { name: "Increase units" }).click();
+    await expect(roseTotal()).toHaveText("15");
+  });
+
+  test("removing a template item from the order and submitting without it", async ({ page }) => {
+    await login(page, { user: "priya" });
+
+    await expect(page.getByRole("heading", { name: "Harvest Table" })).toBeVisible();
+    await page.getByRole("button", { name: /new order/i }).click();
+    await page.waitForURL("**/orders/new");
+    await expect(page.getByRole("heading", { name: "New order" })).toBeVisible();
+
+    // Sparkling Water is in Harvest Table's template — remove it.
+    await expect(page.getByText(/Sparkling Water/i)).toBeVisible();
+    await page.getByRole("button", { name: /Remove Sparkling Water/i }).click();
+    await expect(page.getByText(/Sparkling Water/i)).not.toBeVisible();
+
+    // Remaining template items still allow submission.
+    await page.getByRole("button", { name: /submit order/i }).click();
+    await page.waitForURL("**/success");
+    await expect(page.getByRole("heading", { name: "Order submitted" })).toBeVisible();
   });
 });

@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { OrderRequestItemInput } from "@/lib/orderRequests/schema";
 import type { ProductRow } from "@/lib/products/schema";
-import { DraftItemsList } from "./DraftItemsList";
+import { OrderItemsList } from "./OrderItemsList";
 
 const chardonnay: ProductRow = {
   id: "prod-1",
@@ -44,23 +44,15 @@ beforeEach(() => {
 
 test("renders nothing when items list is empty", () => {
   const { container } = render(
-    <DraftItemsList items={[]} products={products} onUpdate={onUpdate} onRemove={onRemove} />,
+    <OrderItemsList items={[]} products={products} onUpdate={onUpdate} onRemove={onRemove} />,
   );
 
   expect(container).toBeEmptyDOMElement();
 });
 
-test("renders the Additional items heading", () => {
-  render(
-    <DraftItemsList items={items} products={products} onUpdate={onUpdate} onRemove={onRemove} />,
-  );
-
-  expect(screen.getByRole("heading", { name: "Additional items" })).toBeInTheDocument();
-});
-
 test("renders each item's product name", () => {
   render(
-    <DraftItemsList items={items} products={products} onUpdate={onUpdate} onRemove={onRemove} />,
+    <OrderItemsList items={items} products={products} onUpdate={onUpdate} onRemove={onRemove} />,
   );
 
   expect(screen.getByText("Chardonnay")).toBeInTheDocument();
@@ -69,7 +61,7 @@ test("renders each item's product name", () => {
 
 test("calls onUpdate with the correct productId and patch", async () => {
   render(
-    <DraftItemsList items={items} products={products} onUpdate={onUpdate} onRemove={onRemove} />,
+    <OrderItemsList items={items} products={products} onUpdate={onUpdate} onRemove={onRemove} />,
   );
 
   await user.click(screen.getAllByRole("button", { name: "Increase boxes" })[0]);
@@ -79,7 +71,7 @@ test("calls onUpdate with the correct productId and patch", async () => {
 
 test("calls onRemove with the correct productId", async () => {
   render(
-    <DraftItemsList items={items} products={products} onUpdate={onUpdate} onRemove={onRemove} />,
+    <OrderItemsList items={items} products={products} onUpdate={onUpdate} onRemove={onRemove} />,
   );
 
   await user.click(screen.getByRole("button", { name: /Remove Chardonnay/i }));

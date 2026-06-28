@@ -9,8 +9,7 @@ import type { OrderRequestItemInput } from "@/lib/orderRequests/schema";
 import type { ProductRow } from "@/lib/products/schema";
 import type { TemplateWithItems } from "@/lib/templates/schema";
 import { CatalogPickerDrawer } from "./CatalogPickerDrawer";
-import { DraftItemsList } from "./DraftItemsList";
-import { TemplateItemsList } from "./TemplateItemsList";
+import { OrderItemsList } from "./OrderItemsList";
 
 type OrderFormPayload = {
   templateId: string | null;
@@ -29,6 +28,22 @@ type NewOrderFormProps = {
   onSubmit: (data: OrderFormPayload) => Promise<void>;
 };
 
+function buildInitialItems(
+  template: TemplateWithItems | null,
+  persistDraft: boolean,
+  accountId: string,
+): OrderRequestItemInput[] {
+  if (persistDraft) {
+    const draft = loadDraft(accountId);
+    if (draft !== null) return draft;
+  }
+  return (template?.template_items ?? []).map((i) => ({
+    product_id: i.product_id,
+    boxes: i.box_count,
+    extra_units: i.unit_count,
+  }));
+}
+
 export function NewOrderForm({
   accountId,
   accountName,
@@ -39,8 +54,8 @@ export function NewOrderForm({
   onBack,
   onSubmit,
 }: NewOrderFormProps) {
-  const [draftItems, setDraftItems] = useState<OrderRequestItemInput[]>(() =>
-    persistDraft ? loadDraft(accountId) : [],
+  const [items, setItems] = useState<OrderRequestItemInput[]>(() =>
+    buildInitialItems(template, persistDraft, accountId),
   );
   const [pickerOpen, setPickerOpen] = useState(false);
   const [deliveryInstructions, setDeliveryInstructions] = useState(
@@ -49,39 +64,27 @@ export function NewOrderForm({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const templateProductIds = new Set(template?.template_items.map((i) => i.product_id) ?? []);
-  const hasItems = (template?.template_items.length ?? 0) > 0 || draftItems.length > 0;
+  const itemProductIds = new Set(items.map((i) => i.product_id));
 
-  function updateDraft(items: OrderRequestItemInput[]) {
-    setDraftItems(items);
-    if (persistDraft) saveDraft(accountId, items);
+  function updateItems(next: OrderRequestItemInput[]) {
+    setItems(next);
+    if (persistDraft) saveDraft(accountId, next);
   }
 
-  function handleAddDraftItem(productId: string) {
-    if (draftItems.some((i) => i.product_id === productId)) return;
-    updateDraft([...draftItems, { product_id: productId, boxes: 1, extra_units: 0 }]);
+  function handleAddItem(productId: string) {
+    if (items.some((i) => i.product_id === productId)) return;
+    updateItems([...items, { product_id: productId, boxes: 1, extra_units: 0 }]);
   }
 
-  function handleRemoveDraftItem(productId: string) {
-    updateDraft(draftItems.filter((i) => i.product_id !== productId));
+  function handleRemoveItem(productId: string) {
+    updateItems(items.filter((i) => i.product_id !== productId));
   }
 
-  function handleUpdateDraftItem(
-    productId: string,
-    patch: { boxes?: number; extra_units?: number },
-  ) {
-    updateDraft(draftItems.map((i) => (i.product_id === productId ? { ...i, ...patch } : i)));
+  function handleUpdateItem(productId: string, patch: { boxes?: number; extra_units?: number }) {
+    updateItems(items.map((i) => (i.product_id === productId ? { ...i, ...patch } : i)));
   }
 
   async function handleSubmit() {
-    const templateItems =
-      template?.template_items.map((item) => ({
-        product_id: item.product_id,
-        boxes: item.box_count,
-        extra_units: item.unit_count,
-      })) ?? [];
-
-    const items = [...templateItems, ...draftItems];
     if (items.length === 0) return;
 
     setSubmitting(true);
@@ -115,15 +118,11 @@ export function NewOrderForm({
       </div>
 
       <div className="flex flex-col gap-6">
-        {template ? <TemplateItemsList template={template} /> : null}
-
-        <Separator />
-
-        <DraftItemsList
-          items={draftItems}
+        <OrderItemsList
+          items={items}
           products={products}
-          onUpdate={handleUpdateDraftItem}
-          onRemove={handleRemoveDraftItem}
+          onUpdate={handleUpdateItem}
+          onRemove={handleRemoveItem}
         />
 
         <div className="flex justify-end">
@@ -137,7 +136,7 @@ export function NewOrderForm({
           </Button>
         </div>
 
-        {hasItems && <Separator />}
+        {items.length > 0 && <Separator />}
 
         <div className="flex flex-col gap-2">
           <label
@@ -168,7 +167,7 @@ export function NewOrderForm({
           <Button
             size="lg"
             className="w-full sm:w-auto sm:min-w-40 sm:px-8"
-            disabled={!hasItems || submitting}
+            disabled={items.length === 0 || submitting}
             onClick={handleSubmit}
           >
             {submitting ? "Submitting…" : "Submit order"}
@@ -180,10 +179,9 @@ export function NewOrderForm({
         open={pickerOpen}
         onOpenChange={setPickerOpen}
         products={products}
-        templateProductIds={templateProductIds}
-        draftItems={draftItems}
-        onAdd={handleAddDraftItem}
-        onRemove={handleRemoveDraftItem}
+        itemProductIds={itemProductIds}
+        onAdd={handleAddItem}
+        onRemove={handleRemoveItem}
       />
     </div>
   );

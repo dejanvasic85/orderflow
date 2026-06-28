@@ -18,28 +18,21 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import type { OrderRequestItemInput } from "@/lib/orderRequests/schema";
 import type { ProductRow } from "@/lib/products/schema";
 
 type CatalogPickerDrawerProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   products: ProductRow[];
-  templateProductIds: Set<string>;
-  draftItems: OrderRequestItemInput[];
+  itemProductIds: Set<string>;
   onAdd: (productId: string) => void;
   onRemove: (productId: string) => void;
 };
 
-type PickerAction = { kind: "in-template" } | { kind: "add" } | { kind: "added" };
+type PickerAction = { kind: "add" } | { kind: "added" };
 
-function resolveAction(
-  productId: string,
-  templateProductIds: Set<string>,
-  draftItems: OrderRequestItemInput[],
-): PickerAction {
-  if (templateProductIds.has(productId)) return { kind: "in-template" };
-  if (draftItems.some((i) => i.product_id === productId)) return { kind: "added" };
+function resolveAction(productId: string, itemProductIds: Set<string>): PickerAction {
+  if (itemProductIds.has(productId)) return { kind: "added" };
   return { kind: "add" };
 }
 
@@ -53,9 +46,6 @@ type CatalogPickerCardProps = {
 function CatalogPickerCard({ product, action, onAdd, onRemove }: CatalogPickerCardProps) {
   let actionNode: React.ReactNode;
   switch (action.kind) {
-    case "in-template":
-      actionNode = <Button disabled>In your template</Button>;
-      break;
     case "add":
       actionNode = (
         <Button size="sm" variant="outline" onClick={onAdd}>
@@ -84,8 +74,7 @@ export function CatalogPickerDrawer({
   open,
   onOpenChange,
   products,
-  templateProductIds,
-  draftItems,
+  itemProductIds,
   onAdd,
   onRemove,
 }: CatalogPickerDrawerProps) {
@@ -139,7 +128,7 @@ export function CatalogPickerDrawer({
           ) : (
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 items-stretch">
               {filtered.map((product) => {
-                const action = resolveAction(product.id, templateProductIds, draftItems);
+                const action = resolveAction(product.id, itemProductIds);
                 return (
                   <CatalogPickerCard
                     key={product.id}

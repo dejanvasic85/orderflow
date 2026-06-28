@@ -4,7 +4,7 @@ import {
   createRootRoute,
   createRouter,
 } from "@tanstack/react-router";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as draftOrder from "@/lib/orderRequests/draftOrder";
 import type { OrderRequestItemInput } from "@/lib/orderRequests/schema";
@@ -21,6 +21,30 @@ const clearDraftMock = vi.mocked(draftOrder.clearDraft);
 
 const accountId = "b2c3d4e5-f6a7-4b8c-9d0e-000000000a01";
 
+// Products that are in the template
+const rose: ProductRow = {
+  id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001",
+  name: "Rosé",
+  description: null,
+  image_url: null,
+  qty_per_box: 6,
+  active: true,
+  created_at: "2024-01-01T00:00:00Z",
+  updated_at: "2024-01-01T00:00:00Z",
+};
+
+const pinotNoir: ProductRow = {
+  id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000002",
+  name: "Pinot Noir",
+  description: null,
+  image_url: null,
+  qty_per_box: 12,
+  active: true,
+  created_at: "2024-01-01T00:00:00Z",
+  updated_at: "2024-01-01T00:00:00Z",
+};
+
+// Products available in the catalog (not in template)
 const product1: ProductRow = {
   id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003",
   name: "Chardonnay",
@@ -42,6 +66,8 @@ const product2: ProductRow = {
   created_at: "2024-01-01T00:00:00Z",
   updated_at: "2024-01-01T00:00:00Z",
 };
+
+const allProducts = [rose, pinotNoir, product1, product2];
 
 const template: TemplateWithItems = {
   id: "d4e5f6a7-b8c9-4d0e-9f2a-000000000001",
@@ -81,7 +107,7 @@ let user: ReturnType<typeof userEvent.setup>;
 beforeEach(() => {
   onSubmit.mockResolvedValue(undefined);
   user = userEvent.setup();
-  loadDraftMock.mockReturnValue([]);
+  loadDraftMock.mockReturnValue(null);
 });
 
 function renderForm(overrides?: Partial<React.ComponentProps<typeof NewOrderForm>>) {
@@ -92,7 +118,7 @@ function renderForm(overrides?: Partial<React.ComponentProps<typeof NewOrderForm
         accountName="The Winery Bistro"
         defaultDeliveryInstructions={null}
         template={template}
-        products={[product1, product2]}
+        products={allProducts}
         onBack={onBack}
         onSubmit={onSubmit}
         {...overrides}
@@ -244,29 +270,33 @@ test("'Add item' button opens the picker drawer", async () => {
   expect(await screen.findByRole("textbox", { name: "Search products" })).toBeInTheDocument();
 });
 
-test("adding a product via drawer renders it in the draft items section", async () => {
+test("adding a product via drawer renders it in the order items section", async () => {
   renderForm({ template: null });
 
   await user.click(await screen.findByRole("button", { name: /add item/i }));
   const addButtons = await screen.findAllByRole("button", { name: "Add" });
   await user.click(addButtons[0]);
 
-  expect(screen.getByLabelText(/Remove Chardonnay/i)).toBeInTheDocument();
+  expect(screen.getByLabelText(/Remove Rosé/i)).toBeInTheDocument();
 });
 
-test("removing a draft item removes it from the section", async () => {
-  const storedItem: OrderRequestItemInput = {
-    product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003",
-    boxes: 1,
-    extra_units: 0,
-  };
-  loadDraftMock.mockReturnValue([storedItem]);
+test("removing an item removes it from the list", async () => {
+  // Saved draft includes both template items and an extra catalog item — the draft
+  // is the full source of truth, so all three appear on load.
+  const savedDraft: OrderRequestItemInput[] = [
+    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 2, extra_units: 0 }, // Rosé (template)
+    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003", boxes: 1, extra_units: 0 }, // Chardonnay (catalog)
+  ];
+  loadDraftMock.mockReturnValue(savedDraft);
 
-  renderForm({ products: [product1, product2] });
+  renderForm({ products: allProducts });
 
   await user.click(await screen.findByLabelText(/Remove Chardonnay/i));
 
-  expect(screen.queryByLabelText(/Remove Chardonnay/i)).not.toBeInTheDocument();
+  expect(await screen.findByLabelText(/Remove Rosé/i)).toBeInTheDocument();
+  await waitFor(() =>
+    expect(screen.queryByLabelText(/Remove Chardonnay/i)).not.toBeInTheDocument(),
+  );
 });
 
 test("submit enabled when only draft items exist (no template)", async () => {
@@ -280,13 +310,13 @@ test("submit enabled when only draft items exist (no template)", async () => {
   expect(await screen.findByRole("button", { name: "Submit order" })).not.toBeDisabled();
 });
 
-test("onSubmit is called with both template items and draft items merged", async () => {
-  const storedItem: OrderRequestItemInput = {
-    product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003",
-    boxes: 3,
-    extra_units: 1,
-  };
-  loadDraftMock.mockReturnValue([storedItem]);
+test("onSubmit uses the saved draft as the complete item list", async () => {
+  // Draft is the full source of truth: template item at modified quantity + extra catalog item.
+  const savedDraft: OrderRequestItemInput[] = [
+    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 5, extra_units: 0 }, // Rosé — user changed from 2→5
+    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003", boxes: 3, extra_units: 1 }, // Chardonnay — catalog item
+  ];
+  loadDraftMock.mockReturnValue(savedDraft);
 
   renderForm();
 
@@ -294,10 +324,10 @@ test("onSubmit is called with both template items and draft items merged", async
 
   expect(onSubmit).toHaveBeenCalledWith(
     expect.objectContaining({
-      items: expect.arrayContaining([
-        { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 2, extra_units: 0 },
+      items: [
+        { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 5, extra_units: 0 },
         { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003", boxes: 3, extra_units: 1 },
-      ]),
+      ],
     }),
   );
 });
@@ -310,7 +340,7 @@ test("draft items are loaded from localStorage on mount", async () => {
   };
   loadDraftMock.mockReturnValue([storedItem]);
 
-  renderForm({ products: [product1, product2] });
+  renderForm({ products: allProducts });
 
   expect(await screen.findByLabelText(/Remove Chardonnay/i)).toBeInTheDocument();
 });
@@ -331,7 +361,7 @@ test("saveDraft is called when an item is added", async () => {
   await user.click(addButtons[0]);
 
   expect(saveDraftMock).toHaveBeenCalledWith(accountId, [
-    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003", boxes: 1, extra_units: 0 },
+    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 1, extra_units: 0 },
   ]);
 });
 
@@ -343,7 +373,7 @@ test("does not load draft from localStorage when persistDraft is false", async (
   };
   loadDraftMock.mockReturnValue([storedItem]);
 
-  renderForm({ persistDraft: false, products: [product1, product2] });
+  renderForm({ persistDraft: false, products: allProducts });
 
   await screen.findByRole("heading", { name: "New order" });
   expect(loadDraftMock).not.toHaveBeenCalled();
@@ -357,6 +387,6 @@ test("does not call saveDraft when persistDraft is false and an item is added", 
   const addButtons = await screen.findAllByRole("button", { name: "Add" });
   await user.click(addButtons[0]);
 
-  expect(screen.getByLabelText(/Remove Chardonnay/i)).toBeInTheDocument();
+  expect(screen.getByLabelText(/Remove Rosé/i)).toBeInTheDocument();
   expect(saveDraftMock).not.toHaveBeenCalled();
 });

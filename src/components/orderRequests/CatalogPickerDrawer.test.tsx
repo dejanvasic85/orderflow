@@ -1,6 +1,5 @@
 import { render, screen } from "@testing-library/react";
 import userEvent, { type UserEvent } from "@testing-library/user-event";
-import type { OrderRequestItemInput } from "@/lib/orderRequests/schema";
 import type { ProductRow } from "@/lib/products/schema";
 import { CatalogPickerDrawer } from "./CatalogPickerDrawer";
 
@@ -24,8 +23,7 @@ const products: ProductRow[] = [
   makeProduct({ id: "prod-3", name: "Orange Juice" }),
 ];
 
-const noTemplateIds = new Set<string>();
-const noDraftItems: OrderRequestItemInput[] = [];
+const noItemIds = new Set<string>();
 
 const onAdd = vi.fn();
 const onRemove = vi.fn();
@@ -37,20 +35,19 @@ beforeEach(() => {
   user = userEvent.setup();
 });
 
-function renderDrawer(
-  open: boolean,
-  overrides: {
-    templateProductIds?: Set<string>;
-    draftItems?: OrderRequestItemInput[];
-  } = {},
-) {
+function renderDrawer({
+  open,
+  itemProductIds = noItemIds,
+}: {
+  open: boolean;
+  itemProductIds?: Set<string>;
+}) {
   return render(
     <CatalogPickerDrawer
       open={open}
       onOpenChange={onOpenChange}
       products={products}
-      templateProductIds={overrides.templateProductIds ?? noTemplateIds}
-      draftItems={overrides.draftItems ?? noDraftItems}
+      itemProductIds={itemProductIds}
       onAdd={onAdd}
       onRemove={onRemove}
     />,
@@ -58,41 +55,41 @@ function renderDrawer(
 }
 
 test("does not render content when open is false", () => {
-  renderDrawer(false);
+  renderDrawer({ open: false });
 
   expect(screen.queryByText("Add item")).not.toBeInTheDocument();
 });
 
 test("renders product list when open is true", () => {
-  renderDrawer(true);
+  renderDrawer({ open: true });
 
   expect(screen.getByText("Add item")).toBeInTheDocument();
   expect(screen.getByText("Sparkling Water")).toBeInTheDocument();
 });
 
-test("shows 'In your template' for products in templateProductIds", () => {
-  renderDrawer(true, { templateProductIds: new Set(["prod-1"]) });
-
-  expect(screen.getByRole("button", { name: "In your template" })).toBeVisible();
-});
-
-test("shows 'Add' button for products not in template and not in draftItems", () => {
-  renderDrawer(true, { templateProductIds: new Set(["prod-1"]) });
+test("shows 'Add' button for products not in the order", () => {
+  renderDrawer({ open: true });
 
   const addButtons = screen.getAllByRole("button", { name: "Add" });
-  expect(addButtons).toHaveLength(2);
+  expect(addButtons).toHaveLength(3);
 });
 
-test("shows 'Remove' button for products in draftItems", () => {
-  renderDrawer(true, {
-    draftItems: [{ product_id: "prod-2", boxes: 1, extra_units: 0 }],
-  });
+test("shows 'Remove' button for products already in the order", () => {
+  renderDrawer({ open: true, itemProductIds: new Set(["prod-2"]) });
 
   expect(screen.getByRole("button", { name: "Remove" })).toBeInTheDocument();
 });
 
+test("shows 'Add' for products not in the order and 'Remove' for products that are", () => {
+  renderDrawer({ open: true, itemProductIds: new Set(["prod-1"]) });
+
+  expect(screen.getByRole("button", { name: "Remove" })).toBeInTheDocument();
+  const addButtons = screen.getAllByRole("button", { name: "Add" });
+  expect(addButtons).toHaveLength(2);
+});
+
 test("clicking 'Add' calls onAdd with correct productId", async () => {
-  renderDrawer(true);
+  renderDrawer({ open: true });
 
   const addButtons = screen.getAllByRole("button", { name: "Add" });
   await user.click(addButtons[0]);
@@ -101,9 +98,7 @@ test("clicking 'Add' calls onAdd with correct productId", async () => {
 });
 
 test("clicking 'Remove' calls onRemove with correct productId", async () => {
-  renderDrawer(true, {
-    draftItems: [{ product_id: "prod-2", boxes: 1, extra_units: 0 }],
-  });
+  renderDrawer({ open: true, itemProductIds: new Set(["prod-2"]) });
 
   await user.click(screen.getByRole("button", { name: "Remove" }));
 
@@ -111,7 +106,7 @@ test("clicking 'Remove' calls onRemove with correct productId", async () => {
 });
 
 test("clicking 'Add' does not call onOpenChange (drawer stays open)", async () => {
-  renderDrawer(true);
+  renderDrawer({ open: true });
 
   const addButtons = screen.getAllByRole("button", { name: "Add" });
   await user.click(addButtons[0]);
@@ -120,7 +115,7 @@ test("clicking 'Add' does not call onOpenChange (drawer stays open)", async () =
 });
 
 test("search filters products by name (case-insensitive)", async () => {
-  renderDrawer(true);
+  renderDrawer({ open: true });
 
   await user.type(screen.getByRole("textbox", { name: "Search products" }), "water");
 
@@ -130,7 +125,7 @@ test("search filters products by name (case-insensitive)", async () => {
 });
 
 test("shows empty state when search matches nothing", async () => {
-  renderDrawer(true);
+  renderDrawer({ open: true });
 
   await user.type(screen.getByRole("textbox", { name: "Search products" }), "xyz123");
 
