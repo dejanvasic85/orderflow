@@ -2,8 +2,8 @@ import { Link } from "@tanstack/react-router";
 import { ArrowLeft, Plus } from "lucide-react";
 import { useReducer, useState } from "react";
 import { CatalogPickerDrawer } from "@/components/orderRequests/CatalogPickerDrawer";
-import { DraftItemsList } from "@/components/orderRequests/DraftItemsList";
 import { OrderItemCard } from "@/components/orderRequests/OrderItemCard";
+import { OrderItemsList } from "@/components/orderRequests/OrderItemsList";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import type { Account } from "@/lib/accounts/schema";
@@ -153,7 +153,7 @@ export function TemplateEditor({
         {readOnly ? (
           <ReadOnlyItemsList items={visibleItems} products={products} />
         ) : (
-          <DraftItemsList
+          <OrderItemsList
             items={visibleItems.map(toOrderRequestInput)}
             products={products}
             onUpdate={handleUpdateItem}
@@ -196,8 +196,7 @@ export function TemplateEditor({
           open={pickerOpen}
           onOpenChange={setPickerOpen}
           products={products}
-          templateProductIds={new Set<string>()}
-          draftItems={visibleItems.map(toOrderRequestInput)}
+          itemProductIds={new Set(visibleItems.map((i) => i.product_id))}
           onAdd={handleAddItem}
           onRemove={handleRemoveItem}
         />

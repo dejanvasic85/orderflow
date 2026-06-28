@@ -1,6 +1,5 @@
 import { render, screen } from "@testing-library/react";
 import userEvent, { type UserEvent } from "@testing-library/user-event";
-import type { OrderRequestItemInput } from "@/lib/orderRequests/schema";
 import type { ProductRow } from "@/lib/products/schema";
 import { CatalogPickerDrawer } from "./CatalogPickerDrawer";
 
@@ -24,8 +23,7 @@ const products: ProductRow[] = [
   makeProduct({ id: "prod-3", name: "Orange Juice" }),
 ];
 
-const noTemplateIds = new Set<string>();
-const noDraftItems: OrderRequestItemInput[] = [];
+const noItemIds = new Set<string>();
 
 const onAdd = vi.fn();
 const onRemove = vi.fn();
@@ -37,20 +35,13 @@ beforeEach(() => {
   user = userEvent.setup();
 });
 
-function renderDrawer(
-  open: boolean,
-  overrides: {
-    templateProductIds?: Set<string>;
-    draftItems?: OrderRequestItemInput[];
-  } = {},
-) {
+function renderDrawer(open: boolean, itemProductIds: Set<string> = noItemIds) {
   return render(
     <CatalogPickerDrawer
       open={open}
       onOpenChange={onOpenChange}
       products={products}
-      templateProductIds={overrides.templateProductIds ?? noTemplateIds}
-      draftItems={overrides.draftItems ?? noDraftItems}
+      itemProductIds={itemProductIds}
       onAdd={onAdd}
       onRemove={onRemove}
     />,
@@ -70,25 +61,25 @@ test("renders product list when open is true", () => {
   expect(screen.getByText("Sparkling Water")).toBeInTheDocument();
 });
 
-test("shows 'In your template' for products in templateProductIds", () => {
-  renderDrawer(true, { templateProductIds: new Set(["prod-1"]) });
-
-  expect(screen.getByRole("button", { name: "In your template" })).toBeVisible();
-});
-
-test("shows 'Add' button for products not in template and not in draftItems", () => {
-  renderDrawer(true, { templateProductIds: new Set(["prod-1"]) });
+test("shows 'Add' button for products not in the order", () => {
+  renderDrawer(true);
 
   const addButtons = screen.getAllByRole("button", { name: "Add" });
-  expect(addButtons).toHaveLength(2);
+  expect(addButtons).toHaveLength(3);
 });
 
-test("shows 'Remove' button for products in draftItems", () => {
-  renderDrawer(true, {
-    draftItems: [{ product_id: "prod-2", boxes: 1, extra_units: 0 }],
-  });
+test("shows 'Remove' button for products already in the order", () => {
+  renderDrawer(true, new Set(["prod-2"]));
 
   expect(screen.getByRole("button", { name: "Remove" })).toBeInTheDocument();
+});
+
+test("shows 'Add' for products not in the order and 'Remove' for products that are", () => {
+  renderDrawer(true, new Set(["prod-1"]));
+
+  expect(screen.getByRole("button", { name: "Remove" })).toBeInTheDocument();
+  const addButtons = screen.getAllByRole("button", { name: "Add" });
+  expect(addButtons).toHaveLength(2);
 });
 
 test("clicking 'Add' calls onAdd with correct productId", async () => {
@@ -101,9 +92,7 @@ test("clicking 'Add' calls onAdd with correct productId", async () => {
 });
 
 test("clicking 'Remove' calls onRemove with correct productId", async () => {
-  renderDrawer(true, {
-    draftItems: [{ product_id: "prod-2", boxes: 1, extra_units: 0 }],
-  });
+  renderDrawer(true, new Set(["prod-2"]));
 
   await user.click(screen.getByRole("button", { name: "Remove" }));
 

@@ -3,19 +3,18 @@ import type { OrderRequestItemInput } from "@/lib/orderRequests/schema";
 import type { ProductRow } from "@/lib/products/schema";
 import { OrderItemCard } from "./OrderItemCard";
 
-type DraftItemsListProps = {
+type OrderItemsListProps = {
   items: OrderRequestItemInput[];
   products: ProductRow[];
   onUpdate: (productId: string, patch: { boxes?: number; extra_units?: number }) => void;
   onRemove: (productId: string) => void;
 };
 
-export function DraftItemsList({ items, products, onUpdate, onRemove }: DraftItemsListProps) {
+export function OrderItemsList({ items, products, onUpdate, onRemove }: OrderItemsListProps) {
   if (items.length === 0) return null;
 
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="text-xl font-semibold tracking-tight">Additional items</h2>
       <AnimatePresence initial={false}>
         {items.map((item) => {
           const product = products.find((p) => p.id === item.product_id);
