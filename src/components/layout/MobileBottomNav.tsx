@@ -19,27 +19,51 @@ type NavItem = {
   icon: LucideIcon;
 };
 
+type NavGroup = {
+  label: string;
+  icon: LucideIcon;
+  items: readonly NavItem[];
+};
+
 type MobileBottomNavProps = {
   email: string;
   navItems: readonly NavItem[];
+  manageGroup?: NavGroup;
   hasMultipleAccounts?: boolean;
   onSignOut: () => void;
 };
 
-type AccountMenuItem =
+type SheetMenuItem =
   | { label: string; icon: LucideIcon; kind: "link"; to: string }
   | { label: string; icon: LucideIcon; kind: "button"; onClick: () => void };
+
+const tabClass =
+  "relative flex flex-col items-center gap-1 flex-1 py-2 text-xs transition-all duration-200";
+
+const activeTabPill = (
+  <span className="absolute inset-x-1 inset-y-0.5 -z-10 rounded-xl bg-sidebar-primary shadow-[0_4px_14px_0_oklch(0.205_0_0/0.35)] shadow-black/30" />
+);
+
+function tabColor(isActive: boolean) {
+  return isActive
+    ? "text-sidebar-primary-foreground"
+    : "text-sidebar-foreground/50 hover:text-sidebar-foreground";
+}
 
 export function MobileBottomNav({
   email,
   navItems,
+  manageGroup,
   hasMultipleAccounts = false,
   onSignOut,
 }: MobileBottomNavProps) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const [open, setOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [manageOpen, setManageOpen] = useState(false);
 
-  const accountMenuItems: AccountMenuItem[] = [
+  const isManageActive = manageGroup?.items.some((item) => item.to === pathname) ?? false;
+
+  const accountMenuItems: SheetMenuItem[] = [
     ...(hasMultipleAccounts
       ? [{ label: "Change account", icon: Users, kind: "link" as const, to: "/accounts" }]
       : []),
@@ -48,6 +72,14 @@ export function MobileBottomNav({
     { label: "Sign out", icon: LogOut, kind: "button", onClick: onSignOut },
   ];
 
+  const manageMenuItems: SheetMenuItem[] =
+    manageGroup?.items.map((item) => ({
+      label: item.label,
+      icon: item.icon,
+      kind: "link" as const,
+      to: item.to,
+    })) ?? [];
+
   return (
     <>
       <nav className="fixed bottom-0 inset-x-0 z-40 md:hidden border-t bg-sidebar text-sidebar-foreground">
@@ -55,29 +87,33 @@ export function MobileBottomNav({
           {navItems.map(({ label, to, icon: Icon }) => {
             const isActive = pathname === to;
             return (
-              <Link
-                key={to}
-                to={to}
-                className={cn(
-                  "relative flex flex-col items-center gap-1 flex-1 py-2 text-xs transition-all duration-200",
-                  isActive
-                    ? "text-sidebar-primary-foreground"
-                    : "text-sidebar-foreground/50 hover:text-sidebar-foreground",
-                )}
-              >
-                {isActive && (
-                  <span className="absolute inset-x-1 inset-y-0.5 -z-10 rounded-xl bg-sidebar-primary shadow-[0_4px_14px_0_oklch(0.205_0_0/0.35)] shadow-black/30" />
-                )}
+              <Link key={to} to={to} className={cn(tabClass, tabColor(isActive))}>
+                {isActive && activeTabPill}
                 <Icon className="size-5" />
                 <span className={cn("font-medium", isActive && "font-semibold")}>{label}</span>
               </Link>
             );
           })}
 
+          {manageGroup && (
+            <button
+              type="button"
+              aria-label={`Open ${manageGroup.label.toLowerCase()} menu`}
+              onClick={() => setManageOpen(true)}
+              className={cn(tabClass, tabColor(isManageActive))}
+            >
+              {isManageActive && activeTabPill}
+              <manageGroup.icon className="size-5" />
+              <span className={cn("font-medium", isManageActive && "font-semibold")}>
+                {manageGroup.label}
+              </span>
+            </button>
+          )}
+
           <button
             type="button"
             aria-label="Open account menu"
-            onClick={() => setOpen(true)}
+            onClick={() => setAccountOpen(true)}
             className="flex flex-col items-center gap-1 flex-1 py-2 text-xs text-sidebar-foreground/50 hover:text-sidebar-foreground transition-colors"
           >
             <Avatar className="size-5 rounded-full">
@@ -90,49 +126,83 @@ export function MobileBottomNav({
         </div>
       </nav>
 
-      <Sheet open={open} onOpenChange={setOpen}>
+      {manageGroup && (
+        <Sheet open={manageOpen} onOpenChange={setManageOpen}>
+          <SheetContent side="bottom" className="md:hidden rounded-t-2xl px-0 pb-10">
+            <SheetHeader className="px-6 pb-4 border-b">
+              <SheetTitle className="text-left text-base">{manageGroup.label}</SheetTitle>
+            </SheetHeader>
+            <SheetMenuList
+              items={manageMenuItems}
+              pathname={pathname}
+              onNavigate={() => setManageOpen(false)}
+            />
+          </SheetContent>
+        </Sheet>
+      )}
+
+      <Sheet open={accountOpen} onOpenChange={setAccountOpen}>
         <SheetContent side="bottom" className="md:hidden rounded-t-2xl px-0 pb-10">
           <SheetHeader className="px-6 pb-4 border-b">
             <SheetTitle className="text-left text-sm font-normal text-muted-foreground">
               {email}
             </SheetTitle>
           </SheetHeader>
-          <div className="flex flex-col mt-2">
-            {accountMenuItems.map((item) => {
-              const Icon = item.icon;
-              const sharedClass =
-                "flex items-center gap-4 px-6 py-5 text-base font-medium hover:bg-muted active:bg-muted/70 transition-colors w-full text-left";
-              if (item.kind === "link") {
-                return (
-                  <Link
-                    key={item.label}
-                    to={item.to}
-                    onClick={() => setOpen(false)}
-                    className={sharedClass}
-                  >
-                    <Icon className="size-6 shrink-0 text-muted-foreground" />
-                    <span>{item.label}</span>
-                  </Link>
-                );
-              }
-              return (
-                <button
-                  key={item.label}
-                  type="button"
-                  onClick={() => {
-                    setOpen(false);
-                    item.onClick();
-                  }}
-                  className={sharedClass}
-                >
-                  <Icon className="size-6 shrink-0 text-muted-foreground" />
-                  <span>{item.label}</span>
-                </button>
-              );
-            })}
-          </div>
+          <SheetMenuList items={accountMenuItems} onNavigate={() => setAccountOpen(false)} />
         </SheetContent>
       </Sheet>
     </>
+  );
+}
+
+type SheetMenuListProps = {
+  items: SheetMenuItem[];
+  pathname?: string;
+  onNavigate: () => void;
+};
+
+function SheetMenuList({ items, pathname, onNavigate }: SheetMenuListProps) {
+  const sharedClass =
+    "flex items-center gap-4 px-6 py-5 text-base font-medium hover:bg-muted active:bg-muted/70 transition-colors w-full text-left";
+
+  return (
+    <div className="flex flex-col mt-2">
+      {items.map((item) => {
+        const Icon = item.icon;
+        if (item.kind === "link") {
+          const isActive = pathname === item.to;
+          return (
+            <Link
+              key={item.label}
+              to={item.to}
+              onClick={onNavigate}
+              className={cn(sharedClass, isActive && "bg-muted/60")}
+            >
+              <Icon
+                className={cn(
+                  "size-6 shrink-0",
+                  isActive ? "text-foreground" : "text-muted-foreground",
+                )}
+              />
+              <span className={cn(isActive && "font-semibold")}>{item.label}</span>
+            </Link>
+          );
+        }
+        return (
+          <button
+            key={item.label}
+            type="button"
+            onClick={() => {
+              onNavigate();
+              item.onClick();
+            }}
+            className={sharedClass}
+          >
+            <Icon className="size-6 shrink-0 text-muted-foreground" />
+            <span>{item.label}</span>
+          </button>
+        );
+      })}
+    </div>
   );
 }
