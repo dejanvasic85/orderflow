@@ -75,12 +75,22 @@ export function OrderDetailsView({
       {(order.delivery_address || order.delivery_instructions) && (
         <div className="rounded-xl border border-border/60 bg-muted/30 px-4 py-3 flex gap-3">
           <MapPin className="h-4 w-4 mt-0.5 shrink-0 text-muted-foreground" />
-          <div className="flex flex-col gap-0.5">
+          <div className="flex flex-col gap-3">
             {order.delivery_address && (
-              <p className="text-sm font-medium">{order.delivery_address}</p>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Delivery address
+                </span>
+                <p className="text-sm font-medium whitespace-pre-line">{order.delivery_address}</p>
+              </div>
             )}
             {order.delivery_instructions && (
-              <p className="text-sm text-muted-foreground">{order.delivery_instructions}</p>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Delivery instructions
+                </span>
+                <p className="text-sm whitespace-pre-line">{order.delivery_instructions}</p>
+              </div>
             )}
           </div>
         </div>

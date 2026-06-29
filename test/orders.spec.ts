@@ -22,6 +22,13 @@ test.describe("Orders", () => {
 
     await expect(page.getByRole("heading", { name: "New order" })).toBeVisible();
 
+    // The delivery address pre-fills from the account (Harvest Table) and is editable per order.
+    await expect(page.getByLabel(/delivery address/i)).toHaveValue(
+      "4 Orchard Rd, Yarra Glen VIC 3775",
+    );
+    const deliveryAddress = "9 One-Off Court, Healesville VIC 3777";
+    await page.getByLabel(/delivery address/i).fill(deliveryAddress);
+
     const deliveryInstructions = "Leave at the side gate, code 4821.";
     await page.getByLabel(/delivery instructions/i).fill(deliveryInstructions);
     await expect(page.getByLabel(/delivery instructions/i)).toHaveValue(deliveryInstructions);
@@ -40,6 +47,16 @@ test.describe("Orders", () => {
     const staffEmail = await waitForMessageTo("admin@bwow.com.au");
     expect(staffEmail.Subject).toContain("New order");
     expect(staffEmail.Subject).toContain("Harvest Table");
+
+    // The order detail shows both the (edited) delivery address and the instructions —
+    // they must appear together, not cancel each other out. The success URL holds the new
+    // order's id; the detail page is the same URL without the trailing "/success".
+    await page.goto(page.url().replace(/\/success$/, ""));
+
+    await expect(page.getByText("Delivery address")).toBeVisible();
+    await expect(page.getByText(deliveryAddress)).toBeVisible();
+    await expect(page.getByText("Delivery instructions")).toBeVisible();
+    await expect(page.getByText(deliveryInstructions)).toBeVisible();
   });
 
   test("admin places an order on behalf of an account via the combobox", async ({ page }) => {

@@ -4,7 +4,6 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { OrderDetailsView } from "@/components/orderRequests/OrderDetailsView";
 import { getOrderRequestAsAdminOrStaff } from "@/lib/orderRequests/orderRequests.functions";
 import type { OrderRequestWithItems } from "@/lib/orderRequests/schema";
-import { formatOrderRef } from "@/lib/orderRequests/schema";
 
 export const Route = createFileRoute("/_protected/manage/orders/$orderId")({
   loader: async ({ params }) => {
@@ -33,11 +32,11 @@ function AdminOrderDetailsPage() {
   }
 
   const placedByName = order.users?.name ?? "Unknown";
-  const accountName = order.accounts?.name;
+  const accountName = order.accounts?.name ?? "Order";
 
   return (
     <>
-      <PageHeader title={formatOrderRef(order.order_number)} description={accountName} />
+      <PageHeader title={accountName} />
       <PageContent>
         <OrderDetailsView
           order={order}

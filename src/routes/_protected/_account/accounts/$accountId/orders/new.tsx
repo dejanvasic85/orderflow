@@ -64,10 +64,12 @@ function NewOrderPage() {
 
   async function handleSubmit({
     templateId,
+    deliveryAddress,
     deliveryInstructions,
     items,
   }: {
     templateId: string | null;
+    deliveryAddress: string | null;
     deliveryInstructions: string | null;
     items: { product_id: string; boxes: number; extra_units: number }[];
   }) {
@@ -75,6 +77,7 @@ function NewOrderPage() {
       data: {
         account_id: accountId,
         template_id: templateId,
+        delivery_address: deliveryAddress,
         delivery_instructions: deliveryInstructions,
         items,
       },
@@ -93,6 +96,7 @@ function NewOrderPage() {
       key={`${accountId}:${search.fromOrderId ?? ""}`}
       accountId={accountId}
       accountName={account.name}
+      defaultDeliveryAddress={account.delivery_address ?? null}
       defaultDeliveryInstructions={account.delivery_instructions ?? null}
       template={template}
       initialItems={initialItems}
