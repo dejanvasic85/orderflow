@@ -13,6 +13,7 @@ import { OrderItemsList } from "./OrderItemsList";
 
 type OrderFormPayload = {
   templateId: string | null;
+  deliveryAddress: string | null;
   deliveryInstructions: string | null;
   items: OrderRequestItemInput[];
 };
@@ -20,6 +21,7 @@ type OrderFormPayload = {
 type NewOrderFormProps = {
   accountId: string;
   accountName: string;
+  defaultDeliveryAddress: string | null;
   defaultDeliveryInstructions: string | null;
   template: TemplateWithItems | null;
   initialItems?: OrderRequestItemInput[];
@@ -50,6 +52,7 @@ function buildInitialItems(
 export function NewOrderForm({
   accountId,
   accountName,
+  defaultDeliveryAddress,
   defaultDeliveryInstructions,
   template,
   initialItems,
@@ -62,6 +65,7 @@ export function NewOrderForm({
     buildInitialItems(template, persistDraft, accountId, initialItems),
   );
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [deliveryAddress, setDeliveryAddress] = useState(defaultDeliveryAddress ?? "");
   const [deliveryInstructions, setDeliveryInstructions] = useState(
     defaultDeliveryInstructions ?? "",
   );
@@ -97,6 +101,7 @@ export function NewOrderForm({
     try {
       await onSubmit({
         templateId: template?.id ?? null,
+        deliveryAddress: deliveryAddress || null,
         deliveryInstructions: deliveryInstructions || null,
         items,
       });
@@ -141,6 +146,23 @@ export function NewOrderForm({
         </div>
 
         {items.length > 0 && <Separator />}
+
+        <div className="flex flex-col gap-2">
+          <label
+            htmlFor="deliveryAddress"
+            className="text-xs font-medium uppercase tracking-widest text-muted-foreground"
+          >
+            Delivery address (optional)
+          </label>
+          <Textarea
+            id="deliveryAddress"
+            placeholder="Where should this be delivered?"
+            rows={2}
+            className="resize-none"
+            value={deliveryAddress}
+            onChange={(e) => setDeliveryAddress(e.target.value)}
+          />
+        </div>
 
         <div className="flex flex-col gap-2">
           <label

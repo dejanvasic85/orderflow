@@ -5,7 +5,6 @@ import { OrderDetailsView } from "@/components/orderRequests/OrderDetailsView";
 import { getAccount } from "@/lib/accounts/accounts.functions";
 import { getOrderRequest } from "@/lib/orderRequests/orderRequests.functions";
 import type { OrderRequestWithItems } from "@/lib/orderRequests/schema";
-import { formatOrderRef } from "@/lib/orderRequests/schema";
 
 export const Route = createFileRoute("/_protected/_account/accounts/$accountId/orders/$orderId/")({
   loader: async ({ params }) => {
@@ -49,7 +48,7 @@ function OrderDetailsPage() {
 
   return (
     <>
-      <PageHeader title={formatOrderRef(order.order_number)} description={account.name} />
+      <PageHeader title={account.name} />
       <PageContent>
         <OrderDetailsView
           order={order}

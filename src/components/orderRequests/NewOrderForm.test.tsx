@@ -116,6 +116,7 @@ function renderForm(overrides?: Partial<React.ComponentProps<typeof NewOrderForm
       <NewOrderForm
         accountId={accountId}
         accountName="The Winery Bistro"
+        defaultDeliveryAddress={null}
         defaultDeliveryInstructions={null}
         template={template}
         products={allProducts}
@@ -167,6 +168,7 @@ test("calls onSubmit with mapped payload when submitted with no delivery instruc
 
   expect(onSubmit).toHaveBeenCalledWith({
     templateId: "d4e5f6a7-b8c9-4d0e-9f2a-000000000001",
+    deliveryAddress: null,
     deliveryInstructions: null,
     items: [
       { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 2, extra_units: 0 },
@@ -206,6 +208,41 @@ test("submits null deliveryInstructions when user clears the pre-filled value", 
   await user.click(screen.getByRole("button", { name: "Submit order" }));
 
   expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ deliveryInstructions: null }));
+});
+
+test("pre-fills the address field with defaultDeliveryAddress from account", async () => {
+  renderForm({ defaultDeliveryAddress: "12 Vine St, Hawthorn" });
+
+  expect(await screen.findByDisplayValue("12 Vine St, Hawthorn")).toBeInTheDocument();
+
+  await user.click(screen.getByRole("button", { name: "Submit order" }));
+
+  expect(onSubmit).toHaveBeenCalledWith(
+    expect.objectContaining({ deliveryAddress: "12 Vine St, Hawthorn" }),
+  );
+});
+
+test("calls onSubmit with an edited delivery address", async () => {
+  renderForm({ defaultDeliveryAddress: "12 Vine St, Hawthorn" });
+
+  const addressField = await screen.findByDisplayValue("12 Vine St, Hawthorn");
+  await user.clear(addressField);
+  await user.type(addressField, "99 Cellar Rd, Richmond");
+  await user.click(screen.getByRole("button", { name: "Submit order" }));
+
+  expect(onSubmit).toHaveBeenCalledWith(
+    expect.objectContaining({ deliveryAddress: "99 Cellar Rd, Richmond" }),
+  );
+});
+
+test("submits null deliveryAddress when user clears the pre-filled value", async () => {
+  renderForm({ defaultDeliveryAddress: "12 Vine St, Hawthorn" });
+
+  const addressField = await screen.findByDisplayValue("12 Vine St, Hawthorn");
+  await user.clear(addressField);
+  await user.click(screen.getByRole("button", { name: "Submit order" }));
+
+  expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ deliveryAddress: null }));
 });
 
 test("calls onBack when the account name button is clicked", async () => {
