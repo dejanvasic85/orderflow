@@ -5,7 +5,6 @@ import { ProductCard } from "./ProductCard";
 const product: ProductRow = {
   id: "prod-1",
   name: "Sparkling Water",
-  description: "Refreshing sparkling water",
   image_url: null,
   qty_per_box: 24,
   active: true,
@@ -23,18 +22,6 @@ test("renders qty per box badge", () => {
   render(<ProductCard product={product} />);
 
   expect(screen.getByText("24 per box")).toBeInTheDocument();
-});
-
-test("renders product description when present", () => {
-  render(<ProductCard product={product} />);
-
-  expect(screen.getByText("Refreshing sparkling water")).toBeInTheDocument();
-});
-
-test("does not render description when absent", () => {
-  render(<ProductCard product={{ ...product, description: null }} />);
-
-  expect(screen.queryByText("Refreshing sparkling water")).not.toBeInTheDocument();
 });
 
 test("renders action slot content when provided", () => {

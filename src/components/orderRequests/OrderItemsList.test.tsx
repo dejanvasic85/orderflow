@@ -7,7 +7,6 @@ import { OrderItemsList } from "./OrderItemsList";
 const chardonnay: ProductRow = {
   id: "prod-1",
   name: "Chardonnay",
-  description: null,
   image_url: null,
   qty_per_box: 6,
   active: true,
@@ -18,7 +17,6 @@ const chardonnay: ProductRow = {
 const merlot: ProductRow = {
   id: "prod-2",
   name: "Merlot",
-  description: null,
   image_url: null,
   qty_per_box: 12,
   active: true,

@@ -21,7 +21,6 @@ vi.mock("@/components/products/ImageUpload", () => ({
 const existingProduct: ProductRow = {
   id: "prod-1",
   name: "Sparkling Water",
-  description: "Refreshing bubbles",
   image_url: "https://images.example.com/sparkling.jpg",
   qty_per_box: 12,
   active: true,
@@ -42,7 +41,6 @@ test("create mode submits the mapped payload", async () => {
   render(<ProductEditPanel mode="create" onSave={onSave} onDiscard={onDiscard} />);
 
   await user.type(screen.getByLabelText("Name"), "Cider — Apple");
-  await user.type(screen.getByLabelText("Description"), "Crisp and dry");
   await user.type(screen.getByLabelText("Image upload"), "https://images.example.com/cider.jpg");
   await user.clear(screen.getByLabelText("Quantity per box"));
   await user.type(screen.getByLabelText("Quantity per box"), "6");
@@ -50,14 +48,13 @@ test("create mode submits the mapped payload", async () => {
 
   expect(onSave).toHaveBeenCalledWith({
     name: "Cider — Apple",
-    description: "Crisp and dry",
     image_url: "https://images.example.com/cider.jpg",
     qty_per_box: 6,
     active: true,
   });
 });
 
-test("create mode submits null description and image_url when left empty", async () => {
+test("create mode submits null image_url when left empty", async () => {
   render(<ProductEditPanel mode="create" onSave={onSave} onDiscard={onDiscard} />);
 
   await user.type(screen.getByLabelText("Name"), "Cider — Apple");
@@ -65,7 +62,6 @@ test("create mode submits null description and image_url when left empty", async
 
   expect(onSave).toHaveBeenCalledWith({
     name: "Cider — Apple",
-    description: null,
     image_url: null,
     qty_per_box: 1,
     active: true,
@@ -85,7 +81,6 @@ test("edit mode prefills fields from the product", () => {
   render(<ProductEditPanel product={existingProduct} onSave={onSave} onDiscard={onDiscard} />);
 
   expect(screen.getByLabelText("Name")).toHaveValue("Sparkling Water");
-  expect(screen.getByLabelText("Description")).toHaveValue("Refreshing bubbles");
   expect(screen.getByAltText("Current product image")).toHaveAttribute(
     "src",
     "https://images.example.com/sparkling.jpg",
@@ -103,7 +98,6 @@ test("edit mode submits the payload including the product id", async () => {
   expect(onSave).toHaveBeenCalledWith({
     id: "prod-1",
     name: "Sparkling Water",
-    description: "Refreshing bubbles",
     image_url: "https://images.example.com/sparkling.jpg",
     qty_per_box: 24,
     active: true,
@@ -119,7 +113,6 @@ test("edit mode submits active false after toggling the Active switch off", asyn
   expect(onSave).toHaveBeenCalledWith({
     id: "prod-1",
     name: "Sparkling Water",
-    description: "Refreshing bubbles",
     image_url: "https://images.example.com/sparkling.jpg",
     qty_per_box: 12,
     active: false,

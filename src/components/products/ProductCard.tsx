@@ -1,7 +1,7 @@
 import { Package } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { ProductRow } from "@/lib/products/schema";
 
 type ProductImageProps = {
@@ -41,9 +41,6 @@ export function ProductCard({ product, action }: ProductCardProps) {
       <ProductImage imageUrl={product.image_url} name={product.name} />
       <CardHeader className="flex-1">
         <CardTitle className="line-clamp-2">{product.name}</CardTitle>
-        {product.description && (
-          <CardDescription className="line-clamp-3">{product.description}</CardDescription>
-        )}
       </CardHeader>
       <CardContent className="flex flex-col gap-2">
         <Badge variant="secondary" className="w-fit">
