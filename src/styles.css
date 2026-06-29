@@ -1,4 +1,5 @@
 @import "@fontsource-variable/outfit";
+@import "@fontsource-variable/fraunces";
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -7,78 +8,137 @@
 
 @plugin "@tailwindcss/typography";
 
+/*
+  Boutique Wines of the World — brand system
+  ------------------------------------------
+  Primary    : burgundy (deep wine red)  — oklch hue ~18
+  Surface    : warm ivory                — barely-warm off-white
+  Secondary  : warm greige               — taupe-leaning neutral (warm hue ~60)
+  Display    : Fraunces (refined serif)  — headings only
+  Body       : Outfit (clean sans)       — forms, data, UI
+*/
+
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  /* Warm ivory surfaces, deep warm charcoal text */
+  --background: oklch(0.985 0.004 70);
+  --foreground: oklch(0.22 0.012 40);
+  --card: oklch(0.995 0.003 80);
+  --card-foreground: oklch(0.22 0.012 40);
+  --popover: oklch(0.995 0.003 80);
+  --popover-foreground: oklch(0.22 0.012 40);
+
+  /* Burgundy primary */
+  --primary: oklch(0.4 0.13 18);
+  --primary-foreground: oklch(0.985 0.006 60);
+
+  /* Warm greige secondary */
+  --secondary: oklch(0.94 0.008 70);
+  --secondary-foreground: oklch(0.3 0.02 45);
+
+  --muted: oklch(0.95 0.006 70);
+  --muted-foreground: oklch(0.52 0.015 50);
+
+  /* Accent leans into a soft burgundy tint for hover/selected surfaces */
+  --accent: oklch(0.93 0.02 20);
+  --accent-foreground: oklch(0.36 0.12 18);
+
+  --destructive: oklch(0.55 0.2 27);
+
+  --border: oklch(0.9 0.008 65);
+  --input: oklch(0.91 0.008 65);
+  --ring: oklch(0.4 0.13 18);
+
+  /* Charts: a warm burgundy-to-gold progression */
+  --chart-1: oklch(0.4 0.13 18);
+  --chart-2: oklch(0.52 0.11 30);
+  --chart-3: oklch(0.65 0.1 55);
+  --chart-4: oklch(0.74 0.09 75);
+  --chart-5: oklch(0.82 0.06 85);
+
+  --radius: 0.75rem;
+
+  /* Sidebar — a touch deeper than the page for quiet separation */
+  --sidebar: oklch(0.97 0.006 70);
+  --sidebar-foreground: oklch(0.22 0.012 40);
+  --sidebar-primary: oklch(0.4 0.13 18);
+  --sidebar-primary-foreground: oklch(0.985 0.006 60);
+  --sidebar-accent: oklch(0.93 0.02 20);
+  --sidebar-accent-foreground: oklch(0.36 0.12 18);
+  --sidebar-border: oklch(0.9 0.008 65);
+  --sidebar-ring: oklch(0.4 0.13 18);
+
+  /* Warm, layered shadows — tinted with the burgundy/charcoal warmth,
+     never pure-black. This is a big part of the "premium" read. */
+  --shadow-color: 25 35% 18%;
+  --shadow-xs: 0 1px 2px 0 hsl(var(--shadow-color) / 0.04);
+  --shadow-sm:
+    0 1px 2px -1px hsl(var(--shadow-color) / 0.08), 0 2px 4px -2px hsl(var(--shadow-color) / 0.05);
+  --shadow-md:
+    0 2px 4px -2px hsl(var(--shadow-color) / 0.08), 0 6px 12px -3px hsl(var(--shadow-color) / 0.08);
+  --shadow-lg:
+    0 4px 8px -3px hsl(var(--shadow-color) / 0.08), 0 14px 28px -6px hsl(var(--shadow-color) / 0.12);
+  --shadow-xl:
+    0 8px 16px -6px hsl(var(--shadow-color) / 0.1),
+    0 24px 48px -10px hsl(var(--shadow-color) / 0.16);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
+  /* Wine-cellar dark: near-black warm aubergine */
+  --background: oklch(0.18 0.018 25);
+  --foreground: oklch(0.95 0.006 70);
+  --card: oklch(0.22 0.02 25);
+  --card-foreground: oklch(0.95 0.006 70);
+  --popover: oklch(0.22 0.02 25);
+  --popover-foreground: oklch(0.95 0.006 70);
+
+  --primary: oklch(0.62 0.16 20);
+  --primary-foreground: oklch(0.16 0.02 25);
+
+  --secondary: oklch(0.3 0.02 30);
+  --secondary-foreground: oklch(0.95 0.006 70);
+
+  --muted: oklch(0.3 0.02 30);
+  --muted-foreground: oklch(0.72 0.015 60);
+
+  --accent: oklch(0.34 0.06 22);
+  --accent-foreground: oklch(0.9 0.04 30);
+
+  --destructive: oklch(0.7 0.19 22);
+
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --ring: oklch(0.62 0.16 20);
+
+  --chart-1: oklch(0.62 0.16 20);
+  --chart-2: oklch(0.6 0.12 35);
+  --chart-3: oklch(0.68 0.1 60);
+  --chart-4: oklch(0.76 0.09 78);
+  --chart-5: oklch(0.84 0.06 88);
+
+  --sidebar: oklch(0.2 0.02 25);
+  --sidebar-foreground: oklch(0.95 0.006 70);
+  --sidebar-primary: oklch(0.62 0.16 20);
+  --sidebar-primary-foreground: oklch(0.16 0.02 25);
+  --sidebar-accent: oklch(0.34 0.06 22);
+  --sidebar-accent-foreground: oklch(0.9 0.04 30);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --sidebar-ring: oklch(0.62 0.16 20);
+
+  --shadow-color: 0 0% 0%;
+  --shadow-xs: 0 1px 2px 0 hsl(var(--shadow-color) / 0.2);
+  --shadow-sm:
+    0 1px 2px -1px hsl(var(--shadow-color) / 0.3), 0 2px 4px -2px hsl(var(--shadow-color) / 0.2);
+  --shadow-md:
+    0 2px 4px -2px hsl(var(--shadow-color) / 0.3), 0 6px 12px -3px hsl(var(--shadow-color) / 0.3);
+  --shadow-lg:
+    0 4px 8px -3px hsl(var(--shadow-color) / 0.3), 0 14px 28px -6px hsl(var(--shadow-color) / 0.4);
+  --shadow-xl:
+    0 8px 16px -6px hsl(var(--shadow-color) / 0.4), 0 24px 48px -10px hsl(var(--shadow-color) / 0.5);
 }
 
 @theme inline {
-  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
-  --font-heading: var(--font-sans);
+  --font-sans: "Outfit Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "Fraunces Variable", ui-serif, Georgia, serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -117,6 +177,11 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+  --shadow-xs: var(--shadow-xs);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-xl: var(--shadow-xl);
 }
 
 @layer base {
@@ -125,22 +190,41 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "ss01", "cv01";
   }
   html {
     @apply font-sans;
+    /* Slightly larger base for the phone-first, premium read */
+    font-size: 17px;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
 
-  /* Apple-scale typography */
+  /* Editorial display headings — Fraunces, optical-size aware */
+  h1,
+  h2,
+  h3 {
+    @apply font-heading;
+    font-optical-sizing: auto;
+    font-variation-settings:
+      "SOFT" 0,
+      "WONK" 0;
+  }
+
+  /* Apple-scale typography — larger, tighter, serif display */
   h1 {
-    @apply text-5xl font-semibold tracking-tight md:text-6xl;
+    @apply text-4xl font-semibold tracking-tight md:text-6xl;
+    letter-spacing: -0.02em;
   }
   h2 {
     @apply text-3xl font-semibold tracking-tight md:text-4xl;
+    letter-spacing: -0.015em;
   }
   h3 {
-    @apply text-2xl font-semibold;
+    @apply text-2xl font-semibold md:text-3xl;
+    letter-spacing: -0.01em;
   }
   h4 {
-    @apply text-xl font-semibold;
+    @apply text-lg font-semibold md:text-xl;
   }
 }

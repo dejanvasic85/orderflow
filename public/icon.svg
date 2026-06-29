@@ -1,0 +1,30 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Boutique Wines of the World">
+  <defs>
+    <linearGradient id="tile" x1="64" y1="40" x2="448" y2="472" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#7A2233"/>
+      <stop offset="0.55" stop-color="#6A1A2C"/>
+      <stop offset="1" stop-color="#581525"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.2" cy="0.05" r="0.9" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.18"/>
+      <stop offset="0.55" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Burgundy tile -->
+  <rect x="0" y="0" width="512" height="512" rx="116" fill="url(#tile)"/>
+  <rect x="0" y="0" width="512" height="512" rx="116" fill="url(#glow)"/>
+
+  <!-- High-contrast serif 'B' in ivory (Fraunces-inspired thick/thin contrast).
+       Centred optically within the tile; serifs top & bottom on the stem. -->
+  <g fill="#FAF6F0">
+    <path d="M176 150
+             h150 q34 0 56 20 q22 20 22 51 q0 24 -14 41 q-9 11 -23 17
+             q20 5 33 19 q17 19 17 47 q0 34 -24 56 q-24 22 -62 22
+             h-155
+             v-30
+             h28 v-243 h-28 z
+             M234 180 v95 h82 q22 0 34 -13 q12 -13 12 -35 q0 -22 -13 -34 q-13 -13 -36 -13 z
+             M234 305 v97 h86 q24 0 37 -13 q13 -13 13 -36 q0 -23 -14 -36 q-14 -12 -39 -12 z"/>
+  </g>
+</svg>
