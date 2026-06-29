@@ -87,7 +87,7 @@ Change requests and bugs:
 - [x] Description for the product isn't required
 - [ ] Add descriptions in the Role dropdown for the User management to explain what roles are capable of what
 - [ ] Users are getting "active" automatically instead of staying pending until they accept
-- [ ] Address details and delivery details should both appear and not cancel each other out
+- [x] Address details and delivery details should both appear and not cancel each other out
 - [x] Drawer height on mobile is no bigger than 85% of the view height.
 
 ---
