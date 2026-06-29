@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
 import type { CreateProductInput, ProductRow, UpdateProductInput } from "@/lib/products/schema";
 
 type BaseProps = {
@@ -28,7 +27,6 @@ type Props =
 
 const productEditSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  description: z.string(),
   imageUrl: z
     .string()
     .refine((v) => v === "" || z.url().safeParse(v).success, "Must be a valid URL"),
@@ -52,7 +50,6 @@ export function ProductEditPanel(props: Props) {
   const form = useForm({
     defaultValues: {
       name: product?.name ?? "",
-      description: product?.description ?? "",
       imageUrl: product?.image_url ?? "",
       qtyPerBox: product?.qty_per_box ?? 1,
       active: product?.active ?? true,
@@ -61,7 +58,6 @@ export function ProductEditPanel(props: Props) {
     onSubmit: ({ value }) => {
       const payload = {
         name: value.name,
-        description: value.description.trim() || null,
         image_url: value.imageUrl || null,
         qty_per_box: value.qtyPerBox,
         active: value.active,
@@ -102,21 +98,6 @@ export function ProductEditPanel(props: Props) {
               <FieldLabel htmlFor="product-name">Name</FieldLabel>
               <Input
                 id="product-name"
-                value={field.state.value}
-                onChange={(e) => field.handleChange(e.target.value)}
-                onBlur={field.handleBlur}
-              />
-              <FieldError errors={toFieldErrors(field.state.meta.errors)} />
-            </Field>
-          )}
-        </form.Field>
-
-        <form.Field name="description">
-          {(field) => (
-            <Field>
-              <FieldLabel htmlFor="product-description">Description</FieldLabel>
-              <Textarea
-                id="product-description"
                 value={field.state.value}
                 onChange={(e) => field.handleChange(e.target.value)}
                 onBlur={field.handleBlur}

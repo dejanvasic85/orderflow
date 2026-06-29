@@ -7,8 +7,7 @@ import type {
   UpdateProductInput,
 } from "./schema";
 
-const productSelect =
-  "id, name, description, image_url, qty_per_box, active, created_at, updated_at" as const;
+const productSelect = "id, name, image_url, qty_per_box, active, created_at, updated_at" as const;
 
 export type ProductRepository = {
   findActiveProducts(): Promise<Result<ProductRow[]>>;
@@ -45,7 +44,7 @@ export function createProductRepository(): ProductRepository {
       if (filters.q) {
         const safe = filters.q.replace(/[,%_()]/g, "").trim();
         if (safe.length > 0) {
-          query = query.or(`name.ilike.%${safe}%,description.ilike.%${safe}%`);
+          query = query.ilike("name", `%${safe}%`);
         }
       }
 

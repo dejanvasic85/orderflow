@@ -25,7 +25,6 @@ const accountId = "b2c3d4e5-f6a7-4b8c-9d0e-000000000a01";
 const rose: ProductRow = {
   id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001",
   name: "Rosé",
-  description: null,
   image_url: null,
   qty_per_box: 6,
   active: true,
@@ -36,7 +35,6 @@ const rose: ProductRow = {
 const pinotNoir: ProductRow = {
   id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000002",
   name: "Pinot Noir",
-  description: null,
   image_url: null,
   qty_per_box: 12,
   active: true,
@@ -48,7 +46,6 @@ const pinotNoir: ProductRow = {
 const product1: ProductRow = {
   id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003",
   name: "Chardonnay",
-  description: null,
   image_url: null,
   qty_per_box: 6,
   active: true,
@@ -59,7 +56,6 @@ const product1: ProductRow = {
 const product2: ProductRow = {
   id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000004",
   name: "Merlot",
-  description: null,
   image_url: null,
   qty_per_box: 12,
   active: true,

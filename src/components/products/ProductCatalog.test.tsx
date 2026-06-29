@@ -7,7 +7,6 @@ function makeProduct(overrides: Partial<ProductRow> = {}): ProductRow {
   return {
     id: "prod-1",
     name: "Sparkling Water",
-    description: null,
     image_url: null,
     qty_per_box: 12,
     active: true,

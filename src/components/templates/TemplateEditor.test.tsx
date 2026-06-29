@@ -47,7 +47,6 @@ const products: ProductRow[] = [
   {
     id: "prod-1",
     name: "Chardonnay",
-    description: null,
     image_url: null,
     qty_per_box: 6,
     active: true,
@@ -57,7 +56,6 @@ const products: ProductRow[] = [
   {
     id: "prod-2",
     name: "Rosé",
-    description: null,
     image_url: null,
     qty_per_box: 12,
     active: true,

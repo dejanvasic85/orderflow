@@ -84,7 +84,7 @@ Change requests and bugs:
 - [x] Use the word Units in the email
 - [x] The order needs an image for the product instead of just text
 - [x] Users should be able to order again but they should also have ability to edit the items
-- [ ] Description for the product isn't required
+- [x] Description for the product isn't required
 - [ ] Add descriptions in the Role dropdown for the User management to explain what roles are capable of what
 - [ ] Users are getting "active" automatically instead of staying pending until they accept
 - [ ] Address details and delivery details should both appear and not cancel each other out
@@ -94,9 +94,12 @@ Change requests and bugs:
 
 ## Code Cleanup - Post release
 
+- [x] Local development has auth emails going to mailpit but only to console for transactional emails
 - [x] We need a much better and cleaner pattern for Authz
 - [x] The .server.ts files have too much logic in them or all database operations should be somewhere else
 - [ ] Replace all the deprecated API's like `inputValidator` on the tanstack lib
+- [ ] Audit all the variable naming so they are camelCased
+
 - [ ] Cleanup | Casting and typescript needs general cleanup
 
 ```ts
@@ -118,7 +121,3 @@ if (!accountResult.value) throw notFound();
 if (!templateResult.ok) throw new Error(templateResult.error.message);
 if (!productsResult.ok) throw new Error(productsResult.error.message);
 ```
-
-- [ ] Audit all the variable naming so they are camelCased
-
-- [ ] Local development has auth emails going to mailpit but only to console for transactional emails

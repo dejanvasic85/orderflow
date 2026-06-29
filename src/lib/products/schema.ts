@@ -5,7 +5,6 @@ export type ProductRow = Database["public"]["Tables"]["products"]["Row"];
 
 export const createProductSchema = z.object({
   name: z.string().min(1),
-  description: z.string().nullable().optional(),
   image_url: z.string().url().nullable().optional(),
   qty_per_box: z.number().int().min(1),
   active: z.boolean().optional(),

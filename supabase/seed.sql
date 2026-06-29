@@ -186,19 +186,19 @@ ON CONFLICT (id) DO NOTHING;
 -- PRODUCTS
 -- ============================================================
 
-INSERT INTO public.products (id, name, description, qty_per_box, image_url) VALUES
-  ('c3d4e5f6-a7b8-4c9d-8e1f-000000000001', 'Rosé — Provence',               'Dry, pale rosé from southern France',                 6,  'https://pub-8ed295401d494d38a2bf577dd8b8d502.r2.dev/rose.jpg'),
-  ('c3d4e5f6-a7b8-4c9d-8e1f-000000000002', 'Pinot Noir — Central Otago',    'Medium-bodied, cherry and plum notes',                12, 'https://pub-8ed295401d494d38a2bf577dd8b8d502.r2.dev/pinot-noir.jpg'),
-  ('c3d4e5f6-a7b8-4c9d-8e1f-000000000003', 'Chardonnay — Margaret River',   'Unoaked, crisp and citrusy',                          12, 'https://pub-8ed295401d494d38a2bf577dd8b8d502.r2.dev/chardonnay.jpg'),
-  ('c3d4e5f6-a7b8-4c9d-8e1f-000000000004', 'Sauvignon Blanc — Marlborough', 'Classic New Zealand style, passionfruit and citrus',  12, 'https://pub-8ed295401d494d38a2bf577dd8b8d502.r2.dev/sauvignon-blanc.jpg'),
-  ('c3d4e5f6-a7b8-4c9d-8e1f-000000000005', 'Shiraz — Barossa Valley',       'Full-bodied, dark fruit and cracked pepper',          6,  'https://pub-8ed295401d494d38a2bf577dd8b8d502.r2.dev/shiraz.jpg'),
-  ('c3d4e5f6-a7b8-4c9d-8e1f-000000000006', 'Prosecco — Veneto DOC',         'Light, fresh Italian sparkling wine',                 6,  'https://pub-8ed295401d494d38a2bf577dd8b8d502.r2.dev/prosecco.jpg'),
-  ('c3d4e5f6-a7b8-4c9d-8e1f-000000000007', 'Gin — Australian Botanical',    'Small-batch, native Australian botanicals',           6,  'https://pub-8ed295401d494d38a2bf577dd8b8d502.r2.dev/gin.jpg'),
-  ('c3d4e5f6-a7b8-4c9d-8e1f-000000000008', 'Vodka — Premium Triple Distilled', 'Clean and neutral, triple distilled',              6,  'https://pub-8ed295401d494d38a2bf577dd8b8d502.r2.dev/vodka.jpg'),
-  ('c3d4e5f6-a7b8-4c9d-8e1f-000000000009', 'Dark Rum — Caribbean Aged',     '5-year aged, notes of caramel and vanilla',           6,  'https://pub-8ed295401d494d38a2bf577dd8b8d502.r2.dev/rum.jpg'),
-  ('c3d4e5f6-a7b8-4c9d-8e1f-000000000010', 'Lager — Craft Pilsner',         'Clean, crisp session lager',                          24, 'https://pub-8ed295401d494d38a2bf577dd8b8d502.r2.dev/lager.jpg'),
-  ('c3d4e5f6-a7b8-4c9d-8e1f-000000000011', 'Pale Ale — Hazy IPA',           'Tropical hops, low bitterness',                       24, 'https://pub-8ed295401d494d38a2bf577dd8b8d502.r2.dev/pale-ale.jpg'),
-  ('c3d4e5f6-a7b8-4c9d-8e1f-000000000012', 'Sparkling Water — Premium',     '750ml glass bottles',                                 12, null)
+INSERT INTO public.products (id, name, qty_per_box, image_url) VALUES
+  ('c3d4e5f6-a7b8-4c9d-8e1f-000000000001', 'Rosé — Provence',               6,  'https://pub-8ed295401d494d38a2bf577dd8b8d502.r2.dev/rose.jpg'),
+  ('c3d4e5f6-a7b8-4c9d-8e1f-000000000002', 'Pinot Noir — Central Otago',    12, 'https://pub-8ed295401d494d38a2bf577dd8b8d502.r2.dev/pinot-noir.jpg'),
+  ('c3d4e5f6-a7b8-4c9d-8e1f-000000000003', 'Chardonnay — Margaret River',   12, 'https://pub-8ed295401d494d38a2bf577dd8b8d502.r2.dev/chardonnay.jpg'),
+  ('c3d4e5f6-a7b8-4c9d-8e1f-000000000004', 'Sauvignon Blanc — Marlborough', 12, 'https://pub-8ed295401d494d38a2bf577dd8b8d502.r2.dev/sauvignon-blanc.jpg'),
+  ('c3d4e5f6-a7b8-4c9d-8e1f-000000000005', 'Shiraz — Barossa Valley',       6,  'https://pub-8ed295401d494d38a2bf577dd8b8d502.r2.dev/shiraz.jpg'),
+  ('c3d4e5f6-a7b8-4c9d-8e1f-000000000006', 'Prosecco — Veneto DOC',         6,  'https://pub-8ed295401d494d38a2bf577dd8b8d502.r2.dev/prosecco.jpg'),
+  ('c3d4e5f6-a7b8-4c9d-8e1f-000000000007', 'Gin — Australian Botanical',    6,  'https://pub-8ed295401d494d38a2bf577dd8b8d502.r2.dev/gin.jpg'),
+  ('c3d4e5f6-a7b8-4c9d-8e1f-000000000008', 'Vodka — Premium Triple Distilled', 6,  'https://pub-8ed295401d494d38a2bf577dd8b8d502.r2.dev/vodka.jpg'),
+  ('c3d4e5f6-a7b8-4c9d-8e1f-000000000009', 'Dark Rum — Caribbean Aged',     6,  'https://pub-8ed295401d494d38a2bf577dd8b8d502.r2.dev/rum.jpg'),
+  ('c3d4e5f6-a7b8-4c9d-8e1f-000000000010', 'Lager — Craft Pilsner',         24, 'https://pub-8ed295401d494d38a2bf577dd8b8d502.r2.dev/lager.jpg'),
+  ('c3d4e5f6-a7b8-4c9d-8e1f-000000000011', 'Pale Ale — Hazy IPA',           24, 'https://pub-8ed295401d494d38a2bf577dd8b8d502.r2.dev/pale-ale.jpg'),
+  ('c3d4e5f6-a7b8-4c9d-8e1f-000000000012', 'Sparkling Water — Premium',     12, null)
 ON CONFLICT (id) DO NOTHING;
 
 -- ============================================================

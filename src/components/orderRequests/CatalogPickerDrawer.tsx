@@ -86,11 +86,7 @@ export function CatalogPickerDrawer({
 
   const trimmed = query.trim().toLowerCase();
   const filtered = trimmed
-    ? products.filter(
-        (p) =>
-          p.name.toLowerCase().includes(trimmed) ||
-          (p.description ?? "").toLowerCase().includes(trimmed),
-      )
+    ? products.filter((p) => p.name.toLowerCase().includes(trimmed))
     : products;
 
   return (
