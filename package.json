@@ -18,6 +18,7 @@
   "dependencies": {
     "@aws-sdk/client-sns": "3.1075.0",
     "@cloudflare/vite-plugin": "1.42.3",
+    "@fontsource-variable/fraunces": "5.2.9",
     "@fontsource-variable/outfit": "5.2.8",
     "@supabase/ssr": "0.12.0",
     "@supabase/supabase-js": "2.108.2",

@@ -59,7 +59,7 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Security | Must | Ensure that staff have most readonly access to admin dashboard and other admin functions
 - [x] Quality | Must | Unit testing the server functions
 - [x] Quality | Must | Playwright tests improved and working locally and CI
-- [ ] Feature | Must | PWA — manifest, service worker, install prompt, offline app shell
+- [x] Feature | Must | PWA — manifest, service worker, install prompt, offline app shell
 - [x] Feature | Must | Notification preferences UI — users edit their own email/SMS preferences
 - [x] Productionising | Must | Fix the publicly available view users_with_email - see email for warning from supabase
 - [ ] Feature | Must | CSV import for products and accounts (incl. MYOB import back into our system)
@@ -71,7 +71,7 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Productionising | Must | Configure production env vars in GitHub
 - [x] Productionising | Must | Logging and monitoring (Supabase + Cloudflare — consider unifying in Cloudflare logs) sender
 - [x] Feature | Nice | Homepage dashboard — reporting / summary tiles (Phase 4, quoted separately)
-- [ ] Feature | Must | Favicon for the browser and App on the phones
+- [x] Feature | Must | Favicon for the browser and App on the phones
 
 ---
 

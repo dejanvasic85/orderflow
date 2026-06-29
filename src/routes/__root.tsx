@@ -4,6 +4,7 @@ import { HeadContent, Scripts, createRootRouteWithContext } from "@tanstack/reac
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { useEffect } from "react";
 import { Toaster } from "sonner";
+import { ServiceWorkerRegistrar } from "@/components/ServiceWorkerRegistrar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { company } from "@/lib/config";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
@@ -28,11 +29,49 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       {
         title: company.name,
       },
+      {
+        name: "theme-color",
+        content: "#6a1a2c",
+      },
+      {
+        name: "apple-mobile-web-app-title",
+        content: company.shortName.toUpperCase(),
+      },
     ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
+      },
+      {
+        rel: "icon",
+        href: "/favicon.ico",
+        sizes: "any",
+      },
+      {
+        rel: "icon",
+        type: "image/svg+xml",
+        href: "/icon.svg",
+      },
+      {
+        rel: "icon",
+        type: "image/png",
+        sizes: "32x32",
+        href: "/favicon-32x32.png",
+      },
+      {
+        rel: "icon",
+        type: "image/png",
+        sizes: "16x16",
+        href: "/favicon-16x16.png",
+      },
+      {
+        rel: "apple-touch-icon",
+        href: "/apple-touch-icon.png",
+      },
+      {
+        rel: "manifest",
+        href: "/manifest.webmanifest",
       },
     ],
   }),
@@ -55,6 +94,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body className="flex min-h-dvh flex-col font-sans antialiased [overflow-wrap:anywhere]">
         <HydrationMarker />
+        <ServiceWorkerRegistrar />
         <TooltipProvider>{children}</TooltipProvider>
         <Toaster richColors />
         <TanStackDevtools
