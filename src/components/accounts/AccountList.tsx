@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { FileText, MoreHorizontal, PencilLine, Search, ShoppingCart, Users } from "lucide-react";
+import { FileText, MoreHorizontal, PencilLine, ShoppingCart, Users } from "lucide-react";
 import { useState, useEffect } from "react";
+import { ListSearchHeader } from "@/components/ListSearchHeader";
 import { Paging } from "@/components/Paging";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,7 +11,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -65,22 +65,13 @@ export function AccountList({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-3">
-        <InputGroup className="max-w-sm">
-          <InputGroupAddon>
-            <Search />
-          </InputGroupAddon>
-          <InputGroupInput
-            aria-label="Search accounts"
-            placeholder="Search by name..."
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-          />
-        </InputGroup>
-        <span className="text-sm text-muted-foreground">
-          {total} {total === 1 ? "account" : "accounts"}
-        </span>
-      </div>
+      <ListSearchHeader
+        value={inputValue}
+        placeholder="Search by name..."
+        ariaLabel="Search accounts"
+        countLabel={`${total} ${total === 1 ? "account" : "accounts"}`}
+        onChange={setInputValue}
+      />
 
       <Table>
         <TableHeader>
