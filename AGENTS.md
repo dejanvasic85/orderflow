@@ -157,7 +157,7 @@ Vite+ automatically detects and wraps the underlying package manager through `pa
 
 ## React and UI
 
-- When you make UI changes be sure to use the agent-browser skill to test it out
+- Do not visually verify UI changes (no browser/agent-browser); the maintainer verifies these manually. Unit tests, linting, and the other quality gates passing is sufficient to consider UI work done.
 - Use React + TypeScript with explicit prop types in the same file
 - Do not use inline object types in component parameters; declare a `type`/`interface` first
 - Keep constants outside component bodies unless they must capture runtime state
