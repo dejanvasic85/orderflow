@@ -171,7 +171,8 @@ test.describe("Orders", () => {
 
     await page.getByRole("button", { name: /submit order/i }).click();
 
-    // After submit, lands on the created order's detail page.
+    // After submit, lands on the created order's detail page (not the /new form).
+    await page.waitForURL(/\/manage\/orders\/(?!new)[^/]+$/, { timeout: 30000 });
     await expect(page.getByRole("heading", { name: /^ORD-\d{4}$/ }).first()).toBeVisible({
       timeout: 15000,
     });
@@ -196,6 +197,7 @@ test.describe("Orders", () => {
     await expect(page.getByText(/Pinot Noir/i)).toBeVisible();
 
     await page.getByRole("button", { name: /submit order/i }).click();
+    await page.waitForURL(/\/manage\/orders\/(?!new)[^/]+$/, { timeout: 30000 });
     await expect(page.getByRole("heading", { name: /^ORD-\d{4}$/ }).first()).toBeVisible({
       timeout: 15000,
     });
