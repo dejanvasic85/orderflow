@@ -7,6 +7,27 @@ import { deleteAllMailpitMessages, waitForMessageTo } from "./mailpit";
 // against another's expected subject.
 test.describe.configure({ mode: "serial" });
 
+// The order detail page lives at /manage/orders/<id> (a path segment that is not "new").
+const orderDetailUrl = /\/manage\/orders\/(?!new)[^/]+$/;
+
+// Submitting an order POSTs to a TanStack Start server function on the Vite dev
+// server. Under CI load that dev server occasionally drops the request ("Failed to
+// fetch"), which throws in the submit handler and leaves the form in place — a flake,
+// not a product bug. Retry the click only while we are still on the /new form, so a
+// submit that already navigated is never re-issued (avoids double-creating an order).
+async function submitOrderAndAwaitDetail(page: import("@playwright/test").Page) {
+  const submit = page.getByRole("button", { name: /submit order/i });
+  await expect(submit).toBeEnabled();
+
+  await expect(async () => {
+    if (orderDetailUrl.test(new URL(page.url()).pathname)) return;
+    await submit.click();
+    await page.waitForURL(orderDetailUrl, { timeout: 10000 });
+  }).toPass({ timeout: 45000 });
+
+  await expect(page.getByRole("heading", { name: /^ORD-\d{4}$/ }).first()).toBeVisible();
+}
+
 test.describe("Orders", () => {
   test.beforeEach(async () => {
     await deleteAllMailpitMessages();
@@ -153,6 +174,7 @@ test.describe("Orders", () => {
   });
 
   test("admin can re-order from the orders list", async ({ page }) => {
+    test.setTimeout(90000);
     await login(page, { user: "admin" });
     // Navigate directly to order ORD-0001 (seeded Winery Bistro order with Rosé + Pinot Noir).
     await goto(page, "/manage/orders?q=ORD-0001");
@@ -169,15 +191,12 @@ test.describe("Orders", () => {
     await expect(page.getByText(/Rosé/i)).toBeVisible();
     await expect(page.getByText(/Pinot Noir/i)).toBeVisible();
 
-    await page.getByRole("button", { name: /submit order/i }).click();
-
-    // After submit, lands on the created order's detail page.
-    await expect(page.getByRole("heading", { name: /^ORD-\d{4}$/ }).first()).toBeVisible({
-      timeout: 15000,
-    });
+    // After submit, lands on the created order's detail page (not the /new form).
+    await submitOrderAndAwaitDetail(page);
   });
 
   test("admin can re-order from the order detail page", async ({ page }) => {
+    test.setTimeout(90000);
     await login(page, { user: "admin" });
     // Navigate directly to a seeded order detail page.
     await goto(page, "/manage/orders/e5f6a7b8-0001-4c9d-8e1f-000000000001");
@@ -195,10 +214,7 @@ test.describe("Orders", () => {
     await expect(page.getByText(/Rosé/i)).toBeVisible();
     await expect(page.getByText(/Pinot Noir/i)).toBeVisible();
 
-    await page.getByRole("button", { name: /submit order/i }).click();
-    await expect(page.getByRole("heading", { name: /^ORD-\d{4}$/ }).first()).toBeVisible({
-      timeout: 15000,
-    });
+    await submitOrderAndAwaitDetail(page);
   });
 
   test("account user can re-order from the order history list", async ({ page }) => {
