@@ -1,7 +1,7 @@
-import { ClipboardList, Search } from "lucide-react";
+import { ClipboardList } from "lucide-react";
 import { useEffect, useState } from "react";
+import { ListSearchHeader } from "@/components/ListSearchHeader";
 import { Paging } from "@/components/Paging";
-import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { useDebounce } from "@/hooks/use-debounce";
 import type { OrderHistoryItem } from "@/lib/orderRequests/schema";
 import { OrderHistoryCard } from "./OrderHistoryCard";
@@ -47,24 +47,15 @@ export function OrderHistoryList({
   return (
     <div className="flex flex-col gap-4">
       {onSearchChange && (
-        <div className="flex items-center gap-3">
-          <InputGroup className="max-w-sm">
-            <InputGroupAddon>
-              <Search />
-            </InputGroupAddon>
-            <InputGroupInput
-              aria-label="Search orders"
-              placeholder="Search by order number…"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-            />
-          </InputGroup>
-          {total !== undefined && (
-            <span className="text-sm text-muted-foreground">
-              {total} {total === 1 ? "order" : "orders"}
-            </span>
-          )}
-        </div>
+        <ListSearchHeader
+          value={inputValue}
+          placeholder="Search by order number…"
+          ariaLabel="Search orders"
+          countLabel={
+            total !== undefined ? `${total} ${total === 1 ? "order" : "orders"}` : undefined
+          }
+          onChange={setInputValue}
+        />
       )}
 
       {orders.length === 0 ? (

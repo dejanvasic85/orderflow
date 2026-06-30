@@ -1,5 +1,6 @@
-import { MoreHorizontal, Search } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import { useState, useEffect } from "react";
+import { ListSearchHeader } from "@/components/ListSearchHeader";
 import { Paging } from "@/components/Paging";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,7 +11,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -88,30 +88,21 @@ export function UserList({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-3">
-        <InputGroup className="max-w-sm">
-          <InputGroupAddon>
-            <Search />
-          </InputGroupAddon>
-          <InputGroupInput
-            aria-label="Search users"
-            placeholder="Search by name or email..."
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-          />
-        </InputGroup>
-        <span className="text-sm text-muted-foreground">
-          {total} {total === 1 ? "user" : "users"}
-        </span>
-      </div>
+      <ListSearchHeader
+        value={inputValue}
+        placeholder="Search by name or email..."
+        ariaLabel="Search users"
+        countLabel={`${total} ${total === 1 ? "user" : "users"}`}
+        onChange={setInputValue}
+      />
 
-      <div className="flex items-center gap-1.5">
+      <div className="flex flex-wrap items-center gap-1.5">
         {roleFilters.map((f) => (
           <button
             key={f.value}
             onClick={() => onRoleFilterChange(f.value)}
             className={cn(
-              "rounded-full px-3 py-1 text-sm font-medium transition-colors",
+              "rounded-full px-3 py-1.5 text-sm font-medium transition-colors sm:py-1",
               roleFilter === f.value
                 ? "bg-foreground text-background"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground",

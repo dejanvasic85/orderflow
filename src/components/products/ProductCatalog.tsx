@@ -1,5 +1,6 @@
 import { Package, Search } from "lucide-react";
 import { useEffect, useState } from "react";
+import { ListSearchHeader } from "@/components/ListSearchHeader";
 import { Paging } from "@/components/Paging";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -9,7 +10,6 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
-import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDebounce } from "@/hooks/use-debounce";
 import type { ProductRow } from "@/lib/products/schema";
@@ -65,22 +65,13 @@ export function ProductCatalog({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-3">
-        <InputGroup className="max-w-sm">
-          <InputGroupAddon>
-            <Search />
-          </InputGroupAddon>
-          <InputGroupInput
-            aria-label="Search products"
-            placeholder="Search products…"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-          />
-        </InputGroup>
-        <span className="text-sm text-muted-foreground">
-          {total} {total === 1 ? "product" : "products"}
-        </span>
-      </div>
+      <ListSearchHeader
+        value={inputValue}
+        placeholder="Search products…"
+        ariaLabel="Search products"
+        countLabel={`${total} ${total === 1 ? "product" : "products"}`}
+        onChange={setInputValue}
+      />
 
       {isLoading ? (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 items-stretch">
