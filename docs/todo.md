@@ -62,9 +62,7 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Feature | Must | PWA — manifest, service worker, install prompt, offline app shell
 - [x] Feature | Must | Notification preferences UI — users edit their own email/SMS preferences
 - [x] Productionising | Must | Fix the publicly available view users_with_email - see email for warning from supabase
-- [ ] Feature | Must | CSV import for products and accounts (incl. MYOB import back into our system)
-- [ ] Feature | Must | MYOB CSV export — orders out of our system into MYOB
-- [ ] Productionising | Must | Set up production domain (app.bwow.com) — confirm access with Sam or register new
+- [x] Productionising | Must | Set up production domain (app.bwow.com) — confirm access with Sam or register new
 - [ ] Productionising | Must | SMTP server (AWS SES) for email notifications — configure in Supabase, verify `vasic.com.au` for DKIM as interim
 - [ ] Productionising | Must | Email templates
 - [ ] Productionising | Must | Configure production domain in Supabase (currently https://orderflow.team-manager.workers.dev)
@@ -72,6 +70,8 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Productionising | Must | Logging and monitoring (Supabase + Cloudflare — consider unifying in Cloudflare logs) sender
 - [x] Feature | Nice | Homepage dashboard — reporting / summary tiles (Phase 4, quoted separately)
 - [x] Feature | Must | Favicon for the browser and App on the phones
+- [ ] Feature | Must | CSV import for products and accounts (incl. MYOB import back into our system)
+- [ ] Feature | Must | MYOB CSV export — orders out of our system into MYOB
 
 ---
 
