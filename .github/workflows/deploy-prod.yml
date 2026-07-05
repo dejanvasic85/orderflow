@@ -48,10 +48,15 @@ jobs:
           SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
 
       - name: Push Supabase config (incl. auth email templates)
+        # config.toml resolves auth.site_url from env(SITE_URL). It must be set here or
+        # the CLI pushes the literal "env(SITE_URL)" string to the linked project, which
+        # breaks invite/recovery redirect links. Matches the production SITE_URL in
+        # wrangler.jsonc; not a secret (it's a public URL).
         run: supabase config push --project-ref "$SUPABASE_PROJECT_ID" --yes
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+          SITE_URL: https://bwow.app
 
       - name: Build
         run: vp run build

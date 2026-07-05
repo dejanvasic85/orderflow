@@ -164,6 +164,10 @@ additional_redirect_urls = [
   "http://dejan-mpb16.warthog-dominant.ts.net:3344/auth/callback",
   "http://dejan-mpb16.warthog-dominant.ts.net:3344/auth/confirm",
   "http://dejan-mpb16.warthog-dominant.ts.net:3344/auth/reset-password",
+  "https://bwow.app",
+  "https://bwow.app/auth/callback",
+  "https://bwow.app/auth/confirm",
+  "https://bwow.app/auth/reset-password",
 ]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
 jwt_expiry = 3600
