@@ -23,6 +23,7 @@ import {
 import { useDebounce } from "@/hooks/use-debounce";
 import { type User, type UserRole, userRoles } from "@/lib/users/schema";
 import { cn } from "@/lib/utils";
+import { roleInfoValue } from "./roleInfo";
 import { UserStatusBadge } from "./UserStatusBadge";
 
 export type RoleFilter = "all" | UserRole;
@@ -45,15 +46,9 @@ type Props = {
   readOnly?: boolean;
 };
 
-const roleLabelMap: Record<UserRole, string> = {
-  admin: "Admin",
-  staff: "Staff",
-  user: "User",
-};
-
 const roleFilters: { label: string; value: RoleFilter }[] = [
   { label: "All roles", value: "all" },
-  ...userRoles.map((role) => ({ label: roleLabelMap[role], value: role })),
+  ...userRoles.map((role) => ({ label: roleInfoValue[role].label, value: role })),
 ];
 
 export function UserList({
@@ -168,7 +163,7 @@ export function UserList({
                 <TableCell className="font-medium">{user.name}</TableCell>
                 <TableCell className="text-muted-foreground">{user.email}</TableCell>
                 <TableCell>
-                  <Badge variant="secondary">{roleLabelMap[user.role]}</Badge>
+                  <Badge variant="secondary">{roleInfoValue[user.role].label}</Badge>
                 </TableCell>
                 <TableCell className="text-muted-foreground">
                   {user.accounts.length > 0 ? user.accounts.length : "—"}

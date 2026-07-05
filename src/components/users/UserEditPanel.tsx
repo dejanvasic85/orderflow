@@ -19,6 +19,8 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { PendingInviteSection } from "@/components/users/PendingInviteSection";
+import { roleInfoValue } from "@/components/users/roleInfo";
+import { RoleInfoDisclosure } from "@/components/users/RoleInfoDisclosure";
 import { UserAccountsSection } from "@/components/users/UserAccountsSection";
 import { type UpdateUserAccountsInput, type User, userRoles } from "@/lib/users/schema";
 
@@ -265,12 +267,18 @@ export function UserEditPanel(props: Props) {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    <SelectItem value="admin">Admin</SelectItem>
-                    <SelectItem value="staff">Staff</SelectItem>
-                    <SelectItem value="user">User</SelectItem>
+                    {userRoles.map((role) => (
+                      <SelectItem key={role} value={role}>
+                        {roleInfoValue[role].label}
+                        <span className="text-muted-foreground">
+                          &mdash; {roleInfoValue[role].summary}
+                        </span>
+                      </SelectItem>
+                    ))}
                   </SelectGroup>
                 </SelectContent>
               </Select>
+              <RoleInfoDisclosure />
             </Field>
           )}
         </form.Field>
