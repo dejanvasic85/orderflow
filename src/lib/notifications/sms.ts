@@ -11,6 +11,11 @@ function maskPhone(phone: string): string {
   return phone.replace(/\d(?=\d{2})/g, "*");
 }
 
+/** Converts an AU-local mobile number (04xxxxxxxx, per the users.phone DB constraint) to E.164. */
+function toE164Au(phone: string): string {
+  return `+61${phone.slice(1)}`;
+}
+
 export async function sendSms(input: SendSmsInput): Promise<void> {
   const {
     AWS_REGION: region,
@@ -28,7 +33,7 @@ export async function sendSms(input: SendSmsInput): Promise<void> {
   const body = new URLSearchParams({
     Action: "Publish",
     Version: "2010-03-31",
-    PhoneNumber: input.to,
+    PhoneNumber: toE164Au(input.to),
     Message: input.body,
     "MessageAttributes.entry.1.Name": "AWS.SNS.SMS.SMSType",
     "MessageAttributes.entry.1.Value.DataType": "String",
