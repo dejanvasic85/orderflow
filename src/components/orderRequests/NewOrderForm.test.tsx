@@ -441,6 +441,70 @@ test("initialItems overrides template items", async () => {
   expect(screen.getByLabelText(/Remove Chardonnay/i)).toBeInTheDocument();
 });
 
+// --- Zero-quantity item tests ---
+
+test("disables submit button when every item has 0 boxes and 0 units", async () => {
+  const initialItems: OrderRequestItemInput[] = [
+    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 0, extra_units: 0 },
+    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000002", boxes: 0, extra_units: 0 },
+  ];
+
+  renderForm({ initialItems });
+
+  expect(await screen.findByRole("button", { name: "Submit order" })).toBeDisabled();
+});
+
+test("enables submit button when at least one item has a non-zero total", async () => {
+  const initialItems: OrderRequestItemInput[] = [
+    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 0, extra_units: 0 },
+    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000002", boxes: 1, extra_units: 0 },
+  ];
+
+  renderForm({ initialItems });
+
+  expect(await screen.findByRole("button", { name: "Submit order" })).not.toBeDisabled();
+});
+
+test("enables submit button when an item has 0 boxes but non-zero units", async () => {
+  const initialItems: OrderRequestItemInput[] = [
+    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 0, extra_units: 2 },
+  ];
+
+  renderForm({ initialItems });
+
+  expect(await screen.findByRole("button", { name: "Submit order" })).not.toBeDisabled();
+});
+
+test("omits zero-quantity items from the submitted payload", async () => {
+  const initialItems: OrderRequestItemInput[] = [
+    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 0, extra_units: 0 },
+    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000002", boxes: 1, extra_units: 3 },
+  ];
+
+  renderForm({ initialItems });
+
+  await user.click(await screen.findByRole("button", { name: "Submit order" }));
+
+  expect(onSubmit).toHaveBeenCalledWith(
+    expect.objectContaining({
+      items: [{ product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000002", boxes: 1, extra_units: 3 }],
+    }),
+  );
+});
+
+test("keeps zero-quantity items visible in the form after a non-zero item is submitted", async () => {
+  const initialItems: OrderRequestItemInput[] = [
+    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 0, extra_units: 0 },
+    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000002", boxes: 1, extra_units: 0 },
+  ];
+
+  renderForm({ initialItems });
+
+  await user.click(await screen.findByRole("button", { name: "Submit order" }));
+
+  expect(await screen.findByText("Rosé")).toBeInTheDocument();
+});
+
 test("initialItems overrides a saved draft", async () => {
   const savedDraft: OrderRequestItemInput[] = [
     { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 5, extra_units: 0 },

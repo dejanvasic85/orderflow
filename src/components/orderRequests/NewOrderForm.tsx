@@ -31,6 +31,11 @@ type NewOrderFormProps = {
   onSubmit: (data: OrderFormPayload) => Promise<void>;
 };
 
+function getItemTotal(item: OrderRequestItemInput, products: ProductRow[]): number {
+  const qtyPerBox = products.find((p) => p.id === item.product_id)?.qty_per_box ?? 0;
+  return item.boxes * qtyPerBox + item.extra_units;
+}
+
 function buildInitialItems(
   template: TemplateWithItems | null,
   persistDraft: boolean,
@@ -92,8 +97,10 @@ export function NewOrderForm({
     updateItems(items.map((i) => (i.product_id === productId ? { ...i, ...patch } : i)));
   }
 
+  const orderableItems = items.filter((i) => getItemTotal(i, products) > 0);
+
   async function handleSubmit() {
-    if (items.length === 0) return;
+    if (orderableItems.length === 0) return;
 
     setSubmitting(true);
     setError(null);
@@ -103,7 +110,7 @@ export function NewOrderForm({
         templateId: template?.id ?? null,
         deliveryAddress: deliveryAddress || null,
         deliveryInstructions: deliveryInstructions || null,
-        items,
+        items: orderableItems,
       });
     } catch {
       setError("Something went wrong submitting your order. Please try again.");
@@ -193,7 +200,7 @@ export function NewOrderForm({
           <Button
             size="lg"
             className="w-full sm:w-auto sm:min-w-40 sm:px-8"
-            disabled={items.length === 0 || submitting}
+            disabled={orderableItems.length === 0 || submitting}
             onClick={handleSubmit}
           >
             {submitting ? "Submitting…" : "Submit order"}
