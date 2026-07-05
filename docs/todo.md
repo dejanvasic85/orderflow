@@ -90,7 +90,7 @@ Change requests and bugs:
 - [ ] Users are getting "active" automatically instead of staying pending until they accept
 - [x] Address details and delivery details should both appear and not cancel each other out
 - [x] Drawer height on mobile is no bigger than 85% of the view height.
-- [ ] Bug | when the items are 0 quantity, they don't need to be added to the order request
+- [x] Bug | when the items are 0 quantity, they don't need to be added to the order request
 
 ---
 
