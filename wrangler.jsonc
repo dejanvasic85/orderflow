@@ -28,7 +28,7 @@
   // with the preview's own workers.dev URL via `--var`.
   "vars": {
     "AWS_REGION": "ap-southeast-2",
-    "SES_FROM_ADDRESS": "info@vasic.com.au",
+    "SES_FROM_ADDRESS": "noreply@bwow.app",
     "SITE_URL": "https://orderflow.vasic-studio.workers.dev",
     "R2_BUCKET_NAME": "orderflow-assets",
     "R2_PUBLIC_BASE_URL": "https://pub-8ed295401d494d38a2bf577dd8b8d502.r2.dev",
@@ -41,7 +41,7 @@
       "routes": [{ "pattern": "bwow.app", "custom_domain": true }],
       "vars": {
         "AWS_REGION": "ap-southeast-2",
-        "SES_FROM_ADDRESS": "info@vasic.com.au",
+        "SES_FROM_ADDRESS": "noreply@bwow.app",
         "SITE_URL": "https://bwow.app",
         "R2_BUCKET_NAME": "orderflow-assets",
         "R2_PUBLIC_BASE_URL": "https://pub-8ed295401d494d38a2bf577dd8b8d502.r2.dev",
