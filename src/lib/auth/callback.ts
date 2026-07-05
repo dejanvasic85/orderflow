@@ -34,12 +34,12 @@ export async function verifyCallback({
       log.error("auth.callback", "set session failed", { error: error.message });
       return err({ message: error.message });
     }
-    log.info("auth.callback", "verified", { type: effectiveType });
+    log.info("auth.callback", "auth callback verified", { type: effectiveType });
     return ok({ path: resolveRedirectPath(effectiveType) });
   }
 
   if (!code) {
-    log.warn("auth.callback", "missing verification code");
+    log.warn("auth.callback", "callback request is missing a verification code");
     return err({ message: "Invalid or missing verification code. The link may have expired." });
   }
 

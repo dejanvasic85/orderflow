@@ -166,7 +166,7 @@ describe("placeOrder", () => {
 
     await placeOrder(deps, orderInput);
 
-    expect(fakeLog.info).toHaveBeenCalledWith("order.placed", "created", {
+    expect(fakeLog.info).toHaveBeenCalledWith("order.placed", "order created", {
       orderId: "order-1",
       userId: "u-1",
       accountId: "acc-1",
@@ -190,7 +190,9 @@ describe("placeOrder", () => {
 
     expect(result).toEqual(err({ message: "insert failed" }));
     expect(notify).not.toHaveBeenCalled();
-    expect(fakeLog.warn).toHaveBeenCalledWith("order.placed", "failed", { userId: "u-1" });
+    expect(fakeLog.warn).toHaveBeenCalledWith("order.placed", "order creation failed", {
+      userId: "u-1",
+    });
   });
 
   it("notifies with the resolved order details after a successful write", async () => {
@@ -252,7 +254,11 @@ describe("placeOrderOnBehalf", () => {
 
     await placeOrderOnBehalf(deps, orderInput);
 
-    expect(fakeLog.info).toHaveBeenCalledWith("order.placed", "on behalf", { actorId: "u-1" });
+    expect(fakeLog.info).toHaveBeenCalledWith(
+      "order.placed",
+      "staff placing order on behalf of account",
+      { actorId: "u-1", accountId: "acc-1" },
+    );
   });
 
   it("does not place the order when authorization throws", async () => {

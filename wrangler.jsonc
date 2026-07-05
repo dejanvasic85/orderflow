@@ -11,7 +11,9 @@
       "enabled": true,
       "head_sampling_rate": 1,
       "persist": true,
-      "invocation_logs": true,
+      // Disabled: duplicates our own "request"/"handled" log in worker.ts, which
+      // already carries reqId/status/durationMs — the platform line adds only noise.
+      "invocation_logs": false,
     },
     "traces": {
       "enabled": true,

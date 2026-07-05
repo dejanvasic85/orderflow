@@ -14,12 +14,24 @@ export default {
       response = await tanstackEntry.fetch(request);
     } catch (error) {
       const durationMs = Date.now() - startTime;
-      log.error("request", "error", { reqId, method, path, durationMs, error });
+      log.error("request", "request threw before a response was produced", {
+        reqId,
+        method,
+        path,
+        durationMs,
+        error,
+      });
       throw error;
     }
 
     const durationMs = Date.now() - startTime;
-    log.info("request", "handled", { reqId, method, path, status: response.status, durationMs });
+    log.info("request", "request completed", {
+      reqId,
+      method,
+      path,
+      status: response.status,
+      durationMs,
+    });
     return response;
   },
 };

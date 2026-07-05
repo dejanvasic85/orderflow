@@ -126,11 +126,11 @@ export async function placeOrder(
 
   const result = await deps.repo.createOrderWithItems(input, user.id);
   if (!result.ok) {
-    deps.log.warn("order.placed", "failed", { userId: user.id });
+    deps.log.warn("order.placed", "order creation failed", { userId: user.id });
     return result;
   }
 
-  deps.log.info("order.placed", "created", {
+  deps.log.info("order.placed", "order created", {
     orderId: result.value.id,
     userId: user.id,
     accountId: input.account_id,
@@ -145,7 +145,10 @@ export async function placeOrderOnBehalf(
 ): Promise<Result<CreatedOrder>> {
   await deps.authorize();
   const user = await deps.session();
-  deps.log.info("order.placed", "on behalf", { actorId: user.id });
+  deps.log.info("order.placed", "staff placing order on behalf of account", {
+    actorId: user.id,
+    accountId: input.account_id,
+  });
   return placeOrder(deps, input);
 }
 
