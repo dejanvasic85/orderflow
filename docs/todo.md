@@ -79,7 +79,6 @@ Priorities: `Must` · `Should` · `Nice`
 Change requests and bugs:
 22 June 2026
 
-- [ ] Link for accepting an invite is not working
 - [x] Change all wording from bottles to units because sometimes it's not really bottles it's actually cans
 - [x] Allow typing of qty rather than plus / minus
 - [x] Use the word Units in the email
@@ -87,7 +86,6 @@ Change requests and bugs:
 - [x] Users should be able to order again but they should also have ability to edit the items
 - [x] Description for the product isn't required
 - [x] Add descriptions in the Role dropdown for the User management to explain what roles are capable of what
-- [ ] Users are getting "active" automatically instead of staying pending until they accept
 - [x] Address details and delivery details should both appear and not cancel each other out
 - [x] Drawer height on mobile is no bigger than 85% of the view height.
 - [x] Bug | when the items are 0 quantity, they don't need to be added to the order request
