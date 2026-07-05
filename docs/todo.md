@@ -63,13 +63,14 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Feature | Must | Notification preferences UI — users edit their own email/SMS preferences
 - [x] Productionising | Must | Fix the publicly available view users_with_email - see email for warning from supabase
 - [x] Productionising | Must | Set up production domain (app.bwow.com) — confirm access with Sam or register new
-- [ ] Productionising | Must | SMTP server (AWS SES) for email notifications — configure in Supabase, verify `vasic.com.au` for DKIM as interim
-- [ ] Productionising | Must | Email templates
-- [ ] Productionising | Must | Configure production domain in Supabase (currently https://orderflow.team-manager.workers.dev)
+- [x] Productionising | Must | SMTP server (AWS SES) for email notifications — configure in Supabase, verify `vasic.com.au` for DKIM as interim
+- [x] Productionising | Must | Email templates
+- [x] Productionising | Must | Configure production domain in Supabase (currently https://orderflow.team-manager.workers.dev)
 - [x] Productionising | Must | Configure production env vars in GitHub
 - [x] Productionising | Must | Logging and monitoring (Supabase + Cloudflare — consider unifying in Cloudflare logs) sender
 - [x] Feature | Nice | Homepage dashboard — reporting / summary tiles (Phase 4, quoted separately)
 - [x] Feature | Must | Favicon for the browser and App on the phones
+- [ ] Productionising | Must | Setup sms notifications
 - [ ] Feature | Must | CSV import for products and accounts (incl. MYOB import back into our system)
 - [ ] Feature | Must | MYOB CSV export — orders out of our system into MYOB
 
@@ -89,6 +90,7 @@ Change requests and bugs:
 - [ ] Users are getting "active" automatically instead of staying pending until they accept
 - [x] Address details and delivery details should both appear and not cancel each other out
 - [x] Drawer height on mobile is no bigger than 85% of the view height.
+- [ ] Bug | when the items are 0 quantity, they don't need to be added to the order request
 
 ---
 
