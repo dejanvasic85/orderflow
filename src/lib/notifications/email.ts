@@ -16,7 +16,7 @@ type SesConfig = {
 };
 
 // Mailpit requires a From address; SES_FROM_ADDRESS may be unset in local/CI.
-const devFromAddress = "noreply@bwow.com.au";
+const devFromAddress = "noreply@bwow.app";
 
 async function sendViaSes(input: SendEmailInput, config: SesConfig): Promise<void> {
   const aws = new AwsClient({
