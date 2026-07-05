@@ -70,7 +70,7 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Productionising | Must | Logging and monitoring (Supabase + Cloudflare — consider unifying in Cloudflare logs) sender
 - [x] Feature | Nice | Homepage dashboard — reporting / summary tiles (Phase 4, quoted separately)
 - [x] Feature | Must | Favicon for the browser and App on the phones
-- [ ] Productionising | Must | Setup sms notifications
+- [x] Productionising | Must | Setup sms notifications
 - [ ] Feature | Must | CSV import for products and accounts (incl. MYOB import back into our system)
 - [ ] Feature | Must | MYOB CSV export — orders out of our system into MYOB
 
@@ -86,7 +86,7 @@ Change requests and bugs:
 - [x] The order needs an image for the product instead of just text
 - [x] Users should be able to order again but they should also have ability to edit the items
 - [x] Description for the product isn't required
-- [ ] Add descriptions in the Role dropdown for the User management to explain what roles are capable of what
+- [x] Add descriptions in the Role dropdown for the User management to explain what roles are capable of what
 - [ ] Users are getting "active" automatically instead of staying pending until they accept
 - [x] Address details and delivery details should both appear and not cancel each other out
 - [x] Drawer height on mobile is no bigger than 85% of the view height.
