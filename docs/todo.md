@@ -73,7 +73,6 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Productionising | Must | Setup sms notifications
 - [ ] Feature | Must | CSV import for products and accounts (incl. MYOB import back into our system)
 - [ ] Feature | Must | MYOB CSV export — orders out of our system into MYOB
-- [x] Productionising | Must | Email templates for supabase to try and match the transactional
 
 ---
 
