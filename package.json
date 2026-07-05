@@ -45,7 +45,7 @@
     "react-dropzone": "15.0.0",
     "react-easy-crop": "6.1.0",
     "react-email": "6.6.6",
-    "recharts": "3.9.1",
+    "recharts": "3.9.2",
     "shadcn": "4.13.0",
     "sonner": "2.0.7",
     "tailwind-merge": "3.6.0",
@@ -76,5 +76,5 @@
     "vite-plus": "0.2.2",
     "wrangler": "4.107.0"
   },
-  "packageManager": "pnpm@11.9.0"
+  "packageManager": "pnpm@11.10.0"
 }
