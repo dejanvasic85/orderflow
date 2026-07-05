@@ -7,6 +7,10 @@ type SendSmsInput = {
   body: string;
 };
 
+function maskPhone(phone: string): string {
+  return phone.replace(/\d(?=\d{2})/g, "*");
+}
+
 export async function sendSms(input: SendSmsInput): Promise<void> {
   const {
     AWS_REGION: region,
@@ -15,7 +19,7 @@ export async function sendSms(input: SendSmsInput): Promise<void> {
   } = getServerConfig();
 
   if (!region || !accessKeyId || !secretAccessKey) {
-    log.debug("notify.sms", "skipped — AWS not configured", { to: input.to });
+    log.debug("notify.sms", "skipped — AWS not configured", { to: maskPhone(input.to) });
     return;
   }
 
@@ -23,6 +27,7 @@ export async function sendSms(input: SendSmsInput): Promise<void> {
 
   const body = new URLSearchParams({
     Action: "Publish",
+    Version: "2010-03-31",
     PhoneNumber: input.to,
     Message: input.body,
     "MessageAttributes.entry.1.Name": "AWS.SNS.SMS.SMSType",
