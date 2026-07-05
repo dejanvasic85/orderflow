@@ -245,6 +245,7 @@ export function UserEditPanel(props: Props) {
                 onBlur={field.handleBlur}
                 disabled={readOnly}
               />
+              <p className="text-xs text-muted-foreground">Australian mobile numbers only.</p>
               <FieldError errors={toFieldErrors(field.state.meta.errors)} />
             </Field>
           )}

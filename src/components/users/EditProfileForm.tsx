@@ -121,6 +121,7 @@ export function EditProfileForm({ defaultValues, onSave }: EditProfileFormProps)
               onChange={(e) => field.handleChange(e.target.value)}
               onBlur={field.handleBlur}
             />
+            <p className="text-xs text-muted-foreground">Australian mobile numbers only.</p>
             <FieldError errors={field.state.meta.errors} />
           </Field>
         )}
