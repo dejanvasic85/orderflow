@@ -17,7 +17,7 @@
 
   <!-- High-contrast serif 'B' in ivory (Fraunces-inspired thick/thin contrast).
        Centred optically within the tile; serifs top & bottom on the stem. -->
-  <g fill="#FAF6F0">
+  <g fill="#FAF6F0" transform="translate(-40.5,-30.5)">
     <path d="M176 150
              h150 q34 0 56 20 q22 20 22 51 q0 24 -14 41 q-9 11 -23 17
              q20 5 33 19 q17 19 17 47 q0 34 -24 56 q-24 22 -62 22
