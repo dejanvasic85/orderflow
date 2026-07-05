@@ -262,10 +262,13 @@ export function createUserRepository(): UserRepository {
         redirectTo: `${options.redirectTo}/auth/callback`,
       });
       if (error) {
-        log.error("invite", "send failed", { email: maskEmail(email), error: error.message });
+        log.error("invite", "failed to send invitation email", {
+          email: maskEmail(email),
+          error: error.message,
+        });
         return err({ message: "Unable to send user invitation" });
       }
-      log.info("invite", "sent", { email: maskEmail(email) });
+      log.info("invite", "invitation email sent", { email: maskEmail(email) });
       return ok({ userId: data.user.id });
     },
 
@@ -297,10 +300,13 @@ export function createUserRepository(): UserRepository {
         redirectTo: `${redirectTo}/auth/callback`,
       });
       if (error) {
-        log.error("invite", "resend failed", { email: maskEmail(email), error: error.message });
+        log.error("invite", "failed to resend invitation email", {
+          email: maskEmail(email),
+          error: error.message,
+        });
         return err({ message: "Unable to resend invitation" });
       }
-      log.info("invite", "resent", { email: maskEmail(email) });
+      log.info("invite", "invitation email resent", { email: maskEmail(email) });
       return ok();
     },
 
