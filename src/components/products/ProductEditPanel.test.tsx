@@ -119,6 +119,22 @@ test("edit mode submits active false after toggling the Active switch off", asyn
   });
 });
 
+test("disables the button and shows Saving… while onSave is pending", async () => {
+  let resolveSave: () => void = () => {};
+  const pendingSave = vi.fn(() => new Promise<void>((resolve) => (resolveSave = resolve)));
+
+  render(<ProductEditPanel product={existingProduct} onSave={pendingSave} onDiscard={onDiscard} />);
+
+  await user.click(screen.getByRole("button", { name: "Save changes" }));
+
+  const savingButton = await screen.findByRole("button", { name: "Saving…" });
+  expect(savingButton).toBeDisabled();
+
+  resolveSave();
+
+  expect(await screen.findByRole("button", { name: "Save changes" })).toBeEnabled();
+});
+
 test("calls onDiscard when Discard is clicked", async () => {
   render(<ProductEditPanel mode="create" onSave={onSave} onDiscard={onDiscard} />);
 
