@@ -71,14 +71,6 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Feature | Nice | Homepage dashboard — reporting / summary tiles (Phase 4, quoted separately)
 - [x] Feature | Must | Favicon for the browser and App on the phones
 - [x] Productionising | Must | Setup sms notifications
-- [ ] Feature | Must | CSV import for products and accounts (incl. MYOB import back into our system)
-- [ ] Feature | Must | MYOB CSV export — orders out of our system into MYOB
-
----
-
-Change requests and bugs:
-22 June 2026
-
 - [x] Change all wording from bottles to units because sometimes it's not really bottles it's actually cans
 - [x] Allow typing of qty rather than plus / minus
 - [x] Use the word Units in the email
@@ -89,8 +81,10 @@ Change requests and bugs:
 - [x] Address details and delivery details should both appear and not cancel each other out
 - [x] Drawer height on mobile is no bigger than 85% of the view height.
 - [x] Bug | when the items are 0 quantity, they don't need to be added to the order request
-
----
+- [ ] Bug | Email is going to spam for outlook.com
+- [ ] Bug | Loading buttons are not
+- [ ] Feature | Must | CSV import for products and accounts (incl. MYOB import back into our system)
+- [ ] Feature | Must | MYOB CSV export — orders out of our system into MYOB
 
 ## Code Cleanup - Post release
 
