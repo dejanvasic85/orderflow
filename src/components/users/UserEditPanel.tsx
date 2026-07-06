@@ -25,7 +25,7 @@ import { UserAccountsSection } from "@/components/users/UserAccountsSection";
 import { type UpdateUserAccountsInput, type User, userRoles } from "@/lib/users/schema";
 
 type BaseProps = {
-  onSave: (updated: User, accountsPayload?: UpdateUserAccountsInput) => void;
+  onSave: (updated: User, accountsPayload?: UpdateUserAccountsInput) => void | Promise<void>;
   onDiscard: () => void;
   onCheckEmailExists?: (email: string) => Promise<boolean>;
   onResendInvite?: () => Promise<void>;
@@ -100,7 +100,7 @@ export function UserEditPanel(props: Props) {
       active: user.active,
     },
     validators: { onSubmit: userEditSchema },
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       const updatedUser: User = {
         ...user,
         email: value.email,
@@ -114,7 +114,7 @@ export function UserEditPanel(props: Props) {
         },
       };
       const accountsPayload = accountsPayloadRef.current;
-      onSave(updatedUser, accountsPayload ?? undefined);
+      await onSave(updatedUser, accountsPayload ?? undefined);
       if (!isCreate) toast.success("Changes saved");
     },
   });
@@ -368,7 +368,15 @@ export function UserEditPanel(props: Props) {
 
         {/* Actions */}
         <div className="flex items-center gap-2">
-          {!readOnly && <Button type="submit">{submitLabel}</Button>}
+          {!readOnly && (
+            <form.Subscribe selector={(s) => s.isSubmitting}>
+              {(isSubmitting) => (
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? (isCreate ? "Sending invite…" : "Saving…") : submitLabel}
+                </Button>
+              )}
+            </form.Subscribe>
+          )}
           <Button
             type="button"
             variant="ghost"

@@ -69,6 +69,50 @@ test("calls onSave with joined name on valid submit", async () => {
   });
 });
 
+test("disables the button and shows Saving… while onSave is pending", async () => {
+  let resolveSave: () => void = () => {};
+  const pendingSave = vi.fn(() => new Promise<void>((resolve) => (resolveSave = resolve)));
+
+  render(<UserEditPanel user={baseUser} onSave={pendingSave} onDiscard={onDiscard} />);
+
+  await user.click(screen.getByRole("button", { name: "Save changes" }));
+
+  const savingButton = await screen.findByRole("button", { name: "Saving…" });
+  expect(savingButton).toBeDisabled();
+
+  resolveSave();
+
+  expect(await screen.findByRole("button", { name: "Save changes" })).toBeEnabled();
+});
+
+test("create mode shows Sending invite… while the email-exists check is pending", async () => {
+  let resolveCheck: (exists: boolean) => void = () => {};
+  const onCheckEmailExists = vi.fn(
+    () => new Promise<boolean>((resolve) => (resolveCheck = resolve)),
+  );
+
+  render(
+    <UserEditPanel
+      mode="create"
+      onSave={onSave}
+      onDiscard={onDiscard}
+      onCheckEmailExists={onCheckEmailExists}
+    />,
+  );
+
+  await user.type(screen.getByLabelText("Email"), "new@example.com");
+  await user.type(screen.getByLabelText("First name"), "Bob");
+  await user.type(screen.getByLabelText("Last name"), "Jones");
+  await user.click(screen.getByRole("button", { name: "Send invite" }));
+
+  const pendingButton = await screen.findByRole("button", { name: "Sending invite…" });
+  expect(pendingButton).toBeDisabled();
+
+  resolveCheck(false);
+
+  await vi.waitFor(() => expect(onSave).toHaveBeenCalled());
+});
+
 test("calls onDiscard when Discard button is clicked", async () => {
   render(<UserEditPanel user={baseUser} onSave={onSave} onDiscard={onDiscard} />);
 

@@ -262,6 +262,17 @@ test("shows Submitting… and disables button while onSubmit is pending", async 
   resolve!();
 });
 
+test("stays disabled after onSubmit resolves so it does not flash before navigation", async () => {
+  const onSubmit = vi.fn().mockResolvedValue(undefined);
+  renderForm({ onSubmit });
+
+  await user.click(await screen.findByRole("button", { name: "Submit order" }));
+
+  await vi.waitFor(() => expect(onSubmit).toHaveBeenCalled());
+  expect(screen.getByRole("button", { name: "Submitting…" })).toBeDisabled();
+  expect(screen.queryByRole("button", { name: "Submit order" })).not.toBeInTheDocument();
+});
+
 test("shows error alert when onSubmit throws", async () => {
   renderForm({ onSubmit: vi.fn().mockRejectedValue(new Error("Network failure")) });
 

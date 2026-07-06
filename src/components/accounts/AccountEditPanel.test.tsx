@@ -129,6 +129,24 @@ test("calls onSave with null for empty optional fields", async () => {
   });
 });
 
+test("disables the button and shows Saving… while onSave is pending", async () => {
+  let resolveSave: () => void = () => {};
+  const pendingSave = vi.fn(() => new Promise<void>((resolve) => (resolveSave = resolve)));
+
+  render(<AccountEditPanel account={baseAccount} onSave={pendingSave} onDiscard={onDiscard} />, {
+    wrapper,
+  });
+
+  await user.click(screen.getByRole("button", { name: "Save changes" }));
+
+  const savingButton = await screen.findByRole("button", { name: "Saving…" });
+  expect(savingButton).toBeDisabled();
+
+  resolveSave();
+
+  expect(await screen.findByRole("button", { name: "Save changes" })).toBeEnabled();
+});
+
 test("read-only mode hides Save changes button", () => {
   render(
     <AccountEditPanel account={baseAccount} readOnly onSave={onSave} onDiscard={onDiscard} />,

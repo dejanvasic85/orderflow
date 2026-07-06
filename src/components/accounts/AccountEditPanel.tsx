@@ -11,7 +11,7 @@ import type { Account } from "@/lib/accounts/schema";
 type Props = {
   account: Account;
   readOnly?: boolean;
-  onSave: (updated: Account) => void;
+  onSave: (updated: Account) => void | Promise<void>;
   onDiscard: () => void;
 };
 
@@ -43,8 +43,8 @@ export function AccountEditPanel({ account, readOnly = false, onSave, onDiscard 
       delivery_instructions: account.delivery_instructions ?? "",
     },
     validators: { onSubmit: accountEditSchema },
-    onSubmit: ({ value }) => {
-      onSave({
+    onSubmit: async ({ value }) => {
+      await onSave({
         ...account,
         name: value.name,
         contact_name: value.contact_name || null,
@@ -188,7 +188,15 @@ export function AccountEditPanel({ account, readOnly = false, onSave, onDiscard 
         </div>
 
         <div className="flex items-center gap-2">
-          {!readOnly && <Button type="submit">Save changes</Button>}
+          {!readOnly && (
+            <form.Subscribe selector={(s) => s.isSubmitting}>
+              {(isSubmitting) => (
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? "Saving…" : "Save changes"}
+                </Button>
+              )}
+            </form.Subscribe>
+          )}
           <Button
             type="button"
             variant="ghost"

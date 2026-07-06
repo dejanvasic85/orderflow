@@ -114,7 +114,8 @@ export function NewOrderForm({
       });
     } catch {
       setError("Something went wrong submitting your order. Please try again.");
-    } finally {
+      // Only re-enable on error — on success the route navigates away and
+      // unmounts this form, so keeping it disabled avoids a flash back to enabled.
       setSubmitting(false);
     }
   }

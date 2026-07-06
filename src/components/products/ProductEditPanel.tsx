@@ -55,7 +55,7 @@ export function ProductEditPanel(props: Props) {
       active: product?.active ?? true,
     },
     validators: { onSubmit: productEditSchema },
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       const payload = {
         name: value.name,
         image_url: value.imageUrl || null,
@@ -63,10 +63,10 @@ export function ProductEditPanel(props: Props) {
         active: value.active,
       };
       if (props.mode === "create") {
-        void props.onSave(payload);
+        await props.onSave(payload);
         return;
       }
-      void props.onSave({ ...payload, id: props.product.id });
+      await props.onSave({ ...payload, id: props.product.id });
     },
   });
 
@@ -163,7 +163,13 @@ export function ProductEditPanel(props: Props) {
         <Separator />
 
         <div className="flex items-center gap-2">
-          <Button type="submit">{submitLabel}</Button>
+          <form.Subscribe selector={(s) => s.isSubmitting}>
+            {(isSubmitting) => (
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Saving…" : submitLabel}
+              </Button>
+            )}
+          </form.Subscribe>
           <Button
             type="button"
             variant="ghost"
