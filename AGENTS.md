@@ -20,7 +20,6 @@ matrix and "Known gaps" section in `docs/security.md` in sync with any policy ch
 
 - PREFER functional approach over object oriented and imperative
 - Functions shouldn't be doing too much - try and ensure they do one thing
-- Use `vp` (Vite Plus) for all dev/build/test/lint workflows — not raw `pnpm` or `vite`
 - Path alias `@/*` maps to `./src/*` — prefer it over relative imports
 - Auth is handled by Supabase Auth; use `getSession` / `ensureSession` from `src/lib/auth/auth.functions.ts` (see `docs/security.md` for the full model)
 - Server-side Supabase access: `createSupabaseServerClient()` from `src/lib/supabaseServer.ts` (used inside `.server.ts` helpers)
@@ -278,3 +277,7 @@ Pre-commit hooks are configured through Vite+ staged checks; ensure any auto-fix
 - [ ] Run `vp build` when changes affect build/runtime boundaries.
 - [ ] Prefer alias imports (`@/*`) over long relative paths.
 - [ ] Keep environment variables validated through Zod config.
+
+## Creating and running scripts
+
+Prefer to use Typescript and Bun for scripting over Python and other shells.

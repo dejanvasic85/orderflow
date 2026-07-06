@@ -28,6 +28,7 @@ const rose: ProductRow = {
   image_url: null,
   qty_per_box: 6,
   active: true,
+  external_id: null,
   created_at: "2024-01-01T00:00:00Z",
   updated_at: "2024-01-01T00:00:00Z",
 };
@@ -38,6 +39,7 @@ const pinotNoir: ProductRow = {
   image_url: null,
   qty_per_box: 12,
   active: true,
+  external_id: null,
   created_at: "2024-01-01T00:00:00Z",
   updated_at: "2024-01-01T00:00:00Z",
 };
@@ -49,6 +51,7 @@ const product1: ProductRow = {
   image_url: null,
   qty_per_box: 6,
   active: true,
+  external_id: null,
   created_at: "2024-01-01T00:00:00Z",
   updated_at: "2024-01-01T00:00:00Z",
 };
@@ -59,6 +62,7 @@ const product2: ProductRow = {
   image_url: null,
   qty_per_box: 12,
   active: true,
+  external_id: null,
   created_at: "2024-01-01T00:00:00Z",
   updated_at: "2024-01-01T00:00:00Z",
 };
