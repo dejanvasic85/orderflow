@@ -15,6 +15,19 @@
         sans-serif;
     "
   >
+    <div
+      style="
+        display: none;
+        max-height: 0;
+        overflow: hidden;
+        mso-hide: all;
+        font-size: 1px;
+        line-height: 1px;
+        color: #f1eeea;
+      "
+    >
+      Reset the password for your Boutique Wines of the World account.
+    </div>
     <table
       role="presentation"
       width="100%"
@@ -87,6 +100,17 @@
                     </td>
                   </tr>
                 </table>
+                <p style="color: #706761; font-size: 13px; line-height: 1.6; margin: 24px 0 8px">
+                  If the button doesn't work, copy and paste this link into your browser:
+                </p>
+                <p style="font-size: 13px; line-height: 1.6; margin: 0; word-break: break-all">
+                  <a
+                    href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next=/auth/reset-password"
+                    style="color: #7f1f2c"
+                    >{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash
+                    }}&type=recovery&next=/auth/reset-password</a
+                  >
+                </p>
                 <p style="color: #706761; font-size: 13px; line-height: 1.6; margin: 24px 0 0">
                   If you did not request a password reset, you can ignore this email.
                 </p>
@@ -94,8 +118,15 @@
             </tr>
             <tr>
               <td style="background-color: #f1eeea; padding: 16px 32px">
-                <p style="color: #706761; font-size: 12px; margin: 0">
+                <p style="color: #201916; font-size: 13px; font-weight: 600; margin: 0 0 4px">
                   Boutique Wines of the World
+                </p>
+                <p style="color: #706761; font-size: 12px; line-height: 1.5; margin: 0">
+                  80 Primrose Street, Essendon, VIC 3040, Australia
+                </p>
+                <p style="color: #9a938d; font-size: 11px; line-height: 1.5; margin: 8px 0 0">
+                  You received this email because a password reset was requested for your Boutique
+                  Wines of the World account. If this wasn't you, you can safely ignore it.
                 </p>
               </td>
             </tr>
