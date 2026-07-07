@@ -1,48 +1,56 @@
 import { z } from "zod";
-import type { Database } from "@/lib/database.types";
-import type { ProductRow } from "@/lib/products/schema";
 
-export type TemplateRow = Database["public"]["Tables"]["templates"]["Row"];
-export type TemplateItemRow = Database["public"]["Tables"]["template_items"]["Row"];
-
-export type TemplateItem = TemplateItemRow & {
-  products: Pick<ProductRow, "id" | "name" | "qty_per_box">;
+export type TemplateItem = {
+  id: string;
+  templateId: string;
+  productId: string;
+  boxCount: number;
+  unitCount: number;
+  createdBy: string | null;
+  createdAt: string;
+  product: { id: string; name: string; qtyPerBox: number };
 };
 
-export type TemplateWithItems = TemplateRow & {
-  template_items: Array<TemplateItem>;
+export type TemplateWithItems = {
+  id: string;
+  accountId: string;
+  name: string;
+  createdBy: string | null;
+  createdAt: string;
+  updatedAt: string;
+  templateItems: TemplateItem[];
 };
 
 export const createTemplateSchema = z.object({
-  account_id: z.uuid(),
+  accountId: z.uuid(),
   name: z.string().min(1),
 });
 
 export const updateTemplateSchema = createTemplateSchema.partial().extend({ id: z.uuid() });
 
 export const addTemplateItemSchema = z.object({
-  template_id: z.uuid(),
-  product_id: z.uuid(),
-  box_count: z.number().int().min(0).optional(),
-  unit_count: z.number().int().min(0).optional(),
+  templateId: z.uuid(),
+  productId: z.uuid(),
+  boxCount: z.number().int().min(0).optional(),
+  unitCount: z.number().int().min(0).optional(),
 });
 
 export const removeTemplateItemSchema = z.object({ id: z.uuid() });
 
 export const saveTemplateItemsSchema = z.object({
-  account_id: z.uuid(),
+  accountId: z.uuid(),
   toAdd: z.array(
     z.object({
-      product_id: z.uuid(),
-      box_count: z.number().int().min(0),
-      unit_count: z.number().int().min(0),
+      productId: z.uuid(),
+      boxCount: z.number().int().min(0),
+      unitCount: z.number().int().min(0),
     }),
   ),
   toUpdate: z.array(
     z.object({
       id: z.uuid(),
-      box_count: z.number().int().min(0),
-      unit_count: z.number().int().min(0),
+      boxCount: z.number().int().min(0),
+      unitCount: z.number().int().min(0),
     }),
   ),
   toRemove: z.array(z.uuid()),

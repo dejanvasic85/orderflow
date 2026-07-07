@@ -8,38 +8,27 @@ export function makeUser(overrides: Partial<User> = {}): User {
     phone: null,
     active: true,
     role: "user",
-    invite_accepted_at: null,
-    invited_at: null,
+    inviteAcceptedAt: null,
+    invitedAt: null,
     notificationPreferences: { email: true, sms: false },
-    created_at: "2024-01-01T00:00:00Z",
-    updated_at: "2024-01-01T00:00:00Z",
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
     accounts: [],
     ...overrides,
   };
 }
 
-type AccountUserRow = {
-  user_id: string;
-  created_at: string;
-  users: {
-    id: string;
-    name: string;
-    email: string | null;
-    role: "admin" | "staff" | "user" | null;
-    active: boolean | null;
-  };
-};
+import type { AccountUser } from "@/lib/accounts/schema";
 
-export function makeAccountUserRow(overrides: Partial<AccountUserRow> = {}): AccountUserRow {
+export function makeAccountUser(overrides: Partial<AccountUser> = {}): AccountUser {
   return {
-    user_id: "u-1",
-    created_at: "2024-01-01T00:00:00Z",
-    users: {
+    userId: "u-1",
+    createdAt: "2024-01-01T00:00:00Z",
+    user: {
       id: "u-1",
       name: "Alice Smith",
       email: "alice@example.com",
       role: "user",
-      active: true,
     },
     ...overrides,
   };

@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import userEvent, { type UserEvent } from "@testing-library/user-event";
-import type { ProductRow } from "@/lib/products/schema";
+import type { Product } from "@/lib/products/schema";
 import { ProductEditPanel } from "./ProductEditPanel";
 
 vi.mock("@/components/products/ImageUpload", () => ({
@@ -18,15 +18,15 @@ vi.mock("@/components/products/ImageUpload", () => ({
   ),
 }));
 
-const existingProduct: ProductRow = {
+const existingProduct: Product = {
   id: "prod-1",
   name: "Sparkling Water",
-  image_url: "https://images.example.com/sparkling.jpg",
-  qty_per_box: 12,
+  imageUrl: "https://images.example.com/sparkling.jpg",
+  qtyPerBox: 12,
   active: true,
-  external_id: null,
-  created_at: "2024-01-01T00:00:00Z",
-  updated_at: "2024-01-01T00:00:00Z",
+  externalId: null,
+  createdAt: "2024-01-01T00:00:00Z",
+  updatedAt: "2024-01-01T00:00:00Z",
 };
 
 const onSave = vi.fn();
@@ -49,13 +49,13 @@ test("create mode submits the mapped payload", async () => {
 
   expect(onSave).toHaveBeenCalledWith({
     name: "Cider — Apple",
-    image_url: "https://images.example.com/cider.jpg",
-    qty_per_box: 6,
+    imageUrl: "https://images.example.com/cider.jpg",
+    qtyPerBox: 6,
     active: true,
   });
 });
 
-test("create mode submits null image_url when left empty", async () => {
+test("create mode submits null imageUrl when left empty", async () => {
   render(<ProductEditPanel mode="create" onSave={onSave} onDiscard={onDiscard} />);
 
   await user.type(screen.getByLabelText("Name"), "Cider — Apple");
@@ -63,8 +63,8 @@ test("create mode submits null image_url when left empty", async () => {
 
   expect(onSave).toHaveBeenCalledWith({
     name: "Cider — Apple",
-    image_url: null,
-    qty_per_box: 1,
+    imageUrl: null,
+    qtyPerBox: 1,
     active: true,
   });
 });
@@ -99,8 +99,8 @@ test("edit mode submits the payload including the product id", async () => {
   expect(onSave).toHaveBeenCalledWith({
     id: "prod-1",
     name: "Sparkling Water",
-    image_url: "https://images.example.com/sparkling.jpg",
-    qty_per_box: 24,
+    imageUrl: "https://images.example.com/sparkling.jpg",
+    qtyPerBox: 24,
     active: true,
   });
 });
@@ -114,8 +114,8 @@ test("edit mode submits active false after toggling the Active switch off", asyn
   expect(onSave).toHaveBeenCalledWith({
     id: "prod-1",
     name: "Sparkling Water",
-    image_url: "https://images.example.com/sparkling.jpg",
-    qty_per_box: 12,
+    imageUrl: "https://images.example.com/sparkling.jpg",
+    qtyPerBox: 12,
     active: false,
   });
 });

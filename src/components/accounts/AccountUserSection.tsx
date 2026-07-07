@@ -10,6 +10,7 @@ import {
   listAccountUsers,
   unassignUserFromAccount,
 } from "@/lib/accounts/accounts.functions";
+import type { AccountUser } from "@/lib/accounts/schema";
 import { asResult } from "@/lib/result";
 import { listUsers } from "@/lib/users/users.functions";
 import { UserSearchCombobox } from "./UserSearchCombobox";
@@ -39,9 +40,7 @@ export function AccountUserSection({ accountId, readOnly = false, onUserCountCha
   const accountUsersQuery = useQuery({
     queryKey: ["accountUsers", accountId],
     queryFn: async () => {
-      const result = asResult<
-        { user_id: string; users: { id: string; name: string; email: string | null } | null }[]
-      >(await listAccountUsers({ data: accountId }));
+      const result = asResult<AccountUser[]>(await listAccountUsers({ data: accountId }));
       if (!result.ok) throw new Error(result.error.message);
       return result.value;
     },
@@ -61,15 +60,13 @@ export function AccountUserSection({ accountId, readOnly = false, onUserCountCha
 
   async function refetchAndNotify() {
     await queryClient.refetchQueries({ queryKey: ["accountUsers", accountId] });
-    const fresh = queryClient.getQueryData<{ user_id: string }[]>(["accountUsers", accountId]);
+    const fresh = queryClient.getQueryData<AccountUser[]>(["accountUsers", accountId]);
     onUserCountChange?.(fresh?.length ?? 0);
   }
 
   const assignMutation = useMutation({
     mutationFn: async (userId: string) => {
-      const result = asResult(
-        await assignUserToAccount({ data: { account_id: accountId, user_id: userId } }),
-      );
+      const result = asResult(await assignUserToAccount({ data: { accountId, userId } }));
       if (!result.ok) throw new Error(result.error.message);
     },
     onSuccess: refetchAndNotify,
@@ -78,9 +75,7 @@ export function AccountUserSection({ accountId, readOnly = false, onUserCountCha
 
   const unassignMutation = useMutation({
     mutationFn: async (userId: string) => {
-      const result = asResult(
-        await unassignUserFromAccount({ data: { account_id: accountId, user_id: userId } }),
-      );
+      const result = asResult(await unassignUserFromAccount({ data: { accountId, userId } }));
       if (!result.ok) throw new Error(result.error.message);
     },
     onSuccess: refetchAndNotify,
@@ -105,11 +100,11 @@ export function AccountUserSection({ accountId, readOnly = false, onUserCountCha
     );
   }
 
-  const assignedUserIds = new Set((accountUsersQuery.data ?? []).map((r) => r.user_id));
+  const assignedUserIds = new Set((accountUsersQuery.data ?? []).map((r) => r.userId));
 
   const assignedUsers: AssignedUser[] = (accountUsersQuery.data ?? [])
-    .filter((r) => r.users !== null)
-    .map((r) => ({ id: r.user_id, name: r.users!.name, email: r.users!.email }));
+    .filter((r) => r.user !== null)
+    .map((r) => ({ id: r.userId, name: r.user!.name ?? "", email: r.user!.email }));
 
   const unassignedUsers = (allUsersQuery.data ?? []).filter((u) => !assignedUserIds.has(u.id));
 

@@ -1,16 +1,16 @@
 import { render, screen } from "@testing-library/react";
-import type { ProductRow } from "@/lib/products/schema";
+import type { Product } from "@/lib/products/schema";
 import { ProductCard } from "./ProductCard";
 
-const product: ProductRow = {
+const product: Product = {
   id: "prod-1",
   name: "Sparkling Water",
-  image_url: null,
-  qty_per_box: 24,
+  imageUrl: null,
+  qtyPerBox: 24,
   active: true,
-  external_id: null,
-  created_at: "2024-01-01T00:00:00Z",
-  updated_at: "2024-01-01T00:00:00Z",
+  externalId: null,
+  createdAt: "2024-01-01T00:00:00Z",
+  updatedAt: "2024-01-01T00:00:00Z",
 };
 
 test("renders product name", () => {

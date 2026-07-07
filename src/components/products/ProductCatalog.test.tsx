@@ -1,23 +1,23 @@
 import { act, render, screen } from "@testing-library/react";
 import userEvent, { type UserEvent } from "@testing-library/user-event";
-import type { ProductRow } from "@/lib/products/schema";
+import type { Product } from "@/lib/products/schema";
 import { ProductCatalog } from "./ProductCatalog";
 
-function makeProduct(overrides: Partial<ProductRow> = {}): ProductRow {
+function makeProduct(overrides: Partial<Product> = {}): Product {
   return {
     id: "prod-1",
     name: "Sparkling Water",
-    image_url: null,
-    qty_per_box: 12,
+    imageUrl: null,
+    qtyPerBox: 12,
     active: true,
-    external_id: null,
-    created_at: "2024-01-01T00:00:00Z",
-    updated_at: "2024-01-01T00:00:00Z",
+    externalId: null,
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
     ...overrides,
   };
 }
 
-const products: ProductRow[] = [
+const products: Product[] = [
   makeProduct({ id: "prod-1", name: "Sparkling Water" }),
   makeProduct({ id: "prod-2", name: "Still Water" }),
   makeProduct({ id: "prod-3", name: "Orange Juice" }),

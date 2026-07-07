@@ -1,24 +1,38 @@
 import { z } from "zod";
-import type { Database } from "@/lib/database.types";
 
-export type AccountRow = Database["public"]["Tables"]["accounts"]["Row"];
+export type Account = {
+  id: string;
+  name: string;
+  contactName: string | null;
+  contactEmail: string | null;
+  contactPhone: string | null;
+  deliveryAddress: string | null;
+  deliveryInstructions: string | null;
+  createdAt: string;
+  updatedAt: string;
+  userCount: number;
+};
 
-export type Account = AccountRow & { userCount: number };
+export type AccountUser = {
+  userId: string;
+  createdAt: string;
+  user: { id: string; name: string | null; email: string | null; role: string | null } | null;
+};
 
 export const createAccountSchema = z.object({
   name: z.string().min(1),
-  contact_name: z.string().nullable().optional(),
-  contact_email: z.email().nullable().optional(),
-  contact_phone: z.string().nullable().optional(),
-  delivery_address: z.string().nullable().optional(),
-  delivery_instructions: z.string().nullable().optional(),
+  contactName: z.string().nullable().optional(),
+  contactEmail: z.email().nullable().optional(),
+  contactPhone: z.string().nullable().optional(),
+  deliveryAddress: z.string().nullable().optional(),
+  deliveryInstructions: z.string().nullable().optional(),
 });
 
 export const updateAccountSchema = createAccountSchema.partial().extend({ id: z.uuid() });
 
 export const assignSchema = z.object({
-  account_id: z.uuid(),
-  user_id: z.uuid(),
+  accountId: z.uuid(),
+  userId: z.uuid(),
 });
 
 export type CreateAccountInput = z.infer<typeof createAccountSchema>;

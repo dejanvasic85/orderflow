@@ -17,13 +17,13 @@ type Props = {
 
 const accountEditSchema = z.object({
   name: z.string().min(1, "Account name is required"),
-  contact_name: z.string(),
-  contact_email: z
+  contactName: z.string(),
+  contactEmail: z
     .string()
     .refine((v) => !v || z.string().email().safeParse(v).success, "Must be a valid email address"),
-  contact_phone: z.string(),
-  delivery_address: z.string(),
-  delivery_instructions: z.string(),
+  contactPhone: z.string(),
+  deliveryAddress: z.string(),
+  deliveryInstructions: z.string(),
 });
 
 function toFieldErrors(errors: unknown[]): { message?: string }[] {
@@ -36,22 +36,22 @@ export function AccountEditPanel({ account, readOnly = false, onSave, onDiscard 
   const form = useForm({
     defaultValues: {
       name: account.name,
-      contact_name: account.contact_name ?? "",
-      contact_email: account.contact_email ?? "",
-      contact_phone: account.contact_phone ?? "",
-      delivery_address: account.delivery_address ?? "",
-      delivery_instructions: account.delivery_instructions ?? "",
+      contactName: account.contactName ?? "",
+      contactEmail: account.contactEmail ?? "",
+      contactPhone: account.contactPhone ?? "",
+      deliveryAddress: account.deliveryAddress ?? "",
+      deliveryInstructions: account.deliveryInstructions ?? "",
     },
     validators: { onSubmit: accountEditSchema },
     onSubmit: async ({ value }) => {
       await onSave({
         ...account,
         name: value.name,
-        contact_name: value.contact_name || null,
-        contact_email: value.contact_email || null,
-        contact_phone: value.contact_phone || null,
-        delivery_address: value.delivery_address || null,
-        delivery_instructions: value.delivery_instructions || null,
+        contactName: value.contactName || null,
+        contactEmail: value.contactEmail || null,
+        contactPhone: value.contactPhone || null,
+        deliveryAddress: value.deliveryAddress || null,
+        deliveryInstructions: value.deliveryInstructions || null,
       });
       toast.success("Changes saved");
     },
@@ -94,7 +94,7 @@ export function AccountEditPanel({ account, readOnly = false, onSave, onDiscard 
 
         {/* Contact details */}
         <div className="flex flex-col gap-4">
-          <form.Field name="contact_name">
+          <form.Field name="contactName">
             {(field) => (
               <Field>
                 <FieldLabel htmlFor="contact-name">Contact name</FieldLabel>
@@ -112,7 +112,7 @@ export function AccountEditPanel({ account, readOnly = false, onSave, onDiscard 
           </form.Field>
 
           <div className="grid grid-cols-2 gap-3">
-            <form.Field name="contact_email">
+            <form.Field name="contactEmail">
               {(field) => (
                 <Field>
                   <FieldLabel htmlFor="contact-email">Email</FieldLabel>
@@ -129,7 +129,7 @@ export function AccountEditPanel({ account, readOnly = false, onSave, onDiscard 
               )}
             </form.Field>
 
-            <form.Field name="contact_phone">
+            <form.Field name="contactPhone">
               {(field) => (
                 <Field>
                   <FieldLabel htmlFor="contact-phone">Phone</FieldLabel>
@@ -151,7 +151,7 @@ export function AccountEditPanel({ account, readOnly = false, onSave, onDiscard 
 
         {/* Delivery details */}
         <div className="flex flex-col gap-4">
-          <form.Field name="delivery_address">
+          <form.Field name="deliveryAddress">
             {(field) => (
               <Field>
                 <FieldLabel htmlFor="delivery-address">Delivery address</FieldLabel>
@@ -168,7 +168,7 @@ export function AccountEditPanel({ account, readOnly = false, onSave, onDiscard 
             )}
           </form.Field>
 
-          <form.Field name="delivery_instructions">
+          <form.Field name="deliveryInstructions">
             {(field) => (
               <Field>
                 <FieldLabel htmlFor="delivery-instructions">Delivery instructions</FieldLabel>

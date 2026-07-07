@@ -255,7 +255,7 @@ describe("editable mode", () => {
     expect(screen.getByRole("button", { name: "Decrease boxes" })).toBeDisabled();
   });
 
-  test("clicking Increase units calls onUpdate with extra_units + 1", async () => {
+  test("clicking Increase units calls onUpdate with extraUnits + 1", async () => {
     render(
       <OrderItemCard
         name="Chardonnay"
@@ -270,10 +270,10 @@ describe("editable mode", () => {
 
     await user.click(screen.getByRole("button", { name: "Increase units" }));
 
-    expect(onUpdate).toHaveBeenCalledWith({ extra_units: 4 });
+    expect(onUpdate).toHaveBeenCalledWith({ extraUnits: 4 });
   });
 
-  test("clicking Decrease units calls onUpdate with extra_units - 1", async () => {
+  test("clicking Decrease units calls onUpdate with extraUnits - 1", async () => {
     render(
       <OrderItemCard
         name="Chardonnay"
@@ -288,7 +288,7 @@ describe("editable mode", () => {
 
     await user.click(screen.getByRole("button", { name: "Decrease units" }));
 
-    expect(onUpdate).toHaveBeenCalledWith({ extra_units: 2 });
+    expect(onUpdate).toHaveBeenCalledWith({ extraUnits: 2 });
   });
 
   test("clicking remove calls onRemove", async () => {

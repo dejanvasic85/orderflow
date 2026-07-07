@@ -8,7 +8,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as draftOrder from "@/lib/orderRequests/draftOrder";
 import type { OrderRequestItemInput } from "@/lib/orderRequests/schema";
-import type { ProductRow } from "@/lib/products/schema";
+import type { Product } from "@/lib/products/schema";
 import type { TemplateWithItems } from "@/lib/templates/schema";
 import { NewOrderForm } from "./NewOrderForm";
 
@@ -22,80 +22,80 @@ const clearDraftMock = vi.mocked(draftOrder.clearDraft);
 const accountId = "b2c3d4e5-f6a7-4b8c-9d0e-000000000a01";
 
 // Products that are in the template
-const rose: ProductRow = {
+const rose: Product = {
   id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001",
   name: "Rosé",
-  image_url: null,
-  qty_per_box: 6,
+  imageUrl: null,
+  qtyPerBox: 6,
   active: true,
-  external_id: null,
-  created_at: "2024-01-01T00:00:00Z",
-  updated_at: "2024-01-01T00:00:00Z",
+  externalId: null,
+  createdAt: "2024-01-01T00:00:00Z",
+  updatedAt: "2024-01-01T00:00:00Z",
 };
 
-const pinotNoir: ProductRow = {
+const pinotNoir: Product = {
   id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000002",
   name: "Pinot Noir",
-  image_url: null,
-  qty_per_box: 12,
+  imageUrl: null,
+  qtyPerBox: 12,
   active: true,
-  external_id: null,
-  created_at: "2024-01-01T00:00:00Z",
-  updated_at: "2024-01-01T00:00:00Z",
+  externalId: null,
+  createdAt: "2024-01-01T00:00:00Z",
+  updatedAt: "2024-01-01T00:00:00Z",
 };
 
 // Products available in the catalog (not in template)
-const product1: ProductRow = {
+const product1: Product = {
   id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003",
   name: "Chardonnay",
-  image_url: null,
-  qty_per_box: 6,
+  imageUrl: null,
+  qtyPerBox: 6,
   active: true,
-  external_id: null,
-  created_at: "2024-01-01T00:00:00Z",
-  updated_at: "2024-01-01T00:00:00Z",
+  externalId: null,
+  createdAt: "2024-01-01T00:00:00Z",
+  updatedAt: "2024-01-01T00:00:00Z",
 };
 
-const product2: ProductRow = {
+const product2: Product = {
   id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000004",
   name: "Merlot",
-  image_url: null,
-  qty_per_box: 12,
+  imageUrl: null,
+  qtyPerBox: 12,
   active: true,
-  external_id: null,
-  created_at: "2024-01-01T00:00:00Z",
-  updated_at: "2024-01-01T00:00:00Z",
+  externalId: null,
+  createdAt: "2024-01-01T00:00:00Z",
+  updatedAt: "2024-01-01T00:00:00Z",
 };
 
 const allProducts = [rose, pinotNoir, product1, product2];
 
 const template: TemplateWithItems = {
   id: "d4e5f6a7-b8c9-4d0e-9f2a-000000000001",
-  account_id: accountId,
+  accountId,
   name: "Weekly Wine Pack",
-  created_by: "a1b2c3d4-e5f6-4a7b-8c9d-000000000001",
-  created_at: "2024-01-01T00:00:00Z",
-  updated_at: "2024-01-01T00:00:00Z",
-  template_items: [
+  createdBy: "a1b2c3d4-e5f6-4a7b-8c9d-000000000001",
+  createdAt: "2024-01-01T00:00:00Z",
+  updatedAt: "2024-01-01T00:00:00Z",
+  templateItems: [
     {
       id: "item-1",
-      template_id: "d4e5f6a7-b8c9-4d0e-9f2a-000000000001",
-      product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001",
-      box_count: 2,
-      unit_count: 0,
-      created_by: null,
-      created_at: "2024-01-01T00:00:00Z",
-      products: { id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", name: "Rosé", qty_per_box: 6 },
+      templateId: "d4e5f6a7-b8c9-4d0e-9f2a-000000000001",
+      productId: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001",
+      boxCount: 2,
+      unitCount: 0,
+      createdBy: null,
+      createdAt: "2024-01-01T00:00:00Z",
+      product: { id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", name: "Rosé", qtyPerBox: 6 },
     },
     {
       id: "item-2",
-      template_id: "d4e5f6a7-b8c9-4d0e-9f2a-000000000001",
-      product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000002",
-      box_count: 1,
-      unit_count: 3,
-      created_by: null,
-      created_at: "2024-01-01T00:00:00Z",
-      products: { id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000002", name: "Pinot Noir", qty_per_box: 12 },
+      templateId: "d4e5f6a7-b8c9-4d0e-9f2a-000000000001",
+      productId: "c3d4e5f6-a7b8-4c9d-8e1f-000000000002",
+      boxCount: 1,
+      unitCount: 3,
+      createdBy: null,
+      createdAt: "2024-01-01T00:00:00Z",
+      product: { id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000002", name: "Pinot Noir", qtyPerBox: 12 },
     },
   ],
 };
@@ -171,8 +171,8 @@ test("calls onSubmit with mapped payload when submitted with no delivery instruc
     deliveryAddress: null,
     deliveryInstructions: null,
     items: [
-      { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 2, extra_units: 0 },
-      { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000002", boxes: 1, extra_units: 3 },
+      { productId: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 2, extraUnits: 0 },
+      { productId: "c3d4e5f6-a7b8-4c9d-8e1f-000000000002", boxes: 1, extraUnits: 3 },
     ],
   });
 });
@@ -289,7 +289,7 @@ test("shows error alert when onSubmit throws", async () => {
 });
 
 test("disables submit button when template has no items", async () => {
-  renderForm({ template: { ...template, template_items: [] } });
+  renderForm({ template: { ...template, templateItems: [] } });
 
   expect(await screen.findByRole("button", { name: "Submit order" })).toBeDisabled();
 });
@@ -332,8 +332,8 @@ test("removing an item removes it from the list", async () => {
   // Saved draft includes both template items and an extra catalog item — the draft
   // is the full source of truth, so all three appear on load.
   const savedDraft: OrderRequestItemInput[] = [
-    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 2, extra_units: 0 }, // Rosé (template)
-    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003", boxes: 1, extra_units: 0 }, // Chardonnay (catalog)
+    { productId: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 2, extraUnits: 0 }, // Rosé (template)
+    { productId: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003", boxes: 1, extraUnits: 0 }, // Chardonnay (catalog)
   ];
   loadDraftMock.mockReturnValue(savedDraft);
 
@@ -361,8 +361,8 @@ test("submit enabled when only draft items exist (no template)", async () => {
 test("onSubmit uses the saved draft as the complete item list", async () => {
   // Draft is the full source of truth: template item at modified quantity + extra catalog item.
   const savedDraft: OrderRequestItemInput[] = [
-    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 5, extra_units: 0 }, // Rosé — user changed from 2→5
-    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003", boxes: 3, extra_units: 1 }, // Chardonnay — catalog item
+    { productId: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 5, extraUnits: 0 }, // Rosé — user changed from 2→5
+    { productId: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003", boxes: 3, extraUnits: 1 }, // Chardonnay — catalog item
   ];
   loadDraftMock.mockReturnValue(savedDraft);
 
@@ -373,8 +373,8 @@ test("onSubmit uses the saved draft as the complete item list", async () => {
   expect(onSubmit).toHaveBeenCalledWith(
     expect.objectContaining({
       items: [
-        { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 5, extra_units: 0 },
-        { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003", boxes: 3, extra_units: 1 },
+        { productId: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 5, extraUnits: 0 },
+        { productId: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003", boxes: 3, extraUnits: 1 },
       ],
     }),
   );
@@ -382,9 +382,9 @@ test("onSubmit uses the saved draft as the complete item list", async () => {
 
 test("draft items are loaded from localStorage on mount", async () => {
   const storedItem: OrderRequestItemInput = {
-    product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003",
+    productId: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003",
     boxes: 2,
-    extra_units: 0,
+    extraUnits: 0,
   };
   loadDraftMock.mockReturnValue([storedItem]);
 
@@ -409,15 +409,15 @@ test("saveDraft is called when an item is added", async () => {
   await user.click(addButtons[0]);
 
   expect(saveDraftMock).toHaveBeenCalledWith(accountId, [
-    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 1, extra_units: 0 },
+    { productId: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 1, extraUnits: 0 },
   ]);
 });
 
 test("does not load draft from localStorage when persistDraft is false", async () => {
   const storedItem: OrderRequestItemInput = {
-    product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003",
+    productId: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003",
     boxes: 2,
-    extra_units: 0,
+    extraUnits: 0,
   };
   loadDraftMock.mockReturnValue([storedItem]);
 
@@ -443,7 +443,7 @@ test("does not call saveDraft when persistDraft is false and an item is added", 
 
 test("initialItems overrides template items", async () => {
   const initialItems: OrderRequestItemInput[] = [
-    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003", boxes: 3, extra_units: 1 },
+    { productId: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003", boxes: 3, extraUnits: 1 },
   ];
 
   renderForm({ initialItems });
@@ -460,8 +460,8 @@ test("initialItems overrides template items", async () => {
 
 test("disables submit button when every item has 0 boxes and 0 units", async () => {
   const initialItems: OrderRequestItemInput[] = [
-    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 0, extra_units: 0 },
-    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000002", boxes: 0, extra_units: 0 },
+    { productId: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 0, extraUnits: 0 },
+    { productId: "c3d4e5f6-a7b8-4c9d-8e1f-000000000002", boxes: 0, extraUnits: 0 },
   ];
 
   renderForm({ initialItems });
@@ -471,8 +471,8 @@ test("disables submit button when every item has 0 boxes and 0 units", async () 
 
 test("enables submit button when at least one item has a non-zero total", async () => {
   const initialItems: OrderRequestItemInput[] = [
-    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 0, extra_units: 0 },
-    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000002", boxes: 1, extra_units: 0 },
+    { productId: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 0, extraUnits: 0 },
+    { productId: "c3d4e5f6-a7b8-4c9d-8e1f-000000000002", boxes: 1, extraUnits: 0 },
   ];
 
   renderForm({ initialItems });
@@ -482,7 +482,7 @@ test("enables submit button when at least one item has a non-zero total", async 
 
 test("enables submit button when an item has 0 boxes but non-zero units", async () => {
   const initialItems: OrderRequestItemInput[] = [
-    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 0, extra_units: 2 },
+    { productId: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 0, extraUnits: 2 },
   ];
 
   renderForm({ initialItems });
@@ -492,8 +492,8 @@ test("enables submit button when an item has 0 boxes but non-zero units", async 
 
 test("omits zero-quantity items from the submitted payload", async () => {
   const initialItems: OrderRequestItemInput[] = [
-    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 0, extra_units: 0 },
-    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000002", boxes: 1, extra_units: 3 },
+    { productId: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 0, extraUnits: 0 },
+    { productId: "c3d4e5f6-a7b8-4c9d-8e1f-000000000002", boxes: 1, extraUnits: 3 },
   ];
 
   renderForm({ initialItems });
@@ -502,15 +502,15 @@ test("omits zero-quantity items from the submitted payload", async () => {
 
   expect(onSubmit).toHaveBeenCalledWith(
     expect.objectContaining({
-      items: [{ product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000002", boxes: 1, extra_units: 3 }],
+      items: [{ productId: "c3d4e5f6-a7b8-4c9d-8e1f-000000000002", boxes: 1, extraUnits: 3 }],
     }),
   );
 });
 
 test("keeps zero-quantity items visible in the form after a non-zero item is submitted", async () => {
   const initialItems: OrderRequestItemInput[] = [
-    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 0, extra_units: 0 },
-    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000002", boxes: 1, extra_units: 0 },
+    { productId: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 0, extraUnits: 0 },
+    { productId: "c3d4e5f6-a7b8-4c9d-8e1f-000000000002", boxes: 1, extraUnits: 0 },
   ];
 
   renderForm({ initialItems });
@@ -522,12 +522,12 @@ test("keeps zero-quantity items visible in the form after a non-zero item is sub
 
 test("initialItems overrides a saved draft", async () => {
   const savedDraft: OrderRequestItemInput[] = [
-    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 5, extra_units: 0 },
+    { productId: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", boxes: 5, extraUnits: 0 },
   ];
   loadDraftMock.mockReturnValue(savedDraft);
 
   const initialItems: OrderRequestItemInput[] = [
-    { product_id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003", boxes: 2, extra_units: 0 },
+    { productId: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003", boxes: 2, extraUnits: 0 },
   ];
 
   renderForm({ initialItems });

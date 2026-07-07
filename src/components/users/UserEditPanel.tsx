@@ -60,12 +60,12 @@ const blankUser: User = {
   email: "",
   phone: null,
   active: true,
-  invite_accepted_at: null,
-  invited_at: null,
+  inviteAcceptedAt: null,
+  invitedAt: null,
   role: "user",
   notificationPreferences: { email: true, sms: false },
-  created_at: "",
-  updated_at: "",
+  createdAt: "",
+  updatedAt: "",
   accounts: [],
 };
 
@@ -122,7 +122,7 @@ export function UserEditPanel(props: Props) {
   const headerTitle = isCreate ? "Invite new user" : user.name;
   const headerSubtitle = isCreate ? "They'll receive an email to set their password" : user.email;
   const submitLabel = isCreate ? "Send invite" : "Save changes";
-  const isPending = !isCreate && user.active && !user.invite_accepted_at;
+  const isPending = !isCreate && user.active && !user.inviteAcceptedAt;
 
   return (
     <div className="flex flex-col gap-6 p-6">
@@ -133,9 +133,9 @@ export function UserEditPanel(props: Props) {
 
       <Separator />
 
-      {isPending && onResendInvite && user.invited_at && (
+      {isPending && onResendInvite && user.invitedAt && (
         <>
-          <PendingInviteSection invitedAt={user.invited_at} onResend={onResendInvite} />
+          <PendingInviteSection invitedAt={user.invitedAt} onResend={onResendInvite} />
           <Separator />
         </>
       )}

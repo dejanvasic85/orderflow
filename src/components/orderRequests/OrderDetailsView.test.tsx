@@ -4,33 +4,32 @@ import { OrderDetailsView } from "./OrderDetailsView";
 
 const baseOrder: OrderRequestWithItems = {
   id: "11111111-1111-4111-8111-111111111111",
-  order_number: 42,
-  account_id: "22222222-2222-4222-8222-222222222222",
-  placed_by: "33333333-3333-4333-8333-333333333333",
-  template_id: null,
-  delivery_address: null,
-  delivery_instructions: null,
-  created_at: "2026-06-29T09:00:00.000Z",
-  updated_at: "2026-06-29T09:00:00.000Z",
-  order_request_items: [
+  orderNumber: 42,
+  accountId: "22222222-2222-4222-8222-222222222222",
+  placedBy: "33333333-3333-4333-8333-333333333333",
+  templateId: null,
+  deliveryAddress: null,
+  deliveryInstructions: null,
+  createdAt: "2026-06-29T09:00:00.000Z",
+  updatedAt: "2026-06-29T09:00:00.000Z",
+  orderRequestItems: [
     {
       id: "44444444-4444-4444-8444-444444444444",
-      order_request_id: "11111111-1111-4111-8111-111111111111",
-      product_id: "55555555-5555-4555-8555-555555555555",
+      productId: "55555555-5555-4555-8555-555555555555",
       boxes: 2,
-      extra_units: 0,
-      created_at: "2026-06-29T09:00:00.000Z",
-      products: {
+      extraUnits: 0,
+      createdAt: "2026-06-29T09:00:00.000Z",
+      product: {
         id: "55555555-5555-4555-8555-555555555555",
         name: "Rosé",
-        qty_per_box: 6,
-        image_url: null,
+        qtyPerBox: 6,
+        imageUrl: null,
       },
     },
   ],
-  templates: null,
-  users: { id: "33333333-3333-4333-8333-333333333333", name: "Jane Placer" },
-  accounts: { id: "22222222-2222-4222-8222-222222222222", name: "The Winery Bistro" },
+  template: null,
+  user: { id: "33333333-3333-4333-8333-333333333333", name: "Jane Placer" },
+  account: { id: "22222222-2222-4222-8222-222222222222", name: "The Winery Bistro" },
 };
 
 test("shows both the delivery address and the delivery instructions", () => {
@@ -38,8 +37,8 @@ test("shows both the delivery address and the delivery instructions", () => {
     <OrderDetailsView
       order={{
         ...baseOrder,
-        delivery_address: "12 Vine St, Hawthorn",
-        delivery_instructions: "Leave at the rear door",
+        deliveryAddress: "12 Vine St, Hawthorn",
+        deliveryInstructions: "Leave at the rear door",
       }}
       placedByName="Jane Placer"
       onBack={() => {}}
@@ -55,7 +54,7 @@ test("shows both the delivery address and the delivery instructions", () => {
 test("shows the address label without an instructions label when only the address is present", () => {
   render(
     <OrderDetailsView
-      order={{ ...baseOrder, delivery_address: "12 Vine St, Hawthorn" }}
+      order={{ ...baseOrder, deliveryAddress: "12 Vine St, Hawthorn" }}
       placedByName="Jane Placer"
       onBack={() => {}}
     />,
@@ -68,7 +67,7 @@ test("shows the address label without an instructions label when only the addres
 test("shows the instructions label without an address label when only instructions are present", () => {
   render(
     <OrderDetailsView
-      order={{ ...baseOrder, delivery_instructions: "Leave at the rear door" }}
+      order={{ ...baseOrder, deliveryInstructions: "Leave at the rear door" }}
       placedByName="Jane Placer"
       onBack={() => {}}
     />,

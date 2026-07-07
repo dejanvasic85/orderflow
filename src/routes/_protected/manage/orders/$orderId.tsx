@@ -24,15 +24,15 @@ function AdminOrderDetailsPage() {
   }
 
   function handleReorder() {
-    if (!order.account_id) return;
+    if (!order.accountId) return;
     void navigate({
       to: "/manage/orders/new",
-      search: { accountId: order.account_id, fromOrderId: order.id },
+      search: { accountId: order.accountId, fromOrderId: order.id },
     });
   }
 
-  const placedByName = order.users?.name ?? "Unknown";
-  const accountName = order.accounts?.name ?? "Order";
+  const placedByName = order.user?.name ?? "Unknown";
+  const accountName = order.account?.name ?? "Order";
 
   return (
     <>
@@ -42,7 +42,7 @@ function AdminOrderDetailsPage() {
           order={order}
           placedByName={placedByName}
           onBack={handleBack}
-          onReorder={order.account_id ? handleReorder : undefined}
+          onReorder={order.accountId ? handleReorder : undefined}
         />
       </PageContent>
     </>

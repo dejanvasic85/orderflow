@@ -7,7 +7,7 @@ import type { TemplateEditorPayload } from "@/components/templates/TemplateEdito
 import { getAccount } from "@/lib/accounts/accounts.functions";
 import { can, permissions } from "@/lib/permissions";
 import { listProducts } from "@/lib/products/products.functions";
-import type { ProductRow } from "@/lib/products/schema";
+import type { Product } from "@/lib/products/schema";
 import { asResult } from "@/lib/result";
 import type { TemplateWithItems } from "@/lib/templates/schema";
 import { getTemplateForAccount, saveTemplateItems } from "@/lib/templates/templates.functions";
@@ -17,7 +17,7 @@ export const Route = createFileRoute("/_protected/manage/accounts/$accountId/tem
     const [accountResult, templateResult, productsResult] = await Promise.all([
       getAccount({ data: params.accountId }),
       getTemplateForAccount({ data: params.accountId }),
-      listProducts().then((r) => asResult<ProductRow[]>(r)),
+      listProducts().then((r) => asResult<Product[]>(r)),
     ]);
 
     if (!accountResult.ok) throw new Error(accountResult.error.message);

@@ -26,21 +26,19 @@ export function resolvePlacedByName(user: PlacedByUser): {
 }
 
 export function mapOrderHistoryRow(row: OrderHistoryRow): OrderHistoryItem {
-  const rowItems = row.order_request_items ?? [];
-  const user = row.users as PlacedByUser;
-  const account = row.accounts as { id: string; name: string } | null | undefined;
-  const { placedByName, placedByOrgName } = resolvePlacedByName(user);
+  const rowItems = row.items ?? [];
+  const { placedByName, placedByOrgName } = resolvePlacedByName(row.user);
   return {
     id: row.id,
-    order_number: row.order_number,
-    placed_by: row.placed_by,
+    orderNumber: row.orderNumber,
+    placedBy: row.placedBy,
     placedByName,
     ...(placedByOrgName ? { placedByOrgName } : {}),
-    created_at: row.created_at,
-    total_boxes: rowItems.reduce((sum, i) => sum + (i.boxes ?? 0), 0),
-    total_units: rowItems.reduce((sum, i) => sum + (i.extra_units ?? 0), 0),
-    ...(account?.name ? { account_name: account.name } : {}),
-    ...(account?.id ? { account_id: account.id } : {}),
+    createdAt: row.createdAt,
+    totalBoxes: rowItems.reduce((sum, i) => sum + (i.boxes ?? 0), 0),
+    totalUnits: rowItems.reduce((sum, i) => sum + (i.extraUnits ?? 0), 0),
+    ...(row.account?.name ? { accountName: row.account.name } : {}),
+    ...(row.account?.id ? { accountId: row.account.id } : {}),
   };
 }
 
@@ -133,7 +131,7 @@ export async function placeOrder(
   deps.log.info("order.placed", "order created", {
     orderId: result.value.id,
     userId: user.id,
-    accountId: input.account_id,
+    accountId: input.accountId,
   });
   await fireOrderNotification(deps, result.value, input, user.id);
   return result;
@@ -147,7 +145,7 @@ export async function placeOrderOnBehalf(
   const user = await deps.session();
   deps.log.info("order.placed", "staff placing order on behalf of account", {
     actorId: user.id,
-    accountId: input.account_id,
+    accountId: input.accountId,
   });
   return placeOrder(deps, input);
 }
@@ -159,12 +157,12 @@ async function fireOrderNotification(
   placedById: string,
 ): Promise<void> {
   const [account, placedBy, products] = await Promise.all([
-    deps.repo.findAccountName(input.account_id),
+    deps.repo.findAccountName(input.accountId),
     deps.repo.findPlacedByUser(placedById),
-    deps.repo.findProductsByIds(input.items.map((i) => i.product_id)),
+    deps.repo.findProductsByIds(input.items.map((i) => i.productId)),
   ]);
 
-  const accountName = account?.name ?? input.account_id;
+  const accountName = account?.name ?? input.accountId;
   const placedByUser: PlacedByUser = placedBy
     ? { id: placedBy.id, name: placedBy.name, role: placedBy.role as UserRole }
     : null;
@@ -172,19 +170,19 @@ async function fireOrderNotification(
   const productMap = new Map(products.map((p) => [p.id, p.name]));
 
   const items = input.items.map((item) => ({
-    productName: productMap.get(item.product_id) ?? item.product_id,
+    productName: productMap.get(item.productId) ?? item.productId,
     boxes: item.boxes,
-    extraUnits: item.extra_units,
+    extraUnits: item.extraUnits,
   }));
 
   await deps.notify({
     orderId: order.id,
     orderRef: formatOrderRef(order.order_number),
-    accountId: input.account_id,
+    accountId: input.accountId,
     placedById,
     accountName,
     placedByName,
-    deliveryAddress: input.delivery_address ?? null,
+    deliveryAddress: input.deliveryAddress ?? null,
     items,
   });
 }

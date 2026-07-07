@@ -1,9 +1,13 @@
+import type { Database } from "@/lib/database.types";
 import { log } from "@/lib/log/logger";
 import { err, ok, type Result } from "@/lib/result";
 import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import type { CreateOrderRequestInput, OrderHistoryRow, OrderRequestWithItems } from "./schema";
 import { orderPageSize } from "./schema";
+
+type OrderRequestRow = Database["public"]["Tables"]["order_requests"]["Row"];
+type OrderRequestItemRow = Database["public"]["Tables"]["order_request_items"]["Row"];
 
 const orderRequestWithItemsSelect =
   "id, order_number, account_id, placed_by, template_id, delivery_address, delivery_instructions, created_at, updated_at, order_request_items(id, product_id, boxes, extra_units, created_at, products(id, name, qty_per_box, image_url)), templates(id, name), users!order_requests_placed_by_fkey(id, name), accounts(id, name)" as const;
@@ -13,6 +17,91 @@ const orderHistorySelect =
 
 const allOrderHistorySelect =
   "id, order_number, placed_by, created_at, order_request_items(boxes, extra_units), users!order_requests_placed_by_fkey(id, name, role), accounts(id, name)" as const;
+
+type OrderRequestItemJoinRow = OrderRequestItemRow & {
+  products: { id: string; name: string; qty_per_box: number; image_url: string | null };
+};
+
+type OrderRequestWithItemsRow = OrderRequestRow & {
+  order_request_items: OrderRequestItemJoinRow[];
+  templates: { id: string; name: string } | null;
+  users: { id: string; name: string } | null;
+  accounts: { id: string; name: string } | null;
+};
+
+type OrderHistoryJoinRow = {
+  id: string;
+  order_number: number;
+  placed_by: string;
+  created_at: string;
+  order_request_items: { boxes: number | null; extra_units: number | null }[];
+  users: { id: string; name: string; role: string } | null;
+  accounts?: { id: string; name: string } | null;
+};
+
+function toOrderRequestWithItems(row: OrderRequestWithItemsRow): OrderRequestWithItems {
+  return {
+    id: row.id,
+    orderNumber: row.order_number,
+    accountId: row.account_id,
+    placedBy: row.placed_by,
+    templateId: row.template_id,
+    deliveryAddress: row.delivery_address,
+    deliveryInstructions: row.delivery_instructions,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+    orderRequestItems: row.order_request_items.map((item) => ({
+      id: item.id,
+      productId: item.product_id,
+      boxes: item.boxes,
+      extraUnits: item.extra_units,
+      createdAt: item.created_at,
+      product: {
+        id: item.products.id,
+        name: item.products.name,
+        qtyPerBox: item.products.qty_per_box,
+        imageUrl: item.products.image_url,
+      },
+    })),
+    template: row.templates,
+    user: row.users,
+    account: row.accounts,
+  };
+}
+
+function toOrderHistoryRow(row: OrderHistoryJoinRow): OrderHistoryRow {
+  return {
+    id: row.id,
+    orderNumber: row.order_number,
+    placedBy: row.placed_by,
+    createdAt: row.created_at,
+    items: row.order_request_items.map((i) => ({ boxes: i.boxes, extraUnits: i.extra_units })),
+    user: row.users as OrderHistoryRow["user"],
+    account: row.accounts,
+  };
+}
+
+function toOrderRequestInsert(input: Omit<CreateOrderRequestInput, "items">, placedById: string) {
+  return {
+    account_id: input.accountId,
+    template_id: input.templateId ?? null,
+    delivery_address: input.deliveryAddress ?? null,
+    delivery_instructions: input.deliveryInstructions ?? null,
+    placed_by: placedById,
+  };
+}
+
+function toOrderRequestItemInserts(
+  items: CreateOrderRequestInput["items"],
+  orderRequestId: string,
+) {
+  return items.map((item) => ({
+    product_id: item.productId,
+    boxes: item.boxes,
+    extra_units: item.extraUnits,
+    order_request_id: orderRequestId,
+  }));
+}
 
 export type CreatedOrder = { id: string; order_number: number };
 
@@ -57,9 +146,8 @@ export function createOrderRequestRepository(): OrderRequestRepository {
         log.error("order.db", "fetch orders failed", { error: error.message });
         return err({ message: error.message });
       }
-      // The PostgREST-inferred embedded-relation type is structurally close but not
-      // assignable to OrderRequestWithItems (subtle nullability on nested relations).
-      return ok((data ?? []) as OrderRequestWithItems[]);
+      const rows = (data ?? []) as OrderRequestWithItemsRow[];
+      return ok(rows.map(toOrderRequestWithItems));
     },
 
     async findOrderRequestById(id) {
@@ -73,7 +161,7 @@ export function createOrderRequestRepository(): OrderRequestRepository {
         log.error("order.db", "fetch order failed", { error: error.message });
         return err({ message: error.message });
       }
-      return ok(data as OrderRequestWithItems);
+      return ok(toOrderRequestWithItems(data as OrderRequestWithItemsRow));
     },
 
     async findOrderHistoryForAccount(accountId) {
@@ -87,7 +175,8 @@ export function createOrderRequestRepository(): OrderRequestRepository {
         log.error("order.db", "fetch history failed", { error: error.message });
         return err({ message: error.message });
       }
-      return ok(data ?? []);
+      const rows = (data ?? []) as OrderHistoryJoinRow[];
+      return ok(rows.map(toOrderHistoryRow));
     },
 
     async findAllOrderHistory(filter) {
@@ -109,7 +198,8 @@ export function createOrderRequestRepository(): OrderRequestRepository {
         log.error("order.db", "fetch all history failed", { error: error.message });
         return err({ message: error.message });
       }
-      return ok({ rows: data ?? [], total: count ?? 0 });
+      const rows = (data ?? []) as OrderHistoryJoinRow[];
+      return ok({ rows: rows.map(toOrderHistoryRow), total: count ?? 0 });
     },
 
     async createOrderWithItems(input, placedById) {
@@ -124,7 +214,7 @@ export function createOrderRequestRepository(): OrderRequestRepository {
 
       const { data: order, error: orderError } = await supabase
         .from("order_requests")
-        .insert({ ...orderData, placed_by: placedById })
+        .insert(toOrderRequestInsert(orderData, placedById))
         .select("id, order_number")
         .single();
       if (orderError) {
@@ -132,7 +222,7 @@ export function createOrderRequestRepository(): OrderRequestRepository {
         return err({ message: orderError.message });
       }
 
-      const itemRows = items.map((item) => ({ ...item, order_request_id: order.id }));
+      const itemRows = toOrderRequestItemInserts(items, order.id);
       const { error: itemsError } = await supabase.from("order_request_items").insert(itemRows);
       if (itemsError) {
         log.error("order.db", "insert items failed", { error: itemsError.message });

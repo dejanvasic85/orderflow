@@ -1,8 +1,8 @@
 import type { Result } from "@/lib/result";
-import type { AccountListedRow, AccountRepository, AccountUserRow } from "./accounts.repository";
+import type { AccountRepository } from "./accounts.repository";
 import type {
   Account,
-  AccountRow,
+  AccountUser,
   AssignAccountUserInput,
   CreateAccountInput,
   ListAccountsSearch,
@@ -15,10 +15,6 @@ export type AccountServiceDeps = {
   authorize: () => Promise<void>;
 };
 
-export function mapAccount(row: AccountListedRow): Account {
-  return { ...row, userCount: row.account_users?.length ?? 0 };
-}
-
 export async function listAccountsForCurrentUser(
   deps: AccountServiceDeps,
 ): Promise<Result<{ id: string; name: string }[]>> {
@@ -30,31 +26,24 @@ export async function listAccounts(
   deps: AccountServiceDeps,
   filters: ListAccountsSearch,
 ): Promise<Result<{ accounts: Account[]; total: number }>> {
-  const result = await deps.repo.findPagedAccounts(filters);
-  if (!result.ok) return result;
-  return {
-    ok: true,
-    value: { accounts: result.value.accounts.map(mapAccount), total: result.value.total },
-  };
+  return deps.repo.findPagedAccounts(filters);
 }
 
 export async function getAccount(deps: AccountServiceDeps, id: string): Promise<Result<Account>> {
-  const result = await deps.repo.findAccountById(id);
-  if (!result.ok) return result;
-  return { ok: true, value: mapAccount(result.value) };
+  return deps.repo.findAccountById(id);
 }
 
 export async function listAccountUsers(
   deps: AccountServiceDeps,
   accountId: string,
-): Promise<Result<AccountUserRow[]>> {
+): Promise<Result<AccountUser[]>> {
   return deps.repo.findAccountUsers(accountId);
 }
 
 export async function createAccount(
   deps: AccountServiceDeps,
   data: CreateAccountInput,
-): Promise<Result<AccountRow>> {
+): Promise<Result<Account>> {
   await deps.authorize();
   return deps.repo.createAccount(data);
 }
@@ -62,7 +51,7 @@ export async function createAccount(
 export async function updateAccount(
   deps: AccountServiceDeps,
   data: UpdateAccountInput,
-): Promise<Result<AccountRow>> {
+): Promise<Result<Account>> {
   await deps.authorize();
   return deps.repo.updateAccount(data);
 }

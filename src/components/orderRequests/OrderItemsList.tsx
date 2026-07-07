@@ -1,12 +1,12 @@
 import { AnimatePresence, motion } from "framer-motion";
 import type { OrderRequestItemInput } from "@/lib/orderRequests/schema";
-import type { ProductRow } from "@/lib/products/schema";
+import type { Product } from "@/lib/products/schema";
 import { OrderItemCard } from "./OrderItemCard";
 
 type OrderItemsListProps = {
   items: OrderRequestItemInput[];
-  products: ProductRow[];
-  onUpdate: (productId: string, patch: { boxes?: number; extra_units?: number }) => void;
+  products: Product[];
+  onUpdate: (productId: string, patch: { boxes?: number; extraUnits?: number }) => void;
   onRemove: (productId: string) => void;
 };
 
@@ -17,10 +17,10 @@ export function OrderItemsList({ items, products, onUpdate, onRemove }: OrderIte
     <div className="flex flex-col gap-4">
       <AnimatePresence initial={false}>
         {items.map((item) => {
-          const product = products.find((p) => p.id === item.product_id);
+          const product = products.find((p) => p.id === item.productId);
           return (
             <motion.div
-              key={item.product_id}
+              key={item.productId}
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
@@ -28,13 +28,13 @@ export function OrderItemsList({ items, products, onUpdate, onRemove }: OrderIte
               className="overflow-hidden p-px"
             >
               <OrderItemCard
-                name={product?.name ?? item.product_id}
-                imageUrl={product?.image_url ?? null}
-                qtyPerBox={product?.qty_per_box ?? 1}
+                name={product?.name ?? item.productId}
+                imageUrl={product?.imageUrl ?? null}
+                qtyPerBox={product?.qtyPerBox ?? 1}
                 boxes={item.boxes}
-                units={item.extra_units}
-                onUpdate={(patch) => onUpdate(item.product_id, patch)}
-                onRemove={() => onRemove(item.product_id)}
+                units={item.extraUnits}
+                onUpdate={(patch) => onUpdate(item.productId, patch)}
+                onRemove={() => onRemove(item.productId)}
               />
             </motion.div>
           );

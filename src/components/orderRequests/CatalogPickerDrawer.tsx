@@ -18,12 +18,12 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import type { ProductRow } from "@/lib/products/schema";
+import type { Product } from "@/lib/products/schema";
 
 type CatalogPickerDrawerProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  products: ProductRow[];
+  products: Product[];
   itemProductIds: Set<string>;
   onAdd: (productId: string) => void;
   onRemove: (productId: string) => void;
@@ -37,7 +37,7 @@ function resolveAction(productId: string, itemProductIds: Set<string>): PickerAc
 }
 
 type CatalogPickerCardProps = {
-  product: ProductRow;
+  product: Product;
   action: PickerAction;
   onAdd: () => void;
   onRemove: () => void;

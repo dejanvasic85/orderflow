@@ -7,7 +7,7 @@ import {
   unassignUserFromAccount,
 } from "@/lib/accounts/accounts.functions";
 import { listUsers } from "@/lib/users/users.functions";
-import { makeAccountUserRow, makeUser } from "@/test/fixtures/userFixtures";
+import { makeAccountUser, makeUser } from "@/test/fixtures/userFixtures";
 import { AccountUserSection } from "./AccountUserSection";
 
 vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
@@ -53,7 +53,7 @@ test("shows empty state when no users are assigned", async () => {
 test("renders assigned users with name and email", async () => {
   vi.mocked(listAccountUsers).mockResolvedValue({
     ok: true,
-    value: [makeAccountUserRow()],
+    value: [makeAccountUser()],
   });
 
   render(<AccountUserSection accountId="acc-1" />, { wrapper });
@@ -66,10 +66,10 @@ test("renders member count badge", async () => {
   vi.mocked(listAccountUsers).mockResolvedValue({
     ok: true,
     value: [
-      makeAccountUserRow({ user_id: "u-1" }),
-      makeAccountUserRow({
-        user_id: "u-2",
-        users: { id: "u-2", name: "Bob Jones", email: null, role: "user", active: true },
+      makeAccountUser({ userId: "u-1" }),
+      makeAccountUser({
+        userId: "u-2",
+        user: { id: "u-2", name: "Bob Jones", email: null, role: "user" },
       }),
     ],
   });
@@ -82,7 +82,7 @@ test("renders member count badge", async () => {
 test("Add user button is disabled when all users are already assigned", async () => {
   vi.mocked(listAccountUsers).mockResolvedValue({
     ok: true,
-    value: [makeAccountUserRow({ user_id: "u-1" })],
+    value: [makeAccountUser({ userId: "u-1" })],
   });
   vi.mocked(listUsers).mockResolvedValue({
     ok: true,
@@ -117,7 +117,7 @@ test("hides Add user button in read-only mode", async () => {
 test("hides remove button in read-only mode", async () => {
   vi.mocked(listAccountUsers).mockResolvedValue({
     ok: true,
-    value: [makeAccountUserRow()],
+    value: [makeAccountUser()],
   });
 
   render(<AccountUserSection accountId="acc-1" readOnly />, { wrapper });
@@ -129,7 +129,7 @@ test("hides remove button in read-only mode", async () => {
 test("calls unassignUserFromAccount when remove button is clicked", async () => {
   vi.mocked(listAccountUsers).mockResolvedValue({
     ok: true,
-    value: [makeAccountUserRow({ user_id: "u-1" })],
+    value: [makeAccountUser({ userId: "u-1" })],
   });
 
   render(<AccountUserSection accountId="acc-1" />, { wrapper });
@@ -138,7 +138,7 @@ test("calls unassignUserFromAccount when remove button is clicked", async () => 
 
   await vi.waitFor(() => {
     expect(vi.mocked(unassignUserFromAccount)).toHaveBeenCalledWith({
-      data: { account_id: "acc-1", user_id: "u-1" },
+      data: { accountId: "acc-1", userId: "u-1" },
     });
   });
 });
@@ -147,7 +147,7 @@ test("calls onUserCountChange after a user is removed", async () => {
   const onUserCountChange = vi.fn();
 
   vi.mocked(listAccountUsers)
-    .mockResolvedValueOnce({ ok: true, value: [makeAccountUserRow({ user_id: "u-1" })] })
+    .mockResolvedValueOnce({ ok: true, value: [makeAccountUser({ userId: "u-1" })] })
     .mockResolvedValueOnce({ ok: true, value: [] });
 
   render(<AccountUserSection accountId="acc-1" onUserCountChange={onUserCountChange} />, {

@@ -1,5 +1,5 @@
 import { err, ok } from "@/lib/result";
-import type { DashboardRepository, DashboardOrderRow } from "./dashboard.repository";
+import type { DashboardRepository } from "./dashboard.repository";
 import {
   buildKpiSummary,
   buildOrderTimeSeries,
@@ -10,6 +10,7 @@ import {
   orderUnitVolume,
   type DashboardServiceDeps,
 } from "./dashboard.service";
+import type { DashboardOrder } from "./schema";
 
 function makeRepo(overrides: Partial<DashboardRepository> = {}): DashboardRepository {
   return {
@@ -20,16 +21,16 @@ function makeRepo(overrides: Partial<DashboardRepository> = {}): DashboardReposi
   };
 }
 
-function makeOrder(overrides: Partial<DashboardOrderRow> = {}): DashboardOrderRow {
+function makeOrder(overrides: Partial<DashboardOrder> = {}): DashboardOrder {
   return {
     id: "order-1",
-    order_number: 1,
-    created_at: "2026-06-01T10:00:00Z",
-    account_id: "acc-1",
-    placed_by: "user-1",
-    order_request_items: [],
-    accounts: { id: "acc-1", name: "Acme Wines" },
-    users: { id: "user-1", name: "Tom Reynolds", role: "user" },
+    orderNumber: 1,
+    createdAt: "2026-06-01T10:00:00Z",
+    accountId: "acc-1",
+    placedBy: "user-1",
+    items: [],
+    account: { id: "acc-1", name: "Acme Wines" },
+    user: { id: "user-1", name: "Tom Reynolds", role: "user" },
     ...overrides,
   };
 }
@@ -37,13 +38,13 @@ function makeOrder(overrides: Partial<DashboardOrderRow> = {}): DashboardOrderRo
 const fixedNow = new Date("2026-06-20T12:00:00Z");
 
 describe("itemUnitVolume", () => {
-  it("calculates boxes times qty_per_box plus extra_units", () => {
+  it("calculates boxes times qtyPerBox plus extraUnits", () => {
     expect(
       itemUnitVolume({
-        product_id: "p-1",
+        productId: "p-1",
         boxes: 2,
-        extra_units: 3,
-        products: { id: "p-1", name: "Shiraz", qty_per_box: 6 },
+        extraUnits: 3,
+        product: { id: "p-1", name: "Shiraz", qtyPerBox: 6 },
       }),
     ).toBe(15);
   });
@@ -51,54 +52,54 @@ describe("itemUnitVolume", () => {
   it("treats null boxes as zero", () => {
     expect(
       itemUnitVolume({
-        product_id: "p-1",
+        productId: "p-1",
         boxes: null,
-        extra_units: 4,
-        products: { id: "p-1", name: "Shiraz", qty_per_box: 6 },
+        extraUnits: 4,
+        product: { id: "p-1", name: "Shiraz", qtyPerBox: 6 },
       }),
     ).toBe(4);
   });
 
-  it("treats null extra_units as zero", () => {
+  it("treats null extraUnits as zero", () => {
     expect(
       itemUnitVolume({
-        product_id: "p-1",
+        productId: "p-1",
         boxes: 2,
-        extra_units: null,
-        products: { id: "p-1", name: "Shiraz", qty_per_box: 6 },
+        extraUnits: null,
+        product: { id: "p-1", name: "Shiraz", qtyPerBox: 6 },
       }),
     ).toBe(12);
   });
 
-  it("treats missing products join as zero qty_per_box", () => {
-    expect(itemUnitVolume({ product_id: "p-1", boxes: 3, extra_units: 2, products: null })).toBe(2);
+  it("treats missing product join as zero qtyPerBox", () => {
+    expect(itemUnitVolume({ productId: "p-1", boxes: 3, extraUnits: 2, product: null })).toBe(2);
   });
 });
 
 describe("orderUnitVolume", () => {
   it("sums volumes across all items", () => {
-    const row = makeOrder({
-      order_request_items: [
+    const order = makeOrder({
+      items: [
         {
-          product_id: "p-1",
+          productId: "p-1",
           boxes: 2,
-          extra_units: 0,
-          products: { id: "p-1", name: "Shiraz", qty_per_box: 6 },
+          extraUnits: 0,
+          product: { id: "p-1", name: "Shiraz", qtyPerBox: 6 },
         },
         {
-          product_id: "p-2",
+          productId: "p-2",
           boxes: 1,
-          extra_units: 3,
-          products: { id: "p-2", name: "Pinot", qty_per_box: 12 },
+          extraUnits: 3,
+          product: { id: "p-2", name: "Pinot", qtyPerBox: 12 },
         },
       ],
     });
 
-    expect(orderUnitVolume(row)).toBe(27);
+    expect(orderUnitVolume(order)).toBe(27);
   });
 
   it("returns zero for an order with no items", () => {
-    expect(orderUnitVolume(makeOrder({ order_request_items: [] }))).toBe(0);
+    expect(orderUnitVolume(makeOrder({ items: [] }))).toBe(0);
   });
 });
 
@@ -112,34 +113,34 @@ describe("buildKpiSummary", () => {
     expect(result.activeProducts).toBe(0);
   });
 
-  it("counts all rows as totalOrders and sums volume", () => {
-    const rows = [
+  it("counts all orders as totalOrders and sums volume", () => {
+    const orders = [
       makeOrder({
-        created_at: "2026-06-10T00:00:00Z",
-        order_request_items: [
+        createdAt: "2026-06-10T00:00:00Z",
+        items: [
           {
-            product_id: "p-1",
+            productId: "p-1",
             boxes: 2,
-            extra_units: 0,
-            products: { id: "p-1", name: "Shiraz", qty_per_box: 6 },
+            extraUnits: 0,
+            product: { id: "p-1", name: "Shiraz", qtyPerBox: 6 },
           },
         ],
       }),
       makeOrder({
         id: "order-2",
-        created_at: "2026-06-12T00:00:00Z",
-        order_request_items: [
+        createdAt: "2026-06-12T00:00:00Z",
+        items: [
           {
-            product_id: "p-2",
+            productId: "p-2",
             boxes: 1,
-            extra_units: 0,
-            products: { id: "p-2", name: "Pinot", qty_per_box: 12 },
+            extraUnits: 0,
+            product: { id: "p-2", name: "Pinot", qtyPerBox: 12 },
           },
         ],
       }),
     ];
 
-    const result = buildKpiSummary(rows, 5, 11, fixedNow);
+    const result = buildKpiSummary(orders, 5, 11, fixedNow);
 
     expect(result.totalOrders).toBe(2);
     expect(result.totalVolume).toBe(24);
@@ -150,14 +151,14 @@ describe("buildKpiSummary", () => {
   it("computes an up delta when current period has more orders than prior", () => {
     // current: [now-30d, now) = [May 21, June 20) — 3 orders
     // prior:   [now-60d, now-30d) = [Apr 21, May 21) — 1 order
-    const rows = [
-      makeOrder({ id: "o-1", created_at: "2026-06-10T00:00:00Z" }),
-      makeOrder({ id: "o-2", created_at: "2026-06-05T00:00:00Z" }),
-      makeOrder({ id: "o-3", created_at: "2026-05-25T00:00:00Z" }),
-      makeOrder({ id: "o-4", created_at: "2026-04-30T00:00:00Z" }),
+    const orders = [
+      makeOrder({ id: "o-1", createdAt: "2026-06-10T00:00:00Z" }),
+      makeOrder({ id: "o-2", createdAt: "2026-06-05T00:00:00Z" }),
+      makeOrder({ id: "o-3", createdAt: "2026-05-25T00:00:00Z" }),
+      makeOrder({ id: "o-4", createdAt: "2026-04-30T00:00:00Z" }),
     ];
 
-    const result = buildKpiSummary(rows, 5, 11, fixedNow);
+    const result = buildKpiSummary(orders, 5, 11, fixedNow);
 
     expect(result.totalOrdersDelta?.direction).toBe("up");
     expect(result.totalOrdersDelta?.changePct).toBeGreaterThan(0);
@@ -172,9 +173,9 @@ describe("buildKpiSummary", () => {
 
   it("handles divide-by-zero when prior period has no orders", () => {
     // Only orders in current period
-    const rows = [makeOrder({ created_at: "2026-06-10T00:00:00Z" })];
+    const orders = [makeOrder({ createdAt: "2026-06-10T00:00:00Z" })];
 
-    const result = buildKpiSummary(rows, 0, 0, fixedNow);
+    const result = buildKpiSummary(orders, 0, 0, fixedNow);
 
     expect(result.totalOrdersDelta?.direction).toBe("up");
     expect(result.totalOrdersDelta?.changePct).toBe(100);
@@ -196,21 +197,21 @@ describe("buildOrderTimeSeries", () => {
   });
 
   it("increments count for orders on the same day", () => {
-    const rows = [
-      makeOrder({ id: "o-1", created_at: "2026-06-15T09:00:00Z" }),
-      makeOrder({ id: "o-2", created_at: "2026-06-15T14:00:00Z" }),
+    const orders = [
+      makeOrder({ id: "o-1", createdAt: "2026-06-15T09:00:00Z" }),
+      makeOrder({ id: "o-2", createdAt: "2026-06-15T14:00:00Z" }),
     ];
 
-    const result = buildOrderTimeSeries(rows, "30d", fixedNow);
+    const result = buildOrderTimeSeries(orders, "30d", fixedNow);
     const bucket = result.find((p) => p.date === "2026-06-15");
 
     expect(bucket?.count).toBe(2);
   });
 
   it("includes orders placed today (the last bucket)", () => {
-    const rows = [makeOrder({ id: "o-today", created_at: "2026-06-20T08:00:00Z" })];
+    const orders = [makeOrder({ id: "o-today", createdAt: "2026-06-20T08:00:00Z" })];
 
-    const result = buildOrderTimeSeries(rows, "30d", fixedNow);
+    const result = buildOrderTimeSeries(orders, "30d", fixedNow);
     const todayBucket = result.find((p) => p.date === "2026-06-20");
 
     expect(todayBucket?.count).toBe(1);
@@ -218,12 +219,12 @@ describe("buildOrderTimeSeries", () => {
 
   it("excludes orders outside the window", () => {
     // 7d window: since = June 13 (fixedNow Jun 20 minus 7 days)
-    const rows = [
-      makeOrder({ id: "o-in", created_at: "2026-06-14T00:00:00Z" }),
-      makeOrder({ id: "o-out", created_at: "2026-06-10T00:00:00Z" }),
+    const orders = [
+      makeOrder({ id: "o-in", createdAt: "2026-06-14T00:00:00Z" }),
+      makeOrder({ id: "o-out", createdAt: "2026-06-10T00:00:00Z" }),
     ];
 
-    const result = buildOrderTimeSeries(rows, "7d", fixedNow);
+    const result = buildOrderTimeSeries(orders, "7d", fixedNow);
     const total = result.reduce((sum, p) => sum + p.count, 0);
 
     expect(total).toBe(1);
@@ -247,31 +248,31 @@ describe("buildOrderTimeSeries", () => {
 });
 
 describe("buildTopProducts", () => {
-  it("returns empty array when no rows", () => {
+  it("returns empty array when no orders", () => {
     expect(buildTopProducts([])).toEqual([]);
   });
 
   it("ranks products by descending unit volume", () => {
-    const rows = [
+    const orders = [
       makeOrder({
-        order_request_items: [
+        items: [
           {
-            product_id: "p-1",
+            productId: "p-1",
             boxes: 1,
-            extra_units: 0,
-            products: { id: "p-1", name: "Shiraz", qty_per_box: 6 },
+            extraUnits: 0,
+            product: { id: "p-1", name: "Shiraz", qtyPerBox: 6 },
           },
           {
-            product_id: "p-2",
+            productId: "p-2",
             boxes: 2,
-            extra_units: 0,
-            products: { id: "p-2", name: "Pinot", qty_per_box: 12 },
+            extraUnits: 0,
+            product: { id: "p-2", name: "Pinot", qtyPerBox: 12 },
           },
         ],
       }),
     ];
 
-    const result = buildTopProducts(rows);
+    const result = buildTopProducts(orders);
 
     expect(result[0].productId).toBe("p-2");
     expect(result[0].volume).toBe(24);
@@ -280,58 +281,58 @@ describe("buildTopProducts", () => {
   });
 
   it("sums volumes for the same product across multiple orders", () => {
-    const rows = [
+    const orders = [
       makeOrder({
         id: "o-1",
-        order_request_items: [
+        items: [
           {
-            product_id: "p-1",
+            productId: "p-1",
             boxes: 1,
-            extra_units: 0,
-            products: { id: "p-1", name: "Shiraz", qty_per_box: 6 },
+            extraUnits: 0,
+            product: { id: "p-1", name: "Shiraz", qtyPerBox: 6 },
           },
         ],
       }),
       makeOrder({
         id: "o-2",
-        order_request_items: [
+        items: [
           {
-            product_id: "p-1",
+            productId: "p-1",
             boxes: 2,
-            extra_units: 0,
-            products: { id: "p-1", name: "Shiraz", qty_per_box: 6 },
+            extraUnits: 0,
+            product: { id: "p-1", name: "Shiraz", qtyPerBox: 6 },
           },
         ],
       }),
     ];
 
-    const result = buildTopProducts(rows);
+    const result = buildTopProducts(orders);
 
     expect(result).toHaveLength(1);
     expect(result[0].volume).toBe(18);
   });
 
   it("breaks ties alphabetically by product name", () => {
-    const rows = [
+    const orders = [
       makeOrder({
-        order_request_items: [
+        items: [
           {
-            product_id: "p-b",
+            productId: "p-b",
             boxes: 1,
-            extra_units: 0,
-            products: { id: "p-b", name: "Zinfandel", qty_per_box: 6 },
+            extraUnits: 0,
+            product: { id: "p-b", name: "Zinfandel", qtyPerBox: 6 },
           },
           {
-            product_id: "p-a",
+            productId: "p-a",
             boxes: 1,
-            extra_units: 0,
-            products: { id: "p-a", name: "Albariño", qty_per_box: 6 },
+            extraUnits: 0,
+            product: { id: "p-a", name: "Albariño", qtyPerBox: 6 },
           },
         ],
       }),
     ];
 
-    const result = buildTopProducts(rows);
+    const result = buildTopProducts(orders);
 
     expect(result[0].name).toBe("Albariño");
     expect(result[1].name).toBe("Zinfandel");
@@ -339,49 +340,49 @@ describe("buildTopProducts", () => {
 
   it("limits results to the specified count", () => {
     const items = Array.from({ length: 8 }, (_, i) => ({
-      product_id: `p-${i}`,
+      productId: `p-${i}`,
       boxes: 1,
-      extra_units: 0,
-      products: { id: `p-${i}`, name: `Product ${i}`, qty_per_box: 6 },
+      extraUnits: 0,
+      product: { id: `p-${i}`, name: `Product ${i}`, qtyPerBox: 6 },
     }));
-    const rows = [makeOrder({ order_request_items: items })];
+    const orders = [makeOrder({ items })];
 
-    expect(buildTopProducts(rows, 5)).toHaveLength(5);
+    expect(buildTopProducts(orders, 5)).toHaveLength(5);
   });
 
-  it("skips items with no products join", () => {
-    const rows = [
+  it("skips items with no product join", () => {
+    const orders = [
       makeOrder({
-        order_request_items: [{ product_id: "p-1", boxes: 2, extra_units: 0, products: null }],
+        items: [{ productId: "p-1", boxes: 2, extraUnits: 0, product: null }],
       }),
     ];
 
-    expect(buildTopProducts(rows)).toHaveLength(0);
+    expect(buildTopProducts(orders)).toHaveLength(0);
   });
 });
 
 describe("buildRecentActivity", () => {
-  it("returns empty array when no rows", () => {
+  it("returns empty array when no orders", () => {
     expect(buildRecentActivity([])).toEqual([]);
   });
 
   it("maps the order fields correctly", () => {
-    const row = makeOrder({
-      order_number: 7,
-      created_at: "2026-06-15T10:00:00Z",
-      accounts: { id: "acc-1", name: "Acme Wines" },
-      users: { id: "u-1", name: "Tom Reynolds", role: "user" },
-      order_request_items: [
+    const order = makeOrder({
+      orderNumber: 7,
+      createdAt: "2026-06-15T10:00:00Z",
+      account: { id: "acc-1", name: "Acme Wines" },
+      user: { id: "u-1", name: "Tom Reynolds", role: "user" },
+      items: [
         {
-          product_id: "p-1",
+          productId: "p-1",
           boxes: 1,
-          extra_units: 0,
-          products: { id: "p-1", name: "Shiraz", qty_per_box: 6 },
+          extraUnits: 0,
+          product: { id: "p-1", name: "Shiraz", qtyPerBox: 6 },
         },
       ],
     });
 
-    const [item] = buildRecentActivity([row]);
+    const [item] = buildRecentActivity([order]);
 
     expect(item.orderRef).toBe("ORD-0007");
     expect(item.accountName).toBe("Acme Wines");
@@ -391,47 +392,47 @@ describe("buildRecentActivity", () => {
   });
 
   it("masks admin and staff placed-by as bwow", () => {
-    const adminRow = makeOrder({ users: { id: "u-1", name: "Jane Doe", role: "admin" } });
-    const staffRow = makeOrder({
+    const adminOrder = makeOrder({ user: { id: "u-1", name: "Jane Doe", role: "admin" } });
+    const staffOrder = makeOrder({
       id: "order-2",
-      users: { id: "u-2", name: "Sarah", role: "staff" },
+      user: { id: "u-2", name: "Sarah", role: "staff" },
     });
 
-    const [adminItem] = buildRecentActivity([adminRow]);
-    const [staffItem] = buildRecentActivity([staffRow]);
+    const [adminItem] = buildRecentActivity([adminOrder]);
+    const [staffItem] = buildRecentActivity([staffOrder]);
 
     expect(adminItem.placedByName).toBe("bwow");
     expect(staffItem.placedByName).toBe("bwow");
   });
 
-  it("falls back to Unknown when users join is null", () => {
-    const row = makeOrder({ users: null });
+  it("falls back to Unknown when user join is null", () => {
+    const order = makeOrder({ user: null });
 
-    const [item] = buildRecentActivity([row]);
+    const [item] = buildRecentActivity([order]);
 
     expect(item.placedByName).toBe("Unknown");
   });
 
-  it("uses Unknown for account when accounts join is null", () => {
-    const row = makeOrder({ accounts: null });
+  it("uses Unknown for account when account join is null", () => {
+    const order = makeOrder({ account: null });
 
-    const [item] = buildRecentActivity([row]);
+    const [item] = buildRecentActivity([order]);
 
     expect(item.accountName).toBe("Unknown");
   });
 
   it("slices to the limit (default 8)", () => {
-    const rows = Array.from({ length: 12 }, (_, i) =>
-      makeOrder({ id: `order-${i}`, order_number: i + 1 }),
+    const orders = Array.from({ length: 12 }, (_, i) =>
+      makeOrder({ id: `order-${i}`, orderNumber: i + 1 }),
     );
 
-    expect(buildRecentActivity(rows)).toHaveLength(8);
+    expect(buildRecentActivity(orders)).toHaveLength(8);
   });
 
-  it("returns all rows when fewer than the limit", () => {
-    const rows = [makeOrder(), makeOrder({ id: "order-2", order_number: 2 })];
+  it("returns all orders when fewer than the limit", () => {
+    const orders = [makeOrder(), makeOrder({ id: "order-2", orderNumber: 2 })];
 
-    expect(buildRecentActivity(rows)).toHaveLength(2);
+    expect(buildRecentActivity(orders)).toHaveLength(2);
   });
 });
 

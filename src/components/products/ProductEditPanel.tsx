@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
-import type { CreateProductInput, ProductRow, UpdateProductInput } from "@/lib/products/schema";
+import type { CreateProductInput, Product, UpdateProductInput } from "@/lib/products/schema";
 
 type BaseProps = {
   onDiscard: () => void;
@@ -16,12 +16,12 @@ type BaseProps = {
 type Props =
   | (BaseProps & {
       mode: "create";
-      product?: ProductRow;
+      product?: Product;
       onSave: (payload: CreateProductInput) => void | Promise<void>;
     })
   | (BaseProps & {
       mode?: "edit";
-      product: ProductRow;
+      product: Product;
       onSave: (payload: UpdateProductInput) => void | Promise<void>;
     });
 
@@ -50,16 +50,16 @@ export function ProductEditPanel(props: Props) {
   const form = useForm({
     defaultValues: {
       name: product?.name ?? "",
-      imageUrl: product?.image_url ?? "",
-      qtyPerBox: product?.qty_per_box ?? 1,
+      imageUrl: product?.imageUrl ?? "",
+      qtyPerBox: product?.qtyPerBox ?? 1,
       active: product?.active ?? true,
     },
     validators: { onSubmit: productEditSchema },
     onSubmit: async ({ value }) => {
       const payload = {
         name: value.name,
-        image_url: value.imageUrl || null,
-        qty_per_box: value.qtyPerBox,
+        imageUrl: value.imageUrl || null,
+        qtyPerBox: value.qtyPerBox,
         active: value.active,
       };
       if (props.mode === "create") {

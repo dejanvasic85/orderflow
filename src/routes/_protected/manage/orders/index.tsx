@@ -69,8 +69,8 @@ function OrdersPage() {
           total={total}
           buildViewHref={(orderId) => `/manage/orders/${orderId}`}
           buildReorderHref={(order) =>
-            order.account_id
-              ? `/manage/orders/new?accountId=${order.account_id}&fromOrderId=${order.id}`
+            order.accountId
+              ? `/manage/orders/new?accountId=${order.accountId}&fromOrderId=${order.id}`
               : `/manage/orders/new?fromOrderId=${order.id}`
           }
           searchQuery={searchQuery}

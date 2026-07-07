@@ -22,13 +22,13 @@ function wrapper({ children }: { children: React.ReactNode }) {
 const baseAccount: Account = {
   id: "acc-1",
   name: "Acme Corp",
-  contact_name: "Jane Doe",
-  contact_email: "jane@acme.com",
-  contact_phone: "0412345678",
-  delivery_address: "1 Main St",
-  delivery_instructions: "Leave at door",
-  created_at: "2024-01-01T00:00:00Z",
-  updated_at: "2024-01-01T00:00:00Z",
+  contactName: "Jane Doe",
+  contactEmail: "jane@acme.com",
+  contactPhone: "0412345678",
+  deliveryAddress: "1 Main St",
+  deliveryInstructions: "Leave at door",
+  createdAt: "2024-01-01T00:00:00Z",
+  updatedAt: "2024-01-01T00:00:00Z",
   userCount: 0,
 };
 
@@ -106,9 +106,9 @@ test("calls onSave with null for empty optional fields", async () => {
     <AccountEditPanel
       account={{
         ...baseAccount,
-        contact_name: null,
-        contact_email: null,
-        contact_phone: null,
+        contactName: null,
+        contactEmail: null,
+        contactPhone: null,
       }}
       onSave={onSave}
       onDiscard={onDiscard}
@@ -121,9 +121,9 @@ test("calls onSave with null for empty optional fields", async () => {
   await vi.waitFor(() => {
     expect(onSave).toHaveBeenCalledWith(
       expect.objectContaining({
-        contact_name: null,
-        contact_email: null,
-        contact_phone: null,
+        contactName: null,
+        contactEmail: null,
+        contactPhone: null,
       }),
     );
   });

@@ -17,7 +17,7 @@ export const Route = createFileRoute("/_protected/_account/accounts/$accountId/o
     if (!accountResult.value) throw notFound();
     if (!orderResult.ok) throw new Error(orderResult.error.message);
     if (!orderResult.value) throw notFound();
-    if (orderResult.value.account_id !== params.accountId) throw notFound();
+    if (orderResult.value.accountId !== params.accountId) throw notFound();
 
     return {
       account: accountResult.value,
@@ -44,7 +44,7 @@ function OrderDetailsPage() {
     });
   }
 
-  const placedByName = order.users?.name ?? "Unknown";
+  const placedByName = order.user?.name ?? "Unknown";
 
   return (
     <>
