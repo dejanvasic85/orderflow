@@ -89,10 +89,10 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Local development has auth emails going to mailpit but only to console for transactional emails
 - [x] We need a much better and cleaner pattern for Authz
 - [x] The .server.ts files have too much logic in them or all database operations should be somewhere else
-- [ ] Replace all the deprecated API's like `inputValidator` on the tanstack lib
 - [ ] Audit all the variable naming so they are camelCased
+- [ ] Replace all the deprecated API's like `inputValidator` on the tanstack lib
 
-- [ ] Cleanup | Casting and typescript needs general cleanup
+- [ ] Cleanup | Casting and typescript needs general cleanup. Once all the "as" casting is removed tighten the tsconfig to no longer allow this.
 
 ```ts
 const { user } = Route.useRouteContext() as { user: { user_role?: string } };
