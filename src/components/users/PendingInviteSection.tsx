@@ -34,7 +34,13 @@ export function PendingInviteSection({ invitedAt, onResend }: Props) {
     <div className="flex flex-col gap-3">
       <h3 className="text-sm font-medium">Invitation</h3>
       <p className="text-sm text-muted-foreground">Sent {formatDateTime(displayedInvitedAt)}</p>
-      <Button type="button" variant="outline" size="sm" disabled={loading} onClick={handleResend}>
+      <Button
+        type="button"
+        size="sm"
+        className="w-full sm:w-fit"
+        disabled={loading}
+        onClick={handleResend}
+      >
         {loading ? "Sending…" : "Resend invitation"}
       </Button>
     </div>
