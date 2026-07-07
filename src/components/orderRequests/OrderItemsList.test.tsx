@@ -1,36 +1,36 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { OrderRequestItemInput } from "@/lib/orderRequests/schema";
-import type { ProductRow } from "@/lib/products/schema";
+import type { Product } from "@/lib/products/schema";
 import { OrderItemsList } from "./OrderItemsList";
 
-const chardonnay: ProductRow = {
+const chardonnay: Product = {
   id: "prod-1",
   name: "Chardonnay",
-  image_url: null,
-  qty_per_box: 6,
+  imageUrl: null,
+  qtyPerBox: 6,
   active: true,
-  external_id: null,
-  created_at: "2024-01-01T00:00:00Z",
-  updated_at: "2024-01-01T00:00:00Z",
+  externalId: null,
+  createdAt: "2024-01-01T00:00:00Z",
+  updatedAt: "2024-01-01T00:00:00Z",
 };
 
-const merlot: ProductRow = {
+const merlot: Product = {
   id: "prod-2",
   name: "Merlot",
-  image_url: null,
-  qty_per_box: 12,
+  imageUrl: null,
+  qtyPerBox: 12,
   active: true,
-  external_id: null,
-  created_at: "2024-01-01T00:00:00Z",
-  updated_at: "2024-01-01T00:00:00Z",
+  externalId: null,
+  createdAt: "2024-01-01T00:00:00Z",
+  updatedAt: "2024-01-01T00:00:00Z",
 };
 
 const products = [chardonnay, merlot];
 
 const items: OrderRequestItemInput[] = [
-  { product_id: "prod-1", boxes: 2, extra_units: 0 },
-  { product_id: "prod-2", boxes: 1, extra_units: 3 },
+  { productId: "prod-1", boxes: 2, extraUnits: 0 },
+  { productId: "prod-2", boxes: 1, extraUnits: 3 },
 ];
 
 const onUpdate = vi.fn();

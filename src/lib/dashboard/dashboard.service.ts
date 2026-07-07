@@ -2,9 +2,11 @@ import { resolvePlacedByName } from "@/lib/orderRequests/orderRequests.service";
 import { formatOrderRef } from "@/lib/orderRequests/schema";
 import { ok, type Result } from "@/lib/result";
 import { rangeWindowDaysValue, recentActivityLimit, topProductsLimit } from "./constants";
-import type { DashboardRepository, DashboardOrderRow } from "./dashboard.repository";
+import type { DashboardRepository } from "./dashboard.repository";
 import type {
   DashboardData,
+  DashboardOrder,
+  DashboardOrderItem,
   DashboardRange,
   KpiDelta,
   KpiSummary,
@@ -19,12 +21,12 @@ export type DashboardServiceDeps = {
   now?: () => Date;
 };
 
-export function itemUnitVolume(item: DashboardOrderRow["order_request_items"][number]): number {
-  return (item.boxes ?? 0) * (item.products?.qty_per_box ?? 0) + (item.extra_units ?? 0);
+export function itemUnitVolume(item: DashboardOrderItem): number {
+  return (item.boxes ?? 0) * (item.product?.qtyPerBox ?? 0) + (item.extraUnits ?? 0);
 }
 
-export function orderUnitVolume(row: DashboardOrderRow): number {
-  return row.order_request_items.reduce((sum, item) => sum + itemUnitVolume(item), 0);
+export function orderUnitVolume(order: DashboardOrder): number {
+  return order.items.reduce((sum, item) => sum + itemUnitVolume(item), 0);
 }
 
 export function startOfWindow(now: Date, range: DashboardRange): Date {
@@ -45,7 +47,7 @@ function computeDelta(current: number, prior: number): KpiDelta {
 }
 
 export function buildKpiSummary(
-  rows: DashboardOrderRow[],
+  orders: DashboardOrder[],
   activeAccounts: number,
   activeProducts: number,
   now: Date,
@@ -58,18 +60,18 @@ export function buildKpiSummary(
   currentStart.setUTCDate(currentStart.getUTCDate() - 30);
   currentStart.setUTCHours(0, 0, 0, 0);
 
-  const currentRows = rows.filter((r) => new Date(r.created_at) >= currentStart);
-  const priorRows = rows.filter(
-    (r) => new Date(r.created_at) >= priorStart && new Date(r.created_at) < currentStart,
+  const currentOrders = orders.filter((o) => new Date(o.createdAt) >= currentStart);
+  const priorOrders = orders.filter(
+    (o) => new Date(o.createdAt) >= priorStart && new Date(o.createdAt) < currentStart,
   );
 
-  const totalOrders = rows.length;
-  const totalVolume = rows.reduce((sum, r) => sum + orderUnitVolume(r), 0);
+  const totalOrders = orders.length;
+  const totalVolume = orders.reduce((sum, o) => sum + orderUnitVolume(o), 0);
 
-  const currentOrderCount = currentRows.length;
-  const priorOrderCount = priorRows.length;
-  const currentVolume = currentRows.reduce((sum, r) => sum + orderUnitVolume(r), 0);
-  const priorVolume = priorRows.reduce((sum, r) => sum + orderUnitVolume(r), 0);
+  const currentOrderCount = currentOrders.length;
+  const priorOrderCount = priorOrders.length;
+  const currentVolume = currentOrders.reduce((sum, o) => sum + orderUnitVolume(o), 0);
+  const priorVolume = priorOrders.reduce((sum, o) => sum + orderUnitVolume(o), 0);
 
   return {
     totalOrders,
@@ -94,12 +96,12 @@ function formatWeekLabel(d: Date): string {
 }
 
 export function buildOrderTimeSeries(
-  rows: DashboardOrderRow[],
+  orders: DashboardOrder[],
   range: DashboardRange,
   now: Date,
 ): OrderTimePoint[] {
   const since = startOfWindow(now, range);
-  const windowRows = rows.filter((r) => new Date(r.created_at) >= since);
+  const windowOrders = orders.filter((o) => new Date(o.createdAt) >= since);
 
   const useWeekly = range === "3m";
 
@@ -118,8 +120,8 @@ export function buildOrderTimeSeries(
       cursor.setUTCDate(cursor.getUTCDate() + 7);
     }
 
-    for (const row of windowRows) {
-      const d = new Date(row.created_at);
+    for (const order of windowOrders) {
+      const d = new Date(order.createdAt);
       const weekStart = new Date(d);
       weekStart.setUTCDate(weekStart.getUTCDate() - weekStart.getUTCDay());
       weekStart.setUTCHours(0, 0, 0, 0);
@@ -143,8 +145,8 @@ export function buildOrderTimeSeries(
     dailyBuckets.set(key, { count: 0, label: formatAxisLabel(d) });
   }
 
-  for (const row of windowRows) {
-    const key = toDateKey(new Date(row.created_at));
+  for (const order of windowOrders) {
+    const key = toDateKey(new Date(order.createdAt));
     const bucket = dailyBuckets.get(key);
     if (bucket) bucket.count += 1;
   }
@@ -154,21 +156,18 @@ export function buildOrderTimeSeries(
     .map(([date, { count, label }]) => ({ date, label, count }));
 }
 
-export function buildTopProducts(
-  rows: DashboardOrderRow[],
-  limit = topProductsLimit,
-): TopProduct[] {
+export function buildTopProducts(orders: DashboardOrder[], limit = topProductsLimit): TopProduct[] {
   const volumeByProduct = new Map<string, { name: string; volume: number }>();
 
-  for (const row of rows) {
-    for (const item of row.order_request_items) {
-      if (!item.products) continue;
-      const existing = volumeByProduct.get(item.product_id);
+  for (const order of orders) {
+    for (const item of order.items) {
+      if (!item.product) continue;
+      const existing = volumeByProduct.get(item.productId);
       const vol = itemUnitVolume(item);
       if (existing) {
         existing.volume += vol;
       } else {
-        volumeByProduct.set(item.product_id, { name: item.products.name, volume: vol });
+        volumeByProduct.set(item.productId, { name: item.product.name, volume: vol });
       }
     }
   }
@@ -180,25 +179,25 @@ export function buildTopProducts(
 }
 
 export function buildRecentActivity(
-  rows: DashboardOrderRow[],
+  orders: DashboardOrder[],
   limit = recentActivityLimit,
 ): RecentActivityItem[] {
-  return rows.slice(0, limit).map((row) => {
-    const user = row.users
+  return orders.slice(0, limit).map((order) => {
+    const user = order.user
       ? {
-          id: row.users.id,
-          name: row.users.name,
-          role: row.users.role as "admin" | "staff" | "user",
+          id: order.user.id,
+          name: order.user.name,
+          role: order.user.role as "admin" | "staff" | "user",
         }
       : null;
     const { placedByName } = resolvePlacedByName(user);
     return {
-      id: row.id,
-      orderRef: formatOrderRef(row.order_number),
-      accountName: row.accounts?.name ?? "Unknown",
+      id: order.id,
+      orderRef: formatOrderRef(order.orderNumber),
+      accountName: order.account?.name ?? "Unknown",
       placedByName,
-      volume: orderUnitVolume(row),
-      createdAt: row.created_at,
+      volume: orderUnitVolume(order),
+      createdAt: order.createdAt,
     };
   });
 }
@@ -219,16 +218,16 @@ export async function getDashboardData(deps: DashboardServiceDeps): Promise<Resu
   if (!accountsRes.ok) return accountsRes;
   if (!productsRes.ok) return productsRes;
 
-  const rows = ordersRes.value;
+  const orders = ordersRes.value;
 
   return ok({
-    kpis: buildKpiSummary(rows, accountsRes.value, productsRes.value, now),
+    kpis: buildKpiSummary(orders, accountsRes.value, productsRes.value, now),
     timeSeries: {
-      "7d": buildOrderTimeSeries(rows, "7d", now),
-      "30d": buildOrderTimeSeries(rows, "30d", now),
-      "3m": buildOrderTimeSeries(rows, "3m", now),
+      "7d": buildOrderTimeSeries(orders, "7d", now),
+      "30d": buildOrderTimeSeries(orders, "30d", now),
+      "3m": buildOrderTimeSeries(orders, "3m", now),
     },
-    topProducts: buildTopProducts(rows),
-    recentActivity: buildRecentActivity(rows),
+    topProducts: buildTopProducts(orders),
+    recentActivity: buildRecentActivity(orders),
   });
 }

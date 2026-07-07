@@ -7,22 +7,33 @@ import {
   listAccounts,
   listAccountsForCurrentUser,
   listAccountUsers,
-  mapAccount,
   type AccountServiceDeps,
   unassignUser,
   updateAccount,
 } from "./accounts.service";
+import type { Account, AccountUser } from "./schema";
+
+const baseAccount: Account = {
+  id: "acc-1",
+  name: "Boutique",
+  contactName: null,
+  contactEmail: null,
+  contactPhone: null,
+  deliveryAddress: null,
+  deliveryInstructions: null,
+  createdAt: "2024-01-01",
+  updatedAt: "2024-01-01",
+  userCount: 2,
+};
 
 function makeRepo(overrides: Partial<AccountRepository> = {}): AccountRepository {
   return {
     findAccountsForUser: vi.fn().mockResolvedValue(ok([])),
     findPagedAccounts: vi.fn().mockResolvedValue(ok({ accounts: [], total: 0 })),
-    findAccountById: vi
-      .fn()
-      .mockResolvedValue(ok({ id: "acc-1", name: "Test", account_users: [] })),
+    findAccountById: vi.fn().mockResolvedValue(ok(baseAccount)),
     findAccountUsers: vi.fn().mockResolvedValue(ok([])),
-    createAccount: vi.fn().mockResolvedValue(ok({ id: "acc-new", name: "New" })),
-    updateAccount: vi.fn().mockResolvedValue(ok({ id: "acc-1", name: "Updated" })),
+    createAccount: vi.fn().mockResolvedValue(ok({ id: "acc-new", name: "New" } as Account)),
+    updateAccount: vi.fn().mockResolvedValue(ok({ id: "acc-1", name: "Updated" } as Account)),
     assignUserToAccount: vi.fn().mockResolvedValue(ok()),
     unassignUserFromAccount: vi.fn().mockResolvedValue(ok()),
     ...overrides,
@@ -37,65 +48,6 @@ function makeDeps(overrides: Partial<AccountServiceDeps> = {}): AccountServiceDe
     ...overrides,
   };
 }
-
-describe("mapAccount", () => {
-  it("sets userCount to the length of account_users", () => {
-    const row = {
-      id: "acc-1",
-      name: "Boutique",
-      contact_name: null,
-      contact_email: null,
-      contact_phone: null,
-      delivery_address: null,
-      delivery_instructions: null,
-      created_at: "2024-01-01",
-      updated_at: "2024-01-01",
-      account_users: [{ user_id: "u-1" }, { user_id: "u-2" }],
-    };
-
-    const result = mapAccount(row);
-
-    expect(result.userCount).toBe(2);
-  });
-
-  it("defaults userCount to 0 when account_users is null", () => {
-    const row = {
-      id: "acc-1",
-      name: "Boutique",
-      contact_name: null,
-      contact_email: null,
-      contact_phone: null,
-      delivery_address: null,
-      delivery_instructions: null,
-      created_at: "2024-01-01",
-      updated_at: "2024-01-01",
-      account_users: null,
-    };
-
-    const result = mapAccount(row);
-
-    expect(result.userCount).toBe(0);
-  });
-
-  it("defaults userCount to 0 when account_users is empty", () => {
-    const row = {
-      id: "acc-1",
-      name: "Boutique",
-      contact_name: null,
-      contact_email: null,
-      contact_phone: null,
-      delivery_address: null,
-      delivery_instructions: null,
-      created_at: "2024-01-01",
-      updated_at: "2024-01-01",
-      account_users: [],
-    };
-
-    const result = mapAccount(row);
-
-    expect(result.userCount).toBe(0);
-  });
-});
 
 describe("listAccountsForCurrentUser", () => {
   it("resolves the user id from session and passes it to repo", async () => {
@@ -120,29 +72,13 @@ describe("listAccountsForCurrentUser", () => {
 });
 
 describe("listAccounts", () => {
-  it("maps rows through mapAccount", async () => {
-    const rawRow = {
-      id: "acc-1",
-      name: "Boutique",
-      contact_name: null,
-      contact_email: null,
-      contact_phone: null,
-      delivery_address: null,
-      delivery_instructions: null,
-      created_at: "2024-01-01",
-      updated_at: "2024-01-01",
-      account_users: [{ user_id: "u-1" }, { user_id: "u-2" }],
-    };
-    const findPagedAccounts = vi.fn().mockResolvedValue(ok({ accounts: [rawRow], total: 1 }));
+  it("returns accounts from the repo", async () => {
+    const findPagedAccounts = vi.fn().mockResolvedValue(ok({ accounts: [baseAccount], total: 1 }));
     const deps = makeDeps({ repo: makeRepo({ findPagedAccounts }) });
 
     const result = await listAccounts(deps, {});
 
-    expect(result.ok).toBe(true);
-    if (result.ok) {
-      expect(result.value.total).toBe(1);
-      expect(result.value.accounts[0].userCount).toBe(2);
-    }
+    expect(result).toEqual(ok({ accounts: [baseAccount], total: 1 }));
   });
 
   it("passes filters through to repo", async () => {
@@ -165,28 +101,13 @@ describe("listAccounts", () => {
 });
 
 describe("getAccount", () => {
-  it("maps the row through mapAccount", async () => {
-    const rawRow = {
-      id: "acc-1",
-      name: "Boutique",
-      contact_name: null,
-      contact_email: null,
-      contact_phone: null,
-      delivery_address: null,
-      delivery_instructions: null,
-      created_at: "2024-01-01",
-      updated_at: "2024-01-01",
-      account_users: [{ user_id: "u-1" }],
-    };
-    const findAccountById = vi.fn().mockResolvedValue(ok(rawRow));
+  it("returns the account from the repo", async () => {
+    const findAccountById = vi.fn().mockResolvedValue(ok(baseAccount));
     const deps = makeDeps({ repo: makeRepo({ findAccountById }) });
 
     const result = await getAccount(deps, "acc-1");
 
-    expect(result.ok).toBe(true);
-    if (result.ok) {
-      expect(result.value.userCount).toBe(1);
-    }
+    expect(result).toEqual(ok(baseAccount));
   });
 
   it("propagates a repo error", async () => {
@@ -205,11 +126,11 @@ describe("assignUser", () => {
     const authorize = vi.fn().mockResolvedValue(undefined);
     const deps = makeDeps({ repo: makeRepo({ assignUserToAccount }), authorize });
 
-    const result = await assignUser(deps, { account_id: "acc-1", user_id: "u-1" });
+    const result = await assignUser(deps, { accountId: "acc-1", userId: "u-1" });
 
     expect(authorize).toHaveBeenCalledTimes(1);
     expect(result).toEqual(ok());
-    expect(assignUserToAccount).toHaveBeenCalledWith({ account_id: "acc-1", user_id: "u-1" });
+    expect(assignUserToAccount).toHaveBeenCalledWith({ accountId: "acc-1", userId: "u-1" });
   });
 
   it("throws without calling repo when authorize rejects", async () => {
@@ -219,7 +140,7 @@ describe("assignUser", () => {
       authorize: vi.fn().mockRejectedValue(new Error("Forbidden")),
     });
 
-    await expect(assignUser(deps, { account_id: "acc-1", user_id: "u-1" })).rejects.toThrow(
+    await expect(assignUser(deps, { accountId: "acc-1", userId: "u-1" })).rejects.toThrow(
       "Forbidden",
     );
     expect(assignUserToAccount).not.toHaveBeenCalled();
@@ -232,11 +153,11 @@ describe("unassignUser", () => {
     const authorize = vi.fn().mockResolvedValue(undefined);
     const deps = makeDeps({ repo: makeRepo({ unassignUserFromAccount }), authorize });
 
-    const result = await unassignUser(deps, { account_id: "acc-1", user_id: "u-1" });
+    const result = await unassignUser(deps, { accountId: "acc-1", userId: "u-1" });
 
     expect(authorize).toHaveBeenCalledTimes(1);
     expect(result).toEqual(ok());
-    expect(unassignUserFromAccount).toHaveBeenCalledWith({ account_id: "acc-1", user_id: "u-1" });
+    expect(unassignUserFromAccount).toHaveBeenCalledWith({ accountId: "acc-1", userId: "u-1" });
   });
 
   it("throws without calling repo when authorize rejects", async () => {
@@ -246,7 +167,7 @@ describe("unassignUser", () => {
       authorize: vi.fn().mockRejectedValue(new Error("Forbidden")),
     });
 
-    await expect(unassignUser(deps, { account_id: "acc-1", user_id: "u-1" })).rejects.toThrow(
+    await expect(unassignUser(deps, { accountId: "acc-1", userId: "u-1" })).rejects.toThrow(
       "Forbidden",
     );
     expect(unassignUserFromAccount).not.toHaveBeenCalled();
@@ -255,7 +176,7 @@ describe("unassignUser", () => {
 
 describe("createAccount", () => {
   it("calls authorize then delegates to repo.createAccount", async () => {
-    const created = { id: "acc-new", name: "New Wines" } as never;
+    const created = { id: "acc-new", name: "New Wines" } as Account;
     const createAccountFn = vi.fn().mockResolvedValue(ok(created));
     const authorize = vi.fn().mockResolvedValue(undefined);
     const deps = makeDeps({ repo: makeRepo({ createAccount: createAccountFn }), authorize });
@@ -280,7 +201,7 @@ describe("createAccount", () => {
 
 describe("updateAccount", () => {
   it("calls authorize then delegates to repo.updateAccount", async () => {
-    const updated = { id: "acc-1", name: "Renamed Wines" } as never;
+    const updated = { id: "acc-1", name: "Renamed Wines" } as Account;
     const updateAccountFn = vi.fn().mockResolvedValue(ok(updated));
     const authorize = vi.fn().mockResolvedValue(undefined);
     const deps = makeDeps({ repo: makeRepo({ updateAccount: updateAccountFn }), authorize });
@@ -307,7 +228,7 @@ describe("updateAccount", () => {
 
 describe("listAccountUsers", () => {
   it("delegates to repo.findAccountUsers", async () => {
-    const users = [{ user_id: "u-1", created_at: "2024-01-01", users: null }];
+    const users: AccountUser[] = [{ userId: "u-1", createdAt: "2024-01-01", user: null }];
     const findAccountUsers = vi.fn().mockResolvedValue(ok(users));
     const deps = makeDeps({ repo: makeRepo({ findAccountUsers }) });
 

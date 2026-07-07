@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import type { Account } from "@/lib/accounts/schema";
 import type { OrderRequestItemInput } from "@/lib/orderRequests/schema";
-import type { ProductRow } from "@/lib/products/schema";
+import type { Product } from "@/lib/products/schema";
 import type { TemplateWithItems } from "@/lib/templates/schema";
 
 type ItemChangeKind = "existing" | "added" | "updated" | "removed";
@@ -22,16 +22,16 @@ type TemplateItemState = {
 };
 
 type TemplateEditorPayload = {
-  account_id: string;
-  toAdd: { product_id: string; box_count: number; unit_count: number }[];
-  toUpdate: { id: string; box_count: number; unit_count: number }[];
+  accountId: string;
+  toAdd: { productId: string; boxCount: number; unitCount: number }[];
+  toUpdate: { id: string; boxCount: number; unitCount: number }[];
   toRemove: string[];
 };
 
 type TemplateEditorProps = {
   account: Account;
   template: TemplateWithItems | null;
-  products: ProductRow[];
+  products: Product[];
   readOnly?: boolean;
   onSave: (payload: TemplateEditorPayload) => Promise<void>;
 };
@@ -42,35 +42,35 @@ type ItemsAction =
   | { type: "update"; productId: string; patch: { boxes?: number; extra_units?: number } };
 
 function templateItemsToState(template: TemplateWithItems | null): TemplateItemState[] {
-  return (template?.template_items ?? []).map((item) => ({
+  return (template?.templateItems ?? []).map((item) => ({
     id: item.id,
-    product_id: item.product_id,
-    boxes: item.box_count,
-    extra_units: item.unit_count,
+    product_id: item.productId,
+    boxes: item.boxCount,
+    extra_units: item.unitCount,
     kind: "existing" as const,
   }));
 }
 
 function toOrderRequestInput(item: TemplateItemState): OrderRequestItemInput {
-  return { product_id: item.product_id, boxes: item.boxes, extra_units: item.extra_units };
+  return { productId: item.product_id, boxes: item.boxes, extraUnits: item.extra_units };
 }
 
 function buildPayload(accountId: string, items: TemplateItemState[]): TemplateEditorPayload {
   return {
-    account_id: accountId,
+    accountId,
     toAdd: items
       .filter((i) => i.kind === "added")
       .map(({ product_id, boxes, extra_units }) => ({
-        product_id,
-        box_count: boxes,
-        unit_count: extra_units,
+        productId: product_id,
+        boxCount: boxes,
+        unitCount: extra_units,
       })),
     toUpdate: items
       .filter((i) => i.kind === "updated" && i.id !== null)
       .map(({ id, boxes, extra_units }) => ({
         id: id as string,
-        box_count: boxes,
-        unit_count: extra_units,
+        boxCount: boxes,
+        unitCount: extra_units,
       })),
     toRemove: items.filter((i) => i.kind === "removed" && i.id !== null).map((i) => i.id as string),
   };
@@ -118,8 +118,15 @@ export function TemplateEditor({
     dispatch({ type: "remove", productId });
   }
 
-  function handleUpdateItem(productId: string, patch: { boxes?: number; extra_units?: number }) {
-    dispatch({ type: "update", productId, patch });
+  function handleUpdateItem(productId: string, patch: { boxes?: number; extraUnits?: number }) {
+    dispatch({
+      type: "update",
+      productId,
+      patch: {
+        ...(patch.boxes !== undefined && { boxes: patch.boxes }),
+        ...(patch.extraUnits !== undefined && { extra_units: patch.extraUnits }),
+      },
+    });
   }
 
   async function handleSave() {
@@ -207,7 +214,7 @@ export function TemplateEditor({
 
 type ReadOnlyItemsListProps = {
   items: TemplateItemState[];
-  products: ProductRow[];
+  products: Product[];
 };
 
 function ReadOnlyItemsList({ items, products }: ReadOnlyItemsListProps) {
@@ -224,8 +231,8 @@ function ReadOnlyItemsList({ items, products }: ReadOnlyItemsListProps) {
             key={item.product_id}
             readOnly
             name={product?.name ?? item.product_id}
-            imageUrl={product?.image_url ?? null}
-            qtyPerBox={product?.qty_per_box ?? 1}
+            imageUrl={product?.imageUrl ?? null}
+            qtyPerBox={product?.qtyPerBox ?? 1}
             boxes={item.boxes}
             units={item.extra_units}
           />

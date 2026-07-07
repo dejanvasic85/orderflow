@@ -3,12 +3,14 @@ import type {
   AddTemplateItemInput,
   CreateTemplateInput,
   SaveTemplateItemsInput,
-  TemplateItemRow,
-  TemplateRow,
   TemplateWithItems,
   UpdateTemplateInput,
 } from "./schema";
-import type { TemplateRepository } from "./templates.repository";
+import type {
+  CreatedTemplate,
+  CreatedTemplateItem,
+  TemplateRepository,
+} from "./templates.repository";
 
 export type TemplateServiceDeps = {
   repo: TemplateRepository;
@@ -22,7 +24,7 @@ async function ensureTemplateId(
   const existing = await repo.findTemplateForAccount(accountId);
   if (!existing.ok) return existing;
   if (existing.value) return ok(existing.value.id);
-  const created = await repo.createTemplate({ account_id: accountId, name: "Default" });
+  const created = await repo.createTemplate({ accountId, name: "Default" });
   if (!created.ok) return created;
   return ok(created.value.id);
 }
@@ -44,21 +46,21 @@ export async function getTemplate(
 export async function createTemplate(
   deps: TemplateServiceDeps,
   data: CreateTemplateInput,
-): Promise<Result<TemplateRow>> {
+): Promise<Result<CreatedTemplate>> {
   return deps.repo.createTemplate(data);
 }
 
 export async function updateTemplate(
   deps: TemplateServiceDeps,
   data: UpdateTemplateInput,
-): Promise<Result<TemplateRow>> {
+): Promise<Result<CreatedTemplate>> {
   return deps.repo.updateTemplate(data);
 }
 
 export async function addTemplateItem(
   deps: TemplateServiceDeps,
   data: AddTemplateItemInput,
-): Promise<Result<TemplateItemRow>> {
+): Promise<Result<CreatedTemplateItem>> {
   return deps.repo.createTemplateItem(data);
 }
 
@@ -75,7 +77,7 @@ export async function saveTemplateItems(
 ): Promise<Result<void>> {
   await deps.authorize();
 
-  const templateIdResult = await ensureTemplateId(deps.repo, data.account_id);
+  const templateIdResult = await ensureTemplateId(deps.repo, data.accountId);
   if (!templateIdResult.ok) return templateIdResult;
 
   return deps.repo.saveTemplateItemBatch({

@@ -192,7 +192,7 @@ function UsersPage() {
       return;
     }
     setUsers((prev) =>
-      prev.map((u) => (u.id === userId ? { ...u, invited_at: result.value.invitedAt } : u)),
+      prev.map((u) => (u.id === userId ? { ...u, invitedAt: result.value.invitedAt } : u)),
     );
   }
 

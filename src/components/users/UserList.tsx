@@ -171,7 +171,7 @@ export function UserList({
                 <TableCell>
                   <UserStatusBadge
                     status={
-                      !user.active ? "inactive" : !user.invite_accepted_at ? "pending" : "active"
+                      !user.active ? "inactive" : !user.inviteAcceptedAt ? "pending" : "active"
                     }
                   />
                 </TableCell>

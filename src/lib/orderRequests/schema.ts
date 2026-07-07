@@ -1,34 +1,42 @@
 import { z } from "zod";
-import type { Database } from "@/lib/database.types";
-import type { ProductRow } from "@/lib/products/schema";
-import type { TemplateRow } from "@/lib/templates/schema";
 import type { UserRole } from "@/lib/users/schema";
 
-export type OrderRequestRow = Database["public"]["Tables"]["order_requests"]["Row"];
-export type OrderRequestItemRow = Database["public"]["Tables"]["order_request_items"]["Row"];
+export type OrderRequestItem = {
+  id: string;
+  productId: string;
+  boxes: number;
+  extraUnits: number;
+  createdAt: string;
+  product: { id: string; name: string; qtyPerBox: number; imageUrl: string | null };
+};
 
-export type OrderRequestWithItems = OrderRequestRow & {
-  order_request_items: Array<
-    OrderRequestItemRow & {
-      products: Pick<ProductRow, "id" | "name" | "qty_per_box" | "image_url">;
-    }
-  >;
-  templates: Pick<TemplateRow, "id" | "name"> | null;
-  users: { id: string; name: string } | null;
-  accounts: { id: string; name: string } | null;
+export type OrderRequestWithItems = {
+  id: string;
+  orderNumber: number;
+  accountId: string;
+  placedBy: string;
+  templateId: string | null;
+  deliveryAddress: string | null;
+  deliveryInstructions: string | null;
+  createdAt: string;
+  updatedAt: string;
+  orderRequestItems: OrderRequestItem[];
+  template: { id: string; name: string } | null;
+  user: { id: string; name: string } | null;
+  account: { id: string; name: string } | null;
 };
 
 export const orderRequestItemInputSchema = z.object({
-  product_id: z.uuid(),
+  productId: z.uuid(),
   boxes: z.number().int().min(0),
-  extra_units: z.number().int().min(0),
+  extraUnits: z.number().int().min(0),
 });
 
 export const createOrderRequestSchema = z.object({
-  account_id: z.uuid(),
-  template_id: z.uuid().nullable().optional(),
-  delivery_address: z.string().nullable().optional(),
-  delivery_instructions: z.string().nullable().optional(),
+  accountId: z.uuid(),
+  templateId: z.uuid().nullable().optional(),
+  deliveryAddress: z.string().nullable().optional(),
+  deliveryInstructions: z.string().nullable().optional(),
   items: z.array(orderRequestItemInputSchema).min(1),
 });
 
@@ -37,27 +45,27 @@ export type OrderRequestItemInput = z.infer<typeof orderRequestItemInputSchema>;
 
 export type OrderHistoryItem = {
   id: string;
-  order_number: number;
-  placed_by: string;
+  orderNumber: number;
+  placedBy: string;
   placedByName: string;
   placedByOrgName?: string;
-  created_at: string;
-  total_units: number;
-  total_boxes: number;
-  account_name?: string;
-  account_id?: string;
+  createdAt: string;
+  totalUnits: number;
+  totalBoxes: number;
+  accountName?: string;
+  accountId?: string;
 };
 
 export type PlacedByUser = { id: string; name: string; role: UserRole } | null;
 
 export type OrderHistoryRow = {
   id: string;
-  order_number: number;
-  placed_by: string;
-  created_at: string;
-  order_request_items: { boxes: number | null; extra_units: number | null }[];
-  users: unknown;
-  accounts?: unknown;
+  orderNumber: number;
+  placedBy: string;
+  createdAt: string;
+  items: { boxes: number | null; extraUnits: number | null }[];
+  user: PlacedByUser;
+  account?: { id: string; name: string } | null;
 };
 
 export const listOrdersSearchSchema = z.object({

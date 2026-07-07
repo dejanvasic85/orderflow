@@ -7,7 +7,7 @@ import { clearDraft } from "@/lib/orderRequests/draftOrder";
 import { createOrderRequest, getOrderRequest } from "@/lib/orderRequests/orderRequests.functions";
 import type { OrderRequestItemInput } from "@/lib/orderRequests/schema";
 import { listProducts } from "@/lib/products/products.functions";
-import type { ProductRow } from "@/lib/products/schema";
+import type { Product } from "@/lib/products/schema";
 import { asResult } from "@/lib/result";
 import type { TemplateWithItems } from "@/lib/templates/schema";
 import { getTemplateForAccount } from "@/lib/templates/templates.functions";
@@ -25,7 +25,7 @@ export const Route = createFileRoute("/_protected/_account/accounts/$accountId/o
       deps.fromOrderId
         ? Promise.resolve({ ok: true as const, value: null })
         : getTemplateForAccount({ data: params.accountId }),
-      listProducts().then((r) => asResult<ProductRow[]>(r)),
+      listProducts().then((r) => asResult<Product[]>(r)),
     ]);
 
     if (!accountResult.ok) throw new Error(accountResult.error.message);
@@ -38,11 +38,11 @@ export const Route = createFileRoute("/_protected/_account/accounts/$accountId/o
       const sourceOrderResult = await getOrderRequest({ data: deps.fromOrderId });
       if (!sourceOrderResult.ok) throw new Error(sourceOrderResult.error.message);
       if (!sourceOrderResult.value) throw notFound();
-      if (sourceOrderResult.value.account_id !== params.accountId) throw notFound();
-      initialItems = sourceOrderResult.value.order_request_items.map((i) => ({
-        product_id: i.product_id,
+      if (sourceOrderResult.value.accountId !== params.accountId) throw notFound();
+      initialItems = sourceOrderResult.value.orderRequestItems.map((i) => ({
+        productId: i.productId,
         boxes: i.boxes ?? 0,
-        extra_units: i.extra_units ?? 0,
+        extraUnits: i.extraUnits ?? 0,
       }));
     }
 
@@ -71,14 +71,14 @@ function NewOrderPage() {
     templateId: string | null;
     deliveryAddress: string | null;
     deliveryInstructions: string | null;
-    items: { product_id: string; boxes: number; extra_units: number }[];
+    items: { productId: string; boxes: number; extraUnits: number }[];
   }) {
     const result = await createOrderRequest({
       data: {
-        account_id: accountId,
-        template_id: templateId,
-        delivery_address: deliveryAddress,
-        delivery_instructions: deliveryInstructions,
+        accountId,
+        templateId,
+        deliveryAddress,
+        deliveryInstructions,
         items,
       },
     });
@@ -96,8 +96,8 @@ function NewOrderPage() {
       key={`${accountId}:${search.fromOrderId ?? ""}`}
       accountId={accountId}
       accountName={account.name}
-      defaultDeliveryAddress={account.delivery_address ?? null}
-      defaultDeliveryInstructions={account.delivery_instructions ?? null}
+      defaultDeliveryAddress={account.deliveryAddress ?? null}
+      defaultDeliveryInstructions={account.deliveryInstructions ?? null}
       template={template}
       initialItems={initialItems}
       products={products}

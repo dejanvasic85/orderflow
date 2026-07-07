@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { loadDraft, saveDraft } from "@/lib/orderRequests/draftOrder";
 import type { OrderRequestItemInput } from "@/lib/orderRequests/schema";
-import type { ProductRow } from "@/lib/products/schema";
+import type { Product } from "@/lib/products/schema";
 import type { TemplateWithItems } from "@/lib/templates/schema";
 import { CatalogPickerDrawer } from "./CatalogPickerDrawer";
 import { OrderItemsList } from "./OrderItemsList";
@@ -25,15 +25,15 @@ type NewOrderFormProps = {
   defaultDeliveryInstructions: string | null;
   template: TemplateWithItems | null;
   initialItems?: OrderRequestItemInput[];
-  products: ProductRow[];
+  products: Product[];
   persistDraft?: boolean;
   onBack: () => void;
   onSubmit: (data: OrderFormPayload) => Promise<void>;
 };
 
-function getItemTotal(item: OrderRequestItemInput, products: ProductRow[]): number {
-  const qtyPerBox = products.find((p) => p.id === item.product_id)?.qty_per_box ?? 0;
-  return item.boxes * qtyPerBox + item.extra_units;
+function getItemTotal(item: OrderRequestItemInput, products: Product[]): number {
+  const qtyPerBox = products.find((p) => p.id === item.productId)?.qtyPerBox ?? 0;
+  return item.boxes * qtyPerBox + item.extraUnits;
 }
 
 function buildInitialItems(
@@ -47,10 +47,10 @@ function buildInitialItems(
     const draft = loadDraft(accountId);
     if (draft !== null) return draft;
   }
-  return (template?.template_items ?? []).map((i) => ({
-    product_id: i.product_id,
-    boxes: i.box_count,
-    extra_units: i.unit_count,
+  return (template?.templateItems ?? []).map((i) => ({
+    productId: i.productId,
+    boxes: i.boxCount,
+    extraUnits: i.unitCount,
   }));
 }
 
@@ -77,7 +77,7 @@ export function NewOrderForm({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const itemProductIds = new Set(items.map((i) => i.product_id));
+  const itemProductIds = new Set(items.map((i) => i.productId));
 
   function updateItems(next: OrderRequestItemInput[]) {
     setItems(next);
@@ -85,16 +85,16 @@ export function NewOrderForm({
   }
 
   function handleAddItem(productId: string) {
-    if (items.some((i) => i.product_id === productId)) return;
-    updateItems([...items, { product_id: productId, boxes: 1, extra_units: 0 }]);
+    if (items.some((i) => i.productId === productId)) return;
+    updateItems([...items, { productId, boxes: 1, extraUnits: 0 }]);
   }
 
   function handleRemoveItem(productId: string) {
-    updateItems(items.filter((i) => i.product_id !== productId));
+    updateItems(items.filter((i) => i.productId !== productId));
   }
 
-  function handleUpdateItem(productId: string, patch: { boxes?: number; extra_units?: number }) {
-    updateItems(items.map((i) => (i.product_id === productId ? { ...i, ...patch } : i)));
+  function handleUpdateItem(productId: string, patch: { boxes?: number; extraUnits?: number }) {
+    updateItems(items.map((i) => (i.productId === productId ? { ...i, ...patch } : i)));
   }
 
   const orderableItems = items.filter((i) => getItemTotal(i, products) > 0);

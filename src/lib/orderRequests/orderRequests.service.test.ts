@@ -46,54 +46,54 @@ describe("mapOrderHistoryRow", () => {
   it("sums boxes and units and resolves the placed-by name", () => {
     const result = mapOrderHistoryRow({
       id: "order-1",
-      order_number: 7,
-      placed_by: "u-1",
-      created_at: "2024-01-01T00:00:00Z",
-      order_request_items: [
-        { boxes: 2, extra_units: 1 },
-        { boxes: 3, extra_units: 4 },
+      orderNumber: 7,
+      placedBy: "u-1",
+      createdAt: "2024-01-01T00:00:00Z",
+      items: [
+        { boxes: 2, extraUnits: 1 },
+        { boxes: 3, extraUnits: 4 },
       ],
-      users: { id: "u-1", name: "Jane Smith", role: "user" },
+      user: { id: "u-1", name: "Jane Smith", role: "user" },
     });
 
     expect(result).toEqual({
       id: "order-1",
-      order_number: 7,
-      placed_by: "u-1",
+      orderNumber: 7,
+      placedBy: "u-1",
       placedByName: "Jane Smith",
-      created_at: "2024-01-01T00:00:00Z",
-      total_boxes: 5,
-      total_units: 5,
+      createdAt: "2024-01-01T00:00:00Z",
+      totalBoxes: 5,
+      totalUnits: 5,
     });
   });
 
   it("includes the account name and id when an account is present", () => {
     const result = mapOrderHistoryRow({
       id: "order-1",
-      order_number: 7,
-      placed_by: "u-1",
-      created_at: "2024-01-01T00:00:00Z",
-      order_request_items: [],
-      users: { id: "u-1", name: "Jane Smith", role: "user" },
-      accounts: { id: "acc-1", name: "Acme Wines" },
+      orderNumber: 7,
+      placedBy: "u-1",
+      createdAt: "2024-01-01T00:00:00Z",
+      items: [],
+      user: { id: "u-1", name: "Jane Smith", role: "user" },
+      account: { id: "acc-1", name: "Acme Wines" },
     });
 
-    expect(result.account_name).toBe("Acme Wines");
-    expect(result.account_id).toBe("acc-1");
+    expect(result.accountName).toBe("Acme Wines");
+    expect(result.accountId).toBe("acc-1");
   });
 
   it("treats null box and unit counts as zero", () => {
     const result = mapOrderHistoryRow({
       id: "order-1",
-      order_number: 7,
-      placed_by: "u-1",
-      created_at: "2024-01-01T00:00:00Z",
-      order_request_items: [{ boxes: null, extra_units: null }],
-      users: null,
+      orderNumber: 7,
+      placedBy: "u-1",
+      createdAt: "2024-01-01T00:00:00Z",
+      items: [{ boxes: null, extraUnits: null }],
+      user: null,
     });
 
-    expect(result.total_boxes).toBe(0);
-    expect(result.total_units).toBe(0);
+    expect(result.totalBoxes).toBe(0);
+    expect(result.totalUnits).toBe(0);
   });
 });
 
@@ -130,9 +130,9 @@ function makeRepo(overrides: Partial<OrderRequestRepository> = {}): OrderRequest
 }
 
 const orderInput = {
-  account_id: "acc-1",
-  items: [{ product_id: "p-1", boxes: 2, extra_units: 1 }],
-  delivery_address: "1 Vine St",
+  accountId: "acc-1",
+  items: [{ productId: "p-1", boxes: 2, extraUnits: 1 }],
+  deliveryAddress: "1 Vine St",
 };
 
 const fakeLog = { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() };
@@ -300,11 +300,11 @@ describe("listAllOrderHistory", () => {
           rows: [
             {
               id: "order-1",
-              order_number: 7,
-              placed_by: "u-1",
-              created_at: "2024-01-01T00:00:00Z",
-              order_request_items: [{ boxes: 2, extra_units: 1 }],
-              users: { id: "u-1", name: "Jane Smith", role: "user" },
+              orderNumber: 7,
+              placedBy: "u-1",
+              createdAt: "2024-01-01T00:00:00Z",
+              items: [{ boxes: 2, extraUnits: 1 }],
+              user: { id: "u-1", name: "Jane Smith", role: "user" },
             },
           ],
           total: 1,
@@ -326,12 +326,12 @@ describe("listAllOrderHistory", () => {
         orders: [
           {
             id: "order-1",
-            order_number: 7,
-            placed_by: "u-1",
+            orderNumber: 7,
+            placedBy: "u-1",
             placedByName: "Jane Smith",
-            created_at: "2024-01-01T00:00:00Z",
-            total_boxes: 2,
-            total_units: 1,
+            createdAt: "2024-01-01T00:00:00Z",
+            totalBoxes: 2,
+            totalUnits: 1,
           },
         ],
         total: 1,

@@ -125,13 +125,13 @@ export function AccountList({
               >
                 <TableCell className="font-medium">{account.name}</TableCell>
                 <TableCell className="text-muted-foreground">
-                  {account.contact_name ?? "—"}
+                  {account.contactName ?? "—"}
                 </TableCell>
                 <TableCell className="text-muted-foreground">
-                  {account.contact_email ?? "—"}
+                  {account.contactEmail ?? "—"}
                 </TableCell>
                 <TableCell className="text-muted-foreground">
-                  {account.contact_phone ?? "—"}
+                  {account.contactPhone ?? "—"}
                 </TableCell>
                 <TableCell className="text-muted-foreground">
                   {account.userCount > 0 ? account.userCount : "—"}

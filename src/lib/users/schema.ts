@@ -22,12 +22,12 @@ export type User = {
   email: string;
   phone: string | null;
   active: boolean;
-  invite_accepted_at: string | null;
-  invited_at: string | null;
+  inviteAcceptedAt: string | null;
+  invitedAt: string | null;
   role: UserRole;
   notificationPreferences: { email: boolean; sms: boolean };
-  created_at: string;
-  updated_at: string;
+  createdAt: string;
+  updatedAt: string;
   accounts: UserAccount[];
 };
 

@@ -5,12 +5,12 @@ import { OrderHistoryCard } from "./OrderHistoryCard";
 
 const baseOrder: OrderHistoryItem = {
   id: "order-abc",
-  order_number: 42,
-  placed_by: "user-1",
+  orderNumber: 42,
+  placedBy: "user-1",
   placedByName: "Alice Smith",
-  created_at: "2024-06-15T12:00:00Z",
-  total_boxes: 3,
-  total_units: 5,
+  createdAt: "2024-06-15T12:00:00Z",
+  totalBoxes: 3,
+  totalUnits: 5,
 };
 
 const externalOrder: OrderHistoryItem = {

@@ -4,22 +4,22 @@ import { OrderHistoryList } from "./OrderHistoryList";
 
 const orderOne: OrderHistoryItem = {
   id: "order-1",
-  order_number: 1,
-  placed_by: "user-1",
+  orderNumber: 1,
+  placedBy: "user-1",
   placedByName: "Alice Smith",
-  created_at: "2024-06-01T08:00:00Z",
-  total_boxes: 2,
-  total_units: 0,
+  createdAt: "2024-06-01T08:00:00Z",
+  totalBoxes: 2,
+  totalUnits: 0,
 };
 
 const orderTwo: OrderHistoryItem = {
   id: "order-2",
-  order_number: 2,
-  placed_by: "user-2",
+  orderNumber: 2,
+  placedBy: "user-2",
   placedByName: "Bob Jones",
-  created_at: "2024-06-02T09:00:00Z",
-  total_boxes: 5,
-  total_units: 3,
+  createdAt: "2024-06-02T09:00:00Z",
+  totalBoxes: 5,
+  totalUnits: 3,
 };
 
 describe("OrderHistoryList", () => {

@@ -13,7 +13,7 @@ import {
 } from "@/lib/orderRequests/orderRequests.functions";
 import type { OrderRequestItemInput } from "@/lib/orderRequests/schema";
 import { listProducts } from "@/lib/products/products.functions";
-import type { ProductRow } from "@/lib/products/schema";
+import type { Product } from "@/lib/products/schema";
 import { asResult } from "@/lib/result";
 import type { TemplateWithItems } from "@/lib/templates/schema";
 import { getTemplateForAccount } from "@/lib/templates/templates.functions";
@@ -29,7 +29,7 @@ export const Route = createFileRoute("/_protected/manage/orders/new")({
   loader: async ({ deps }) => {
     const [accountsResult, productsResult] = await Promise.all([
       listAccounts({ data: {} }).then((r) => asResult<PagedAccountsResult>(r)),
-      listProducts().then((r) => asResult<ProductRow[]>(r)),
+      listProducts().then((r) => asResult<Product[]>(r)),
     ]);
     if (!accountsResult.ok) throw new Error(accountsResult.error.message);
     if (!productsResult.ok) throw new Error(productsResult.error.message);
@@ -44,16 +44,16 @@ export const Route = createFileRoute("/_protected/manage/orders/new")({
       const sourceOrder = sourceOrderResult.value;
       if (
         resolvedAccountId &&
-        sourceOrder.account_id &&
-        resolvedAccountId !== sourceOrder.account_id
+        sourceOrder.accountId &&
+        resolvedAccountId !== sourceOrder.accountId
       ) {
         throw new Error("accountId does not match the source order's account");
       }
-      resolvedAccountId = resolvedAccountId ?? sourceOrder.account_id;
-      sourceOrderItems = sourceOrder.order_request_items.map((i) => ({
-        product_id: i.product_id,
+      resolvedAccountId = resolvedAccountId ?? sourceOrder.accountId;
+      sourceOrderItems = sourceOrder.orderRequestItems.map((i) => ({
+        productId: i.productId,
         boxes: i.boxes ?? 0,
-        extra_units: i.extra_units ?? 0,
+        extraUnits: i.extraUnits ?? 0,
       }));
     }
 
@@ -107,15 +107,15 @@ function ManageNewOrderPage() {
     templateId: string | null;
     deliveryAddress: string | null;
     deliveryInstructions: string | null;
-    items: { product_id: string; boxes: number; extra_units: number }[];
+    items: { productId: string; boxes: number; extraUnits: number }[];
   }) {
     if (!selected) return;
     const result = await createOrderRequestOnBehalf({
       data: {
-        account_id: selected.account.id,
-        template_id: templateId,
-        delivery_address: deliveryAddress,
-        delivery_instructions: deliveryInstructions,
+        accountId: selected.account.id,
+        templateId,
+        deliveryAddress,
+        deliveryInstructions,
         items,
       },
     });
@@ -146,8 +146,8 @@ function ManageNewOrderPage() {
             key={`${selected.account.id}:${search.fromOrderId ?? ""}`}
             accountId={selected.account.id}
             accountName={selected.account.name}
-            defaultDeliveryAddress={selected.account.delivery_address ?? null}
-            defaultDeliveryInstructions={selected.account.delivery_instructions ?? null}
+            defaultDeliveryAddress={selected.account.deliveryAddress ?? null}
+            defaultDeliveryInstructions={selected.account.deliveryInstructions ?? null}
             template={selected.template}
             initialItems={selected.initialItems}
             products={products}

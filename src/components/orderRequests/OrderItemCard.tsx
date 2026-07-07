@@ -21,7 +21,7 @@ type OrderItemCardProps =
       qtyPerBox: number;
       boxes: number;
       units: number;
-      onUpdate: (patch: { boxes?: number; extra_units?: number }) => void;
+      onUpdate: (patch: { boxes?: number; extraUnits?: number }) => void;
       onRemove: () => void;
     };
 
@@ -81,7 +81,7 @@ export function OrderItemCard(props: OrderItemCardProps) {
               <QuantityStepper
                 label="Units"
                 value={units}
-                onChange={(next) => props.onUpdate({ extra_units: next })}
+                onChange={(next) => props.onUpdate({ extraUnits: next })}
               />
             </div>
           )}

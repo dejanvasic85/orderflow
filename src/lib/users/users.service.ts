@@ -35,12 +35,12 @@ export function mapUser(row: ListedRow): User {
     email: row.email ?? "",
     phone: row.phone,
     active: row.active ?? true,
-    invite_accepted_at: row.invite_accepted_at ?? null,
-    invited_at: row.invited_at ?? null,
+    inviteAcceptedAt: row.invite_accepted_at ?? null,
+    invitedAt: row.invited_at ?? null,
     role: row.role ?? "user",
     notificationPreferences: parseNotificationPrefs(row.notification_preferences),
-    created_at: row.created_at ?? "",
-    updated_at: row.updated_at ?? "",
+    createdAt: row.created_at ?? "",
+    updatedAt: row.updated_at ?? "",
     accounts: (row.account_users ?? [])
       .map((au) => au.account)
       .filter((a): a is UserAccount => a !== null),
@@ -187,12 +187,12 @@ export async function inviteUser(
     email: data.email,
     phone: data.phone ?? null,
     active: true,
-    invite_accepted_at: null,
-    invited_at: now,
+    inviteAcceptedAt: null,
+    invitedAt: now,
     role: data.role,
     notificationPreferences: data.notificationPreferences,
-    created_at: now,
-    updated_at: now,
+    createdAt: now,
+    updatedAt: now,
     accounts,
   });
 }

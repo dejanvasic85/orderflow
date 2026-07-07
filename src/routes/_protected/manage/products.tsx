@@ -27,7 +27,7 @@ import { createProduct, listPagedProducts, updateProduct } from "@/lib/products/
 import type {
   CreateProductInput,
   PagedProductsResult,
-  ProductRow,
+  Product,
   UpdateProductInput,
 } from "@/lib/products/schema";
 import { listProductsSearchSchema, productPageSize } from "@/lib/products/schema";
@@ -56,7 +56,7 @@ function ProductsPage() {
   const { user } = useRouteContext({ from: "/_protected" });
   const canWriteProducts = can(user.user_role, permissions.products.write);
 
-  const [products, setProducts] = useState<ProductRow[]>(loadedProducts);
+  const [products, setProducts] = useState<Product[]>(loadedProducts);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
 
@@ -89,7 +89,7 @@ function ProductsPage() {
     });
   }
 
-  function handleSelectProduct(product: ProductRow) {
+  function handleSelectProduct(product: Product) {
     setSelectedId(product.id);
     setCreating(false);
   }
@@ -105,7 +105,7 @@ function ProductsPage() {
   }
 
   async function handleSave(payload: UpdateProductInput) {
-    const result = asResult<ProductRow>(await updateProduct({ data: payload }));
+    const result = asResult<Product>(await updateProduct({ data: payload }));
     if (!result.ok) {
       toast.error(result.error.message);
       return;
@@ -116,7 +116,7 @@ function ProductsPage() {
   }
 
   async function handleCreate(payload: CreateProductInput) {
-    const result = asResult<ProductRow>(await createProduct({ data: payload }));
+    const result = asResult<Product>(await createProduct({ data: payload }));
     if (!result.ok) {
       toast.error(result.error.message);
       return;

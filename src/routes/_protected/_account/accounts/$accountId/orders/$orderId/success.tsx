@@ -30,5 +30,5 @@ function OrderSuccessPage() {
   const { accountId } = Route.useParams();
   const { order } = Route.useLoaderData();
 
-  return <OrderSuccessView accountId={accountId} orderNumber={order.order_number} />;
+  return <OrderSuccessView accountId={accountId} orderNumber={order.orderNumber} />;
 }

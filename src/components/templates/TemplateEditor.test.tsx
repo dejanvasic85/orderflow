@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent, { type UserEvent } from "@testing-library/user-event";
 import type { Account } from "@/lib/accounts/schema";
-import type { ProductRow } from "@/lib/products/schema";
+import type { Product } from "@/lib/products/schema";
 import type { TemplateWithItems } from "@/lib/templates/schema";
 import { TemplateEditor } from "./TemplateEditor";
 
@@ -33,56 +33,56 @@ vi.mock("@/components/orderRequests/CatalogPickerDrawer", () => ({
 const account: Account = {
   id: "acc-1",
   name: "Acme Corp",
-  contact_name: null,
-  contact_email: null,
-  contact_phone: null,
-  delivery_address: null,
-  delivery_instructions: null,
-  created_at: "2024-01-01T00:00:00Z",
-  updated_at: "2024-01-01T00:00:00Z",
+  contactName: null,
+  contactEmail: null,
+  contactPhone: null,
+  deliveryAddress: null,
+  deliveryInstructions: null,
+  createdAt: "2024-01-01T00:00:00Z",
+  updatedAt: "2024-01-01T00:00:00Z",
   userCount: 0,
 };
 
-const products: ProductRow[] = [
+const products: Product[] = [
   {
     id: "prod-1",
     name: "Chardonnay",
-    image_url: null,
-    qty_per_box: 6,
+    imageUrl: null,
+    qtyPerBox: 6,
     active: true,
-    external_id: null,
-    created_at: "2024-01-01T00:00:00Z",
-    updated_at: "2024-01-01T00:00:00Z",
+    externalId: null,
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
   },
   {
     id: "prod-2",
     name: "Rosé",
-    image_url: null,
-    qty_per_box: 12,
+    imageUrl: null,
+    qtyPerBox: 12,
     active: true,
-    external_id: null,
-    created_at: "2024-01-01T00:00:00Z",
-    updated_at: "2024-01-01T00:00:00Z",
+    externalId: null,
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
   },
 ];
 
 const templateWithOneItem: TemplateWithItems = {
   id: "tmpl-1",
-  account_id: "acc-1",
+  accountId: "acc-1",
   name: "Default",
-  created_by: null,
-  created_at: "2024-01-01T00:00:00Z",
-  updated_at: "2024-01-01T00:00:00Z",
-  template_items: [
+  createdBy: null,
+  createdAt: "2024-01-01T00:00:00Z",
+  updatedAt: "2024-01-01T00:00:00Z",
+  templateItems: [
     {
       id: "item-1",
-      template_id: "tmpl-1",
-      product_id: "prod-1",
-      box_count: 2,
-      unit_count: 3,
-      created_by: null,
-      created_at: "2024-01-01T00:00:00Z",
-      products: { id: "prod-1", name: "Chardonnay", qty_per_box: 6 },
+      templateId: "tmpl-1",
+      productId: "prod-1",
+      boxCount: 2,
+      unitCount: 3,
+      createdBy: null,
+      createdAt: "2024-01-01T00:00:00Z",
+      product: { id: "prod-1", name: "Chardonnay", qtyPerBox: 6 },
     },
   ],
 };
@@ -122,7 +122,7 @@ test("save with existing item unchanged sends empty diffs", async () => {
 
   await vi.waitFor(() => {
     expect(onSave).toHaveBeenCalledWith({
-      account_id: "acc-1",
+      accountId: "acc-1",
       toAdd: [],
       toUpdate: [],
       toRemove: [],
@@ -145,9 +145,9 @@ test("save after increment sends item in toUpdate", async () => {
 
   await vi.waitFor(() => {
     expect(onSave).toHaveBeenCalledWith({
-      account_id: "acc-1",
+      accountId: "acc-1",
       toAdd: [],
-      toUpdate: [{ id: "item-1", box_count: 3, unit_count: 3 }],
+      toUpdate: [{ id: "item-1", boxCount: 3, unitCount: 3 }],
       toRemove: [],
     });
   });
@@ -168,9 +168,9 @@ test("save after decrement sends item in toUpdate", async () => {
 
   await vi.waitFor(() => {
     expect(onSave).toHaveBeenCalledWith({
-      account_id: "acc-1",
+      accountId: "acc-1",
       toAdd: [],
-      toUpdate: [{ id: "item-1", box_count: 2, unit_count: 2 }],
+      toUpdate: [{ id: "item-1", boxCount: 2, unitCount: 2 }],
       toRemove: [],
     });
   });
@@ -206,7 +206,7 @@ test("save after remove sends item id in toRemove", async () => {
 
   await vi.waitFor(() => {
     expect(onSave).toHaveBeenCalledWith({
-      account_id: "acc-1",
+      accountId: "acc-1",
       toAdd: [],
       toUpdate: [],
       toRemove: ["item-1"],
@@ -223,8 +223,8 @@ test("save after adding a new product sends item in toAdd", async () => {
 
   await vi.waitFor(() => {
     expect(onSave).toHaveBeenCalledWith({
-      account_id: "acc-1",
-      toAdd: [{ product_id: "prod-2", box_count: 1, unit_count: 0 }],
+      accountId: "acc-1",
+      toAdd: [{ productId: "prod-2", boxCount: 1, unitCount: 0 }],
       toUpdate: [],
       toRemove: [],
     });
@@ -238,7 +238,7 @@ test("save with empty template sends all empty diffs", async () => {
 
   await vi.waitFor(() => {
     expect(onSave).toHaveBeenCalledWith({
-      account_id: "acc-1",
+      accountId: "acc-1",
       toAdd: [],
       toUpdate: [],
       toRemove: [],

@@ -14,12 +14,12 @@ import {
 
 const existingTemplate = {
   id: "tmpl-1",
-  account_id: "acc-1",
+  accountId: "acc-1",
   name: "Default",
-  created_by: "u-1",
-  created_at: "2024-01-01",
-  updated_at: "2024-01-01",
-  template_items: [],
+  createdBy: "u-1",
+  createdAt: "2024-01-01",
+  updatedAt: "2024-01-01",
+  templateItems: [],
 };
 
 function makeRepo(overrides: Partial<TemplateRepository> = {}): TemplateRepository {
@@ -67,7 +67,7 @@ describe("ensureTemplateId", () => {
     const result = await ensureTemplateId(repo, "acc-1");
 
     expect(result).toEqual(ok("tmpl-new"));
-    expect(createTemplate).toHaveBeenCalledWith({ account_id: "acc-1", name: "Default" });
+    expect(createTemplate).toHaveBeenCalledWith({ accountId: "acc-1", name: "Default" });
   });
 
   it("propagates a repo error from findTemplateForAccount", async () => {
@@ -97,10 +97,10 @@ describe("ensureTemplateId", () => {
 
 describe("saveTemplateItems", () => {
   const validInput = {
-    account_id: "acc-1",
+    accountId: "acc-1",
     toRemove: ["item-old"],
-    toUpdate: [{ id: "item-2", box_count: 3, unit_count: 0 }],
-    toAdd: [{ product_id: "prod-1", box_count: 2, unit_count: 0 }],
+    toUpdate: [{ id: "item-2", boxCount: 3, unitCount: 0 }],
+    toAdd: [{ productId: "prod-1", boxCount: 2, unitCount: 0 }],
   };
 
   it("calls authorize before any repo operations", async () => {
@@ -161,7 +161,7 @@ describe("saveTemplateItems", () => {
 
     await saveTemplateItems(deps, validInput);
 
-    expect(createTemplate).toHaveBeenCalledWith({ account_id: "acc-1", name: "Default" });
+    expect(createTemplate).toHaveBeenCalledWith({ accountId: "acc-1", name: "Default" });
     expect(saveTemplateItemBatch).toHaveBeenCalledWith(
       expect.objectContaining({ templateId: "tmpl-new" }),
     );
@@ -206,7 +206,7 @@ describe("createTemplate", () => {
     const row = { id: "tmpl-new", name: "My Template" } as never;
     const createTemplateFn = vi.fn().mockResolvedValue(ok(row));
     const deps = makeDeps({ repo: makeRepo({ createTemplate: createTemplateFn }) });
-    const input = { account_id: "acc-1", name: "My Template" };
+    const input = { accountId: "acc-1", name: "My Template" };
 
     const result = await createTemplate(deps, input);
 
@@ -218,7 +218,7 @@ describe("createTemplate", () => {
     const createTemplateFn = vi.fn().mockResolvedValue(err({ message: "insert failed" }));
     const deps = makeDeps({ repo: makeRepo({ createTemplate: createTemplateFn }) });
 
-    const result = await createTemplate(deps, { account_id: "acc-1", name: "My Template" });
+    const result = await createTemplate(deps, { accountId: "acc-1", name: "My Template" });
 
     expect(result).toEqual(err({ message: "insert failed" }));
   });
@@ -249,10 +249,10 @@ describe("updateTemplate", () => {
 
 describe("addTemplateItem", () => {
   it("delegates to repo.createTemplateItem", async () => {
-    const item = { id: "item-1", product_id: "prod-1" } as never;
+    const item = { id: "item-1", productId: "prod-1" } as never;
     const createTemplateItem = vi.fn().mockResolvedValue(ok(item));
     const deps = makeDeps({ repo: makeRepo({ createTemplateItem }) });
-    const input = { template_id: "tmpl-1", product_id: "prod-1", box_count: 2, unit_count: 0 };
+    const input = { templateId: "tmpl-1", productId: "prod-1", boxCount: 2, unitCount: 0 };
 
     const result = await addTemplateItem(deps, input);
 

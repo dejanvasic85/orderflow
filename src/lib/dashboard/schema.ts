@@ -2,6 +2,24 @@ import type { dashboardRanges } from "./constants";
 
 export type DashboardRange = (typeof dashboardRanges)[number];
 
+export type DashboardOrderItem = {
+  productId: string;
+  boxes: number | null;
+  extraUnits: number | null;
+  product: { id: string; name: string; qtyPerBox: number } | null;
+};
+
+export type DashboardOrder = {
+  id: string;
+  orderNumber: number;
+  createdAt: string;
+  accountId: string;
+  placedBy: string;
+  items: DashboardOrderItem[];
+  account: { id: string; name: string } | null;
+  user: { id: string; name: string; role: string } | null;
+};
+
 export type KpiDelta = { changePct: number; direction: "up" | "down" | "flat" };
 
 export type KpiSummary = {

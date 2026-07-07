@@ -19,8 +19,8 @@ export function OrderDetailsView({
   onBack,
   onReorder,
 }: OrderDetailsViewProps) {
-  const totalBoxes = order.order_request_items.reduce((sum, i) => sum + (i.boxes ?? 0), 0);
-  const totalUnits = order.order_request_items.reduce((sum, i) => sum + (i.extra_units ?? 0), 0);
+  const totalBoxes = order.orderRequestItems.reduce((sum, i) => sum + (i.boxes ?? 0), 0);
+  const totalUnits = order.orderRequestItems.reduce((sum, i) => sum + (i.extraUnits ?? 0), 0);
 
   return (
     <div className="flex flex-col gap-6">
@@ -45,10 +45,10 @@ export function OrderDetailsView({
       <div className="flex flex-col gap-1.5">
         <div className="flex items-baseline gap-3">
           <h2 className="font-mono text-2xl font-bold tracking-tight">
-            {formatOrderRef(order.order_number)}
+            {formatOrderRef(order.orderNumber)}
           </h2>
           <span className="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">
-            {formatDate(order.created_at)} at {formatTime(order.created_at)}
+            {formatDate(order.createdAt)} at {formatTime(order.createdAt)}
           </span>
         </div>
       </div>
@@ -68,28 +68,28 @@ export function OrderDetailsView({
         <MetaTile
           icon={<Calendar className="h-4 w-4" />}
           label="Items"
-          value={String(order.order_request_items.length)}
+          value={String(order.orderRequestItems.length)}
         />
       </div>
 
-      {(order.delivery_address || order.delivery_instructions) && (
+      {(order.deliveryAddress || order.deliveryInstructions) && (
         <div className="rounded-xl border border-border/60 bg-muted/30 px-4 py-3 flex gap-3">
           <MapPin className="h-4 w-4 mt-0.5 shrink-0 text-muted-foreground" />
           <div className="flex flex-col gap-3">
-            {order.delivery_address && (
+            {order.deliveryAddress && (
               <div className="flex flex-col gap-0.5">
                 <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   Delivery address
                 </span>
-                <p className="text-sm font-medium whitespace-pre-line">{order.delivery_address}</p>
+                <p className="text-sm font-medium whitespace-pre-line">{order.deliveryAddress}</p>
               </div>
             )}
-            {order.delivery_instructions && (
+            {order.deliveryInstructions && (
               <div className="flex flex-col gap-0.5">
                 <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   Delivery instructions
                 </span>
-                <p className="text-sm whitespace-pre-line">{order.delivery_instructions}</p>
+                <p className="text-sm whitespace-pre-line">{order.deliveryInstructions}</p>
               </div>
             )}
           </div>
@@ -103,15 +103,15 @@ export function OrderDetailsView({
           Items ordered
         </h3>
         <div className="flex flex-col gap-2">
-          {order.order_request_items.map((item) => (
+          {order.orderRequestItems.map((item) => (
             <OrderItemCard
               key={item.id}
               readOnly
-              name={item.products?.name ?? "Unknown product"}
-              imageUrl={item.products?.image_url ?? null}
-              qtyPerBox={item.products?.qty_per_box ?? 0}
+              name={item.product?.name ?? "Unknown product"}
+              imageUrl={item.product?.imageUrl ?? null}
+              qtyPerBox={item.product?.qtyPerBox ?? 0}
               boxes={item.boxes ?? 0}
-              units={item.extra_units ?? 0}
+              units={item.extraUnits ?? 0}
             />
           ))}
         </div>

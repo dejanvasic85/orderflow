@@ -12,11 +12,11 @@ import {
 } from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDebounce } from "@/hooks/use-debounce";
-import type { ProductRow } from "@/lib/products/schema";
+import type { Product } from "@/lib/products/schema";
 import { ProductCard } from "./ProductCard";
 
 type ProductCatalogProps = {
-  products: ProductRow[];
+  products: Product[];
   total: number;
   searchQuery: string;
   currentPage: number;
@@ -24,7 +24,7 @@ type ProductCatalogProps = {
   isLoading?: boolean;
   onSearchChange: (q: string) => void;
   onPageChange: (page: number) => void;
-  onSelectProduct?: (product: ProductRow) => void;
+  onSelectProduct?: (product: Product) => void;
 };
 
 const skeletonCardCount = 8;

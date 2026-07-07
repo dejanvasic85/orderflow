@@ -22,7 +22,7 @@ import {
 import { useDelayedBoolean } from "@/hooks/use-delayed-boolean";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { createAccount, listAccounts, updateAccount } from "@/lib/accounts/accounts.functions";
-import type { Account, AccountRow, PagedAccountsResult } from "@/lib/accounts/schema";
+import type { Account, PagedAccountsResult } from "@/lib/accounts/schema";
 import { accountPageSize, listAccountsSearchSchema } from "@/lib/accounts/schema";
 import { can, permissions } from "@/lib/permissions";
 import { asResult } from "@/lib/result";
@@ -98,16 +98,16 @@ function AccountsPage() {
   }
 
   async function handleSave(updated: Account) {
-    const result = asResult<AccountRow>(
+    const result = asResult<Account>(
       await updateAccount({
         data: {
           id: updated.id,
           name: updated.name,
-          contact_name: updated.contact_name,
-          contact_email: updated.contact_email,
-          contact_phone: updated.contact_phone,
-          delivery_address: updated.delivery_address,
-          delivery_instructions: updated.delivery_instructions,
+          contactName: updated.contactName,
+          contactEmail: updated.contactEmail,
+          contactPhone: updated.contactPhone,
+          deliveryAddress: updated.deliveryAddress,
+          deliveryInstructions: updated.deliveryInstructions,
         },
       }),
     );
@@ -115,24 +115,20 @@ function AccountsPage() {
       toast.error(result.error.message);
       return;
     }
-    setAccounts((prev) =>
-      prev.map((a) =>
-        a.id === updated.id ? { ...result.value, userCount: updated.userCount } : a,
-      ),
-    );
+    setAccounts((prev) => prev.map((a) => (a.id === updated.id ? result.value : a)));
     setSelectedId(null);
   }
 
   async function handleCreate(draft: Account) {
-    const result = asResult<AccountRow>(
+    const result = asResult<Account>(
       await createAccount({
         data: {
           name: draft.name,
-          contact_name: draft.contact_name,
-          contact_email: draft.contact_email,
-          contact_phone: draft.contact_phone,
-          delivery_address: draft.delivery_address,
-          delivery_instructions: draft.delivery_instructions,
+          contactName: draft.contactName,
+          contactEmail: draft.contactEmail,
+          contactPhone: draft.contactPhone,
+          deliveryAddress: draft.deliveryAddress,
+          deliveryInstructions: draft.deliveryInstructions,
         },
       }),
     );
@@ -203,13 +199,13 @@ function AccountsPage() {
                 account={{
                   id: "",
                   name: "",
-                  contact_name: null,
-                  contact_email: null,
-                  contact_phone: null,
-                  delivery_address: null,
-                  delivery_instructions: null,
-                  created_at: "",
-                  updated_at: "",
+                  contactName: null,
+                  contactEmail: null,
+                  contactPhone: null,
+                  deliveryAddress: null,
+                  deliveryInstructions: null,
+                  createdAt: "",
+                  updatedAt: "",
                   userCount: 0,
                 }}
                 onSave={handleCreate}

@@ -126,11 +126,11 @@ describe("getProduct", () => {
 
 describe("createProduct", () => {
   it("calls authorizeAdmin then delegates to repo.createProduct", async () => {
-    const newProduct = { id: "p-new", name: "Shiraz", qty_per_box: 6 } as never;
+    const newProduct = { id: "p-new", name: "Shiraz", qtyPerBox: 6 } as never;
     const createProductFn = vi.fn().mockResolvedValue(ok(newProduct));
     const authorizeAdmin = vi.fn().mockResolvedValue(undefined);
     const deps = makeDeps({ repo: makeRepo({ createProduct: createProductFn }), authorizeAdmin });
-    const input = { name: "Shiraz", qty_per_box: 6 };
+    const input = { name: "Shiraz", qtyPerBox: 6 };
 
     const result = await createProduct(deps, input);
 
@@ -146,7 +146,7 @@ describe("createProduct", () => {
       authorizeAdmin: vi.fn().mockRejectedValue(new Error("Forbidden")),
     });
 
-    await expect(createProduct(deps, { name: "Shiraz", qty_per_box: 6 })).rejects.toThrow(
+    await expect(createProduct(deps, { name: "Shiraz", qtyPerBox: 6 })).rejects.toThrow(
       "Forbidden",
     );
     expect(createProductFn).not.toHaveBeenCalled();
@@ -155,7 +155,7 @@ describe("createProduct", () => {
 
 describe("updateProduct", () => {
   it("calls authorizeAdmin then delegates to repo.updateProduct", async () => {
-    const updated = { id: "p-1", name: "Shiraz Reserve", qty_per_box: 12 } as never;
+    const updated = { id: "p-1", name: "Shiraz Reserve", qtyPerBox: 12 } as never;
     const updateProductFn = vi.fn().mockResolvedValue(ok(updated));
     const authorizeAdmin = vi.fn().mockResolvedValue(undefined);
     const deps = makeDeps({ repo: makeRepo({ updateProduct: updateProductFn }), authorizeAdmin });
