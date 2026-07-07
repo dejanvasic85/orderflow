@@ -3,14 +3,13 @@ import { PageContent } from "@/components/layout/PageContent";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { OrderDetailsView } from "@/components/orderRequests/OrderDetailsView";
 import { getOrderRequestAsAdminOrStaff } from "@/lib/orderRequests/orderRequests.functions";
-import type { OrderRequestWithItems } from "@/lib/orderRequests/schema";
 
 export const Route = createFileRoute("/_protected/manage/orders/$orderId")({
   loader: async ({ params }) => {
     const result = await getOrderRequestAsAdminOrStaff({ data: params.orderId });
     if (!result.ok) throw new Error(result.error.message);
     if (!result.value) throw notFound();
-    return { order: result.value as OrderRequestWithItems };
+    return { order: result.value };
   },
   component: AdminOrderDetailsPage,
 });

@@ -9,7 +9,6 @@ import { can, permissions } from "@/lib/permissions";
 import { listProducts } from "@/lib/products/products.functions";
 import type { Product } from "@/lib/products/schema";
 import { asResult } from "@/lib/result";
-import type { TemplateWithItems } from "@/lib/templates/schema";
 import { getTemplateForAccount, saveTemplateItems } from "@/lib/templates/templates.functions";
 
 export const Route = createFileRoute("/_protected/manage/accounts/$accountId/template")({
@@ -27,7 +26,7 @@ export const Route = createFileRoute("/_protected/manage/accounts/$accountId/tem
 
     return {
       account: accountResult.value,
-      template: templateResult.value as TemplateWithItems | null,
+      template: templateResult.value,
       products: productsResult.value,
     };
   },

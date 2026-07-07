@@ -2,7 +2,6 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { OrderSuccessView } from "@/components/orderRequests/OrderSuccessView";
 import { getAccount } from "@/lib/accounts/accounts.functions";
 import { getOrderRequest } from "@/lib/orderRequests/orderRequests.functions";
-import type { OrderRequestWithItems } from "@/lib/orderRequests/schema";
 
 export const Route = createFileRoute(
   "/_protected/_account/accounts/$accountId/orders/$orderId/success",
@@ -20,7 +19,7 @@ export const Route = createFileRoute(
 
     return {
       account: accountResult.value,
-      order: orderResult.value as OrderRequestWithItems,
+      order: orderResult.value,
     };
   },
   component: OrderSuccessPage,

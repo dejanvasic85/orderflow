@@ -4,7 +4,6 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { OrderDetailsView } from "@/components/orderRequests/OrderDetailsView";
 import { getAccount } from "@/lib/accounts/accounts.functions";
 import { getOrderRequest } from "@/lib/orderRequests/orderRequests.functions";
-import type { OrderRequestWithItems } from "@/lib/orderRequests/schema";
 
 export const Route = createFileRoute("/_protected/_account/accounts/$accountId/orders/$orderId/")({
   loader: async ({ params }) => {
@@ -21,7 +20,7 @@ export const Route = createFileRoute("/_protected/_account/accounts/$accountId/o
 
     return {
       account: accountResult.value,
-      order: orderResult.value as OrderRequestWithItems,
+      order: orderResult.value,
     };
   },
   component: OrderDetailsPage,
