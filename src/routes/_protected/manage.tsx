@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/_protected/manage")({
   beforeLoad: ({ context }) => {
-    const user = context.user as unknown as { user_role?: string };
+    const { user } = context;
     if (user.user_role !== "admin" && user.user_role !== "staff") {
       throw redirect({ to: "/accounts" });
     }
