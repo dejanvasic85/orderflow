@@ -83,18 +83,16 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Bug | when the items are 0 quantity, they don't need to be added to the order request
 - [x] Bug | Email is going to spam for outlook.com
 - [x] Bug | Loading buttons are not working properly
-- [ ] Feature | Must | CSV import for products and accounts (incl. MYOB import back into our system)
-- [ ] Feature | Must | MYOB CSV export — orders out of our system into MYOB
 
 ## Code Cleanup - Post release
 
 - [x] Local development has auth emails going to mailpit but only to console for transactional emails
 - [x] We need a much better and cleaner pattern for Authz
 - [x] The .server.ts files have too much logic in them or all database operations should be somewhere else
-- [ ] Replace all the deprecated API's like `inputValidator` on the tanstack lib
 - [ ] Audit all the variable naming so they are camelCased
+- [ ] Replace all the deprecated API's like `inputValidator` on the tanstack lib
 
-- [ ] Cleanup | Casting and typescript needs general cleanup
+- [ ] Cleanup | Casting and typescript needs general cleanup. Once all the "as" casting is removed tighten the tsconfig to no longer allow this.
 
 ```ts
 const { user } = Route.useRouteContext() as { user: { user_role?: string } };
