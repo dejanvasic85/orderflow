@@ -83,8 +83,6 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Bug | when the items are 0 quantity, they don't need to be added to the order request
 - [x] Bug | Email is going to spam for outlook.com
 - [x] Bug | Loading buttons are not working properly
-- [ ] Feature | Must | CSV import for products and accounts (incl. MYOB import back into our system)
-- [ ] Feature | Must | MYOB CSV export — orders out of our system into MYOB
 
 ## Code Cleanup - Post release
 
