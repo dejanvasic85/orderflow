@@ -9,6 +9,9 @@ export type UserRole = Database["public"]["Enums"]["user_role"];
 
 export const userRoles = ["admin", "staff", "user"] as const satisfies readonly UserRole[];
 
+export const isUserRole = (value: string): value is UserRole =>
+  userRoles.includes(value as UserRole);
+
 export const isAdmin = (role: UserRole): boolean => role === "admin";
 export const isStaff = (role: UserRole): boolean => role === "staff";
 export const isUser = (role: UserRole): boolean => role === "user";

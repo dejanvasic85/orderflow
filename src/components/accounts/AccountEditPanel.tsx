@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import type { Account } from "@/lib/accounts/schema";
+import { toFieldErrors } from "@/lib/forms";
 
 type Props = {
   account: Account;
@@ -25,12 +26,6 @@ const accountEditSchema = z.object({
   deliveryAddress: z.string(),
   deliveryInstructions: z.string(),
 });
-
-function toFieldErrors(errors: unknown[]): { message?: string }[] {
-  return errors.map((e) => ({
-    message: typeof e === "string" ? e : (e as { message?: string })?.message,
-  }));
-}
 
 export function AccountEditPanel({ account, readOnly = false, onSave, onDiscard }: Props) {
   const form = useForm({

@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/input-group";
 import { Separator } from "@/components/ui/separator";
 import { setPasswordSchema } from "@/lib/auth/schema";
+import { toFieldErrors } from "@/lib/forms";
 import type { Result } from "@/lib/result";
 import type { User } from "@/lib/users/schema";
 
@@ -22,12 +23,6 @@ type Props = {
   onSendResetEmail: () => Promise<Result<void, { message: string }>>;
   onClose: () => void;
 };
-
-function toFieldErrors(errors: unknown[]): { message?: string }[] {
-  return errors.map((e) => ({
-    message: typeof e === "string" ? e : (e as { message?: string })?.message,
-  }));
-}
 
 export function SetUserPasswordPanel({ user, onSetPassword, onSendResetEmail, onClose }: Props) {
   const [showPassword, setShowPassword] = useState(false);

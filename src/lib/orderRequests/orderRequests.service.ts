@@ -1,7 +1,7 @@
 import type { Logger } from "@/lib/log/logger";
 import type { NotifyOrderPlacedInput } from "@/lib/notifications/notifications.server";
 import { ok, type Result } from "@/lib/result";
-import { isStaffOrAdmin, type UserRole } from "@/lib/users/schema";
+import { isStaffOrAdmin, isUserRole } from "@/lib/users/schema";
 import type { CreatedOrder, OrderRequestRepository } from "./orderRequests.repository";
 import {
   formatOrderRef,
@@ -163,9 +163,10 @@ async function fireOrderNotification(
   ]);
 
   const accountName = account?.name ?? input.accountId;
-  const placedByUser: PlacedByUser = placedBy
-    ? { id: placedBy.id, name: placedBy.name, role: placedBy.role as UserRole }
-    : null;
+  const placedByUser: PlacedByUser =
+    placedBy && isUserRole(placedBy.role)
+      ? { id: placedBy.id, name: placedBy.name, role: placedBy.role }
+      : null;
   const { placedByName } = resolvePlacedByName(placedByUser);
   const productMap = new Map(products.map((p) => [p.id, p.name]));
 

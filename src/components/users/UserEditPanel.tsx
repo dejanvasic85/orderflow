@@ -22,6 +22,7 @@ import { PendingInviteSection } from "@/components/users/PendingInviteSection";
 import { roleInfoValue } from "@/components/users/roleInfo";
 import { RoleInfoDisclosure } from "@/components/users/RoleInfoDisclosure";
 import { UserAccountsSection } from "@/components/users/UserAccountsSection";
+import { toFieldErrors } from "@/lib/forms";
 import { type UpdateUserAccountsInput, type User, userRoles } from "@/lib/users/schema";
 
 type BaseProps = {
@@ -68,12 +69,6 @@ const blankUser: User = {
   updatedAt: "",
   accounts: [],
 };
-
-function toFieldErrors(errors: unknown[]): { message?: string }[] {
-  return errors.map((e) => ({
-    message: typeof e === "string" ? e : (e as { message?: string })?.message,
-  }));
-}
 
 export function UserEditPanel(props: Props) {
   const { onSave, onDiscard, onCheckEmailExists, onResendInvite, allAccounts, readOnly } = props;

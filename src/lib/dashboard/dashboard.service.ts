@@ -1,6 +1,7 @@
 import { resolvePlacedByName } from "@/lib/orderRequests/orderRequests.service";
 import { formatOrderRef } from "@/lib/orderRequests/schema";
 import { ok, type Result } from "@/lib/result";
+import { isUserRole } from "@/lib/users/schema";
 import { rangeWindowDaysValue, recentActivityLimit, topProductsLimit } from "./constants";
 import type { DashboardRepository } from "./dashboard.repository";
 import type {
@@ -183,13 +184,10 @@ export function buildRecentActivity(
   limit = recentActivityLimit,
 ): RecentActivityItem[] {
   return orders.slice(0, limit).map((order) => {
-    const user = order.user
-      ? {
-          id: order.user.id,
-          name: order.user.name,
-          role: order.user.role as "admin" | "staff" | "user",
-        }
-      : null;
+    const user =
+      order.user && isUserRole(order.user.role)
+        ? { id: order.user.id, name: order.user.name, role: order.user.role }
+        : null;
     const { placedByName } = resolvePlacedByName(user);
     return {
       id: order.id,
