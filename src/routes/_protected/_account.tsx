@@ -16,6 +16,8 @@ function AccountLayout() {
   const { user } = Route.useRouteContext();
   const { hasMultipleAccounts } = Route.useLoaderData();
   const router = useRouter();
+  // Route matches are typed per-route; accountId only exists on some routes in this
+  // layout's subtree, so TanStack Router can't narrow `params` across the whole array.
   const accountId = useRouterState({
     select: (s) => {
       const match = s.matches.find((m) => (m.params as Record<string, string>).accountId);

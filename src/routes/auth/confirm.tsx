@@ -35,6 +35,8 @@ export const Route = createFileRoute("/auth/confirm")({
     }
 
     log.info("auth.confirm", "verified", { type: deps.type, next: deps.next });
+    // `next` is a runtime redirect target (from search params or a server default);
+    // TanStack Router's `to` requires a literal route path, which can't be proven statically here.
     throw redirect({ to: result.next as "/" });
   },
 });

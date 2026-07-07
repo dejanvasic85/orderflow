@@ -1,6 +1,7 @@
 import { createFileRoute, Link, redirect, useRouter } from "@tanstack/react-router";
 import { LoginForm, type LoginValues } from "@/components/auth/LoginForm";
 import { getSession } from "@/lib/auth/auth.functions";
+import { parseJwtClaims } from "@/lib/auth/jwtClaims";
 import { getPostLoginRedirect } from "@/lib/auth/userRedirect";
 import { company } from "@/lib/config";
 import { supabase } from "@/lib/supabase";
@@ -23,19 +24,10 @@ function LoginPage() {
     if (error) {
       return { error: error.message ?? "Sign in failed" };
     }
-    const token = data.session?.access_token ?? "";
-    let userRole: string | undefined;
-    if (token) {
-      try {
-        const base64Url = token.split(".")[1] ?? "";
-        const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-        const padded = base64.padEnd(Math.ceil(base64.length / 4) * 4, "=");
-        const payload = JSON.parse(atob(padded)) as { user_role?: string };
-        userRole = payload.user_role;
-      } catch {
-        userRole = undefined;
-      }
-    }
+    const base64Url = data.session?.access_token.split(".")[1] ?? "";
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = base64.padEnd(Math.ceil(base64.length / 4) * 4, "=");
+    const userRole = padded ? parseJwtClaims(atob(padded)).user_role : undefined;
     const to = getPostLoginRedirect(userRole);
     await router.navigate({ to });
   };
