@@ -149,6 +149,7 @@ export function createAccountRepository(): AccountRepository {
         .select("user_id, created_at, users:users_with_email(id, name, email, role, active)")
         .eq("account_id", accountId);
       if (error) return err({ message: error.message });
+      // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- supabase-js doesn't narrow a joined .select() string to this row shape
       const rows = (data ?? []) as AccountUserRow[];
       return ok(rows.map(toAccountUser));
     },

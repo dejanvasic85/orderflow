@@ -5,6 +5,7 @@ export type Result<T, E = ResultError> = { ok: true; value: T } | { ok: false; e
 export function ok(): Result<void, never>;
 export function ok<T>(value: T): Result<T, never>;
 export function ok<T>(value?: T) {
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion, typescript/consistent-type-assertions -- overload signature can't be expressed without this cast
   return { ok: true, value } as Result<T, never>;
 }
 export const err = <E>(error: E): Result<never, E> => ({ ok: false, error });
@@ -12,5 +13,6 @@ export const err = <E>(error: E): Result<never, E> => ({ ok: false, error });
 // TanStack Start serializes server function returns over HTTP, losing the inferred type.
 // Use this at call sites to restore type safety when the inferred return is `unknown`.
 export function asResult<T, E = ResultError>(value: unknown): Result<T, E> {
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- sanctioned boundary cast: restores the type lost when createServerFn serializes its return
   return value as Result<T, E>;
 }

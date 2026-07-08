@@ -83,20 +83,17 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Bug | when the items are 0 quantity, they don't need to be added to the order request
 - [x] Bug | Email is going to spam for outlook.com
 - [x] Bug | Loading buttons are not working properly
-
-## Code Cleanup - Post release
-
 - [x] Local development has auth emails going to mailpit but only to console for transactional emails
 - [x] We need a much better and cleaner pattern for Authz
 - [x] The .server.ts files have too much logic in them or all database operations should be somewhere else
 - [x] Audit all the variable naming so they are camelCased
+- [ ] Redesgin components to look better like the orders page and order component
+- [ ] Cron job in github pipelines to login to the app every day and verify all pages are functional
+- [ ] Create test fixtures to help with the unit tests instead of inline all the data
 - [ ] Replace all the deprecated API's like `inputValidator` on the tanstack lib
 
-- [ ] Cleanup | Casting and typescript needs general cleanup. Once all the "as" casting is removed tighten the tsconfig to no longer allow this.
-
-```ts
-const { user } = Route.useRouteContext() as { user: { user_role?: string } };
-```
+- [x] Cleanup | Casting and typescript needs general cleanup. Once all the "as" casting is removed tighten the tsconfig to no longer allow this.
+- [ ] Cleanup | Nice | Verify Supabase repository row types match their .select() column lists (accounts/orderRequests/users/templates/dashboard repositories)
 
 - [ ] Cleanup | Improve the code pattern around fetching and checking result
 

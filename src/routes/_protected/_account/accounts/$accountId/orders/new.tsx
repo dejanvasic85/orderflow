@@ -9,7 +9,6 @@ import type { OrderRequestItemInput } from "@/lib/orderRequests/schema";
 import { listProducts } from "@/lib/products/products.functions";
 import type { Product } from "@/lib/products/schema";
 import { asResult } from "@/lib/result";
-import type { TemplateWithItems } from "@/lib/templates/schema";
 import { getTemplateForAccount } from "@/lib/templates/templates.functions";
 
 const searchSchema = z.object({
@@ -48,7 +47,7 @@ export const Route = createFileRoute("/_protected/_account/accounts/$accountId/o
 
     return {
       account: accountResult.value,
-      template: templateResult.value as TemplateWithItems | null,
+      template: templateResult.value,
       products: productsResult.value,
       initialItems,
     };

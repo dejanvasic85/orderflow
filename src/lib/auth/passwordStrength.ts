@@ -23,6 +23,7 @@ export const passwordRequirementsValue = {
 
 export type PasswordRequirementKey = keyof typeof passwordRequirementsValue;
 
+// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- Object.keys widens to string[]; keys are guaranteed by passwordRequirementsValue's own shape
 const requirementKeys = Object.keys(passwordRequirementsValue) as PasswordRequirementKey[];
 
 const hasSymbol = (password: string) => /[^a-zA-Z0-9]/.test(password);
@@ -62,6 +63,7 @@ export function evaluatePassword(password: string): PasswordEvaluation {
       acc[key] = passwordRequirementsValue[key].test(password);
       return acc;
     },
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- reduce accumulator seed; filled with every key on the first pass
     {} as Record<PasswordRequirementKey, boolean>,
   );
 

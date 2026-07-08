@@ -1,4 +1,5 @@
 import type { EmailOtpType } from "@supabase/supabase-js";
+import { parseJwtClaims } from "@/lib/auth/jwtClaims";
 import { log } from "@/lib/log/logger";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
 
@@ -14,15 +15,10 @@ export async function fetchSession() {
     data: { session },
   } = await supabase.auth.getSession();
   const token = session?.access_token ?? "";
-  let userRole: string | undefined;
-  if (token) {
-    try {
-      const payload = JSON.parse(Buffer.from(token.split(".")[1], "base64").toString());
-      userRole = payload.user_role as string | undefined;
-    } catch {
-      // ignore decode errors
-    }
-  }
+  const payloadSegment = token.split(".")[1];
+  const userRole = payloadSegment
+    ? parseJwtClaims(Buffer.from(payloadSegment, "base64").toString()).user_role
+    : undefined;
 
   return { ...user, user_role: userRole };
 }

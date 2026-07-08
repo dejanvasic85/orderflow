@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
+import { toFieldErrors } from "@/lib/forms";
 import type { CreateProductInput, Product, UpdateProductInput } from "@/lib/products/schema";
 
 type BaseProps = {
@@ -36,12 +37,6 @@ const productEditSchema = z.object({
     .min(1, "Must be at least 1"),
   active: z.boolean(),
 });
-
-function toFieldErrors(errors: unknown[]): { message?: string }[] {
-  return errors.map((e) => ({
-    message: typeof e === "string" ? e : (e as { message?: string })?.message,
-  }));
-}
 
 export function ProductEditPanel(props: Props) {
   const { onDiscard, product } = props;

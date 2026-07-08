@@ -22,7 +22,8 @@ import { PendingInviteSection } from "@/components/users/PendingInviteSection";
 import { roleInfoValue } from "@/components/users/roleInfo";
 import { RoleInfoDisclosure } from "@/components/users/RoleInfoDisclosure";
 import { UserAccountsSection } from "@/components/users/UserAccountsSection";
-import { type UpdateUserAccountsInput, type User, userRoles } from "@/lib/users/schema";
+import { toFieldErrors } from "@/lib/forms";
+import { isUserRole, type UpdateUserAccountsInput, type User, userRoles } from "@/lib/users/schema";
 
 type BaseProps = {
   onSave: (updated: User, accountsPayload?: UpdateUserAccountsInput) => void | Promise<void>;
@@ -52,8 +53,6 @@ const userEditSchema = z.object({
   active: z.boolean(),
 });
 
-type UserEditValues = z.infer<typeof userEditSchema>;
-
 const blankUser: User = {
   id: "",
   name: "",
@@ -68,12 +67,6 @@ const blankUser: User = {
   updatedAt: "",
   accounts: [],
 };
-
-function toFieldErrors(errors: unknown[]): { message?: string }[] {
-  return errors.map((e) => ({
-    message: typeof e === "string" ? e : (e as { message?: string })?.message,
-  }));
-}
 
 export function UserEditPanel(props: Props) {
   const { onSave, onDiscard, onCheckEmailExists, onResendInvite, allAccounts, readOnly } = props;
@@ -259,7 +252,9 @@ export function UserEditPanel(props: Props) {
               <FieldLabel htmlFor="role">Role</FieldLabel>
               <Select
                 value={field.state.value}
-                onValueChange={(v) => field.handleChange(v as UserEditValues["role"])}
+                onValueChange={(v) => {
+                  if (isUserRole(v)) field.handleChange(v);
+                }}
                 disabled={readOnly}
               >
                 <SelectTrigger id="role" className="w-full">

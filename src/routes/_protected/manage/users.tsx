@@ -1,4 +1,4 @@
-import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { useNavigate, useRouteContext, useRouterState } from "@tanstack/react-router";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -59,9 +59,7 @@ export const Route = createFileRoute("/_protected/manage/users")({
 });
 
 function UsersPage() {
-  const { user: currentUser } = Route.useRouteContext() as {
-    user: { id: string; user_role?: string };
-  };
+  const { user: currentUser } = useRouteContext({ from: "/_protected" });
   const { users: loadedUsers, total, accounts } = Route.useLoaderData();
   const currentUserId = currentUser.id;
   const canWriteUsers = can(currentUser.user_role, permissions.users.write);

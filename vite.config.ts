@@ -62,6 +62,29 @@ const config = defineConfig({
   lint: {
     ignorePatterns: ["src/lib/database.types.ts", "src/routeTree.gen.ts"],
     options: { typeAware: true, typeCheck: true },
+    rules: {
+      "typescript/consistent-type-assertions": [
+        "error",
+        { assertionStyle: "as", objectLiteralTypeAssertions: "allow-as-parameter" },
+      ],
+      "typescript/no-unsafe-type-assertion": "error",
+    },
+    overrides: [
+      {
+        files: ["**/*.test.ts", "**/*.test.tsx", "test/**"],
+        rules: {
+          "typescript/consistent-type-assertions": "off",
+          "typescript/no-unsafe-type-assertion": "off",
+        },
+      },
+      {
+        files: ["src/components/ui/**"],
+        rules: {
+          "typescript/consistent-type-assertions": "off",
+          "typescript/no-unsafe-type-assertion": "off",
+        },
+      },
+    ],
   },
   plugins: [
     devtools(),

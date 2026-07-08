@@ -11,6 +11,7 @@ export function prettyRequestPath(pathname: string): string {
     // In the Workers runtime the segment arrives percent-encoded; decode it before
     // atob. Also normalise URL-safe base64 (-/_ -> +//) so atob doesn't reject it.
     const base64 = decodeURIComponent(segment).replace(/-/g, "+").replace(/_/g, "/");
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- logging-only decode of an internal framework path encoding, wrapped in try/catch
     const decoded = JSON.parse(atob(base64)) as { file?: string; export?: string };
     const name = serverFnName(decoded.export);
     return name ? `serverFn:${name}` : "serverFn";
