@@ -41,7 +41,7 @@ jobs:
           SECRETS_JSON: ${{ toJSON(secrets) }}
 
       - name: Setup Supabase CLI
-        uses: supabase/setup-cli@v2
+        uses: supabase/setup-cli@v3
 
       - name: Apply database migrations
         run: |
