@@ -23,7 +23,7 @@ import { roleInfoValue } from "@/components/users/roleInfo";
 import { RoleInfoDisclosure } from "@/components/users/RoleInfoDisclosure";
 import { UserAccountsSection } from "@/components/users/UserAccountsSection";
 import { toFieldErrors } from "@/lib/forms";
-import { type UpdateUserAccountsInput, type User, userRoles } from "@/lib/users/schema";
+import { isUserRole, type UpdateUserAccountsInput, type User, userRoles } from "@/lib/users/schema";
 
 type BaseProps = {
   onSave: (updated: User, accountsPayload?: UpdateUserAccountsInput) => void | Promise<void>;
@@ -52,8 +52,6 @@ const userEditSchema = z.object({
   notifications: z.object({ email: z.boolean(), sms: z.boolean() }),
   active: z.boolean(),
 });
-
-type UserEditValues = z.infer<typeof userEditSchema>;
 
 const blankUser: User = {
   id: "",
@@ -254,7 +252,9 @@ export function UserEditPanel(props: Props) {
               <FieldLabel htmlFor="role">Role</FieldLabel>
               <Select
                 value={field.state.value}
-                onValueChange={(v) => field.handleChange(v as UserEditValues["role"])}
+                onValueChange={(v) => {
+                  if (isUserRole(v)) field.handleChange(v);
+                }}
                 disabled={readOnly}
               >
                 <SelectTrigger id="role" className="w-full">

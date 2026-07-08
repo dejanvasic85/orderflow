@@ -82,6 +82,7 @@ export function createTemplateRepository(): TemplateRepository {
         .eq("account_id", accountId)
         .maybeSingle();
       if (error) return err({ message: error.message });
+      // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- supabase-js doesn't narrow a joined .select() string to this row shape
       return ok(data ? toTemplateWithItems(data as TemplateWithItemsRow) : null);
     },
 
@@ -93,6 +94,7 @@ export function createTemplateRepository(): TemplateRepository {
         .eq("id", id)
         .single();
       if (error) return err({ message: error.message });
+      // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- supabase-js doesn't narrow a joined .select() string to this row shape
       return ok(toTemplateWithItems(data as TemplateWithItemsRow));
     },
 

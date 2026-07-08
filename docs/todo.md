@@ -92,11 +92,8 @@ Priorities: `Must` · `Should` · `Nice`
 - [ ] Create test fixtures to help with the unit tests instead of inline all the data
 - [ ] Replace all the deprecated API's like `inputValidator` on the tanstack lib
 
-- [ ] Cleanup | Casting and typescript needs general cleanup. Once all the "as" casting is removed tighten the tsconfig to no longer allow this.
-
-```ts
-const { user } = Route.useRouteContext() as { user: { user_role?: string } };
-```
+- [x] Cleanup | Casting and typescript needs general cleanup. Once all the "as" casting is removed tighten the tsconfig to no longer allow this.
+- [ ] Cleanup | Nice | Verify Supabase repository row types match their .select() column lists (accounts/orderRequests/users/templates/dashboard repositories)
 
 - [ ] Cleanup | Improve the code pattern around fetching and checking result
 

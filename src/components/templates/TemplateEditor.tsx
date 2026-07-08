@@ -66,13 +66,15 @@ function buildPayload(accountId: string, items: TemplateItemState[]): TemplateEd
         unitCount: extra_units,
       })),
     toUpdate: items
-      .filter((i) => i.kind === "updated" && i.id !== null)
+      .filter((i): i is TemplateItemState & { id: string } => i.kind === "updated" && i.id !== null)
       .map(({ id, boxes, extra_units }) => ({
-        id: id as string,
+        id,
         boxCount: boxes,
         unitCount: extra_units,
       })),
-    toRemove: items.filter((i) => i.kind === "removed" && i.id !== null).map((i) => i.id as string),
+    toRemove: items
+      .filter((i): i is TemplateItemState & { id: string } => i.kind === "removed" && i.id !== null)
+      .map((i) => i.id),
   };
 }
 

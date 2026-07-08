@@ -10,6 +10,7 @@ export type UserRole = Database["public"]["Enums"]["user_role"];
 export const userRoles = ["admin", "staff", "user"] as const satisfies readonly UserRole[];
 
 export const isUserRole = (value: string): value is UserRole =>
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- Array<UserRole>.includes requires a UserRole argument to check a plain string
   userRoles.includes(value as UserRole);
 
 export const isAdmin = (role: UserRole): boolean => role === "admin";

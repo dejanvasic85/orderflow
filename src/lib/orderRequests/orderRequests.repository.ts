@@ -76,6 +76,7 @@ function toOrderHistoryRow(row: OrderHistoryJoinRow): OrderHistoryRow {
     placedBy: row.placed_by,
     createdAt: row.created_at,
     items: row.order_request_items.map((i) => ({ boxes: i.boxes, extraUnits: i.extra_units })),
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- supabase-js doesn't narrow a joined .select() string to this row shape
     user: row.users as OrderHistoryRow["user"],
     account: row.accounts,
   };
@@ -146,6 +147,7 @@ export function createOrderRequestRepository(): OrderRequestRepository {
         log.error("order.db", "fetch orders failed", { error: error.message });
         return err({ message: error.message });
       }
+      // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- supabase-js doesn't narrow a joined .select() string to this row shape
       const rows = (data ?? []) as OrderRequestWithItemsRow[];
       return ok(rows.map(toOrderRequestWithItems));
     },
@@ -161,6 +163,7 @@ export function createOrderRequestRepository(): OrderRequestRepository {
         log.error("order.db", "fetch order failed", { error: error.message });
         return err({ message: error.message });
       }
+      // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- supabase-js doesn't narrow a joined .select() string to this row shape
       return ok(toOrderRequestWithItems(data as OrderRequestWithItemsRow));
     },
 

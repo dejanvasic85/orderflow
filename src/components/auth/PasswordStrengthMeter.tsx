@@ -16,6 +16,7 @@ const strengthStylesValue: Record<PasswordStrengthLabel, { segment: string; text
   Strong: { segment: "bg-emerald-600", text: "text-emerald-600" },
 };
 
+// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- Object.keys widens to string[]; keys are guaranteed by passwordRequirementsValue's own shape
 const requirementOrder = Object.keys(passwordRequirementsValue) as PasswordRequirementKey[];
 
 type PasswordStrengthMeterProps = {
