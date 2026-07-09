@@ -1,6 +1,9 @@
 import { readFileSync } from "node:fs";
+import path from "node:path";
 import { parseEnv } from "node:util";
 import { defineConfig, devices } from "@playwright/test";
+
+const repoRoot = path.resolve(import.meta.dirname, "../..");
 
 function loadEnvFile(path: string): Record<string, string | undefined> {
   try {
@@ -10,11 +13,11 @@ function loadEnvFile(path: string): Record<string, string | undefined> {
   }
 }
 
-const localEnv = loadEnvFile(".env.local");
+const localEnv = loadEnvFile(path.join(repoRoot, ".env.local"));
 const baseURL = localEnv["SITE_URL"] ?? "http://localhost:3344";
 
 export default defineConfig({
-  testDir: "./test",
+  testDir: ".",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
@@ -36,6 +39,7 @@ export default defineConfig({
   ],
   webServer: {
     command: "vp dev",
+    cwd: repoRoot,
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120000,

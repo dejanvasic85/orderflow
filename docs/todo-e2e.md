@@ -1,7 +1,8 @@
 # Todo list — e2e test coverage
 
-Tracks e2e (Playwright) tests still to be written. See `test/*.spec.ts` for the
-current suite and `test/flows.ts` / `test/mailpit.ts` for shared helpers.
+Tracks e2e (Playwright) tests still to be written. See `test/features/*.spec.ts`
+for the current suite and `test/features/flows.ts` / `test/features/mailpit.ts`
+for shared helpers.
 
 Format: `[status] Priority | Spec file | Description`
 

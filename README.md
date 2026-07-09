@@ -89,7 +89,7 @@ vp check         # lint + format + type checks
 
 ```bash
 # Requires supabase + vp dev both running
-vp exec playwright test
+vp run test:features
 ```
 
 ## Deployment

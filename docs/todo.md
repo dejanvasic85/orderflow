@@ -87,8 +87,8 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] We need a much better and cleaner pattern for Authz
 - [x] The .server.ts files have too much logic in them or all database operations should be somewhere else
 - [x] Audit all the variable naming so they are camelCased
-- [ ] Redesgin components to look better like the orders page and order component
-- [ ] Cron job in github pipelines to login to the app every day and verify all pages are functional
+- [x] Cron job in github pipelines to login to the app every day and verify all pages are functional
+- [ ] Redesign components to look better like the orders page and order component
 - [ ] Create test fixtures to help with the unit tests instead of inline all the data
 - [ ] Replace all the deprecated API's like `inputValidator` on the tanstack lib
 - [ ] Feature | Should | Better error pages

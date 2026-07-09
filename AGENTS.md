@@ -94,7 +94,13 @@ Supabase Studio is at http://localhost:54323 — use it to inspect auth users an
 ```bash
 supabase start        # must be running
 vp dev                # must be running in another terminal
-vp exec playwright test
+vp run test:features
+```
+
+## Running production smoke tests
+
+```bash
+SMOKE_SITE_URL=https://bwow.app SMOKE_TEST_EMAIL=... SMOKE_TEST_PASSWORD=... vp run test:smoke
 ```
 
 ## Vite+ Workflow (Required)
