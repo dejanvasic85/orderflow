@@ -87,7 +87,7 @@ export function ResetPasswordForm({ onReset }: ResetPasswordFormProps) {
 
       <form.Subscribe selector={(s) => s.isSubmitting}>
         {(isSubmitting) => (
-          <Button type="submit" className="mt-1 w-full" disabled={isSubmitting}>
+          <Button type="submit" className="mt-1 w-full" loading={isSubmitting}>
             {isSubmitting ? "Resetting password…" : "Reset password"}
           </Button>
         )}

@@ -1,8 +1,8 @@
-import { Link, createFileRoute, useNavigate, useRouterState } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useRouterState } from "@tanstack/react-router";
 import { PageContent } from "@/components/layout/PageContent";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { OrderHistoryList } from "@/components/orderRequests/OrderHistoryList";
-import { Button } from "@/components/ui/button";
+import { NavButton } from "@/components/ui/NavButton";
 import { useDelayedBoolean } from "@/hooks/use-delayed-boolean";
 import { listAllOrders } from "@/lib/orderRequests/orderRequests.functions";
 import {
@@ -57,11 +57,7 @@ function OrdersPage() {
     <>
       <PageHeader
         title="Orders"
-        actions={
-          <Button asChild>
-            <Link to="/manage/orders/new">+ New order</Link>
-          </Button>
-        }
+        actions={<NavButton to="/manage/orders/new">+ New order</NavButton>}
       />
       <PageContent>
         <OrderHistoryList

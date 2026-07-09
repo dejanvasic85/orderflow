@@ -125,7 +125,7 @@ export function ChangePasswordForm({ onChangePassword }: ChangePasswordFormProps
 
       <form.Subscribe selector={(s) => s.isSubmitting}>
         {(isSubmitting) => (
-          <Button type="submit" className="mt-1 w-full" disabled={isSubmitting}>
+          <Button type="submit" className="mt-1 w-full" loading={isSubmitting}>
             {isSubmitting ? "Changing password…" : "Change password"}
           </Button>
         )}

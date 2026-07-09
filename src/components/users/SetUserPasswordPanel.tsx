@@ -174,7 +174,7 @@ export function SetUserPasswordPanel({ user, onSetPassword, onSendResetEmail, on
           <form.Subscribe selector={(s) => s.isSubmitting}>
             {(isSubmitting) => (
               <div className="flex items-center gap-2">
-                <Button type="submit" disabled={isSubmitting}>
+                <Button type="submit" loading={isSubmitting}>
                   {isSubmitting ? "Setting password…" : "Set password"}
                 </Button>
                 <Button type="button" variant="ghost" onClick={onClose}>
