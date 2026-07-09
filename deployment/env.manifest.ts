@@ -13,7 +13,14 @@
  * here aligned with that schema; this file adds the CI-only metadata Zod doesn't model.
  */
 
-export const deploymentContexts = ["e2e", "preview", "prod", "migrate", "cleanup"] as const;
+export const deploymentContexts = [
+  "e2e",
+  "preview",
+  "prod",
+  "migrate",
+  "cleanup",
+  "smoke",
+] as const;
 
 export type DeploymentContext = (typeof deploymentContexts)[number];
 
@@ -132,6 +139,21 @@ export const envManifest = [
     name: "SUPABASE_PROJECT_ID",
     requiredIn: ["prod", "migrate"],
     roles: ["cli"],
+  },
+  {
+    name: "SMOKE_SITE_URL",
+    requiredIn: ["smoke"],
+    roles: ["configVar"],
+  },
+  {
+    name: "SMOKE_TEST_EMAIL",
+    requiredIn: ["smoke"],
+    roles: ["configVar"],
+  },
+  {
+    name: "SMOKE_TEST_PASSWORD",
+    requiredIn: ["smoke"],
+    roles: ["configVar"],
   },
 ] as const satisfies readonly EnvVarSpec[];
 

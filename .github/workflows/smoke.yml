@@ -1,0 +1,59 @@
+name: Production Smoke Test
+
+on:
+  schedule:
+    # 16:00 UTC ≈ 2am AEST (Sydney, non-DST). GitHub Actions cron is fixed UTC
+    # and does not shift for Sydney daylight saving — adjust manually across DST if needed.
+    - cron: "0 16 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    name: Smoke test production
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+    env:
+      SMOKE_SITE_URL: https://bwow.app
+      SMOKE_TEST_EMAIL: ${{ secrets.SMOKE_TEST_EMAIL }}
+      SMOKE_TEST_PASSWORD: ${{ secrets.SMOKE_TEST_PASSWORD }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Vite+
+        uses: voidzero-dev/setup-vp@v1
+        with:
+          cache: true
+
+      - name: Install dependencies
+        run: vp install --frozen-lockfile
+
+      - name: Verify required secrets
+        run: vp exec tsx deployment/verifyEnv.ts smoke --from-env
+
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-1.61.0
+
+      - name: Install Playwright browsers
+        run: vp exec playwright install --with-deps chromium
+
+      - name: Run smoke tests
+        run: vp run test:smoke
+        env:
+          CI: true
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: smoke-playwright-report
+          path: test/smoke/playwright-report/
+          retention-days: 7
