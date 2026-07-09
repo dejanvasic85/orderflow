@@ -91,6 +91,8 @@ Priorities: `Must` · `Should` · `Nice`
 - [ ] Cron job in github pipelines to login to the app every day and verify all pages are functional
 - [ ] Create test fixtures to help with the unit tests instead of inline all the data
 - [ ] Replace all the deprecated API's like `inputValidator` on the tanstack lib
+- [ ] Feature | Should | Better error pages
+- [ ] Feature | Should | Loaders/pending state when clicking between nav links — currently nothing happens for ~1s which feels broken
 
 - [x] Cleanup | Casting and typescript needs general cleanup. Once all the "as" casting is removed tighten the tsconfig to no longer allow this.
 - [ ] Cleanup | Nice | Verify Supabase repository row types match their .select() column lists (accounts/orderRequests/users/templates/dashboard repositories)
