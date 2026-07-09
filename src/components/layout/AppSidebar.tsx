@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { KeyRoundIcon, LogOutIcon, SettingsIcon } from "lucide-react";
+import { KeyRoundIcon, Loader2Icon, LogOutIcon, SettingsIcon } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -20,6 +20,7 @@ import {
   SidebarMenuItem,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { useNavPending } from "@/hooks/use-nav-pending";
 import { company } from "@/lib/config";
 import { adminNavItemsValue } from "@/lib/routes";
 
@@ -42,6 +43,7 @@ function getInitials(email: string) {
 
 export function AppSidebar({ email, onSignOut }: AppSidebarProps) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isNavPending = useNavPending();
 
   return (
     <Sidebar collapsible="icon">
@@ -69,9 +71,13 @@ export function AppSidebar({ email, onSignOut }: AppSidebarProps) {
                 isActive={pathname === to}
                 className="h-10 rounded-lg font-medium text-sidebar-foreground/60 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground data-[active=true]:bg-sidebar-primary data-[active=true]:font-semibold data-[active=true]:text-sidebar-primary-foreground data-[active=true]:shadow-sm data-[active=true]:hover:bg-sidebar-primary data-[active=true]:hover:text-sidebar-primary-foreground"
               >
-                <Link to={to}>
+                <Link to={to} data-nav-link data-pending={isNavPending(to)}>
                   <Icon />
                   <span>{label}</span>
+                  <Loader2Icon
+                    aria-hidden
+                    className="nav-link-spinner ml-auto size-4 group-data-[collapsible=icon]:hidden"
+                  />
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

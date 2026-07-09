@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { KeyRoundIcon, LogOutIcon, RepeatIcon, SettingsIcon } from "lucide-react";
+import { KeyRoundIcon, Loader2Icon, LogOutIcon, RepeatIcon, SettingsIcon } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -10,6 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useNavPending } from "@/hooks/use-nav-pending";
 import { company } from "@/lib/config";
 import { cn } from "@/lib/utils";
 
@@ -42,6 +43,7 @@ export function AccountTopNav({
   onSignOut,
 }: AccountTopNavProps) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isNavPending = useNavPending();
 
   return (
     <header className="sticky top-0 z-40 hidden md:flex border-b bg-background">
@@ -55,14 +57,17 @@ export function AccountTopNav({
               <Link
                 key={to}
                 to={to}
+                data-nav-link
+                data-pending={isNavPending(to)}
                 className={cn(
-                  "px-3 py-1.5 rounded-md text-sm transition-colors",
+                  "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm transition-colors",
                   isActive
                     ? "text-foreground font-medium"
                     : "text-muted-foreground hover:text-foreground hover:bg-accent",
                 )}
               >
                 {label}
+                <Loader2Icon aria-hidden className="nav-link-spinner size-3.5" />
               </Link>
             );
           })}
