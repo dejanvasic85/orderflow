@@ -366,7 +366,7 @@ export function UserEditPanel(props: Props) {
           {!readOnly && (
             <form.Subscribe selector={(s) => s.isSubmitting}>
               {(isSubmitting) => (
-                <Button type="submit" disabled={isSubmitting}>
+                <Button type="submit" loading={isSubmitting}>
                   {isSubmitting ? (isCreate ? "Sending invite…" : "Saving…") : submitLabel}
                 </Button>
               )}

@@ -77,7 +77,7 @@ export function SetPasswordForm({ onSetPassword }: SetPasswordFormProps) {
 
       <form.Subscribe selector={(s) => s.isSubmitting}>
         {(isSubmitting) => (
-          <Button type="submit" className="mt-1 w-full" disabled={isSubmitting}>
+          <Button type="submit" className="mt-1 w-full" loading={isSubmitting}>
             {isSubmitting ? "Setting password…" : "Set password"}
           </Button>
         )}

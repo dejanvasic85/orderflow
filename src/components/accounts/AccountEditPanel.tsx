@@ -186,7 +186,7 @@ export function AccountEditPanel({ account, readOnly = false, onSave, onDiscard 
           {!readOnly && (
             <form.Subscribe selector={(s) => s.isSubmitting}>
               {(isSubmitting) => (
-                <Button type="submit" disabled={isSubmitting}>
+                <Button type="submit" loading={isSubmitting}>
                   {isSubmitting ? "Saving…" : "Save changes"}
                 </Button>
               )}

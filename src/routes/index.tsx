@@ -1,6 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import Footer from "@/components/Footer";
-import { Button } from "@/components/ui/button";
+import { NavButton } from "@/components/ui/NavButton";
 import { company } from "@/lib/config";
 
 export const Route = createFileRoute("/")({ component: App });
@@ -15,9 +15,9 @@ function App() {
             A fresh start.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3">
-            <Button asChild size="lg">
-              <Link to="/login">Login</Link>
-            </Button>
+            <NavButton to="/login" size="lg">
+              Login
+            </NavButton>
           </div>
         </section>
       </main>

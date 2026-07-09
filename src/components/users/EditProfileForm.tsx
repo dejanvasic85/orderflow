@@ -168,7 +168,7 @@ export function EditProfileForm({ defaultValues, onSave }: EditProfileFormProps)
 
       <form.Subscribe selector={(s) => s.isSubmitting}>
         {(isSubmitting) => (
-          <Button type="submit" className="mt-1 w-full" disabled={isSubmitting}>
+          <Button type="submit" className="mt-1 w-full" loading={isSubmitting}>
             {isSubmitting ? "Saving…" : "Save details"}
           </Button>
         )}

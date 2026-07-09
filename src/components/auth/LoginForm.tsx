@@ -92,7 +92,7 @@ export function LoginForm({ onLogin }: LoginFormProps) {
 
       <form.Subscribe selector={(s) => s.isSubmitting}>
         {(isSubmitting) => (
-          <Button type="submit" className="mt-1 w-full" disabled={isSubmitting}>
+          <Button type="submit" className="mt-1 w-full" loading={isSubmitting}>
             {isSubmitting ? "Signing in…" : "Sign in"}
           </Button>
         )}

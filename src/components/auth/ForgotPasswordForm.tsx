@@ -61,7 +61,7 @@ export function ForgotPasswordForm({ onSubmit }: ForgotPasswordFormProps) {
 
       <form.Subscribe selector={(s) => s.isSubmitting}>
         {(isSubmitting) => (
-          <Button type="submit" className="mt-1 w-full" disabled={isSubmitting}>
+          <Button type="submit" className="mt-1 w-full" loading={isSubmitting}>
             {isSubmitting ? "Sending…" : "Send reset link"}
           </Button>
         )}

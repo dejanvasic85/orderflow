@@ -160,7 +160,7 @@ export function ProductEditPanel(props: Props) {
         <div className="flex items-center gap-2">
           <form.Subscribe selector={(s) => s.isSubmitting}>
             {(isSubmitting) => (
-              <Button type="submit" disabled={isSubmitting}>
+              <Button type="submit" loading={isSubmitting}>
                 {isSubmitting ? "Saving…" : submitLabel}
               </Button>
             )}

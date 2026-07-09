@@ -201,7 +201,8 @@ export function NewOrderForm({
           <Button
             size="lg"
             className="w-full sm:w-auto sm:min-w-40 sm:px-8"
-            disabled={orderableItems.length === 0 || submitting}
+            disabled={orderableItems.length === 0}
+            loading={submitting}
             onClick={handleSubmit}
           >
             {submitting ? "Submitting…" : "Submit order"}
