@@ -88,11 +88,11 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] The .server.ts files have too much logic in them or all database operations should be somewhere else
 - [x] Audit all the variable naming so they are camelCased
 - [x] Cron job in github pipelines to login to the app every day and verify all pages are functional
+- [x] Feature | Should | Loaders/pending state when clicking between nav links — currently nothing happens for ~1s which feels broken
+- [ ] Feature | Should | Better error pages
 - [ ] Redesign components to look better like the orders page and order component
 - [ ] Create test fixtures to help with the unit tests instead of inline all the data
 - [ ] Replace all the deprecated API's like `inputValidator` on the tanstack lib
-- [ ] Feature | Should | Better error pages
-- [ ] Feature | Should | Loaders/pending state when clicking between nav links — currently nothing happens for ~1s which feels broken
 
 - [x] Cleanup | Casting and typescript needs general cleanup. Once all the "as" casting is removed tighten the tsconfig to no longer allow this.
 - [ ] Cleanup | Nice | Verify Supabase repository row types match their .select() column lists (accounts/orderRequests/users/templates/dashboard repositories)

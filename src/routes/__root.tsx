@@ -4,6 +4,7 @@ import { HeadContent, Scripts, createRootRouteWithContext } from "@tanstack/reac
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { useEffect } from "react";
 import { Toaster } from "sonner";
+import { RouteProgressBar } from "@/components/layout/RouteProgressBar";
 import { ServiceWorkerRegistrar } from "@/components/ServiceWorkerRegistrar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { company } from "@/lib/config";
@@ -94,6 +95,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body className="flex min-h-dvh flex-col font-sans antialiased [overflow-wrap:anywhere]">
         <HydrationMarker />
+        <RouteProgressBar />
         <ServiceWorkerRegistrar />
         <TooltipProvider>{children}</TooltipProvider>
         <Toaster richColors />

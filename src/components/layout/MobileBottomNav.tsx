@@ -1,8 +1,9 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { KeyRound, LogOut, Settings, Users, type LucideIcon } from "lucide-react";
+import { KeyRound, Loader2, LogOut, Settings, Users, type LucideIcon } from "lucide-react";
 import { useState } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { useNavPending } from "@/hooks/use-nav-pending";
 import { cn } from "@/lib/utils";
 
 function getInitials(email: string) {
@@ -58,6 +59,7 @@ export function MobileBottomNav({
   onSignOut,
 }: MobileBottomNavProps) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isNavPending = useNavPending();
   const [accountOpen, setAccountOpen] = useState(false);
   const [manageOpen, setManageOpen] = useState(false);
 
@@ -87,9 +89,21 @@ export function MobileBottomNav({
           {navItems.map(({ label, to, icon: Icon }) => {
             const isActive = pathname === to;
             return (
-              <Link key={to} to={to} className={cn(tabClass, tabColor(isActive))}>
+              <Link
+                key={to}
+                to={to}
+                data-nav-link
+                data-pending={isNavPending(to)}
+                className={cn(tabClass, tabColor(isActive))}
+              >
                 {isActive && activeTabPill}
-                <Icon className="size-5" />
+                <span className="relative inline-flex size-5 items-center justify-center">
+                  <Icon className="size-5 [[data-pending=true]_&]:invisible" />
+                  <Loader2
+                    aria-hidden
+                    className="nav-link-spinner absolute inset-0 m-auto size-5"
+                  />
+                </span>
                 <span className={cn("font-medium", isActive && "font-semibold")}>{label}</span>
               </Link>
             );
@@ -162,6 +176,7 @@ type SheetMenuListProps = {
 };
 
 function SheetMenuList({ items, pathname, onNavigate }: SheetMenuListProps) {
+  const isNavPending = useNavPending();
   const sharedClass =
     "flex items-center gap-4 px-6 py-5 text-base font-medium hover:bg-muted active:bg-muted/70 transition-colors w-full text-left";
 
@@ -176,6 +191,8 @@ function SheetMenuList({ items, pathname, onNavigate }: SheetMenuListProps) {
               key={item.label}
               to={item.to}
               onClick={onNavigate}
+              data-nav-link
+              data-pending={isNavPending(item.to)}
               className={cn(sharedClass, isActive && "bg-muted/60")}
             >
               <Icon
@@ -185,6 +202,10 @@ function SheetMenuList({ items, pathname, onNavigate }: SheetMenuListProps) {
                 )}
               />
               <span className={cn(isActive && "font-semibold")}>{item.label}</span>
+              <Loader2
+                aria-hidden
+                className="nav-link-spinner ml-auto size-5 text-muted-foreground"
+              />
             </Link>
           );
         }
