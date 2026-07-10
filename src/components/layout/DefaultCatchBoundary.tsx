@@ -10,16 +10,24 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
+import { log } from "@/lib/log/logger";
 
 /**
  * Friendly fallback rendered when a route's loader or component throws. Users see
- * a reassuring message and recovery actions — never the raw error. The technical
- * detail is logged to the console and only surfaced on screen during development.
+ * a reassuring message and recovery actions — never the raw error.
+ *
+ * TanStack Start catches loader errors internally and renders this into a 200
+ * response, so the error never reaches the worker.ts catch. We log server-side
+ * here to close that gap (reaches Workers Logs). The log is guarded to the server
+ * render only: on the client the error surfaces in the browser console anyway, and
+ * logging in the render body would re-fire on every re-render / StrictMode pass.
  */
 export function DefaultCatchBoundary({ error }: ErrorComponentProps) {
   const router = useRouter();
 
-  console.error("Route error caught by DefaultCatchBoundary:", error);
+  if (typeof window === "undefined") {
+    log.error("route.boundary", "route error caught by DefaultCatchBoundary", { error });
+  }
 
   return (
     <main className="flex flex-1 flex-col items-center justify-center px-6 py-16">

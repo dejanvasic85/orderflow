@@ -18,10 +18,6 @@ function renderBoundary(error: Error) {
 }
 
 describe("DefaultCatchBoundary", () => {
-  beforeEach(() => {
-    vi.spyOn(console, "error").mockImplementation(() => {});
-  });
-
   test("shows a friendly message as the heading", async () => {
     renderBoundary(new Error("PGRST116: relation does not exist"));
 
@@ -39,16 +35,5 @@ describe("DefaultCatchBoundary", () => {
     renderBoundary(new Error("boom"));
     const link = await screen.findByRole("link", { name: "Go home" });
     expect(link).toHaveAttribute("href", "/");
-  });
-
-  test("logs the technical error to the console", async () => {
-    const error = new Error("relation does not exist");
-    renderBoundary(error);
-
-    await screen.findByText("Something went wrong");
-    expect(console.error).toHaveBeenCalledWith(
-      "Route error caught by DefaultCatchBoundary:",
-      error,
-    );
   });
 });
