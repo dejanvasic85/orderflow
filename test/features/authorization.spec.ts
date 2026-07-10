@@ -64,7 +64,7 @@ test.describe("Authorization — user denied access to an unassigned account", (
 
     await goto(page, `/accounts/${unassignedAccountId}`, { waitForHydration: false });
 
-    await expect(page.getByText("Something went wrong!")).toBeVisible();
+    await expect(page.getByText("Something went wrong")).toBeVisible();
     await expect(page.getByRole("heading", { name: "The Winery Bistro" })).not.toBeVisible();
   });
 });
