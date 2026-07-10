@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { KeyRound, Loader2, LogOut, Settings, Users, type LucideIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useNavPending } from "@/hooks/use-nav-pending";
@@ -62,6 +62,14 @@ export function MobileBottomNav({
   const isNavPending = useNavPending();
   const [accountOpen, setAccountOpen] = useState(false);
   const [manageOpen, setManageOpen] = useState(false);
+
+  // Link taps inside the sheets keep the sheet open so the tapped item's spinner
+  // stays visible while the destination route loads; the sheet closes once the
+  // navigation lands on the new path.
+  useEffect(() => {
+    setManageOpen(false);
+    setAccountOpen(false);
+  }, [pathname]);
 
   const isManageActive = manageGroup?.items.some((item) => item.to === pathname) ?? false;
 
@@ -186,13 +194,18 @@ function SheetMenuList({ items, pathname, onNavigate }: SheetMenuListProps) {
         const Icon = item.icon;
         if (item.kind === "link") {
           const isActive = pathname === item.to;
+          const pending = isNavPending(item.to);
           return (
             <Link
               key={item.label}
               to={item.to}
-              onClick={onNavigate}
+              // Tapping the current route won't navigate, so close the sheet
+              // immediately; other links stay open showing their spinner until
+              // the navigation lands (the parent closes on pathname change).
+              onClick={isActive ? onNavigate : undefined}
               data-nav-link
-              data-pending={isNavPending(item.to)}
+              data-pending={pending}
+              aria-busy={pending || undefined}
               className={cn(sharedClass, isActive && "bg-muted/60")}
             >
               <Icon
