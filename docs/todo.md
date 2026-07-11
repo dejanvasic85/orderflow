@@ -92,7 +92,6 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Feature | Should | Better error pages
 - [x] Redesign components to look better like the orders page and order component
 - [x] Create test fixtures to help with the unit tests instead of inline all the data
-- [ ] Replace all the deprecated API's like `inputValidator` on the tanstack lib
 
 - [x] Cleanup | Casting and typescript needs general cleanup. Once all the "as" casting is removed tighten the tsconfig to no longer allow this.
 - [ ] Cleanup | Nice | Verify Supabase repository row types match their .select() column lists (accounts/orderRequests/users/templates/dashboard repositories)
