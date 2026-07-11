@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import userEvent, { type UserEvent } from "@testing-library/user-event";
-import type { Product } from "@/lib/products/schema";
+import { makeProduct } from "@/test/fixtures/productFixtures";
 import { ProductEditPanel } from "./ProductEditPanel";
 
 vi.mock("@/components/products/ImageUpload", () => ({
@@ -18,16 +18,12 @@ vi.mock("@/components/products/ImageUpload", () => ({
   ),
 }));
 
-const existingProduct: Product = {
+const existingProduct = makeProduct({
   id: "prod-1",
   name: "Sparkling Water",
   imageUrl: "https://images.example.com/sparkling.jpg",
   qtyPerBox: 12,
-  active: true,
-  externalId: null,
-  createdAt: "2024-01-01T00:00:00Z",
-  updatedAt: "2024-01-01T00:00:00Z",
-};
+});
 
 const onSave = vi.fn();
 const onDiscard = vi.fn();

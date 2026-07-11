@@ -7,7 +7,8 @@ import {
   unassignUserFromAccount,
 } from "@/lib/accounts/accounts.functions";
 import { listUsers } from "@/lib/users/users.functions";
-import { makeAccountUser, makeUser } from "@/test/fixtures/userFixtures";
+import { makeAccountUser } from "@/test/fixtures/accountFixtures";
+import { makeUser } from "@/test/fixtures/userFixtures";
 import { AccountUserSection } from "./AccountUserSection";
 
 vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn() } }));

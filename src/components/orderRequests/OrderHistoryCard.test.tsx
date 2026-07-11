@@ -1,9 +1,9 @@
 import { render, screen } from "@testing-library/react";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import type { OrderHistoryItem } from "@/lib/orderRequests/schema";
+import { makeOrderHistoryItem } from "@/test/fixtures/orderFixtures";
 import { OrderHistoryCard } from "./OrderHistoryCard";
 
-const baseOrder: OrderHistoryItem = {
+const baseOrder = makeOrderHistoryItem({
   id: "order-abc",
   orderNumber: 42,
   placedBy: "user-1",
@@ -11,13 +11,13 @@ const baseOrder: OrderHistoryItem = {
   createdAt: "2024-06-15T12:00:00Z",
   totalBoxes: 3,
   totalUnits: 5,
-};
+});
 
-const externalOrder: OrderHistoryItem = {
+const externalOrder = makeOrderHistoryItem({
   ...baseOrder,
   placedByName: "bwow",
   placedByOrgName: "Boutique Wines of the World",
-};
+});
 
 describe("OrderHistoryCard", () => {
   it("renders the formatted order reference", () => {

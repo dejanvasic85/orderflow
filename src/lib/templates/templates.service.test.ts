@@ -1,4 +1,5 @@
 import { err, ok } from "@/lib/result";
+import { makeTemplateWithItems } from "@/test/fixtures/templateFixtures";
 import type { TemplateRepository } from "./templates.repository";
 import {
   addTemplateItem,
@@ -12,15 +13,14 @@ import {
   updateTemplate,
 } from "./templates.service";
 
-const existingTemplate = {
+const existingTemplate = makeTemplateWithItems({
   id: "tmpl-1",
   accountId: "acc-1",
   name: "Default",
   createdBy: "u-1",
   createdAt: "2024-01-01",
   updatedAt: "2024-01-01",
-  templateItems: [],
-};
+});
 
 function makeRepo(overrides: Partial<TemplateRepository> = {}): TemplateRepository {
   return {

@@ -8,8 +8,8 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as draftOrder from "@/lib/orderRequests/draftOrder";
 import type { OrderRequestItemInput } from "@/lib/orderRequests/schema";
-import type { Product } from "@/lib/products/schema";
-import type { TemplateWithItems } from "@/lib/templates/schema";
+import { makeProduct } from "@/test/fixtures/productFixtures";
+import { makeTemplateItem, makeTemplateWithItems } from "@/test/fixtures/templateFixtures";
 import { NewOrderForm } from "./NewOrderForm";
 
 vi.mock("@/lib/orderRequests/draftOrder");
@@ -22,83 +22,57 @@ const clearDraftMock = vi.mocked(draftOrder.clearDraft);
 const accountId = "b2c3d4e5-f6a7-4b8c-9d0e-000000000a01";
 
 // Products that are in the template
-const rose: Product = {
+const rose = makeProduct({
   id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001",
   name: "Rosé",
-  imageUrl: null,
   qtyPerBox: 6,
-  active: true,
-  externalId: null,
-  createdAt: "2024-01-01T00:00:00Z",
-  updatedAt: "2024-01-01T00:00:00Z",
-};
+});
 
-const pinotNoir: Product = {
+const pinotNoir = makeProduct({
   id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000002",
   name: "Pinot Noir",
-  imageUrl: null,
   qtyPerBox: 12,
-  active: true,
-  externalId: null,
-  createdAt: "2024-01-01T00:00:00Z",
-  updatedAt: "2024-01-01T00:00:00Z",
-};
+});
 
 // Products available in the catalog (not in template)
-const product1: Product = {
+const product1 = makeProduct({
   id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000003",
   name: "Chardonnay",
-  imageUrl: null,
   qtyPerBox: 6,
-  active: true,
-  externalId: null,
-  createdAt: "2024-01-01T00:00:00Z",
-  updatedAt: "2024-01-01T00:00:00Z",
-};
+});
 
-const product2: Product = {
+const product2 = makeProduct({
   id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000004",
   name: "Merlot",
-  imageUrl: null,
   qtyPerBox: 12,
-  active: true,
-  externalId: null,
-  createdAt: "2024-01-01T00:00:00Z",
-  updatedAt: "2024-01-01T00:00:00Z",
-};
+});
 
 const allProducts = [rose, pinotNoir, product1, product2];
 
-const template: TemplateWithItems = {
+const template = makeTemplateWithItems({
   id: "d4e5f6a7-b8c9-4d0e-9f2a-000000000001",
   accountId,
   name: "Weekly Wine Pack",
   createdBy: "a1b2c3d4-e5f6-4a7b-8c9d-000000000001",
-  createdAt: "2024-01-01T00:00:00Z",
-  updatedAt: "2024-01-01T00:00:00Z",
   templateItems: [
-    {
+    makeTemplateItem({
       id: "item-1",
       templateId: "d4e5f6a7-b8c9-4d0e-9f2a-000000000001",
       productId: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001",
       boxCount: 2,
       unitCount: 0,
-      createdBy: null,
-      createdAt: "2024-01-01T00:00:00Z",
       product: { id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000001", name: "Rosé", qtyPerBox: 6 },
-    },
-    {
+    }),
+    makeTemplateItem({
       id: "item-2",
       templateId: "d4e5f6a7-b8c9-4d0e-9f2a-000000000001",
       productId: "c3d4e5f6-a7b8-4c9d-8e1f-000000000002",
       boxCount: 1,
       unitCount: 3,
-      createdBy: null,
-      createdAt: "2024-01-01T00:00:00Z",
       product: { id: "c3d4e5f6-a7b8-4c9d-8e1f-000000000002", name: "Pinot Noir", qtyPerBox: 12 },
-    },
+    }),
   ],
-};
+});
 
 const onSubmit = vi.fn();
 const onBack = vi.fn();

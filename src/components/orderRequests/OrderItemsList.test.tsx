@@ -1,30 +1,12 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { OrderRequestItemInput } from "@/lib/orderRequests/schema";
-import type { Product } from "@/lib/products/schema";
+import { makeProduct } from "@/test/fixtures/productFixtures";
 import { OrderItemsList } from "./OrderItemsList";
 
-const chardonnay: Product = {
-  id: "prod-1",
-  name: "Chardonnay",
-  imageUrl: null,
-  qtyPerBox: 6,
-  active: true,
-  externalId: null,
-  createdAt: "2024-01-01T00:00:00Z",
-  updatedAt: "2024-01-01T00:00:00Z",
-};
+const chardonnay = makeProduct({ id: "prod-1", name: "Chardonnay", qtyPerBox: 6 });
 
-const merlot: Product = {
-  id: "prod-2",
-  name: "Merlot",
-  imageUrl: null,
-  qtyPerBox: 12,
-  active: true,
-  externalId: null,
-  createdAt: "2024-01-01T00:00:00Z",
-  updatedAt: "2024-01-01T00:00:00Z",
-};
+const merlot = makeProduct({ id: "prod-2", name: "Merlot", qtyPerBox: 12 });
 
 const products = [chardonnay, merlot];
 

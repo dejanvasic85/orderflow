@@ -1,4 +1,5 @@
 import { err, ok } from "@/lib/result";
+import { makeAccount, makeAccountUser } from "@/test/fixtures/accountFixtures";
 import type { AccountRepository } from "./accounts.repository";
 import {
   assignUser,
@@ -11,20 +12,14 @@ import {
   unassignUser,
   updateAccount,
 } from "./accounts.service";
-import type { Account, AccountUser } from "./schema";
+import type { Account } from "./schema";
 
-const baseAccount: Account = {
-  id: "acc-1",
+const baseAccount = makeAccount({
   name: "Boutique",
-  contactName: null,
-  contactEmail: null,
-  contactPhone: null,
-  deliveryAddress: null,
-  deliveryInstructions: null,
   createdAt: "2024-01-01",
   updatedAt: "2024-01-01",
   userCount: 2,
-};
+});
 
 function makeRepo(overrides: Partial<AccountRepository> = {}): AccountRepository {
   return {
@@ -228,7 +223,7 @@ describe("updateAccount", () => {
 
 describe("listAccountUsers", () => {
   it("delegates to repo.findAccountUsers", async () => {
-    const users: AccountUser[] = [{ userId: "u-1", createdAt: "2024-01-01", user: null }];
+    const users = [makeAccountUser({ createdAt: "2024-01-01", user: null })];
     const findAccountUsers = vi.fn().mockResolvedValue(ok(users));
     const deps = makeDeps({ repo: makeRepo({ findAccountUsers }) });
 

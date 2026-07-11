@@ -1,8 +1,8 @@
 import { render, screen } from "@testing-library/react";
-import type { OrderHistoryItem } from "@/lib/orderRequests/schema";
+import { makeOrderHistoryItem } from "@/test/fixtures/orderFixtures";
 import { OrderHistoryList } from "./OrderHistoryList";
 
-const orderOne: OrderHistoryItem = {
+const orderOne = makeOrderHistoryItem({
   id: "order-1",
   orderNumber: 1,
   placedBy: "user-1",
@@ -10,9 +10,9 @@ const orderOne: OrderHistoryItem = {
   createdAt: "2024-06-01T08:00:00Z",
   totalBoxes: 2,
   totalUnits: 0,
-};
+});
 
-const orderTwo: OrderHistoryItem = {
+const orderTwo = makeOrderHistoryItem({
   id: "order-2",
   orderNumber: 2,
   placedBy: "user-2",
@@ -20,7 +20,7 @@ const orderTwo: OrderHistoryItem = {
   createdAt: "2024-06-02T09:00:00Z",
   totalBoxes: 5,
   totalUnits: 3,
-};
+});
 
 describe("OrderHistoryList", () => {
   it("renders an empty state when there are no orders", () => {

@@ -1,17 +1,8 @@
 import { render, screen } from "@testing-library/react";
-import type { Product } from "@/lib/products/schema";
+import { makeProduct } from "@/test/fixtures/productFixtures";
 import { ProductCard } from "./ProductCard";
 
-const product: Product = {
-  id: "prod-1",
-  name: "Sparkling Water",
-  imageUrl: null,
-  qtyPerBox: 24,
-  active: true,
-  externalId: null,
-  createdAt: "2024-01-01T00:00:00Z",
-  updatedAt: "2024-01-01T00:00:00Z",
-};
+const product = makeProduct({ id: "prod-1", name: "Sparkling Water", qtyPerBox: 24 });
 
 test("renders product name", () => {
   render(<ProductCard product={product} />);
