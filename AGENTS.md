@@ -209,6 +209,15 @@ Do not unit-test shadcn primitives directly, trivial pass-through components, or
 - Use `*.test.ts` for logic, `*.test.tsx` for components
 - File naming follows the source file: PascalCase for component tests, camelCase for module tests
 
+### Test fixtures
+
+Build domain-model test data with the fixture factories in `src/test/fixtures/<entity>Fixtures.ts`
+(imported via `@/test/fixtures/...`) instead of hand-writing full object literals. Each entity exposes
+a `make<Entity>(overrides: Partial<T> = {}): T` that fills sensible defaults; pass only the fields a
+test actually asserts on via `overrides` so the test still reads self-contained (DAMP). Entities with a
+snake_case repository-row variant also expose a `make<Entity>Row` for service-layer repo mocks. Add a
+new factory here when you introduce an entity that more than one test needs to construct.
+
 ### Style — keep tests simple and DAMP, not DRY
 
 Per _Software Engineering at Google_: **test code should contain no logic**. A test that needs reasoning to verify is a test that itself needs tests. Prefer obvious, repetitive, linear tests over clever ones.

@@ -30,6 +30,7 @@ const config = defineConfig({
       include: ["src/**/*.{ts,tsx}"],
       exclude: [
         "src/**/*.{test,spec}.{ts,tsx}",
+        "src/test/**",
         "src/components/ui/**",
         "src/routeTree.gen.ts",
         "src/router.tsx",

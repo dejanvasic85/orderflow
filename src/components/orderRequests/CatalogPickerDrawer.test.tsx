@@ -1,23 +1,9 @@
 import { render, screen } from "@testing-library/react";
 import userEvent, { type UserEvent } from "@testing-library/user-event";
-import type { Product } from "@/lib/products/schema";
+import { makeProduct } from "@/test/fixtures/productFixtures";
 import { CatalogPickerDrawer } from "./CatalogPickerDrawer";
 
-function makeProduct(overrides: Partial<Product> = {}): Product {
-  return {
-    id: "prod-1",
-    name: "Sparkling Water",
-    imageUrl: null,
-    qtyPerBox: 24,
-    active: true,
-    externalId: null,
-    createdAt: "2024-01-01T00:00:00Z",
-    updatedAt: "2024-01-01T00:00:00Z",
-    ...overrides,
-  };
-}
-
-const products: Product[] = [
+const products = [
   makeProduct({ id: "prod-1", name: "Sparkling Water" }),
   makeProduct({ id: "prod-2", name: "Still Water" }),
   makeProduct({ id: "prod-3", name: "Orange Juice" }),

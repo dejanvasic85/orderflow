@@ -1,4 +1,5 @@
 import { err, ok } from "@/lib/result";
+import { makeDashboardOrder } from "@/test/fixtures/dashboardFixtures";
 import type { DashboardRepository } from "./dashboard.repository";
 import {
   buildKpiSummary,
@@ -10,27 +11,12 @@ import {
   orderUnitVolume,
   type DashboardServiceDeps,
 } from "./dashboard.service";
-import type { DashboardOrder } from "./schema";
 
 function makeRepo(overrides: Partial<DashboardRepository> = {}): DashboardRepository {
   return {
     findOrdersWithItemsSince: vi.fn().mockResolvedValue(ok([])),
     countActiveAccounts: vi.fn().mockResolvedValue(ok(0)),
     countActiveProducts: vi.fn().mockResolvedValue(ok(0)),
-    ...overrides,
-  };
-}
-
-function makeOrder(overrides: Partial<DashboardOrder> = {}): DashboardOrder {
-  return {
-    id: "order-1",
-    orderNumber: 1,
-    createdAt: "2026-06-01T10:00:00Z",
-    accountId: "acc-1",
-    placedBy: "user-1",
-    items: [],
-    account: { id: "acc-1", name: "Acme Wines" },
-    user: { id: "user-1", name: "Tom Reynolds", role: "user" },
     ...overrides,
   };
 }
@@ -78,7 +64,7 @@ describe("itemUnitVolume", () => {
 
 describe("orderUnitVolume", () => {
   it("sums volumes across all items", () => {
-    const order = makeOrder({
+    const order = makeDashboardOrder({
       items: [
         {
           productId: "p-1",
@@ -99,7 +85,7 @@ describe("orderUnitVolume", () => {
   });
 
   it("returns zero for an order with no items", () => {
-    expect(orderUnitVolume(makeOrder({ items: [] }))).toBe(0);
+    expect(orderUnitVolume(makeDashboardOrder({ items: [] }))).toBe(0);
   });
 });
 
@@ -115,7 +101,7 @@ describe("buildKpiSummary", () => {
 
   it("counts all orders as totalOrders and sums volume", () => {
     const orders = [
-      makeOrder({
+      makeDashboardOrder({
         createdAt: "2026-06-10T00:00:00Z",
         items: [
           {
@@ -126,7 +112,7 @@ describe("buildKpiSummary", () => {
           },
         ],
       }),
-      makeOrder({
+      makeDashboardOrder({
         id: "order-2",
         createdAt: "2026-06-12T00:00:00Z",
         items: [
@@ -152,10 +138,10 @@ describe("buildKpiSummary", () => {
     // current: [now-30d, now) = [May 21, June 20) — 3 orders
     // prior:   [now-60d, now-30d) = [Apr 21, May 21) — 1 order
     const orders = [
-      makeOrder({ id: "o-1", createdAt: "2026-06-10T00:00:00Z" }),
-      makeOrder({ id: "o-2", createdAt: "2026-06-05T00:00:00Z" }),
-      makeOrder({ id: "o-3", createdAt: "2026-05-25T00:00:00Z" }),
-      makeOrder({ id: "o-4", createdAt: "2026-04-30T00:00:00Z" }),
+      makeDashboardOrder({ id: "o-1", createdAt: "2026-06-10T00:00:00Z" }),
+      makeDashboardOrder({ id: "o-2", createdAt: "2026-06-05T00:00:00Z" }),
+      makeDashboardOrder({ id: "o-3", createdAt: "2026-05-25T00:00:00Z" }),
+      makeDashboardOrder({ id: "o-4", createdAt: "2026-04-30T00:00:00Z" }),
     ];
 
     const result = buildKpiSummary(orders, 5, 11, fixedNow);
@@ -173,7 +159,7 @@ describe("buildKpiSummary", () => {
 
   it("handles divide-by-zero when prior period has no orders", () => {
     // Only orders in current period
-    const orders = [makeOrder({ createdAt: "2026-06-10T00:00:00Z" })];
+    const orders = [makeDashboardOrder({ createdAt: "2026-06-10T00:00:00Z" })];
 
     const result = buildKpiSummary(orders, 0, 0, fixedNow);
 
@@ -198,8 +184,8 @@ describe("buildOrderTimeSeries", () => {
 
   it("increments count for orders on the same day", () => {
     const orders = [
-      makeOrder({ id: "o-1", createdAt: "2026-06-15T09:00:00Z" }),
-      makeOrder({ id: "o-2", createdAt: "2026-06-15T14:00:00Z" }),
+      makeDashboardOrder({ id: "o-1", createdAt: "2026-06-15T09:00:00Z" }),
+      makeDashboardOrder({ id: "o-2", createdAt: "2026-06-15T14:00:00Z" }),
     ];
 
     const result = buildOrderTimeSeries(orders, "30d", fixedNow);
@@ -209,7 +195,7 @@ describe("buildOrderTimeSeries", () => {
   });
 
   it("includes orders placed today (the last bucket)", () => {
-    const orders = [makeOrder({ id: "o-today", createdAt: "2026-06-20T08:00:00Z" })];
+    const orders = [makeDashboardOrder({ id: "o-today", createdAt: "2026-06-20T08:00:00Z" })];
 
     const result = buildOrderTimeSeries(orders, "30d", fixedNow);
     const todayBucket = result.find((p) => p.date === "2026-06-20");
@@ -220,8 +206,8 @@ describe("buildOrderTimeSeries", () => {
   it("excludes orders outside the window", () => {
     // 7d window: since = June 13 (fixedNow Jun 20 minus 7 days)
     const orders = [
-      makeOrder({ id: "o-in", createdAt: "2026-06-14T00:00:00Z" }),
-      makeOrder({ id: "o-out", createdAt: "2026-06-10T00:00:00Z" }),
+      makeDashboardOrder({ id: "o-in", createdAt: "2026-06-14T00:00:00Z" }),
+      makeDashboardOrder({ id: "o-out", createdAt: "2026-06-10T00:00:00Z" }),
     ];
 
     const result = buildOrderTimeSeries(orders, "7d", fixedNow);
@@ -254,7 +240,7 @@ describe("buildTopProducts", () => {
 
   it("ranks products by descending unit volume", () => {
     const orders = [
-      makeOrder({
+      makeDashboardOrder({
         items: [
           {
             productId: "p-1",
@@ -282,7 +268,7 @@ describe("buildTopProducts", () => {
 
   it("sums volumes for the same product across multiple orders", () => {
     const orders = [
-      makeOrder({
+      makeDashboardOrder({
         id: "o-1",
         items: [
           {
@@ -293,7 +279,7 @@ describe("buildTopProducts", () => {
           },
         ],
       }),
-      makeOrder({
+      makeDashboardOrder({
         id: "o-2",
         items: [
           {
@@ -314,7 +300,7 @@ describe("buildTopProducts", () => {
 
   it("breaks ties alphabetically by product name", () => {
     const orders = [
-      makeOrder({
+      makeDashboardOrder({
         items: [
           {
             productId: "p-b",
@@ -345,14 +331,14 @@ describe("buildTopProducts", () => {
       extraUnits: 0,
       product: { id: `p-${i}`, name: `Product ${i}`, qtyPerBox: 6 },
     }));
-    const orders = [makeOrder({ items })];
+    const orders = [makeDashboardOrder({ items })];
 
     expect(buildTopProducts(orders, 5)).toHaveLength(5);
   });
 
   it("skips items with no product join", () => {
     const orders = [
-      makeOrder({
+      makeDashboardOrder({
         items: [{ productId: "p-1", boxes: 2, extraUnits: 0, product: null }],
       }),
     ];
@@ -367,7 +353,7 @@ describe("buildRecentActivity", () => {
   });
 
   it("maps the order fields correctly", () => {
-    const order = makeOrder({
+    const order = makeDashboardOrder({
       orderNumber: 7,
       createdAt: "2026-06-15T10:00:00Z",
       account: { id: "acc-1", name: "Acme Wines" },
@@ -392,8 +378,8 @@ describe("buildRecentActivity", () => {
   });
 
   it("masks admin and staff placed-by as bwow", () => {
-    const adminOrder = makeOrder({ user: { id: "u-1", name: "Jane Doe", role: "admin" } });
-    const staffOrder = makeOrder({
+    const adminOrder = makeDashboardOrder({ user: { id: "u-1", name: "Jane Doe", role: "admin" } });
+    const staffOrder = makeDashboardOrder({
       id: "order-2",
       user: { id: "u-2", name: "Sarah", role: "staff" },
     });
@@ -406,7 +392,7 @@ describe("buildRecentActivity", () => {
   });
 
   it("falls back to Unknown when user join is null", () => {
-    const order = makeOrder({ user: null });
+    const order = makeDashboardOrder({ user: null });
 
     const [item] = buildRecentActivity([order]);
 
@@ -414,7 +400,7 @@ describe("buildRecentActivity", () => {
   });
 
   it("uses Unknown for account when account join is null", () => {
-    const order = makeOrder({ account: null });
+    const order = makeDashboardOrder({ account: null });
 
     const [item] = buildRecentActivity([order]);
 
@@ -423,14 +409,14 @@ describe("buildRecentActivity", () => {
 
   it("slices to the limit (default 8)", () => {
     const orders = Array.from({ length: 12 }, (_, i) =>
-      makeOrder({ id: `order-${i}`, orderNumber: i + 1 }),
+      makeDashboardOrder({ id: `order-${i}`, orderNumber: i + 1 }),
     );
 
     expect(buildRecentActivity(orders)).toHaveLength(8);
   });
 
   it("returns all orders when fewer than the limit", () => {
-    const orders = [makeOrder(), makeOrder({ id: "order-2", orderNumber: 2 })];
+    const orders = [makeDashboardOrder(), makeDashboardOrder({ id: "order-2", orderNumber: 2 })];
 
     expect(buildRecentActivity(orders)).toHaveLength(2);
   });

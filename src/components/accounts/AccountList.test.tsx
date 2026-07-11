@@ -1,6 +1,6 @@
 import { act, render, screen } from "@testing-library/react";
 import userEvent, { type UserEvent } from "@testing-library/user-event";
-import type { Account } from "@/lib/accounts/schema";
+import { makeAccount } from "@/test/fixtures/accountFixtures";
 import { AccountList } from "./AccountList";
 
 vi.mock("@tanstack/react-router", () => ({
@@ -26,7 +26,7 @@ vi.mock("@tanstack/react-router", () => ({
   },
 }));
 
-const account: Account = {
+const account = makeAccount({
   id: "acc-1",
   name: "Acme Corp",
   contactName: "Jane Doe",
@@ -34,23 +34,10 @@ const account: Account = {
   contactPhone: "0412345678",
   deliveryAddress: "1 Main St",
   deliveryInstructions: "Leave at door",
-  createdAt: "2024-01-01T00:00:00Z",
-  updatedAt: "2024-01-01T00:00:00Z",
   userCount: 3,
-};
+});
 
-const accountWithNullContacts: Account = {
-  id: "acc-2",
-  name: "Defunct Inc",
-  contactName: null,
-  contactEmail: null,
-  contactPhone: null,
-  deliveryAddress: null,
-  deliveryInstructions: null,
-  createdAt: "2024-01-01T00:00:00Z",
-  updatedAt: "2024-01-01T00:00:00Z",
-  userCount: 0,
-};
+const accountWithNullContacts = makeAccount({ id: "acc-2", name: "Defunct Inc" });
 
 const defaultProps = {
   total: 2,

@@ -1,8 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import userEvent, { type UserEvent } from "@testing-library/user-event";
-import type { Account } from "@/lib/accounts/schema";
-import type { Product } from "@/lib/products/schema";
-import type { TemplateWithItems } from "@/lib/templates/schema";
+import { makeAccount } from "@/test/fixtures/accountFixtures";
+import { makeProduct } from "@/test/fixtures/productFixtures";
+import { makeTemplateItem, makeTemplateWithItems } from "@/test/fixtures/templateFixtures";
 import { TemplateEditor } from "./TemplateEditor";
 
 vi.mock("@tanstack/react-router", () => ({
@@ -30,62 +30,28 @@ vi.mock("@/components/orderRequests/CatalogPickerDrawer", () => ({
   },
 }));
 
-const account: Account = {
-  id: "acc-1",
-  name: "Acme Corp",
-  contactName: null,
-  contactEmail: null,
-  contactPhone: null,
-  deliveryAddress: null,
-  deliveryInstructions: null,
-  createdAt: "2024-01-01T00:00:00Z",
-  updatedAt: "2024-01-01T00:00:00Z",
-  userCount: 0,
-};
+const account = makeAccount({ id: "acc-1", name: "Acme Corp" });
 
-const products: Product[] = [
-  {
-    id: "prod-1",
-    name: "Chardonnay",
-    imageUrl: null,
-    qtyPerBox: 6,
-    active: true,
-    externalId: null,
-    createdAt: "2024-01-01T00:00:00Z",
-    updatedAt: "2024-01-01T00:00:00Z",
-  },
-  {
-    id: "prod-2",
-    name: "Rosé",
-    imageUrl: null,
-    qtyPerBox: 12,
-    active: true,
-    externalId: null,
-    createdAt: "2024-01-01T00:00:00Z",
-    updatedAt: "2024-01-01T00:00:00Z",
-  },
+const products = [
+  makeProduct({ id: "prod-1", name: "Chardonnay", qtyPerBox: 6 }),
+  makeProduct({ id: "prod-2", name: "Rosé", qtyPerBox: 12 }),
 ];
 
-const templateWithOneItem: TemplateWithItems = {
+const templateWithOneItem = makeTemplateWithItems({
   id: "tmpl-1",
   accountId: "acc-1",
   name: "Default",
-  createdBy: null,
-  createdAt: "2024-01-01T00:00:00Z",
-  updatedAt: "2024-01-01T00:00:00Z",
   templateItems: [
-    {
+    makeTemplateItem({
       id: "item-1",
       templateId: "tmpl-1",
       productId: "prod-1",
       boxCount: 2,
       unitCount: 3,
-      createdBy: null,
-      createdAt: "2024-01-01T00:00:00Z",
       product: { id: "prod-1", name: "Chardonnay", qtyPerBox: 6 },
-    },
+    }),
   ],
-};
+});
 
 const onSave = vi.fn<() => Promise<void>>().mockResolvedValue(undefined);
 

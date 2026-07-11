@@ -1,24 +1,17 @@
 import { render, screen } from "@testing-library/react";
 import userEvent, { type UserEvent } from "@testing-library/user-event";
-import type { User } from "@/lib/users/schema";
+import { makeUser } from "@/test/fixtures/userFixtures";
 import { UserEditPanel } from "./UserEditPanel";
 
 vi.mock("sonner", () => ({ toast: { success: vi.fn() } }));
 
-const baseUser: User = {
-  id: "u-1",
+const baseUser = makeUser({
   name: "Alice Smith",
   email: "alice@example.com",
-  phone: null,
-  active: true,
   inviteAcceptedAt: "2024-01-02T00:00:00Z",
   invitedAt: "2024-01-01T00:00:00Z",
   role: "staff",
-  notificationPreferences: { email: true, sms: false },
-  createdAt: "2024-01-01T00:00:00Z",
-  updatedAt: "2024-01-01T00:00:00Z",
-  accounts: [],
-};
+});
 
 const onSave = vi.fn();
 const onDiscard = vi.fn();

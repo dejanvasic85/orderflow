@@ -1,52 +1,37 @@
 import { act, render, screen } from "@testing-library/react";
 import userEvent, { type UserEvent } from "@testing-library/user-event";
-import type { User } from "@/lib/users/schema";
+import { makeUser } from "@/test/fixtures/userFixtures";
 import { UserList } from "./UserList";
 
-const adminUser: User = {
+const adminUser = makeUser({
   id: "1",
   name: "Alice Admin",
   email: "alice@example.com",
-  phone: null,
-  active: true,
   inviteAcceptedAt: "2024-01-02T00:00:00Z",
   invitedAt: "2024-01-01T00:00:00Z",
   role: "admin",
-  notificationPreferences: { email: true, sms: false },
-  createdAt: "2024-01-01T00:00:00Z",
-  updatedAt: "2024-01-01T00:00:00Z",
   accounts: [{ id: "acc-1", name: "Acme" }],
-};
+});
 
-const staffUser: User = {
+const staffUser = makeUser({
   id: "2",
   name: "Bob Staff",
   email: "bob@example.com",
-  phone: null,
   active: false,
   inviteAcceptedAt: "2024-01-02T00:00:00Z",
   invitedAt: "2024-01-01T00:00:00Z",
   role: "staff",
   notificationPreferences: { email: false, sms: false },
-  createdAt: "2024-01-01T00:00:00Z",
-  updatedAt: "2024-01-01T00:00:00Z",
-  accounts: [],
-};
+});
 
-const pendingUser: User = {
+const pendingUser = makeUser({
   id: "3",
   name: "Carol Pending",
   email: "carol@example.com",
-  phone: null,
-  active: true,
   inviteAcceptedAt: null,
   invitedAt: "2024-01-01T00:00:00Z",
   role: "user",
-  notificationPreferences: { email: true, sms: false },
-  createdAt: "2024-01-01T00:00:00Z",
-  updatedAt: "2024-01-01T00:00:00Z",
-  accounts: [],
-};
+});
 
 const onSelectUser = vi.fn();
 const onRoleFilterChange = vi.fn();

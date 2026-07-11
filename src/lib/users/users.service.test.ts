@@ -1,4 +1,6 @@
 import { err, ok } from "@/lib/result";
+import { makeFakeLog } from "@/test/fixtures/logFixtures";
+import { makeUserRow } from "@/test/fixtures/userFixtures";
 import type { UserRepository } from "./users.repository";
 import {
   checkEmailExists,
@@ -16,20 +18,14 @@ import {
   updateUserAccounts,
 } from "./users.service";
 
-const baseListedRow = {
-  id: "u-1",
+const baseListedRow = makeUserRow({
   name: "Jane Smith",
   email: "jane@example.com",
   phone: "0412345678",
-  active: true,
-  invite_accepted_at: null,
-  invited_at: null,
-  role: "user" as const,
-  notification_preferences: { email: true, sms: false },
   created_at: "2024-01-01",
   updated_at: "2024-01-01",
   account_users: [{ account: { id: "acc-1", name: "Wines Co" } }],
-};
+});
 
 function makeRepo(overrides: Partial<UserRepository> = {}): UserRepository {
   return {
@@ -57,7 +53,7 @@ function makeRepo(overrides: Partial<UserRepository> = {}): UserRepository {
   };
 }
 
-const fakeLog = { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() };
+const fakeLog = makeFakeLog();
 
 function makeDeps(overrides: Partial<UserServiceDeps> = {}): UserServiceDeps {
   return {

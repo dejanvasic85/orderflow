@@ -1,4 +1,6 @@
 import { err, ok } from "@/lib/result";
+import { makeFakeLog } from "@/test/fixtures/logFixtures";
+import { makeCreateOrderRequestInput, makeOrderHistoryRow } from "@/test/fixtures/orderFixtures";
 import type { OrderRequestRepository } from "./orderRequests.repository";
 import {
   listAllOrderHistory,
@@ -44,17 +46,16 @@ describe("resolvePlacedByName", () => {
 
 describe("mapOrderHistoryRow", () => {
   it("sums boxes and units and resolves the placed-by name", () => {
-    const result = mapOrderHistoryRow({
-      id: "order-1",
-      orderNumber: 7,
-      placedBy: "u-1",
-      createdAt: "2024-01-01T00:00:00Z",
-      items: [
-        { boxes: 2, extraUnits: 1 },
-        { boxes: 3, extraUnits: 4 },
-      ],
-      user: { id: "u-1", name: "Jane Smith", role: "user" },
-    });
+    const result = mapOrderHistoryRow(
+      makeOrderHistoryRow({
+        orderNumber: 7,
+        items: [
+          { boxes: 2, extraUnits: 1 },
+          { boxes: 3, extraUnits: 4 },
+        ],
+        user: { id: "u-1", name: "Jane Smith", role: "user" },
+      }),
+    );
 
     expect(result).toEqual({
       id: "order-1",
@@ -68,29 +69,26 @@ describe("mapOrderHistoryRow", () => {
   });
 
   it("includes the account name and id when an account is present", () => {
-    const result = mapOrderHistoryRow({
-      id: "order-1",
-      orderNumber: 7,
-      placedBy: "u-1",
-      createdAt: "2024-01-01T00:00:00Z",
-      items: [],
-      user: { id: "u-1", name: "Jane Smith", role: "user" },
-      account: { id: "acc-1", name: "Acme Wines" },
-    });
+    const result = mapOrderHistoryRow(
+      makeOrderHistoryRow({
+        orderNumber: 7,
+        user: { id: "u-1", name: "Jane Smith", role: "user" },
+        account: { id: "acc-1", name: "Acme Wines" },
+      }),
+    );
 
     expect(result.accountName).toBe("Acme Wines");
     expect(result.accountId).toBe("acc-1");
   });
 
   it("treats null box and unit counts as zero", () => {
-    const result = mapOrderHistoryRow({
-      id: "order-1",
-      orderNumber: 7,
-      placedBy: "u-1",
-      createdAt: "2024-01-01T00:00:00Z",
-      items: [{ boxes: null, extraUnits: null }],
-      user: null,
-    });
+    const result = mapOrderHistoryRow(
+      makeOrderHistoryRow({
+        orderNumber: 7,
+        items: [{ boxes: null, extraUnits: null }],
+        user: null,
+      }),
+    );
 
     expect(result.totalBoxes).toBe(0);
     expect(result.totalUnits).toBe(0);
@@ -129,13 +127,9 @@ function makeRepo(overrides: Partial<OrderRequestRepository> = {}): OrderRequest
   };
 }
 
-const orderInput = {
-  accountId: "acc-1",
-  items: [{ productId: "p-1", boxes: 2, extraUnits: 1 }],
-  deliveryAddress: "1 Vine St",
-};
+const orderInput = makeCreateOrderRequestInput({ deliveryAddress: "1 Vine St" });
 
-const fakeLog = { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() };
+const fakeLog = makeFakeLog();
 
 describe("placeOrder", () => {
   it("creates the order with the session user's id", async () => {
@@ -298,14 +292,11 @@ describe("listAllOrderHistory", () => {
       findAllOrderHistory: vi.fn().mockResolvedValue(
         ok({
           rows: [
-            {
-              id: "order-1",
+            makeOrderHistoryRow({
               orderNumber: 7,
-              placedBy: "u-1",
-              createdAt: "2024-01-01T00:00:00Z",
               items: [{ boxes: 2, extraUnits: 1 }],
               user: { id: "u-1", name: "Jane Smith", role: "user" },
-            },
+            }),
           ],
           total: 1,
         }),
