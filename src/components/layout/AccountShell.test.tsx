@@ -48,6 +48,20 @@ describe("AccountShell", () => {
     expect(header.querySelector('a[href="/accounts/abc123/browse"]')).toBeInTheDocument();
   });
 
+  test("renders a New Order mobile tab pointing to the account's new order route", async () => {
+    renderShell({ accountId: "abc123" });
+
+    const link = await screen.findByRole("link", { name: /new order/i });
+    expect(link).toHaveAttribute("href", "/accounts/abc123/orders/new");
+  });
+
+  test("New Order tab falls back to the account picker when no account is active", async () => {
+    renderShell({ accountId: "" });
+
+    const link = await screen.findByRole("link", { name: /new order/i });
+    expect(link).toHaveAttribute("href", "/accounts");
+  });
+
   test("calls onSignOut when Sign out is clicked", async () => {
     const user = userEvent.setup();
     renderShell();

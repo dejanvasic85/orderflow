@@ -90,7 +90,7 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Cron job in github pipelines to login to the app every day and verify all pages are functional
 - [x] Feature | Should | Loaders/pending state when clicking between nav links — currently nothing happens for ~1s which feels broken
 - [x] Feature | Should | Better error pages
-- [ ] Redesign components to look better like the orders page and order component
+- [x] Redesign components to look better like the orders page and order component
 - [ ] Create test fixtures to help with the unit tests instead of inline all the data
 - [ ] Replace all the deprecated API's like `inputValidator` on the tanstack lib
 

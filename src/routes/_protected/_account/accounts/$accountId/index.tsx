@@ -40,7 +40,8 @@ function AccountPage() {
       <PageHeader
         title={account.name}
         actions={
-          <Button onClick={handleCreateOrder}>
+          // Hidden on mobile — the bottom nav provides the "New Order" shortcut there.
+          <Button onClick={handleCreateOrder} className="hidden md:inline-flex">
             <Plus className="mr-2 h-4 w-4" />
             New Order
           </Button>

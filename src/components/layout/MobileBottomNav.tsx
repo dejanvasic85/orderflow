@@ -73,6 +73,8 @@ export function MobileBottomNav({
 
   const isManageActive = manageGroup?.items.some((item) => item.to === pathname) ?? false;
 
+  const navTargets = navItems.map((item) => item.to);
+
   const accountMenuItems: SheetMenuItem[] = [
     ...(hasMultipleAccounts
       ? [{ label: "Change account", icon: Users, kind: "link" as const, to: "/accounts" }]
@@ -101,7 +103,7 @@ export function MobileBottomNav({
                 key={to}
                 to={to}
                 data-nav-link
-                data-pending={isNavPending(to)}
+                data-pending={isNavPending(to, navTargets)}
                 className={cn(tabClass, tabColor(isActive))}
               >
                 {isActive && activeTabPill}

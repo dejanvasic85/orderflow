@@ -1,4 +1,4 @@
-import { BookOpenIcon, ShoppingCartIcon } from "lucide-react";
+import { BookOpenIcon, PlusIcon, ShoppingCartIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { AccountTopNav } from "./AccountTopNav";
 import { MobileBottomNav } from "./MobileBottomNav";
@@ -23,8 +23,13 @@ export function AccountShell({
     { label: "Browse", to: `/accounts/${accountId}/browse` },
   ];
 
+  // When no account is active (the /accounts picker for multi-account users),
+  // "New Order" routes to the picker so an account is chosen first.
+  const newOrderTo = accountId ? `/accounts/${accountId}/orders/new` : "/accounts";
+
   const mobileNavItems = [
     { label: "Orders", to: `/accounts/${accountId}`, icon: ShoppingCartIcon },
+    { label: "New Order", to: newOrderTo, icon: PlusIcon },
     { label: "Browse", to: `/accounts/${accountId}/browse`, icon: BookOpenIcon },
   ] as const;
 
