@@ -1,4 +1,13 @@
-import { ArrowLeft, Box, Calendar, MapPin, Package, RefreshCw, User2 } from "lucide-react";
+import {
+  ArrowLeft,
+  BottleWine,
+  Box,
+  Calendar,
+  CalendarDays,
+  MapPin,
+  RefreshCw,
+  User2,
+} from "lucide-react";
 import { OrderItemCard } from "@/components/orderRequests/OrderItemCard";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -42,15 +51,14 @@ export function OrderDetailsView({
         )}
       </div>
 
-      <div className="flex flex-col gap-1.5">
-        <div className="flex items-baseline gap-3">
-          <h2 className="font-mono text-2xl font-bold tracking-tight">
-            {formatOrderRef(order.orderNumber)}
-          </h2>
-          <span className="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">
-            {formatDate(order.createdAt)} at {formatTime(order.createdAt)}
-          </span>
-        </div>
+      <div className="flex flex-col items-start gap-2.5 sm:flex-row sm:items-baseline sm:gap-3">
+        <h2 className="font-mono text-2xl font-bold tracking-tight whitespace-nowrap">
+          {formatOrderRef(order.orderNumber)}
+        </h2>
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium whitespace-nowrap text-muted-foreground">
+          <CalendarDays className="size-3 shrink-0" />
+          {formatDate(order.createdAt)} at {formatTime(order.createdAt)}
+        </span>
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -61,7 +69,7 @@ export function OrderDetailsView({
           value={String(totalBoxes)}
         />
         <MetaTile
-          icon={<Package className="h-4 w-4" />}
+          icon={<BottleWine className="h-4 w-4" />}
           label="Extra units"
           value={String(totalUnits)}
         />
