@@ -1,10 +1,5 @@
 # Todo list - MVP
 
-Format: `[status] Category | Priority | Description`
-
-Categories: `Productionising` · `Feature` · `Infra` · `Quality` · `Cleanup`
-Priorities: `Must` · `Should` · `Nice`
-
 - [x] Infra | Must | Rename bww to bwow including admin email
 - [x] Infra | Must | Layout components — update agents.md instructions and skills for UI development
 - [x] Infra | Must | Form library and validation — replace all useState in UserEditPanel
@@ -92,22 +87,6 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Feature | Should | Better error pages
 - [x] Redesign components to look better like the orders page and order component
 - [x] Create test fixtures to help with the unit tests instead of inline all the data
-
 - [x] Cleanup | Casting and typescript needs general cleanup. Once all the "as" casting is removed tighten the tsconfig to no longer allow this.
-- [ ] Cleanup | Nice | Verify Supabase repository row types match their .select() column lists (accounts/orderRequests/users/templates/dashboard repositories)
-
 - [x] Cleanup | Improve the code pattern around fetching and checking result
-
-```ts
-const existingResult = await fetchTemplateForAccount(data.account_id);
-if (!existingResult.ok) return existingResult;
-```
-
 - [x] Cleanup | Page loaders are could be improved with this pattern of reading and throwing:
-
-```ts
-if (!accountResult.ok) throw new Error(accountResult.error.message);
-if (!accountResult.value) throw notFound();
-if (!templateResult.ok) throw new Error(templateResult.error.message);
-if (!productsResult.ok) throw new Error(productsResult.error.message);
-```
