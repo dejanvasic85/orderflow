@@ -5,12 +5,12 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { getDashboardStats } from "@/lib/dashboard/dashboard.functions";
 import type { DashboardData } from "@/lib/dashboard/schema";
 import { asResult } from "@/lib/result";
+import { unwrapOrThrow } from "@/lib/resultLoader";
 
 export const Route = createFileRoute("/_protected/manage/dashboard")({
   loader: async () => {
     const result = asResult<DashboardData>(await getDashboardStats());
-    if (!result.ok) throw new Error(result.error.message);
-    return result.value;
+    return unwrapOrThrow(result);
   },
   component: DashboardPage,
 });

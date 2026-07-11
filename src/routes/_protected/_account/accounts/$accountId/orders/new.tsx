@@ -9,6 +9,7 @@ import type { OrderRequestItemInput } from "@/lib/orderRequests/schema";
 import { listProducts } from "@/lib/products/products.functions";
 import type { Product } from "@/lib/products/schema";
 import { asResult } from "@/lib/result";
+import { unwrapOrThrow, valueOrNotFound } from "@/lib/resultLoader";
 import { getTemplateForAccount } from "@/lib/templates/templates.functions";
 
 const searchSchema = z.object({
@@ -27,18 +28,16 @@ export const Route = createFileRoute("/_protected/_account/accounts/$accountId/o
       listProducts().then((r) => asResult<Product[]>(r)),
     ]);
 
-    if (!accountResult.ok) throw new Error(accountResult.error.message);
-    if (!accountResult.value) throw notFound();
-    if (!templateResult.ok) throw new Error(templateResult.error.message);
-    if (!productsResult.ok) throw new Error(productsResult.error.message);
+    const account = valueOrNotFound(unwrapOrThrow(accountResult));
+    const template = unwrapOrThrow(templateResult);
+    const products = unwrapOrThrow(productsResult);
 
     let initialItems: OrderRequestItemInput[] | undefined;
     if (deps.fromOrderId) {
       const sourceOrderResult = await getOrderRequest({ data: deps.fromOrderId });
-      if (!sourceOrderResult.ok) throw new Error(sourceOrderResult.error.message);
-      if (!sourceOrderResult.value) throw notFound();
-      if (sourceOrderResult.value.accountId !== params.accountId) throw notFound();
-      initialItems = sourceOrderResult.value.orderRequestItems.map((i) => ({
+      const sourceOrder = valueOrNotFound(unwrapOrThrow(sourceOrderResult));
+      if (sourceOrder.accountId !== params.accountId) throw notFound();
+      initialItems = sourceOrder.orderRequestItems.map((i) => ({
         productId: i.productId,
         boxes: i.boxes ?? 0,
         extraUnits: i.extraUnits ?? 0,
@@ -46,9 +45,9 @@ export const Route = createFileRoute("/_protected/_account/accounts/$accountId/o
     }
 
     return {
-      account: accountResult.value,
-      template: templateResult.value,
-      products: productsResult.value,
+      account,
+      template,
+      products,
       initialItems,
     };
   },
@@ -81,12 +80,12 @@ function NewOrderPage() {
         items,
       },
     });
-    if (!result.ok) throw new Error(result.error.message);
+    const order = unwrapOrThrow(result);
     toast.success("Order request submitted");
     clearDraft(accountId);
     void navigate({
       to: "/accounts/$accountId/orders/$orderId/success",
-      params: { accountId, orderId: result.value.id },
+      params: { accountId, orderId: order.id },
     });
   }
 

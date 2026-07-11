@@ -7,6 +7,7 @@ import { listPagedProducts } from "@/lib/products/products.functions";
 import type { PagedProductsResult } from "@/lib/products/schema";
 import { listProductsSearchSchema, productPageSize } from "@/lib/products/schema";
 import { asResult } from "@/lib/result";
+import { unwrapOrThrow } from "@/lib/resultLoader";
 
 export const Route = createFileRoute("/_protected/_account/accounts/$accountId/browse")({
   validateSearch: listProductsSearchSchema,
@@ -15,8 +16,8 @@ export const Route = createFileRoute("/_protected/_account/accounts/$accountId/b
     const result = asResult<PagedProductsResult>(
       await listPagedProducts({ data: { q: deps.q, page: deps.page } }),
     );
-    if (!result.ok) throw new Error(result.error.message);
-    return { products: result.value.products, total: result.value.total };
+    const { products, total } = unwrapOrThrow(result);
+    return { products, total };
   },
   component: BrowsePage,
 });

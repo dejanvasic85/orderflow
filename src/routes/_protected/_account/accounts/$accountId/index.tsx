@@ -1,4 +1,4 @@
-import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
 import { PageContent } from "@/components/layout/PageContent";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -6,6 +6,7 @@ import { OrderHistoryList } from "@/components/orderRequests/OrderHistoryList";
 import { Button } from "@/components/ui/button";
 import { getAccount } from "@/lib/accounts/accounts.functions";
 import { listOrderHistory } from "@/lib/orderRequests/orderRequests.functions";
+import { unwrapOrThrow, valueOrNotFound } from "@/lib/resultLoader";
 
 export const Route = createFileRoute("/_protected/_account/accounts/$accountId/")({
   loader: async ({ params }) => {
@@ -14,13 +15,9 @@ export const Route = createFileRoute("/_protected/_account/accounts/$accountId/"
       listOrderHistory({ data: params.accountId }),
     ]);
 
-    if (!accountResult.ok) throw new Error(accountResult.error.message);
-    if (!accountResult.value) throw notFound();
-    if (!historyResult.ok) throw new Error(historyResult.error.message);
-
     return {
-      account: accountResult.value,
-      orders: historyResult.value,
+      account: valueOrNotFound(unwrapOrThrow(accountResult)),
+      orders: unwrapOrThrow(historyResult),
     };
   },
   component: AccountPage,

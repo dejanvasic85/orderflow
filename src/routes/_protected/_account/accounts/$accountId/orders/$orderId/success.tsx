@@ -1,7 +1,8 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { OrderSuccessView } from "@/components/orderRequests/OrderSuccessView";
 import { getAccount } from "@/lib/accounts/accounts.functions";
 import { getOrderRequest } from "@/lib/orderRequests/orderRequests.functions";
+import { unwrapOrThrow, valueOrNotFound } from "@/lib/resultLoader";
 
 export const Route = createFileRoute(
   "/_protected/_account/accounts/$accountId/orders/$orderId/success",
@@ -12,14 +13,9 @@ export const Route = createFileRoute(
       getOrderRequest({ data: params.orderId }),
     ]);
 
-    if (!accountResult.ok) throw new Error(accountResult.error.message);
-    if (!accountResult.value) throw notFound();
-    if (!orderResult.ok) throw new Error(orderResult.error.message);
-    if (!orderResult.value) throw notFound();
-
     return {
-      account: accountResult.value,
-      order: orderResult.value,
+      account: valueOrNotFound(unwrapOrThrow(accountResult)),
+      order: valueOrNotFound(unwrapOrThrow(orderResult)),
     };
   },
   component: OrderSuccessPage,
