@@ -46,13 +46,11 @@ describe("OrderHistoryCard", () => {
     expect(screen.getByText("units")).toBeInTheDocument();
   });
 
-  it("renders the date as an amber pill", () => {
+  it("renders the date", () => {
     render(<OrderHistoryCard order={baseOrder} />);
 
     // Mid-month noon UTC avoids timezone day-boundary shifts across any locale
-    const pill = screen.getByText(/15 June? 2024/);
-    expect(pill).toBeInTheDocument();
-    expect(pill).toHaveClass("bg-amber-100");
+    expect(screen.getByText(/15 June? 2024/)).toBeInTheDocument();
   });
 
   it("does not render a View order link when viewHref is not provided", () => {

@@ -44,6 +44,7 @@ export function AccountTopNav({
 }: AccountTopNavProps) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isNavPending = useNavPending();
+  const navTargets = navLinks.map((link) => link.to);
 
   return (
     <header className="sticky top-0 z-40 hidden md:flex border-b bg-background">
@@ -58,7 +59,7 @@ export function AccountTopNav({
                 key={to}
                 to={to}
                 data-nav-link
-                data-pending={isNavPending(to)}
+                data-pending={isNavPending(to, navTargets)}
                 className={cn(
                   "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm transition-colors",
                   isActive
