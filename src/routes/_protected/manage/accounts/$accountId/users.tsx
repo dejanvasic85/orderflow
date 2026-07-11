@@ -1,16 +1,15 @@
-import { createFileRoute, notFound, useRouteContext } from "@tanstack/react-router";
+import { createFileRoute, useRouteContext } from "@tanstack/react-router";
 import { AccountUserSection } from "@/components/accounts/AccountUserSection";
 import { PageContent } from "@/components/layout/PageContent";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { getAccount } from "@/lib/accounts/accounts.functions";
 import { can, permissions } from "@/lib/permissions";
+import { unwrapOrThrow, valueOrNotFound } from "@/lib/resultLoader";
 
 export const Route = createFileRoute("/_protected/manage/accounts/$accountId/users")({
   loader: async ({ params }) => {
     const accountResult = await getAccount({ data: params.accountId });
-    if (!accountResult.ok) throw new Error(accountResult.error.message);
-    if (!accountResult.value) throw notFound();
-    return { account: accountResult.value };
+    return { account: valueOrNotFound(unwrapOrThrow(accountResult)) };
   },
   component: AccountUsersPage,
 });

@@ -11,6 +11,7 @@ import {
   type PagedOrdersResult,
 } from "@/lib/orderRequests/schema";
 import { asResult } from "@/lib/result";
+import { unwrapOrThrow } from "@/lib/resultLoader";
 
 export const Route = createFileRoute("/_protected/manage/orders/")({
   validateSearch: listOrdersSearchSchema,
@@ -19,8 +20,8 @@ export const Route = createFileRoute("/_protected/manage/orders/")({
     const result = asResult<PagedOrdersResult>(
       await listAllOrders({ data: { q: deps.q, page: deps.page } }),
     );
-    if (!result.ok) throw new Error(result.error.message);
-    return { orders: result.value.orders, total: result.value.total };
+    const { orders, total } = unwrapOrThrow(result);
+    return { orders, total };
   },
   component: OrdersPage,
 });

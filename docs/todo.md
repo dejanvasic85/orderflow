@@ -96,14 +96,14 @@ Priorities: `Must` · `Should` · `Nice`
 - [x] Cleanup | Casting and typescript needs general cleanup. Once all the "as" casting is removed tighten the tsconfig to no longer allow this.
 - [ ] Cleanup | Nice | Verify Supabase repository row types match their .select() column lists (accounts/orderRequests/users/templates/dashboard repositories)
 
-- [ ] Cleanup | Improve the code pattern around fetching and checking result
+- [x] Cleanup | Improve the code pattern around fetching and checking result
 
 ```ts
 const existingResult = await fetchTemplateForAccount(data.account_id);
 if (!existingResult.ok) return existingResult;
 ```
 
-- [ ] Cleanup | Page loaders are could be improved with this pattern of reading and throwing:
+- [x] Cleanup | Page loaders are could be improved with this pattern of reading and throwing:
 
 ```ts
 if (!accountResult.ok) throw new Error(accountResult.error.message);

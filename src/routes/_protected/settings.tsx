@@ -4,6 +4,7 @@ import { PageContent } from "@/components/layout/PageContent";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { EditProfileForm } from "@/components/users/EditProfileForm";
 import { asResult } from "@/lib/result";
+import { unwrapOrThrow } from "@/lib/resultLoader";
 import type { UpdateOwnProfileInput } from "@/lib/users/schema";
 import { getOwnProfile, updateOwnProfile } from "@/lib/users/users.functions";
 
@@ -17,8 +18,7 @@ type OwnProfile = {
 export const Route = createFileRoute("/_protected/settings")({
   loader: async () => {
     const result = asResult<OwnProfile>(await getOwnProfile());
-    if (!result.ok) throw new Error(result.error.message);
-    return { profile: result.value };
+    return { profile: unwrapOrThrow(result) };
   },
   component: SettingsPage,
 });

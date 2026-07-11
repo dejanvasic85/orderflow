@@ -1,6 +1,6 @@
 import type { Logger } from "@/lib/log/logger";
 import type { NotifyOrderPlacedInput } from "@/lib/notifications/notifications.server";
-import { ok, type Result } from "@/lib/result";
+import { mapResult, ok, type Result } from "@/lib/result";
 import { isStaffOrAdmin, isUserRole } from "@/lib/users/schema";
 import type { CreatedOrder, OrderRequestRepository } from "./orderRequests.repository";
 import {
@@ -95,8 +95,7 @@ export async function listOrderHistoryForAccount(
   accountId: string,
 ): Promise<Result<OrderHistoryItem[]>> {
   const result = await deps.repo.findOrderHistoryForAccount(accountId);
-  if (!result.ok) return result;
-  return ok(result.value.map(mapOrderHistoryRow));
+  return mapResult(result, (rows) => rows.map(mapOrderHistoryRow));
 }
 
 export async function listAllOrderHistory(
@@ -112,8 +111,7 @@ export async function listAllOrderHistory(
     orderNumber: search.orderNumber,
     page: search.page,
   });
-  if (!result.ok) return result;
-  return ok({ orders: result.value.rows.map(mapOrderHistoryRow), total: result.value.total });
+  return mapResult(result, ({ rows, total }) => ({ orders: rows.map(mapOrderHistoryRow), total }));
 }
 
 export async function placeOrder(

@@ -16,3 +16,26 @@ export function asResult<T, E = ResultError>(value: unknown): Result<T, E> {
   // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- sanctioned boundary cast: restores the type lost when createServerFn serializes its return
   return value as Result<T, E>;
 }
+
+export function mapResult<T, U, E = ResultError>(
+  result: Result<T, E>,
+  fn: (value: T) => U,
+): Result<U, E> {
+  if (!result.ok) return result;
+  return ok(fn(result.value));
+}
+
+export function unwrapOr<T, E = ResultError>(result: Result<T, E>, fallback: T): T {
+  return result.ok ? result.value : fallback;
+}
+
+type Results<T extends readonly unknown[]> = { [K in keyof T]: Result<T[K]> };
+
+export function combine<T extends readonly unknown[]>(
+  results: readonly [...Results<T>],
+): Result<T> {
+  const firstError = results.find((r) => !r.ok);
+  if (firstError && !firstError.ok) return firstError;
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- every result is confirmed ok above; T is the tuple of their values
+  return ok(results.map((r) => (r.ok ? r.value : undefined)) as unknown as T);
+}

@@ -26,6 +26,7 @@ import type { Account, PagedAccountsResult } from "@/lib/accounts/schema";
 import { accountPageSize, listAccountsSearchSchema } from "@/lib/accounts/schema";
 import { can, permissions } from "@/lib/permissions";
 import { asResult } from "@/lib/result";
+import { unwrapOrThrow } from "@/lib/resultLoader";
 
 export const Route = createFileRoute("/_protected/manage/accounts/")({
   validateSearch: listAccountsSearchSchema,
@@ -34,8 +35,8 @@ export const Route = createFileRoute("/_protected/manage/accounts/")({
     const result = asResult<PagedAccountsResult>(
       await listAccounts({ data: { q: deps.q, page: deps.page } }),
     );
-    if (!result.ok) throw new Error(result.error.message);
-    return { accounts: result.value.accounts, total: result.value.total };
+    const { accounts, total } = unwrapOrThrow(result);
+    return { accounts, total };
   },
   component: AccountsPage,
 });

@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { OrderDetailsView } from "@/components/orderRequests/OrderDetailsView";
 import { getAccount } from "@/lib/accounts/accounts.functions";
 import { getOrderRequest } from "@/lib/orderRequests/orderRequests.functions";
+import { unwrapOrThrow, valueOrNotFound } from "@/lib/resultLoader";
 
 export const Route = createFileRoute("/_protected/_account/accounts/$accountId/orders/$orderId/")({
   loader: async ({ params }) => {
@@ -12,15 +13,13 @@ export const Route = createFileRoute("/_protected/_account/accounts/$accountId/o
       getOrderRequest({ data: params.orderId }),
     ]);
 
-    if (!accountResult.ok) throw new Error(accountResult.error.message);
-    if (!accountResult.value) throw notFound();
-    if (!orderResult.ok) throw new Error(orderResult.error.message);
-    if (!orderResult.value) throw notFound();
-    if (orderResult.value.accountId !== params.accountId) throw notFound();
+    const account = valueOrNotFound(unwrapOrThrow(accountResult));
+    const order = valueOrNotFound(unwrapOrThrow(orderResult));
+    if (order.accountId !== params.accountId) throw notFound();
 
     return {
-      account: accountResult.value,
-      order: orderResult.value,
+      account,
+      order,
     };
   },
   component: OrderDetailsPage,

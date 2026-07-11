@@ -1,13 +1,13 @@
 import { Outlet, createFileRoute, useRouter, useRouterState } from "@tanstack/react-router";
 import { AccountShell } from "@/components/layout/AccountShell";
 import { listAccountsForCurrentUser } from "@/lib/accounts/accounts.functions";
+import { unwrapOrThrow } from "@/lib/resultLoader";
 import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/_protected/_account")({
   loader: async () => {
     const result = await listAccountsForCurrentUser();
-    if (!result.ok) throw new Error(result.error.message);
-    return { hasMultipleAccounts: result.value.length > 1 };
+    return { hasMultipleAccounts: unwrapOrThrow(result).length > 1 };
   },
   component: AccountLayout,
 });

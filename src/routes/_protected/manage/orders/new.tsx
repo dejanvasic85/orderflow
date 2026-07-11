@@ -15,6 +15,7 @@ import type { OrderRequestItemInput } from "@/lib/orderRequests/schema";
 import { listProducts } from "@/lib/products/products.functions";
 import type { Product } from "@/lib/products/schema";
 import { asResult } from "@/lib/result";
+import { unwrapOrThrow, valueOrNotFound } from "@/lib/resultLoader";
 import { getTemplateForAccount } from "@/lib/templates/templates.functions";
 
 const searchSchema = z.object({
@@ -30,17 +31,15 @@ export const Route = createFileRoute("/_protected/manage/orders/new")({
       listAccounts({ data: {} }).then((r) => asResult<PagedAccountsResult>(r)),
       listProducts().then((r) => asResult<Product[]>(r)),
     ]);
-    if (!accountsResult.ok) throw new Error(accountsResult.error.message);
-    if (!productsResult.ok) throw new Error(productsResult.error.message);
+    const accounts = unwrapOrThrow(accountsResult);
+    const products = unwrapOrThrow(productsResult);
 
     let sourceOrderItems: OrderRequestItemInput[] | undefined;
     let resolvedAccountId = deps.accountId;
 
     if (deps.fromOrderId) {
       const sourceOrderResult = await getOrderRequestAsAdminOrStaff({ data: deps.fromOrderId });
-      if (!sourceOrderResult.ok) throw new Error(sourceOrderResult.error.message);
-      if (!sourceOrderResult.value) throw new Error("Source order not found");
-      const sourceOrder = sourceOrderResult.value;
+      const sourceOrder = valueOrNotFound(unwrapOrThrow(sourceOrderResult));
       if (
         resolvedAccountId &&
         sourceOrder.accountId &&
@@ -57,11 +56,7 @@ export const Route = createFileRoute("/_protected/manage/orders/new")({
     }
 
     if (!resolvedAccountId) {
-      return {
-        accounts: accountsResult.value.accounts,
-        products: productsResult.value,
-        selected: null,
-      };
+      return { accounts: accounts.accounts, products, selected: null };
     }
 
     const [accountResult, templateResult] = await Promise.all([
@@ -70,16 +65,16 @@ export const Route = createFileRoute("/_protected/manage/orders/new")({
         ? Promise.resolve({ ok: true as const, value: null })
         : getTemplateForAccount({ data: resolvedAccountId }),
     ]);
-    if (!accountResult.ok) throw new Error(accountResult.error.message);
-    if (!templateResult.ok) throw new Error(templateResult.error.message);
+    const account = unwrapOrThrow(accountResult);
+    const template = unwrapOrThrow(templateResult);
 
     return {
-      accounts: accountsResult.value.accounts,
-      products: productsResult.value,
-      selected: accountResult.value
+      accounts: accounts.accounts,
+      products,
+      selected: account
         ? {
-            account: accountResult.value,
-            template: templateResult.value,
+            account,
+            template,
             initialItems: sourceOrderItems,
           }
         : null,
@@ -118,9 +113,9 @@ function ManageNewOrderPage() {
         items,
       },
     });
-    if (!result.ok) throw new Error(result.error.message);
+    const order = unwrapOrThrow(result);
     toast.success("Order request created");
-    void navigate({ to: "/manage/orders/$orderId", params: { orderId: result.value.id } });
+    void navigate({ to: "/manage/orders/$orderId", params: { orderId: order.id } });
   }
 
   return (

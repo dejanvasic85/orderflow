@@ -12,6 +12,7 @@ import {
 } from "@/lib/accounts/accounts.functions";
 import type { AccountUser } from "@/lib/accounts/schema";
 import { asResult } from "@/lib/result";
+import { unwrapOrThrow } from "@/lib/resultLoader";
 import { listUsers } from "@/lib/users/users.functions";
 import { UserSearchCombobox } from "./UserSearchCombobox";
 
@@ -41,8 +42,7 @@ export function AccountUserSection({ accountId, readOnly = false, onUserCountCha
     queryKey: ["accountUsers", accountId],
     queryFn: async () => {
       const result = asResult<AccountUser[]>(await listAccountUsers({ data: accountId }));
-      if (!result.ok) throw new Error(result.error.message);
-      return result.value;
+      return unwrapOrThrow(result);
     },
   });
 
@@ -53,8 +53,7 @@ export function AccountUserSection({ accountId, readOnly = false, onUserCountCha
       const result = asResult<{ users: { id: string; name: string }[]; total: number }>(
         await listUsers({ data: { role: "user" } }),
       );
-      if (!result.ok) throw new Error(result.error.message);
-      return result.value.users;
+      return unwrapOrThrow(result).users;
     },
   });
 
@@ -67,7 +66,7 @@ export function AccountUserSection({ accountId, readOnly = false, onUserCountCha
   const assignMutation = useMutation({
     mutationFn: async (userId: string) => {
       const result = asResult(await assignUserToAccount({ data: { accountId, userId } }));
-      if (!result.ok) throw new Error(result.error.message);
+      unwrapOrThrow(result);
     },
     onSuccess: refetchAndNotify,
     onError: (e) => toast.error(e.message),
@@ -76,7 +75,7 @@ export function AccountUserSection({ accountId, readOnly = false, onUserCountCha
   const unassignMutation = useMutation({
     mutationFn: async (userId: string) => {
       const result = asResult(await unassignUserFromAccount({ data: { accountId, userId } }));
-      if (!result.ok) throw new Error(result.error.message);
+      unwrapOrThrow(result);
     },
     onSuccess: refetchAndNotify,
     onError: (e) => toast.error(e.message),

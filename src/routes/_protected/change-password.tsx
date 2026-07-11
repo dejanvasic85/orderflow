@@ -7,12 +7,12 @@ import { changePassword, getPasswordChangedAt } from "@/lib/auth/auth.functions"
 import { getPostLoginRedirect } from "@/lib/auth/userRedirect";
 import { formatDateTime } from "@/lib/dates";
 import { asResult } from "@/lib/result";
+import { unwrapOrThrow } from "@/lib/resultLoader";
 
 export const Route = createFileRoute("/_protected/change-password")({
   loader: async () => {
     const result = asResult<string | null>(await getPasswordChangedAt());
-    if (!result.ok) throw new Error(result.error.message);
-    return { passwordChangedAt: result.value };
+    return { passwordChangedAt: unwrapOrThrow(result) };
   },
   component: ChangePasswordPage,
 });

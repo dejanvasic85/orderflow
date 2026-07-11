@@ -22,6 +22,7 @@ import { listAccounts } from "@/lib/accounts/accounts.functions";
 import type { Account, PagedAccountsResult } from "@/lib/accounts/schema";
 import { can, permissions } from "@/lib/permissions";
 import { asResult, type Result } from "@/lib/result";
+import { unwrapOrThrow } from "@/lib/resultLoader";
 import type { PagedUsersResult, UpdateUserAccountsInput, User } from "@/lib/users/schema";
 import { listUsersSearchSchema, userPageSize } from "@/lib/users/schema";
 import {
@@ -46,13 +47,13 @@ export const Route = createFileRoute("/_protected/manage/users")({
       listAccounts({ data: {} }).then(asResult<PagedAccountsResult>),
     ]);
 
-    if (!usersResult.ok) throw new Error(usersResult.error.message);
-    if (!accountsResult.ok) throw new Error(accountsResult.error.message);
+    const users = unwrapOrThrow(usersResult);
+    const accounts = unwrapOrThrow(accountsResult);
 
     return {
-      users: usersResult.value.users,
-      total: usersResult.value.total,
-      accounts: accountsResult.value.accounts,
+      users: users.users,
+      total: users.total,
+      accounts: accounts.accounts,
     };
   },
   component: UsersPage,
@@ -300,8 +301,7 @@ function UsersPage() {
                 onDiscard={handleDiscard}
                 onCheckEmailExists={async (email) => {
                   const result = asResult<boolean>(await checkEmailExists({ data: email }));
-                  if (!result.ok) throw new Error(result.error.message);
-                  return result.value;
+                  return unwrapOrThrow(result);
                 }}
               />
             )}

@@ -1,5 +1,5 @@
 import type { Logger } from "@/lib/log/logger";
-import { err, ok, type Result } from "@/lib/result";
+import { combine, err, mapResult, ok, unwrapOr, type Result } from "@/lib/result";
 import { parseNotificationPrefs } from "./notificationPrefs";
 import type {
   CreateUserInput,
@@ -53,8 +53,7 @@ export async function listUsers(
 ): Promise<Result<{ users: User[]; total: number }>> {
   await deps.authorizeStaff();
   const result = await deps.repo.findPagedUsers(filters);
-  if (!result.ok) return result;
-  return ok({ users: result.value.users.map(mapUser), total: result.value.total });
+  return mapResult(result, ({ users, total }) => ({ users: users.map(mapUser), total }));
 }
 
 export async function getUser(deps: UserServiceDeps, id: string): Promise<Result<RawUserRow>> {
@@ -72,13 +71,12 @@ export async function getOwnProfile(deps: UserServiceDeps): Promise<
 > {
   const sessionUser = await deps.session();
   const result = await deps.repo.findOwnProfile(sessionUser.id);
-  if (!result.ok) return result;
-  return ok({
+  return mapResult(result, (profile) => ({
     email: sessionUser.email ?? "",
-    name: result.value.name ?? "",
-    phone: result.value.phone ?? "",
-    notificationPreferences: parseNotificationPrefs(result.value.notification_preferences),
-  });
+    name: profile.name ?? "",
+    phone: profile.phone ?? "",
+    notificationPreferences: parseNotificationPrefs(profile.notification_preferences),
+  }));
 }
 
 export async function updateOwnProfile(
@@ -220,14 +218,12 @@ export async function updateUserAccounts(
 ): Promise<Result<void>> {
   await deps.authorize();
 
-  const [removeResult, addResult] = await Promise.all([
+  const results = await Promise.all([
     deps.repo.removeUserFromAccounts(data.userId, data.toRemove),
     deps.repo.addUserToAccounts(data.userId, data.toAdd),
   ]);
 
-  const firstError = [removeResult, addResult].find((r) => !r.ok);
-  if (firstError && !firstError.ok) return firstError;
-  return ok();
+  return mapResult(combine(results), () => undefined);
 }
 
 export async function setUserPassword(
@@ -253,7 +249,7 @@ export async function setUserPassword(
   const passwordResult = await deps.repo.setPassword(data.userId, data.password);
   if (!passwordResult.ok) return passwordResult;
 
-  const adminName = nameResult.ok ? (nameResult.value ?? "An administrator") : "An administrator";
+  const adminName = unwrapOr(nameResult, "An administrator") ?? "An administrator";
   deps.log.info("admin.password", "set for user", { userId: data.userId, actorId: sessionUser.id });
   await deps.notify.passwordSet({ email: emailResult.value, adminName });
 

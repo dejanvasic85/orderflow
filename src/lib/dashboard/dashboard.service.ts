@@ -1,6 +1,6 @@
 import { resolvePlacedByName } from "@/lib/orderRequests/orderRequests.service";
 import { formatOrderRef } from "@/lib/orderRequests/schema";
-import { ok, type Result } from "@/lib/result";
+import { combine, mapResult, type Result } from "@/lib/result";
 import { isUserRole } from "@/lib/users/schema";
 import { rangeWindowDaysValue, recentActivityLimit, topProductsLimit } from "./constants";
 import type { DashboardRepository } from "./dashboard.repository";
@@ -206,20 +206,14 @@ export async function getDashboardData(deps: DashboardServiceDeps): Promise<Resu
   const now = (deps.now ?? (() => new Date()))();
   const sinceIso = startOfWindow(now, "3m").toISOString();
 
-  const [ordersRes, accountsRes, productsRes] = await Promise.all([
+  const results = await Promise.all([
     deps.repo.findOrdersWithItemsSince(sinceIso),
     deps.repo.countActiveAccounts(),
     deps.repo.countActiveProducts(),
   ]);
 
-  if (!ordersRes.ok) return ordersRes;
-  if (!accountsRes.ok) return accountsRes;
-  if (!productsRes.ok) return productsRes;
-
-  const orders = ordersRes.value;
-
-  return ok({
-    kpis: buildKpiSummary(orders, accountsRes.value, productsRes.value, now),
+  return mapResult(combine(results), ([orders, activeAccounts, activeProducts]) => ({
+    kpis: buildKpiSummary(orders, activeAccounts, activeProducts, now),
     timeSeries: {
       "7d": buildOrderTimeSeries(orders, "7d", now),
       "30d": buildOrderTimeSeries(orders, "30d", now),
@@ -227,5 +221,5 @@ export async function getDashboardData(deps: DashboardServiceDeps): Promise<Resu
     },
     topProducts: buildTopProducts(orders),
     recentActivity: buildRecentActivity(orders),
-  });
+  }));
 }
