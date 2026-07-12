@@ -45,10 +45,19 @@ test("notification switches reflect defaultValues", async () => {
   renderForm();
 
   const emailSwitch = await screen.findByRole("switch", { name: "Email notifications" });
-  const smsSwitch = screen.getByRole("switch", { name: "SMS notifications" });
+  const smsSwitch = screen.getByRole("switch", { name: /SMS notifications/ });
 
   expect(emailSwitch).toHaveAttribute("aria-checked", "true");
   expect(smsSwitch).toHaveAttribute("aria-checked", "false");
+});
+
+test("SMS switch is disabled and marked coming soon", async () => {
+  renderForm();
+
+  const smsSwitch = await screen.findByRole("switch", { name: /SMS notifications/ });
+
+  expect(smsSwitch).toBeDisabled();
+  expect(screen.getByText("(Coming soon)")).toBeInTheDocument();
 });
 
 test("submits with mapped name and notification preferences", async () => {
@@ -62,21 +71,6 @@ test("submits with mapped name and notification preferences", async () => {
     phone: "0412345678",
     notificationPreferences: { email: true, sms: false },
   });
-});
-
-test("toggles SMS on and submits updated notification preferences", async () => {
-  const user = userEvent.setup();
-  renderForm({ notifications: { email: true, sms: false } });
-
-  const smsSwitch = await screen.findByRole("switch", { name: "SMS notifications" });
-  await user.click(smsSwitch);
-  await user.click(screen.getByRole("button", { name: "Save details" }));
-
-  expect(onSave).toHaveBeenCalledWith(
-    expect.objectContaining({
-      notificationPreferences: { email: true, sms: true },
-    }),
-  );
 });
 
 test("shows validation error for invalid AU phone number", async () => {

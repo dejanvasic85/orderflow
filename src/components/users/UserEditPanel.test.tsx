@@ -118,23 +118,14 @@ test("notification checkboxes reflect user preferences", () => {
   render(<UserEditPanel user={baseUser} onSave={onSave} onDiscard={onDiscard} />);
 
   expect(screen.getByLabelText("Email notifications")).toBeChecked();
-  expect(screen.getByLabelText("SMS notifications")).not.toBeChecked();
+  expect(screen.getByLabelText(/SMS notifications/)).not.toBeChecked();
 });
 
-test("calls onSave with updated notification preferences", async () => {
+test("SMS checkbox is disabled and marked coming soon", () => {
   render(<UserEditPanel user={baseUser} onSave={onSave} onDiscard={onDiscard} />);
 
-  await user.click(screen.getByLabelText("SMS notifications"));
-  await user.click(screen.getByRole("button", { name: "Save changes" }));
-
-  await vi.waitFor(() => {
-    expect(onSave).toHaveBeenCalledWith(
-      expect.objectContaining({
-        notificationPreferences: { email: true, sms: true },
-      }),
-      undefined,
-    );
-  });
+  expect(screen.getByLabelText(/SMS notifications/)).toBeDisabled();
+  expect(screen.getByText("(Coming soon)")).toBeInTheDocument();
 });
 
 test("create mode shows invite header and send invite button", () => {
