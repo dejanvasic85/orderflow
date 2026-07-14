@@ -44,7 +44,7 @@
     "radix-ui": "1.6.2",
     "react": "19.2.7",
     "react-dom": "19.2.7",
-    "react-dropzone": "16.0.0",
+    "react-dropzone": "17.0.0",
     "react-easy-crop": "6.2.2",
     "react-email": "6.7.0",
     "recharts": "3.9.2",
