@@ -51,13 +51,12 @@ test("notification switches reflect defaultValues", async () => {
   expect(smsSwitch).toHaveAttribute("aria-checked", "false");
 });
 
-test("SMS switch is disabled and marked coming soon", async () => {
+test("SMS switch is enabled", async () => {
   renderForm();
 
   const smsSwitch = await screen.findByRole("switch", { name: /SMS notifications/ });
 
-  expect(smsSwitch).toBeDisabled();
-  expect(screen.getByText("(Coming soon)")).toBeInTheDocument();
+  expect(smsSwitch).toBeEnabled();
 });
 
 test("submits with mapped name and notification preferences", async () => {

@@ -121,11 +121,10 @@ test("notification checkboxes reflect user preferences", () => {
   expect(screen.getByLabelText(/SMS notifications/)).not.toBeChecked();
 });
 
-test("SMS checkbox is disabled and marked coming soon", () => {
+test("SMS checkbox is enabled", () => {
   render(<UserEditPanel user={baseUser} onSave={onSave} onDiscard={onDiscard} />);
 
-  expect(screen.getByLabelText(/SMS notifications/)).toBeDisabled();
-  expect(screen.getByText("(Coming soon)")).toBeInTheDocument();
+  expect(screen.getByLabelText(/SMS notifications/)).toBeEnabled();
 });
 
 test("create mode shows invite header and send invite button", () => {

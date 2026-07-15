@@ -307,10 +307,10 @@ export function UserEditPanel(props: Props) {
                   id="notif-sms"
                   checked={field.state.value}
                   onCheckedChange={(v) => field.handleChange(!!v)}
-                  disabled
+                  disabled={readOnly}
                 />
                 <Label htmlFor="notif-sms" className="font-normal">
-                  SMS notifications <span className="text-muted-foreground">(Coming soon)</span>
+                  SMS notifications
                 </Label>
               </div>
             )}
