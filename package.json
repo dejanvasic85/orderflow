@@ -31,8 +31,8 @@
     "@tanstack/react-router": "1.170.18",
     "@tanstack/react-router-devtools": "1.167.0",
     "@tanstack/react-router-ssr-query": "1.167.1",
-    "@tanstack/react-start": "1.168.28",
-    "@tanstack/router-plugin": "1.168.20",
+    "@tanstack/react-start": "1.168.30",
+    "@tanstack/router-plugin": "1.168.22",
     "aws4fetch": "1.0.20",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
@@ -78,5 +78,5 @@
     "vite-plus": "0.2.5",
     "wrangler": "4.112.0"
   },
-  "packageManager": "pnpm@11.13.1"
+  "packageManager": "pnpm@11.15.0"
 }
