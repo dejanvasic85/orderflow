@@ -2,6 +2,10 @@
 
 This file defines the baseline engineering conventions for agents working in this repository.
 
+## Writing
+
+- **Never use em-dashes (`—`)** in any output: code, comments, docs, commit messages, PR descriptions, or drafted emails. Use a comma, a full stop, a colon, or parentheses instead, whichever fits the sentence.
+
 ## Project Context
 
 Read `docs/project-context.md` before making any changes.
