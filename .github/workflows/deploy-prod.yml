@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-  # Allows redeploying the current main without an empty commit — needed when a
+  # Allows redeploying the current main without an empty commit, needed when a
   # secret is rotated, since secrets only reach the worker on a deploy.
   workflow_dispatch:
 
@@ -19,6 +19,9 @@ jobs:
   deploy:
     name: Deploy to prod
     runs-on: ubuntu-latest
+    # Never build or deploy a non-main ref with production secrets. `workflow_dispatch`
+    # lets the caller pick any branch, so this guard is what keeps prod tied to main.
+    if: github.ref == 'refs/heads/main'
     environment: production
     timeout-minutes: 15
     steps:
