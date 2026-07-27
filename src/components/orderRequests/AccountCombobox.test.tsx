@@ -1,76 +1,165 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import type { ReactNode } from "react";
+import { listAccounts } from "@/lib/accounts/accounts.functions";
+import { makeAccount } from "@/test/fixtures/accountFixtures";
 import { AccountCombobox } from "./AccountCombobox";
 
-const accounts = [
-  { id: "1", name: "Acme Corp" },
-  { id: "2", name: "Globex Inc" },
-  { id: "3", name: "Initech" },
-];
+vi.mock("@/lib/accounts/accounts.functions", () => ({
+  listAccounts: vi.fn(),
+}));
+
+function renderWithClient(ui: ReactNode) {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+  return render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>);
+}
 
 describe("AccountCombobox", () => {
+  beforeEach(() => {
+    vi.mocked(listAccounts).mockResolvedValue({
+      ok: true,
+      value: {
+        accounts: [
+          makeAccount({ id: "1", name: "Acme Corp" }),
+          makeAccount({ id: "2", name: "Globex Inc" }),
+        ],
+        total: 2,
+      },
+    });
+  });
+
   it("shows placeholder when no account is selected", () => {
-    render(<AccountCombobox accounts={accounts} selectedId={null} onSelect={vi.fn()} />);
+    renderWithClient(<AccountCombobox selected={null} onSelect={vi.fn()} />);
 
     expect(screen.getByRole("combobox")).toHaveTextContent("Select an account...");
   });
 
-  it("shows selected account name when an id is provided", () => {
-    render(<AccountCombobox accounts={accounts} selectedId="2" onSelect={vi.fn()} />);
+  it("shows the selected account name", () => {
+    renderWithClient(
+      <AccountCombobox selected={{ id: "2", name: "Globex Inc" }} onSelect={vi.fn()} />,
+    );
 
     expect(screen.getByRole("combobox")).toHaveTextContent("Globex Inc");
   });
 
-  it("opens the dropdown and lists all accounts when triggered", async () => {
+  it("does not query accounts before the dropdown is opened", () => {
+    renderWithClient(<AccountCombobox selected={null} onSelect={vi.fn()} />);
+
+    expect(listAccounts).not.toHaveBeenCalled();
+  });
+
+  it("lists accounts returned by the server when opened", async () => {
     const user = userEvent.setup();
-    render(<AccountCombobox accounts={accounts} selectedId={null} onSelect={vi.fn()} />);
+    renderWithClient(<AccountCombobox selected={null} onSelect={vi.fn()} />);
 
     await user.click(screen.getByRole("combobox"));
 
-    expect(screen.getByText("Acme Corp")).toBeInTheDocument();
+    expect(await screen.findByText("Acme Corp")).toBeInTheDocument();
     expect(screen.getByText("Globex Inc")).toBeInTheDocument();
-    expect(screen.getByText("Initech")).toBeInTheDocument();
+  });
+
+  it("sends the typed search term to the server", async () => {
+    const user = userEvent.setup();
+    renderWithClient(<AccountCombobox selected={null} onSelect={vi.fn()} />);
+
+    await user.click(screen.getByRole("combobox"));
+    await user.type(screen.getByLabelText("Search accounts"), "primrose");
+
+    await vi.waitFor(() => {
+      expect(listAccounts).toHaveBeenCalledWith({ data: { q: "primrose" } });
+    });
+  });
+
+  it("renders server results that the client list did not contain", async () => {
+    const user = userEvent.setup();
+    vi.mocked(listAccounts).mockResolvedValue({
+      ok: true,
+      value: {
+        accounts: [makeAccount({ id: "9", name: "Primrose Bakery" })],
+        total: 1,
+      },
+    });
+    renderWithClient(<AccountCombobox selected={null} onSelect={vi.fn()} />);
+
+    await user.click(screen.getByRole("combobox"));
+    await user.type(screen.getByLabelText("Search accounts"), "primrose");
+
+    expect(await screen.findByText("Primrose Bakery")).toBeInTheDocument();
+  });
+
+  it("shows the searching indicator while a new search is in flight", async () => {
+    const user = userEvent.setup();
+    renderWithClient(<AccountCombobox selected={null} onSelect={vi.fn()} />);
+
+    await user.click(screen.getByRole("combobox"));
+    await screen.findByText("Acme Corp");
+    vi.mocked(listAccounts).mockReturnValue(new Promise(() => {}));
+    await user.type(screen.getByLabelText("Search accounts"), "primrose");
+
+    expect(await screen.findByText("Searching...")).toBeInTheDocument();
   });
 
   it("calls onSelect with the account id when an item is chosen", async () => {
     const user = userEvent.setup();
     const onSelect = vi.fn();
-    render(<AccountCombobox accounts={accounts} selectedId={null} onSelect={onSelect} />);
+    renderWithClient(<AccountCombobox selected={null} onSelect={onSelect} />);
 
     await user.click(screen.getByRole("combobox"));
-    await user.click(screen.getByText("Acme Corp"));
+    await user.click(await screen.findByText("Acme Corp"));
 
     expect(onSelect).toHaveBeenCalledWith("1");
   });
 
   it("closes the dropdown after selecting an account", async () => {
     const user = userEvent.setup();
-    render(<AccountCombobox accounts={accounts} selectedId={null} onSelect={vi.fn()} />);
+    renderWithClient(<AccountCombobox selected={null} onSelect={vi.fn()} />);
 
     await user.click(screen.getByRole("combobox"));
-    await user.click(screen.getByText("Globex Inc"));
+    await user.click(await screen.findByText("Globex Inc"));
 
     expect(screen.queryByText("Acme Corp")).not.toBeInTheDocument();
   });
 
-  it("filters accounts by search input", async () => {
+  it("shows an error message instead of an empty result when the search fails", async () => {
     const user = userEvent.setup();
-    render(<AccountCombobox accounts={accounts} selectedId={null} onSelect={vi.fn()} />);
+    vi.mocked(listAccounts).mockRejectedValue(new Error("network down"));
+    renderWithClient(<AccountCombobox selected={null} onSelect={vi.fn()} />);
 
     await user.click(screen.getByRole("combobox"));
-    await user.type(screen.getByPlaceholderText("Search accounts..."), "glob");
 
-    expect(screen.queryByText("Acme Corp")).not.toBeInTheDocument();
-    expect(screen.getByText("Globex Inc")).toBeInTheDocument();
+    expect(await screen.findByText("Could not load accounts.")).toBeInTheDocument();
+    expect(screen.queryByText("No accounts found.")).not.toBeInTheDocument();
   });
 
-  it("shows empty message when search yields no results", async () => {
+  it("retries the search when the error retry button is pressed", async () => {
     const user = userEvent.setup();
-    render(<AccountCombobox accounts={accounts} selectedId={null} onSelect={vi.fn()} />);
+    vi.mocked(listAccounts).mockRejectedValue(new Error("network down"));
+    renderWithClient(<AccountCombobox selected={null} onSelect={vi.fn()} />);
 
     await user.click(screen.getByRole("combobox"));
-    await user.type(screen.getByPlaceholderText("Search accounts..."), "zzz");
+    await screen.findByText("Could not load accounts.");
+    vi.mocked(listAccounts).mockResolvedValue({
+      ok: true,
+      value: { accounts: [makeAccount({ id: "1", name: "Acme Corp" })], total: 1 },
+    });
+    await user.click(screen.getByRole("button", { name: "Try again" }));
 
-    expect(screen.getByText("No accounts found.")).toBeInTheDocument();
+    expect(await screen.findByText("Acme Corp")).toBeInTheDocument();
+  });
+
+  it("shows empty message when the server returns no matches", async () => {
+    const user = userEvent.setup();
+    vi.mocked(listAccounts).mockResolvedValue({
+      ok: true,
+      value: { accounts: [], total: 0 },
+    });
+    renderWithClient(<AccountCombobox selected={null} onSelect={vi.fn()} />);
+
+    await user.click(screen.getByRole("combobox"));
+
+    expect(await screen.findByText("No accounts found.")).toBeInTheDocument();
   });
 });

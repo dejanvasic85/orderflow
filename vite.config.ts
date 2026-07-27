@@ -47,7 +47,7 @@ const config = defineConfig({
     "*": "vp check --fix",
   },
   fmt: {
-    ignorePatterns: ["src/routeTree.gen.ts", "src/lib/database.types.ts"],
+    ignorePatterns: [".claude/**", "src/routeTree.gen.ts", "src/lib/database.types.ts"],
     printWidth: 100,
     sortImports: {
       groups: [
@@ -61,7 +61,7 @@ const config = defineConfig({
     },
   },
   lint: {
-    ignorePatterns: ["src/lib/database.types.ts", "src/routeTree.gen.ts"],
+    ignorePatterns: [".claude/**", "src/lib/database.types.ts", "src/routeTree.gen.ts"],
     options: { typeAware: true, typeCheck: true },
     rules: {
       "typescript/consistent-type-assertions": [

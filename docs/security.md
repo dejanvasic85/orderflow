@@ -140,7 +140,7 @@ reproduced the identical error, which is what finally ruled the email provider o
    GoTrue**, so no email provider was ever involved. That single check settles it.
 2. Call the endpoint directly with the key you believe is live:
    ```bash
-   curl -X POST "$SUPABASE_URL/auth/v1/invite" \
+   curl -sS -w '\nHTTP %{http_code}\n' -X POST "$SUPABASE_URL/auth/v1/invite" \
      -H "apikey: $SUPABASE_SECRET_KEY" \
      -H "Authorization: Bearer $SUPABASE_SECRET_KEY" \
      -H "Content-Type: application/json" \
