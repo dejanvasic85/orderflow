@@ -1,3 +1,4 @@
+import type { AuthError } from "@supabase/supabase-js";
 import { log } from "@/lib/log/logger";
 import { err, ok, type Result } from "@/lib/result";
 import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
@@ -8,6 +9,20 @@ import { userPageSize } from "./schema";
 function maskEmail(email: string): string {
   const [local, domain] = email.split("@");
   return `${local[0]}***@${domain}`;
+}
+
+/**
+ * GoTrue surfaces gateway-level rejections (bad/rotated API key) with the same generic
+ * message shape as SMTP failures, so log status/code too. Otherwise an auth problem is
+ * indistinguishable from an email-provider problem.
+ */
+function inviteErrorFields(email: string, error: AuthError) {
+  return {
+    email: maskEmail(email),
+    error: error.message,
+    status: error.status,
+    code: error.code,
+  };
 }
 
 export const userListSelect = `
@@ -262,10 +277,7 @@ export function createUserRepository(): UserRepository {
         redirectTo: `${options.redirectTo}/auth/callback`,
       });
       if (error) {
-        log.error("invite", "failed to send invitation email", {
-          email: maskEmail(email),
-          error: error.message,
-        });
+        log.error("invite", "failed to send invitation email", inviteErrorFields(email, error));
         return err({ message: "Unable to send user invitation" });
       }
       log.info("invite", "invitation email sent", { email: maskEmail(email) });
@@ -300,10 +312,7 @@ export function createUserRepository(): UserRepository {
         redirectTo: `${redirectTo}/auth/callback`,
       });
       if (error) {
-        log.error("invite", "failed to resend invitation email", {
-          email: maskEmail(email),
-          error: error.message,
-        });
+        log.error("invite", "failed to resend invitation email", inviteErrorFields(email, error));
         return err({ message: "Unable to resend invitation" });
       }
       log.info("invite", "invitation email resent", { email: maskEmail(email) });

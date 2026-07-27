@@ -119,6 +119,45 @@ a tight `with check`:
 - **Staff are read-only outside placing orders.** No staff write policies on `users`,
   `accounts`, `products`, `templates`. Intentional.
 
+## Troubleshooting: `"Unregistered API key"` on invite / auth email
+
+**Symptom.** Inviting a user fails. The worker logs `event: "invite"`,
+`msg: "failed to send invitation email"`, `error: "Unregistered API key"`.
+
+**Cause.** The worker's `SUPABASE_SECRET_KEY` is stale or revoked. Supabase's API
+gateway rejects the request before it reaches GoTrue, and supabase-js surfaces the
+gateway's message through the same `error.message` field an SMTP failure would use. It
+therefore reads as an email-provider problem when it is an auth problem.
+
+**Do not** start by debugging SES, IAM, SMTP credentials, verified identities, or sender
+domains. In July 2026 that misread cost most of a day, and swapping SES for Resend
+reproduced the identical error, which is what finally ruled the email provider out.
+
+**Diagnose in this order:**
+
+1. Check the GoTrue logs (Supabase dashboard, or `get_logs` with `service: "auth"`) for a
+   `POST /admin/users` around the failure. **No entry means the request never reached
+   GoTrue**, so no email provider was ever involved. That single check settles it.
+2. Call the endpoint directly with the key you believe is live:
+   ```bash
+   curl -X POST "$SUPABASE_URL/auth/v1/invite" \
+     -H "apikey: $SUPABASE_SECRET_KEY" \
+     -H "Authorization: Bearer $SUPABASE_SECRET_KEY" \
+     -H "Content-Type: application/json" \
+     -d '{"email":"you@example.com"}'
+   ```
+   `200` means the key and the email path are both fine and the stale value is on the
+   worker. `401` means the key itself is dead.
+3. Confirm the key in Cloudflare matches a live key under Project Settings → API Keys →
+   Secret keys. It must be a `sb_secret_...` value; a legacy JWT (`eyJ...`) is also
+   rejected this way.
+
+**Fix.** Set the `SUPABASE_SECRET_KEY` GitHub secret, then **redeploy**. `wrangler secret
+bulk` alone does not always roll a new worker version, so confirm `scriptVersion.id` in
+the logs actually changed. Use the `workflow_dispatch` trigger on `deploy-prod.yml`
+rather than editing worker secrets by hand, hand edits drift from the manifest and are
+not reproducible.
+
 ## Checklist when touching auth / data access
 
 - [ ] New table → `enable row level security` **and** policies in the **same migration**.
