@@ -94,7 +94,7 @@ vp run test:features
 
 ## Deployment
 
-The app is deployed to Cloudflare Workers via `wrangler`. Every push to `main` deploys to production at [https://bwow.vasic.com.au](https://bwow.vasic.com.au).
+The app is deployed to Cloudflare Workers via `wrangler`. Every push to `main` deploys to production at [https://bwow.app](https://bwow.app).
 
 ---
 
