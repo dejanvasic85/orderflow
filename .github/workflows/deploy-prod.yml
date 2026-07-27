@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+  # Allows redeploying the current main without an empty commit — needed when a
+  # secret is rotated, since secrets only reach the worker on a deploy.
+  workflow_dispatch:
 
 permissions:
   contents: read
