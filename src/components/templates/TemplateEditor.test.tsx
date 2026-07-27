@@ -190,7 +190,7 @@ test("save after adding a new product sends item in toAdd", async () => {
   await vi.waitFor(() => {
     expect(onSave).toHaveBeenCalledWith({
       accountId: "acc-1",
-      toAdd: [{ productId: "prod-2", boxCount: 1, unitCount: 0 }],
+      toAdd: [{ productId: "prod-2", boxCount: 0, unitCount: 0 }],
       toUpdate: [],
       toRemove: [],
     });

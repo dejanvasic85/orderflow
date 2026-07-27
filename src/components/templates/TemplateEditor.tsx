@@ -83,7 +83,7 @@ function itemsReducer(state: TemplateItemState[], action: ItemsAction): Template
     case "add":
       return [
         ...state,
-        { id: null, product_id: action.productId, boxes: 1, extra_units: 0, kind: "added" },
+        { id: null, product_id: action.productId, boxes: 0, extra_units: 0, kind: "added" },
       ];
     case "remove":
       return state.map((item) =>
