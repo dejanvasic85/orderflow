@@ -20,6 +20,11 @@ database, the three security layers, and a per-table RLS coverage matrix. RLS is
 the security boundary; app-layer `assert*` checks are convenience only. Keep the
 matrix and "Known gaps" section in `docs/security.md` in sync with any policy change.
 
+**Auth emails (invite, magic link, password reset) failing?** Read the
+troubleshooting section in `docs/security.md` before touching SES, SMTP credentials,
+or sender domains. A stale `SUPABASE_SECRET_KEY` presents as an email-sending
+failure, and debugging the email provider is a dead end.
+
 ## Key conventions
 
 - PREFER functional approach over object oriented and imperative
