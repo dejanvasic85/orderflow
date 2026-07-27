@@ -66,7 +66,7 @@ describe("AccountCombobox", () => {
     renderWithClient(<AccountCombobox selected={null} onSelect={vi.fn()} />);
 
     await user.click(screen.getByRole("combobox"));
-    await user.type(screen.getByPlaceholderText("Search accounts..."), "primrose");
+    await user.type(screen.getByLabelText("Search accounts"), "primrose");
 
     await vi.waitFor(() => {
       expect(listAccounts).toHaveBeenCalledWith({ data: { q: "primrose" } });
@@ -85,7 +85,7 @@ describe("AccountCombobox", () => {
     renderWithClient(<AccountCombobox selected={null} onSelect={vi.fn()} />);
 
     await user.click(screen.getByRole("combobox"));
-    await user.type(screen.getByPlaceholderText("Search accounts..."), "primrose");
+    await user.type(screen.getByLabelText("Search accounts"), "primrose");
 
     expect(await screen.findByText("Primrose Bakery")).toBeInTheDocument();
   });
@@ -97,7 +97,7 @@ describe("AccountCombobox", () => {
     await user.click(screen.getByRole("combobox"));
     await screen.findByText("Acme Corp");
     vi.mocked(listAccounts).mockReturnValue(new Promise(() => {}));
-    await user.type(screen.getByPlaceholderText("Search accounts..."), "primrose");
+    await user.type(screen.getByLabelText("Search accounts"), "primrose");
 
     expect(await screen.findByText("Searching...")).toBeInTheDocument();
   });
@@ -121,6 +121,33 @@ describe("AccountCombobox", () => {
     await user.click(await screen.findByText("Globex Inc"));
 
     expect(screen.queryByText("Acme Corp")).not.toBeInTheDocument();
+  });
+
+  it("shows an error message instead of an empty result when the search fails", async () => {
+    const user = userEvent.setup();
+    vi.mocked(listAccounts).mockRejectedValue(new Error("network down"));
+    renderWithClient(<AccountCombobox selected={null} onSelect={vi.fn()} />);
+
+    await user.click(screen.getByRole("combobox"));
+
+    expect(await screen.findByText("Could not load accounts.")).toBeInTheDocument();
+    expect(screen.queryByText("No accounts found.")).not.toBeInTheDocument();
+  });
+
+  it("retries the search when the error retry button is pressed", async () => {
+    const user = userEvent.setup();
+    vi.mocked(listAccounts).mockRejectedValue(new Error("network down"));
+    renderWithClient(<AccountCombobox selected={null} onSelect={vi.fn()} />);
+
+    await user.click(screen.getByRole("combobox"));
+    await screen.findByText("Could not load accounts.");
+    vi.mocked(listAccounts).mockResolvedValue({
+      ok: true,
+      value: { accounts: [makeAccount({ id: "1", name: "Acme Corp" })], total: 1 },
+    });
+    await user.click(screen.getByRole("button", { name: "Try again" }));
+
+    expect(await screen.findByText("Acme Corp")).toBeInTheDocument();
   });
 
   it("shows empty message when the server returns no matches", async () => {

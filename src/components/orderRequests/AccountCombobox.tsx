@@ -71,12 +71,20 @@ export function AccountCombobox({ selected, onSelect }: AccountComboboxProps) {
       <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
         <Command shouldFilter={false}>
           <CommandInput
+            aria-label="Search accounts"
             placeholder="Search accounts..."
             value={inputValue}
             onValueChange={setInputValue}
           />
           <CommandList>
-            {accountsQuery.isFetching ? (
+            {accountsQuery.isError ? (
+              <div className="flex flex-col items-center gap-2 py-6 text-sm text-muted-foreground">
+                <span>Could not load accounts.</span>
+                <Button variant="outline" size="sm" onClick={() => void accountsQuery.refetch()}>
+                  Try again
+                </Button>
+              </div>
+            ) : accountsQuery.isFetching ? (
               <div className="py-6 text-center text-sm text-muted-foreground">Searching...</div>
             ) : (
               <CommandEmpty>No accounts found.</CommandEmpty>
