@@ -5,8 +5,7 @@ import { PageContent } from "@/components/layout/PageContent";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AccountCombobox } from "@/components/orderRequests/AccountCombobox";
 import { NewOrderForm } from "@/components/orderRequests/NewOrderForm";
-import { getAccount, listAccounts } from "@/lib/accounts/accounts.functions";
-import type { PagedAccountsResult } from "@/lib/accounts/schema";
+import { getAccount } from "@/lib/accounts/accounts.functions";
 import {
   createOrderRequestOnBehalf,
   getOrderRequestAsAdminOrStaff,
@@ -27,11 +26,7 @@ export const Route = createFileRoute("/_protected/manage/orders/new")({
   validateSearch: searchSchema,
   loaderDeps: ({ search }) => ({ accountId: search.accountId, fromOrderId: search.fromOrderId }),
   loader: async ({ deps }) => {
-    const [accountsResult, productsResult] = await Promise.all([
-      listAccounts({ data: {} }).then((r) => asResult<PagedAccountsResult>(r)),
-      listProducts().then((r) => asResult<Product[]>(r)),
-    ]);
-    const accounts = unwrapOrThrow(accountsResult);
+    const productsResult = await listProducts().then((r) => asResult<Product[]>(r));
     const products = unwrapOrThrow(productsResult);
 
     let sourceOrderItems: OrderRequestItemInput[] | undefined;
@@ -56,7 +51,7 @@ export const Route = createFileRoute("/_protected/manage/orders/new")({
     }
 
     if (!resolvedAccountId) {
-      return { accounts: accounts.accounts, products, selected: null };
+      return { products, selected: null };
     }
 
     const [accountResult, templateResult] = await Promise.all([
@@ -69,7 +64,6 @@ export const Route = createFileRoute("/_protected/manage/orders/new")({
     const template = unwrapOrThrow(templateResult);
 
     return {
-      accounts: accounts.accounts,
       products,
       selected: account
         ? {
@@ -84,7 +78,7 @@ export const Route = createFileRoute("/_protected/manage/orders/new")({
 });
 
 function ManageNewOrderPage() {
-  const { accounts, products, selected } = Route.useLoaderData();
+  const { products, selected } = Route.useLoaderData();
   const search = Route.useSearch();
   const navigate = useNavigate();
 
@@ -128,8 +122,7 @@ function ManageNewOrderPage() {
               Account
             </legend>
             <AccountCombobox
-              accounts={accounts}
-              selectedId={selected?.account.id ?? null}
+              selected={selected ? { id: selected.account.id, name: selected.account.name } : null}
               onSelect={handleSelectAccount}
             />
           </fieldset>

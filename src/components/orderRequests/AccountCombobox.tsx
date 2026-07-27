@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { ChevronsUpDownIcon } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -10,26 +11,50 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useDebounce } from "@/hooks/use-debounce";
+import { listAccounts } from "@/lib/accounts/accounts.functions";
+import type { PagedAccountsResult } from "@/lib/accounts/schema";
+import { asResult } from "@/lib/result";
+import { unwrapOrThrow } from "@/lib/resultLoader";
+
+const searchDebounceMs = 300;
 
 type AccountOption = { id: string; name: string };
 
 type AccountComboboxProps = {
-  accounts: AccountOption[];
-  selectedId: string | null;
+  selected: AccountOption | null;
   onSelect: (accountId: string) => void;
 };
 
-export function AccountCombobox({ accounts, selectedId, onSelect }: AccountComboboxProps) {
+export function AccountCombobox({ selected, onSelect }: AccountComboboxProps) {
   const [open, setOpen] = useState(false);
-  const selected = accounts.find((a) => a.id === selectedId) ?? null;
+  const [inputValue, setInputValue] = useState("");
+  const search = useDebounce(inputValue, searchDebounceMs);
+
+  const accountsQuery = useQuery({
+    queryKey: ["accounts", "search", search],
+    enabled: open,
+    placeholderData: (previous) => previous,
+    queryFn: async () => {
+      const result = asResult<PagedAccountsResult>(await listAccounts({ data: { q: search } }));
+      return unwrapOrThrow(result).accounts;
+    },
+  });
+
+  const accounts = accountsQuery.data ?? [];
 
   function handleSelect(accountId: string) {
     onSelect(accountId);
     setOpen(false);
   }
 
+  function handleOpenChange(nextOpen: boolean) {
+    setOpen(nextOpen);
+    if (!nextOpen) setInputValue("");
+  }
+
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
@@ -44,15 +69,23 @@ export function AccountCombobox({ accounts, selectedId, onSelect }: AccountCombo
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
-        <Command>
-          <CommandInput placeholder="Search accounts..." />
+        <Command shouldFilter={false}>
+          <CommandInput
+            placeholder="Search accounts..."
+            value={inputValue}
+            onValueChange={setInputValue}
+          />
           <CommandList>
-            <CommandEmpty>No accounts found.</CommandEmpty>
+            {accountsQuery.isFetching ? (
+              <div className="py-6 text-center text-sm text-muted-foreground">Searching...</div>
+            ) : (
+              <CommandEmpty>No accounts found.</CommandEmpty>
+            )}
             <CommandGroup>
               {accounts.map((account) => (
                 <CommandItem
                   key={account.id}
-                  value={account.name}
+                  value={account.id}
                   onSelect={() => handleSelect(account.id)}
                 >
                   {account.name}
