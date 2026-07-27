@@ -9,38 +9,42 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
-import { Route as ProtectedRouteImport } from './routes/_protected'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthSetPasswordRouteImport } from './routes/auth/set-password'
-import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
-import { Route as AuthConfirmRouteImport } from './routes/auth/confirm'
-import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
-import { Route as ProtectedSettingsRouteImport } from './routes/_protected/settings'
-import { Route as ProtectedManageRouteImport } from './routes/_protected/manage'
-import { Route as ProtectedChangePasswordRouteImport } from './routes/_protected/change-password'
+import { Route as ProtectedRouteImport } from './routes/_protected'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as ProtectedAccountRouteImport } from './routes/_protected/_account'
-import { Route as ProtectedAccountsIndexRouteImport } from './routes/_protected/accounts/index'
-import { Route as ProtectedManageUsersRouteImport } from './routes/_protected/manage/users'
-import { Route as ProtectedManageProductsRouteImport } from './routes/_protected/manage/products'
-import { Route as ProtectedManageDashboardRouteImport } from './routes/_protected/manage/dashboard'
+import { Route as ProtectedChangePasswordRouteImport } from './routes/_protected/change-password'
+import { Route as ProtectedManageRouteImport } from './routes/_protected/manage'
+import { Route as ProtectedSettingsRouteImport } from './routes/_protected/settings'
+import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
+import { Route as AuthConfirmRouteImport } from './routes/auth/confirm'
+import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
+import { Route as AuthSetPasswordRouteImport } from './routes/auth/set-password'
 import { Route as ProtectedAccountAccountsRouteImport } from './routes/_protected/_account/accounts'
-import { Route as ProtectedManageOrdersIndexRouteImport } from './routes/_protected/manage/orders/index'
+import { Route as ProtectedAccountsIndexRouteImport } from './routes/_protected/accounts/index'
+import { Route as ProtectedManageDashboardRouteImport } from './routes/_protected/manage/dashboard'
+import { Route as ProtectedManageProductsRouteImport } from './routes/_protected/manage/products'
+import { Route as ProtectedManageUsersRouteImport } from './routes/_protected/manage/users'
 import { Route as ProtectedManageAccountsIndexRouteImport } from './routes/_protected/manage/accounts/index'
-import { Route as ProtectedManageOrdersNewRouteImport } from './routes/_protected/manage/orders/new'
+import { Route as ProtectedManageOrdersIndexRouteImport } from './routes/_protected/manage/orders/index'
 import { Route as ProtectedManageOrdersOrderIdRouteImport } from './routes/_protected/manage/orders/$orderId'
+import { Route as ProtectedManageOrdersNewRouteImport } from './routes/_protected/manage/orders/new'
 import { Route as ProtectedAccountAccountsAccountIdIndexRouteImport } from './routes/_protected/_account/accounts/$accountId/index'
-import { Route as ProtectedManageAccountsAccountIdUsersRouteImport } from './routes/_protected/manage/accounts/$accountId/users'
-import { Route as ProtectedManageAccountsAccountIdTemplateRouteImport } from './routes/_protected/manage/accounts/$accountId/template'
 import { Route as ProtectedAccountAccountsAccountIdBrowseRouteImport } from './routes/_protected/_account/accounts/$accountId/browse'
+import { Route as ProtectedManageAccountsAccountIdTemplateRouteImport } from './routes/_protected/manage/accounts/$accountId/template'
+import { Route as ProtectedManageAccountsAccountIdUsersRouteImport } from './routes/_protected/manage/accounts/$accountId/users'
 import { Route as ProtectedAccountAccountsAccountIdOrdersNewRouteImport } from './routes/_protected/_account/accounts/$accountId/orders/new'
 import { Route as ProtectedAccountAccountsAccountIdOrdersOrderIdIndexRouteImport } from './routes/_protected/_account/accounts/$accountId/orders/$orderId/index'
 import { Route as ProtectedAccountAccountsAccountIdOrdersOrderIdSuccessRouteImport } from './routes/_protected/_account/accounts/$accountId/orders/$orderId/success'
 
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProtectedRoute = ProtectedRouteImport.update({
+  id: '/_protected',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
@@ -48,43 +52,13 @@ const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProtectedRoute = ProtectedRouteImport.update({
-  id: '/_protected',
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthSetPasswordRoute = AuthSetPasswordRouteImport.update({
-  id: '/auth/set-password',
-  path: '/auth/set-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
-  id: '/auth/reset-password',
-  path: '/auth/reset-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthConfirmRoute = AuthConfirmRouteImport.update({
-  id: '/auth/confirm',
-  path: '/auth/confirm',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthCallbackRoute = AuthCallbackRouteImport.update({
-  id: '/auth/callback',
-  path: '/auth/callback',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProtectedSettingsRoute = ProtectedSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => ProtectedRoute,
-} as any)
-const ProtectedManageRoute = ProtectedManageRouteImport.update({
-  id: '/manage',
-  path: '/manage',
+const ProtectedAccountRoute = ProtectedAccountRouteImport.update({
+  id: '/_account',
   getParentRoute: () => ProtectedRoute,
 } as any)
 const ProtectedChangePasswordRoute = ProtectedChangePasswordRouteImport.update({
@@ -92,24 +66,46 @@ const ProtectedChangePasswordRoute = ProtectedChangePasswordRouteImport.update({
   path: '/change-password',
   getParentRoute: () => ProtectedRoute,
 } as any)
-const ProtectedAccountRoute = ProtectedAccountRouteImport.update({
-  id: '/_account',
+const ProtectedManageRoute = ProtectedManageRouteImport.update({
+  id: '/manage',
+  path: '/manage',
   getParentRoute: () => ProtectedRoute,
 } as any)
+const ProtectedSettingsRoute = ProtectedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthConfirmRoute = AuthConfirmRouteImport.update({
+  id: '/auth/confirm',
+  path: '/auth/confirm',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
+  id: '/auth/reset-password',
+  path: '/auth/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthSetPasswordRoute = AuthSetPasswordRouteImport.update({
+  id: '/auth/set-password',
+  path: '/auth/set-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProtectedAccountAccountsRoute =
+  ProtectedAccountAccountsRouteImport.update({
+    id: '/accounts',
+    path: '/accounts',
+    getParentRoute: () => ProtectedAccountRoute,
+  } as any)
 const ProtectedAccountsIndexRoute = ProtectedAccountsIndexRouteImport.update({
   id: '/accounts/',
   path: '/accounts/',
   getParentRoute: () => ProtectedRoute,
-} as any)
-const ProtectedManageUsersRoute = ProtectedManageUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => ProtectedManageRoute,
-} as any)
-const ProtectedManageProductsRoute = ProtectedManageProductsRouteImport.update({
-  id: '/products',
-  path: '/products',
-  getParentRoute: () => ProtectedManageRoute,
 } as any)
 const ProtectedManageDashboardRoute =
   ProtectedManageDashboardRouteImport.update({
@@ -117,28 +113,26 @@ const ProtectedManageDashboardRoute =
     path: '/dashboard',
     getParentRoute: () => ProtectedManageRoute,
   } as any)
-const ProtectedAccountAccountsRoute =
-  ProtectedAccountAccountsRouteImport.update({
-    id: '/accounts',
-    path: '/accounts',
-    getParentRoute: () => ProtectedAccountRoute,
-  } as any)
-const ProtectedManageOrdersIndexRoute =
-  ProtectedManageOrdersIndexRouteImport.update({
-    id: '/orders/',
-    path: '/orders/',
-    getParentRoute: () => ProtectedManageRoute,
-  } as any)
+const ProtectedManageProductsRoute = ProtectedManageProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => ProtectedManageRoute,
+} as any)
+const ProtectedManageUsersRoute = ProtectedManageUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => ProtectedManageRoute,
+} as any)
 const ProtectedManageAccountsIndexRoute =
   ProtectedManageAccountsIndexRouteImport.update({
     id: '/accounts/',
     path: '/accounts/',
     getParentRoute: () => ProtectedManageRoute,
   } as any)
-const ProtectedManageOrdersNewRoute =
-  ProtectedManageOrdersNewRouteImport.update({
-    id: '/orders/new',
-    path: '/orders/new',
+const ProtectedManageOrdersIndexRoute =
+  ProtectedManageOrdersIndexRouteImport.update({
+    id: '/orders/',
+    path: '/orders/',
     getParentRoute: () => ProtectedManageRoute,
   } as any)
 const ProtectedManageOrdersOrderIdRoute =
@@ -147,17 +141,23 @@ const ProtectedManageOrdersOrderIdRoute =
     path: '/orders/$orderId',
     getParentRoute: () => ProtectedManageRoute,
   } as any)
+const ProtectedManageOrdersNewRoute =
+  ProtectedManageOrdersNewRouteImport.update({
+    id: '/orders/new',
+    path: '/orders/new',
+    getParentRoute: () => ProtectedManageRoute,
+  } as any)
 const ProtectedAccountAccountsAccountIdIndexRoute =
   ProtectedAccountAccountsAccountIdIndexRouteImport.update({
     id: '/$accountId/',
     path: '/$accountId/',
     getParentRoute: () => ProtectedAccountAccountsRoute,
   } as any)
-const ProtectedManageAccountsAccountIdUsersRoute =
-  ProtectedManageAccountsAccountIdUsersRouteImport.update({
-    id: '/accounts/$accountId/users',
-    path: '/accounts/$accountId/users',
-    getParentRoute: () => ProtectedManageRoute,
+const ProtectedAccountAccountsAccountIdBrowseRoute =
+  ProtectedAccountAccountsAccountIdBrowseRouteImport.update({
+    id: '/$accountId/browse',
+    path: '/$accountId/browse',
+    getParentRoute: () => ProtectedAccountAccountsRoute,
   } as any)
 const ProtectedManageAccountsAccountIdTemplateRoute =
   ProtectedManageAccountsAccountIdTemplateRouteImport.update({
@@ -165,11 +165,11 @@ const ProtectedManageAccountsAccountIdTemplateRoute =
     path: '/accounts/$accountId/template',
     getParentRoute: () => ProtectedManageRoute,
   } as any)
-const ProtectedAccountAccountsAccountIdBrowseRoute =
-  ProtectedAccountAccountsAccountIdBrowseRouteImport.update({
-    id: '/$accountId/browse',
-    path: '/$accountId/browse',
-    getParentRoute: () => ProtectedAccountAccountsRoute,
+const ProtectedManageAccountsAccountIdUsersRoute =
+  ProtectedManageAccountsAccountIdUsersRouteImport.update({
+    id: '/accounts/$accountId/users',
+    path: '/accounts/$accountId/users',
+    getParentRoute: () => ProtectedManageRoute,
   } as any)
 const ProtectedAccountAccountsAccountIdOrdersNewRoute =
   ProtectedAccountAccountsAccountIdOrdersNewRouteImport.update({
@@ -377,18 +377,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/forgot-password': {
-      id: '/forgot-password'
-      path: '/forgot-password'
-      fullPath: '/forgot-password'
-      preLoaderRoute: typeof ForgotPasswordRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_protected': {
@@ -398,53 +391,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_protected/_account': {
+      id: '/_protected/_account'
+      path: ''
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth/set-password': {
-      id: '/auth/set-password'
-      path: '/auth/set-password'
-      fullPath: '/auth/set-password'
-      preLoaderRoute: typeof AuthSetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth/reset-password': {
-      id: '/auth/reset-password'
-      path: '/auth/reset-password'
-      fullPath: '/auth/reset-password'
-      preLoaderRoute: typeof AuthResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth/confirm': {
-      id: '/auth/confirm'
-      path: '/auth/confirm'
-      fullPath: '/auth/confirm'
-      preLoaderRoute: typeof AuthConfirmRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth/callback': {
-      id: '/auth/callback'
-      path: '/auth/callback'
-      fullPath: '/auth/callback'
-      preLoaderRoute: typeof AuthCallbackRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_protected/settings': {
-      id: '/_protected/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof ProtectedSettingsRouteImport
-      parentRoute: typeof ProtectedRoute
-    }
-    '/_protected/manage': {
-      id: '/_protected/manage'
-      path: '/manage'
-      fullPath: '/manage'
-      preLoaderRoute: typeof ProtectedManageRouteImport
+      preLoaderRoute: typeof ProtectedAccountRouteImport
       parentRoute: typeof ProtectedRoute
     }
     '/_protected/change-password': {
@@ -454,12 +419,54 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedChangePasswordRouteImport
       parentRoute: typeof ProtectedRoute
     }
-    '/_protected/_account': {
-      id: '/_protected/_account'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof ProtectedAccountRouteImport
+    '/_protected/manage': {
+      id: '/_protected/manage'
+      path: '/manage'
+      fullPath: '/manage'
+      preLoaderRoute: typeof ProtectedManageRouteImport
       parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/settings': {
+      id: '/_protected/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof ProtectedSettingsRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/confirm': {
+      id: '/auth/confirm'
+      path: '/auth/confirm'
+      fullPath: '/auth/confirm'
+      preLoaderRoute: typeof AuthConfirmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/reset-password': {
+      id: '/auth/reset-password'
+      path: '/auth/reset-password'
+      fullPath: '/auth/reset-password'
+      preLoaderRoute: typeof AuthResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/set-password': {
+      id: '/auth/set-password'
+      path: '/auth/set-password'
+      fullPath: '/auth/set-password'
+      preLoaderRoute: typeof AuthSetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_protected/_account/accounts': {
+      id: '/_protected/_account/accounts'
+      path: '/accounts'
+      fullPath: '/accounts'
+      preLoaderRoute: typeof ProtectedAccountAccountsRouteImport
+      parentRoute: typeof ProtectedAccountRoute
     }
     '/_protected/accounts/': {
       id: '/_protected/accounts/'
@@ -468,11 +475,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedAccountsIndexRouteImport
       parentRoute: typeof ProtectedRoute
     }
-    '/_protected/manage/users': {
-      id: '/_protected/manage/users'
-      path: '/users'
-      fullPath: '/manage/users'
-      preLoaderRoute: typeof ProtectedManageUsersRouteImport
+    '/_protected/manage/dashboard': {
+      id: '/_protected/manage/dashboard'
+      path: '/dashboard'
+      fullPath: '/manage/dashboard'
+      preLoaderRoute: typeof ProtectedManageDashboardRouteImport
       parentRoute: typeof ProtectedManageRoute
     }
     '/_protected/manage/products': {
@@ -482,25 +489,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedManageProductsRouteImport
       parentRoute: typeof ProtectedManageRoute
     }
-    '/_protected/manage/dashboard': {
-      id: '/_protected/manage/dashboard'
-      path: '/dashboard'
-      fullPath: '/manage/dashboard'
-      preLoaderRoute: typeof ProtectedManageDashboardRouteImport
-      parentRoute: typeof ProtectedManageRoute
-    }
-    '/_protected/_account/accounts': {
-      id: '/_protected/_account/accounts'
-      path: '/accounts'
-      fullPath: '/accounts'
-      preLoaderRoute: typeof ProtectedAccountAccountsRouteImport
-      parentRoute: typeof ProtectedAccountRoute
-    }
-    '/_protected/manage/orders/': {
-      id: '/_protected/manage/orders/'
-      path: '/orders'
-      fullPath: '/manage/orders/'
-      preLoaderRoute: typeof ProtectedManageOrdersIndexRouteImport
+    '/_protected/manage/users': {
+      id: '/_protected/manage/users'
+      path: '/users'
+      fullPath: '/manage/users'
+      preLoaderRoute: typeof ProtectedManageUsersRouteImport
       parentRoute: typeof ProtectedManageRoute
     }
     '/_protected/manage/accounts/': {
@@ -510,11 +503,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedManageAccountsIndexRouteImport
       parentRoute: typeof ProtectedManageRoute
     }
-    '/_protected/manage/orders/new': {
-      id: '/_protected/manage/orders/new'
-      path: '/orders/new'
-      fullPath: '/manage/orders/new'
-      preLoaderRoute: typeof ProtectedManageOrdersNewRouteImport
+    '/_protected/manage/orders/': {
+      id: '/_protected/manage/orders/'
+      path: '/orders'
+      fullPath: '/manage/orders/'
+      preLoaderRoute: typeof ProtectedManageOrdersIndexRouteImport
       parentRoute: typeof ProtectedManageRoute
     }
     '/_protected/manage/orders/$orderId': {
@@ -524,6 +517,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedManageOrdersOrderIdRouteImport
       parentRoute: typeof ProtectedManageRoute
     }
+    '/_protected/manage/orders/new': {
+      id: '/_protected/manage/orders/new'
+      path: '/orders/new'
+      fullPath: '/manage/orders/new'
+      preLoaderRoute: typeof ProtectedManageOrdersNewRouteImport
+      parentRoute: typeof ProtectedManageRoute
+    }
     '/_protected/_account/accounts/$accountId/': {
       id: '/_protected/_account/accounts/$accountId/'
       path: '/$accountId'
@@ -531,12 +531,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedAccountAccountsAccountIdIndexRouteImport
       parentRoute: typeof ProtectedAccountAccountsRoute
     }
-    '/_protected/manage/accounts/$accountId/users': {
-      id: '/_protected/manage/accounts/$accountId/users'
-      path: '/accounts/$accountId/users'
-      fullPath: '/manage/accounts/$accountId/users'
-      preLoaderRoute: typeof ProtectedManageAccountsAccountIdUsersRouteImport
-      parentRoute: typeof ProtectedManageRoute
+    '/_protected/_account/accounts/$accountId/browse': {
+      id: '/_protected/_account/accounts/$accountId/browse'
+      path: '/$accountId/browse'
+      fullPath: '/accounts/$accountId/browse'
+      preLoaderRoute: typeof ProtectedAccountAccountsAccountIdBrowseRouteImport
+      parentRoute: typeof ProtectedAccountAccountsRoute
     }
     '/_protected/manage/accounts/$accountId/template': {
       id: '/_protected/manage/accounts/$accountId/template'
@@ -545,12 +545,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedManageAccountsAccountIdTemplateRouteImport
       parentRoute: typeof ProtectedManageRoute
     }
-    '/_protected/_account/accounts/$accountId/browse': {
-      id: '/_protected/_account/accounts/$accountId/browse'
-      path: '/$accountId/browse'
-      fullPath: '/accounts/$accountId/browse'
-      preLoaderRoute: typeof ProtectedAccountAccountsAccountIdBrowseRouteImport
-      parentRoute: typeof ProtectedAccountAccountsRoute
+    '/_protected/manage/accounts/$accountId/users': {
+      id: '/_protected/manage/accounts/$accountId/users'
+      path: '/accounts/$accountId/users'
+      fullPath: '/manage/accounts/$accountId/users'
+      preLoaderRoute: typeof ProtectedManageAccountsAccountIdUsersRouteImport
+      parentRoute: typeof ProtectedManageRoute
     }
     '/_protected/_account/accounts/$accountId/orders/new': {
       id: '/_protected/_account/accounts/$accountId/orders/new'
