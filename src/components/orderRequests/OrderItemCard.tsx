@@ -85,8 +85,8 @@ export function OrderItemCard(props: OrderItemCardProps) {
               />
             </div>
           )}
-          <div className="flex flex-col items-end gap-0.5">
-            <span className="text-xs text-muted-foreground">Total</span>
+          <div className="flex shrink-0 flex-col items-end gap-0.5">
+            <span className="text-xs whitespace-nowrap text-muted-foreground">Total</span>
             <AnimatedTotal
               value={total}
               aria-label={`Total ${total}`}
