@@ -268,11 +268,12 @@ Keep components free of plumbing. Components should accept callbacks (props) for
 
 ## Testing and Quality Gates
 
-At minimum before opening or updating a PR:
+Complete the failing when completing a set of changes
 
 1. `vp check`
 2. `vp test` if any source or test files changed
 3. `vp build` for larger or riskier changes
+4. Run `/caveman-review` skill and address all the valid suggestions unless
 
 Pre-commit hooks are configured through Vite+ staged checks; ensure any auto-fixes are included in commits.
 
