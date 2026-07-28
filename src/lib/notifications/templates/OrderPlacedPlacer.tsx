@@ -24,7 +24,7 @@ function OrderPlacedPlacer({ orderRef, accountName, deliveryAddress, items, orde
       <Button
         href={orderUrl}
         style={{
-          backgroundColor: "#1e3a5f",
+          backgroundColor: "#7f1f2c",
           borderRadius: "6px",
           color: "#ffffff",
           display: "inline-block",
