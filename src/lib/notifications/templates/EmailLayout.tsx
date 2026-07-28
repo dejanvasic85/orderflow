@@ -13,7 +13,7 @@ const styles = {
   headerText: { color: "#fdf9f6", fontSize: "20px", fontWeight: "700", margin: 0 },
   content: { padding: "32px" },
   footer: { backgroundColor: "#f1eeea", borderRadius: "0 0 8px 8px", padding: "16px 32px" },
-  footerText: { color: "#9a938d", fontSize: "12px", margin: 0 },
+  footerText: { color: "#706761", fontSize: "12px", margin: 0 },
 };
 
 export function EmailLayout({ preview, children }: EmailLayoutProps) {
