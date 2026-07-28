@@ -140,6 +140,22 @@ test("create mode enables the email input", () => {
   expect(screen.getByLabelText("Email")).toBeEnabled();
 });
 
+test("create mode does not offer Staff as a role option", async () => {
+  render(<UserEditPanel mode="create" onSave={onSave} onDiscard={onDiscard} />);
+
+  await user.click(screen.getByLabelText("Role"));
+
+  expect(screen.queryByRole("option", { name: /Staff/ })).not.toBeInTheDocument();
+});
+
+test("edit mode offers Staff as a role option", async () => {
+  render(<UserEditPanel user={baseUser} onSave={onSave} onDiscard={onDiscard} />);
+
+  await user.click(screen.getByLabelText("Role"));
+
+  expect(screen.getByRole("option", { name: /Staff/ })).toBeInTheDocument();
+});
+
 test("pre-fills phone from user.phone", () => {
   render(
     <UserEditPanel

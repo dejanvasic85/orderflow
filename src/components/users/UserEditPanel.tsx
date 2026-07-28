@@ -53,6 +53,8 @@ const userEditSchema = z.object({
   active: z.boolean(),
 });
 
+const creatableUserRoles = userRoles.filter((role) => role !== "staff");
+
 const blankUser: User = {
   id: "",
   name: "",
@@ -262,7 +264,7 @@ export function UserEditPanel(props: Props) {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    {userRoles.map((role) => (
+                    {(isCreate ? creatableUserRoles : userRoles).map((role) => (
                       <SelectItem key={role} value={role}>
                         {roleInfoValue[role].label}
                         <span className="text-muted-foreground">
@@ -273,7 +275,7 @@ export function UserEditPanel(props: Props) {
                   </SelectGroup>
                 </SelectContent>
               </Select>
-              <RoleInfoDisclosure />
+              <RoleInfoDisclosure roles={isCreate ? creatableUserRoles : userRoles} />
             </Field>
           )}
         </form.Field>

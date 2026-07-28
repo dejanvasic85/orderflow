@@ -2,10 +2,14 @@ import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { roleInfoValue } from "@/components/users/roleInfo";
-import { userRoles } from "@/lib/users/schema";
+import { userRoles, type UserRole } from "@/lib/users/schema";
 import { cn } from "@/lib/utils";
 
-export function RoleInfoDisclosure() {
+type RoleInfoDisclosureProps = {
+  roles?: readonly UserRole[];
+};
+
+export function RoleInfoDisclosure({ roles = userRoles }: RoleInfoDisclosureProps) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -22,7 +26,7 @@ export function RoleInfoDisclosure() {
       </CollapsibleTrigger>
       <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
         <div className="mt-2 flex flex-col divide-y divide-border rounded-lg border border-border bg-muted/40">
-          {userRoles.map((role) => {
+          {roles.map((role) => {
             const info = roleInfoValue[role];
             return (
               <div key={role} className="flex flex-col gap-1.5 px-3 py-2.5">

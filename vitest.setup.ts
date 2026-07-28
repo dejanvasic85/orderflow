@@ -5,6 +5,11 @@ import { afterEach } from "vite-plus/test";
 // jsdom does not implement scrollIntoView; stub it for cmdk and similar components
 Element.prototype.scrollIntoView = () => {};
 
+// jsdom does not implement pointer capture; stub it for Radix UI Select and similar components
+Element.prototype.hasPointerCapture = () => false;
+Element.prototype.setPointerCapture = () => {};
+Element.prototype.releasePointerCapture = () => {};
+
 // jsdom does not implement ResizeObserver; stub it for Radix UI components that use it
 global.ResizeObserver = class ResizeObserver {
   observe() {}
