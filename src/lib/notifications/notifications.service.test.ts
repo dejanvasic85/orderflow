@@ -1,5 +1,6 @@
 import {
   buildOrderUrl,
+  buildOrdersInboxIntent,
   dedupeById,
   mapRecipients,
   planNotifications,
@@ -273,5 +274,23 @@ describe("planNotifications", () => {
         },
       },
     ]);
+  });
+});
+
+describe("buildOrdersInboxIntent", () => {
+  it("emails the orders inbox using the staff template and manage-path order url", () => {
+    const intent = buildOrdersInboxIntent({
+      siteUrl: "https://app.test",
+      orderId: "order-1",
+      accountId: "acc-1",
+      baseInput,
+    });
+
+    expect(intent).toEqual({
+      channel: "email",
+      to: "orders@bwow.au",
+      template: "staff",
+      emailInput: { ...baseInput, orderUrl: "https://app.test/manage/orders/order-1" },
+    });
   });
 });
