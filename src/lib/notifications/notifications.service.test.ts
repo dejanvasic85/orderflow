@@ -115,6 +115,7 @@ const baseInput = {
   accountName: "Acme Wines",
   placedByName: "Jane Smith",
   deliveryAddress: "1 Vine St",
+  deliveryInstructions: "Leave at the rear door",
   items: [{ productName: "Shiraz", boxes: 2, extraUnits: 1 }],
 };
 

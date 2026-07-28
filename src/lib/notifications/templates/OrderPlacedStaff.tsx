@@ -11,6 +11,7 @@ function OrderPlacedStaff({
   accountName,
   placedByName,
   deliveryAddress,
+  deliveryInstructions,
   items,
   orderUrl,
 }: Props) {
@@ -26,11 +27,20 @@ function OrderPlacedStaff({
         <strong>Placed by:</strong> {placedByName}
       </Text>
       {deliveryAddress ? (
-        <Text style={{ margin: "0 0 24px" }}>
+        <Text style={{ margin: "0 0 8px" }}>
           <strong>Delivery address:</strong> {deliveryAddress}
         </Text>
       ) : (
-        <Text style={{ margin: "0 0 24px", color: "#6b7280" }}>No delivery address specified.</Text>
+        <Text style={{ margin: "0 0 8px", color: "#6b7280" }}>No delivery address specified.</Text>
+      )}
+      {deliveryInstructions ? (
+        <Text style={{ margin: "0 0 24px" }}>
+          <strong>Delivery instructions:</strong> {deliveryInstructions}
+        </Text>
+      ) : (
+        <Text style={{ margin: "0 0 24px", color: "#6b7280" }}>
+          No delivery instructions specified.
+        </Text>
       )}
       <ItemsTable items={items} />
       <Button

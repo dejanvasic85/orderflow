@@ -182,6 +182,7 @@ async function fireOrderNotification(
     accountName,
     placedByName,
     deliveryAddress: input.deliveryAddress ?? null,
+    deliveryInstructions: input.deliveryInstructions ?? null,
     items,
   });
 }

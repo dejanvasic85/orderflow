@@ -58,7 +58,11 @@ export type EmailTemplateKind = "staff" | "placer" | "account";
 
 export type NotificationIntent =
   | { channel: "email"; to: string; template: EmailTemplateKind; emailInput: OrderEmailInput }
-  | { channel: "sms"; to: string; smsInput: Omit<OrderEmailInput, "deliveryAddress" | "items"> };
+  | {
+      channel: "sms";
+      to: string;
+      smsInput: Omit<OrderEmailInput, "deliveryAddress" | "deliveryInstructions" | "items">;
+    };
 
 export type PlanNotificationsInput = {
   recipients: NotificationRecipient[];

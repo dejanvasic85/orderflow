@@ -6,7 +6,14 @@ import type { OrderEmailInput } from "./types";
 
 type Props = OrderEmailInput;
 
-function OrderPlacedPlacer({ orderRef, accountName, deliveryAddress, items, orderUrl }: Props) {
+function OrderPlacedPlacer({
+  orderRef,
+  accountName,
+  deliveryAddress,
+  deliveryInstructions,
+  items,
+  orderUrl,
+}: Props) {
   return (
     <EmailLayout preview={`Your order ${orderRef} has been submitted`}>
       <Heading as="h1" style={{ fontSize: "22px", margin: "0 0 16px" }}>
@@ -16,8 +23,13 @@ function OrderPlacedPlacer({ orderRef, accountName, deliveryAddress, items, orde
         <strong>Account:</strong> {accountName}
       </Text>
       {deliveryAddress && (
-        <Text style={{ margin: "0 0 24px" }}>
+        <Text style={{ margin: deliveryInstructions ? "0 0 8px" : "0 0 24px" }}>
           <strong>Delivery address:</strong> {deliveryAddress}
+        </Text>
+      )}
+      {deliveryInstructions && (
+        <Text style={{ margin: "0 0 24px" }}>
+          <strong>Delivery instructions:</strong> {deliveryInstructions}
         </Text>
       )}
       <ItemsTable items={items} />

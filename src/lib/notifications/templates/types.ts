@@ -9,6 +9,7 @@ export type OrderEmailInput = {
   accountName: string;
   placedByName: string;
   deliveryAddress: string | null;
+  deliveryInstructions: string | null;
   items: OrderEmailItem[];
   orderUrl: string;
 };

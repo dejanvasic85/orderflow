@@ -140,6 +140,7 @@ export async function notifyOrderPlaced(input: NotifyOrderPlacedInput): Promise<
       accountName: input.accountName,
       placedByName: input.placedByName,
       deliveryAddress: input.deliveryAddress,
+      deliveryInstructions: input.deliveryInstructions,
       items: input.items,
     },
   });
