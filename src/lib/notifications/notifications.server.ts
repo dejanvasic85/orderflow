@@ -3,6 +3,7 @@ import { log } from "@/lib/log/logger";
 import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
 import { sendEmail } from "./email";
 import {
+  buildOrdersInboxIntent,
   dedupeById,
   mapRecipients,
   planNotifications,
@@ -123,27 +124,36 @@ function executeIntent(intent: NotificationIntent): Promise<void> {
 export async function notifyOrderPlaced(input: NotifyOrderPlacedInput): Promise<void> {
   const recipients = await fetchOrderRecipients(input.accountId);
   if (recipients.length === 0) {
-    log.warn("notify", "no recipients", { accountId: input.accountId });
-    return;
+    log.warn("notify", "no account/staff recipients", { accountId: input.accountId });
   }
 
   const { SITE_URL: siteUrl } = getServerConfig();
 
-  const intents = planNotifications({
-    recipients,
-    siteUrl,
-    orderId: input.orderId,
-    accountId: input.accountId,
-    placedById: input.placedById,
-    baseInput: {
-      orderRef: input.orderRef,
-      accountName: input.accountName,
-      placedByName: input.placedByName,
-      deliveryAddress: input.deliveryAddress,
-      deliveryInstructions: input.deliveryInstructions,
-      items: input.items,
-    },
-  });
+  const baseInput = {
+    orderRef: input.orderRef,
+    accountName: input.accountName,
+    placedByName: input.placedByName,
+    deliveryAddress: input.deliveryAddress,
+    deliveryInstructions: input.deliveryInstructions,
+    items: input.items,
+  };
+
+  const intents = [
+    ...planNotifications({
+      recipients,
+      siteUrl,
+      orderId: input.orderId,
+      accountId: input.accountId,
+      placedById: input.placedById,
+      baseInput,
+    }),
+    buildOrdersInboxIntent({
+      siteUrl,
+      orderId: input.orderId,
+      accountId: input.accountId,
+      baseInput,
+    }),
+  ];
 
   await Promise.allSettled(intents.map(executeIntent));
 }

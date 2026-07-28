@@ -1,5 +1,6 @@
 import { parseNotificationPrefs } from "@/lib/users/notificationPrefs";
 import { isStaffOrAdmin, type UserRole, type UserWithEmailRow } from "@/lib/users/schema";
+import { ordersInboxEmail } from "./constants";
 import type { OrderEmailInput } from "./templates/types";
 
 export type NotificationRecipient = {
@@ -111,4 +112,19 @@ export function planNotifications(input: PlanNotificationsInput): NotificationIn
   }
 
   return intents;
+}
+
+// Unconditional: every order gets a copy here regardless of account recipients or preferences.
+export function buildOrdersInboxIntent(
+  input: Pick<PlanNotificationsInput, "siteUrl" | "orderId" | "accountId" | "baseInput">,
+): NotificationIntent {
+  return {
+    channel: "email",
+    to: ordersInboxEmail,
+    template: "staff",
+    emailInput: {
+      ...input.baseInput,
+      orderUrl: buildOrderUrl(input.siteUrl, input.orderId, input.accountId, "staff"),
+    },
+  };
 }
