@@ -11,6 +11,7 @@ function OrderPlacedAccount({
   accountName,
   placedByName,
   deliveryAddress,
+  deliveryInstructions,
   items,
   orderUrl,
 }: Props) {
@@ -26,8 +27,13 @@ function OrderPlacedAccount({
         <strong>Placed by:</strong> {placedByName}
       </Text>
       {deliveryAddress && (
-        <Text style={{ margin: "0 0 24px" }}>
+        <Text style={{ margin: deliveryInstructions ? "0 0 8px" : "0 0 24px" }}>
           <strong>Delivery address:</strong> {deliveryAddress}
+        </Text>
+      )}
+      {deliveryInstructions && (
+        <Text style={{ margin: "0 0 24px" }}>
+          <strong>Delivery instructions:</strong> {deliveryInstructions}
         </Text>
       )}
       <ItemsTable items={items} />

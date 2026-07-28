@@ -212,6 +212,7 @@ describe("placeOrder", () => {
       accountName: "Acme Wines",
       placedByName: "Jane Smith",
       deliveryAddress: "1 Vine St",
+      deliveryInstructions: null,
       items: [{ productName: "Shiraz", boxes: 2, extraUnits: 1 }],
     });
   });
