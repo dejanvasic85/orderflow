@@ -90,8 +90,8 @@ importers:
         specifier: 19.2.8
         version: 19.2.8(react@19.2.8)
       react-dropzone:
-        specifier: 19.2.0
-        version: 19.2.0(@types/react@19.2.18)(react@19.2.8)
+        specifier: 20.0.0
+        version: 20.0.0(@types/react@19.2.18)(react@19.2.8)
       react-easy-crop:
         specifier: 6.2.3
         version: 6.2.3(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -4832,9 +4832,9 @@ packages:
     peerDependencies:
       react: ^19.2.8
 
-  react-dropzone@19.2.0:
-    resolution: {integrity: sha512-/tIFow8ymZYnGGzO7KhsLaEUV+NKr04TBAIreBj4qXztPkQN2XwlmYFswUh2koQZvoTOTBK4kVpys4Nq4UqFYw==}
-    engines: {node: '>= 20'}
+  react-dropzone@20.0.0:
+    resolution: {integrity: sha512-Xw8tvvVPJQzj8ir5wivUMzA+G6R+aGhdU5KQzUMvVBlJNb26AW/0137VoYVmb5UgZcbhM9OCpjE4KOqqSL9QuQ==}
+    engines: {node: '>= 22'}
     peerDependencies:
       '@types/react': '*'
       react: '>= 18'
@@ -9670,7 +9670,7 @@ snapshots:
       react: 19.2.8
       scheduler: 0.27.0
 
-  react-dropzone@19.2.0(@types/react@19.2.18)(react@19.2.8):
+  react-dropzone@20.0.0(@types/react@19.2.18)(react@19.2.8):
     dependencies:
       attr-accept: 2.2.5
       file-selector: 4.1.0
