@@ -1,8 +1,10 @@
+import * as Sentry from "@sentry/cloudflare";
+import { wrapFetchWithSentry } from "@sentry/tanstackstart-react";
 import tanstackEntry from "@tanstack/react-start/server-entry";
 import { log } from "@/lib/log/logger";
 import { prettyRequestPath } from "@/lib/log/requestPath";
 
-export default {
+const handler = {
   async fetch(request: Request): Promise<Response> {
     const reqId = crypto.randomUUID().slice(0, 8);
     const method = request.method;
@@ -35,3 +37,10 @@ export default {
     return response;
   },
 };
+
+export default Sentry.withSentry(
+  () => ({
+    dsn: import.meta.env.VITE_SENTRY_DSN,
+  }),
+  wrapFetchWithSentry(handler),
+);

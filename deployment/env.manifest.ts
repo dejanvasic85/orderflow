@@ -57,6 +57,12 @@ export const envManifest = [
     roles: ["build"],
   },
   {
+    name: "VITE_SENTRY_DSN",
+    // Not required in e2e: Sentry alerting has no value in local/CI test runs.
+    requiredIn: ["preview", "prod"],
+    roles: ["build"],
+  },
+  {
     name: "SUPABASE_SECRET_KEY",
     requiredIn: ["e2e", "preview", "prod"],
     roles: ["workerSecret"],
