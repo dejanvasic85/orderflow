@@ -82,6 +82,17 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
+      - name: Register Sentry deploy
+        # Registers a deploy against the release the Build step already created (same commit
+        # SHA), which is what populates Sentry's "Latest Deploys" widget. Source map upload and
+        # release creation happen at build time; skip entirely if Sentry isn't configured.
+        if: ${{ secrets.SENTRY_AUTH_TOKEN != '' }}
+        run: vp exec sentry-cli deploys new --release "$GITHUB_SHA" -e production
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.VITE_SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.VITE_SENTRY_PROJECT }}
+
       - name: Sync Cloudflare Worker secrets
         run: vp exec tsx deployment/syncWorkerSecrets.ts
         env:
