@@ -70,6 +70,10 @@ jobs:
           CLOUDFLARE_ENV: production
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_SENTRY_DSN: ${{ secrets.VITE_SENTRY_DSN }}
+          VITE_SENTRY_ORG: ${{ secrets.VITE_SENTRY_ORG }}
+          VITE_SENTRY_PROJECT: ${{ secrets.VITE_SENTRY_PROJECT }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - name: Deploy
         run: vp exec wrangler deploy
