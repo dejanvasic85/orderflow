@@ -40,7 +40,7 @@
     "clsx": "2.1.1",
     "cmdk": "1.1.1",
     "dotenv-cli": "11.0.0",
-    "framer-motion": "12.43.0",
+    "framer-motion": "13.0.0",
     "lucide-react": "1.28.0",
     "playwright": "1.62.1",
     "radix-ui": "1.6.7",
