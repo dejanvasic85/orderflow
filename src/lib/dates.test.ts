@@ -1,6 +1,24 @@
-import { formatRelativeTime } from "./dates";
+import { formatDate, formatRelativeTime, formatShortDate, formatTime } from "./dates";
 
 const now = new Date("2026-06-20T12:00:00Z");
+
+describe("formatDate", () => {
+  it("formats an ISO timestamp in the Australia/Melbourne timezone", () => {
+    expect(formatDate("2026-06-15T09:30:00Z")).toBe("Monday 15 June 2026");
+  });
+});
+
+describe("formatShortDate", () => {
+  it("formats an ISO timestamp in the Australia/Melbourne timezone", () => {
+    expect(formatShortDate("2026-06-15T09:30:00Z")).toBe("15 June 2026");
+  });
+});
+
+describe("formatTime", () => {
+  it("formats an ISO timestamp in the Australia/Melbourne timezone regardless of the host timezone", () => {
+    expect(formatTime("2026-06-15T09:30:00Z")).toBe("7:30 pm");
+  });
+});
 
 describe("formatRelativeTime", () => {
   it("returns 'just now' for times under a minute ago", () => {
