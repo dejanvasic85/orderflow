@@ -1,4 +1,23 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>dejanvasic85/renovate-config:default"]
+  "extends": ["github>dejanvasic85/renovate-config:default"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^\\.github/workflows/.+\\.ya?ml$/"],
+      "matchStrings": ["uses: supabase/setup-cli@v\\d+\\s+with:\\s+version: (?<currentValue>\\S+)"],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "supabase/cli",
+      "extractVersionTemplate": "^v(?<version>.*)$"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchDepNames": ["supabase/cli"],
+      "groupName": "supabase cli",
+      "automerge": false,
+      "ignoreUnstable": true,
+      "allowedVersions": "!/-(beta|rc|alpha)/"
+    }
+  ]
 }
