@@ -280,6 +280,7 @@ Complete the following when completing a set of changes:
 2. `vp test` if any source or test files changed
 3. `vp build` for larger or riskier changes
 4. Run the `/caveman-review` skill and address all valid suggestions
+5. Open a PR, then confirm CI checks pass on it
 
 Pre-commit hooks are configured through Vite+ staged checks; ensure any auto-fixes are included in commits.
 
