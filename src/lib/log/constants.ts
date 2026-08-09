@@ -11,3 +11,7 @@ export const logColorValue = {
 } as const;
 
 export const logColorReset = "\x1b[0m";
+
+// Fraction of transactions Sentry captures traces for. Hardcoded rather than
+// env-driven; tune by editing this value.
+export const sentryTracesSampleRate = 0.2;

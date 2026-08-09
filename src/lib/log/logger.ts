@@ -1,3 +1,4 @@
+import { logger as sentryLogger } from "@sentry/core";
 import { type LogLevel, logColorReset, logColorValue } from "./constants";
 
 type LogFields = Record<string, unknown>;
@@ -41,6 +42,10 @@ function formatFieldsForDev(fields: LogFields): string {
   return parts.length > 0 ? `  ${parts.join(" ")}` : "";
 }
 
+function sendToSentry(level: LogLevel, event: string, msg: string, fields: LogFields): void {
+  sentryLogger[level](msg, { event, ...fields });
+}
+
 function emit(level: LogLevel, event: string, msg: string, fields: LogFields): void {
   const serialized = serializeFields(fields);
 
@@ -59,6 +64,7 @@ function emit(level: LogLevel, event: string, msg: string, fields: LogFields): v
     level,
     JSON.stringify({ level, event, msg, ts: new Date().toISOString(), ...serialized }),
   );
+  sendToSentry(level, event, msg, serialized);
 }
 
 export const log: Logger = {
