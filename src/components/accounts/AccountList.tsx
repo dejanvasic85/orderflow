@@ -58,7 +58,7 @@ export function AccountList({
   }, [debouncedInput]);
 
   useEffect(() => {
-    if (inputValue === debouncedInput) setInputValue(searchQuery);
+    if (inputValue === debouncedInput && searchQuery === debouncedInput) setInputValue(searchQuery);
   }, [searchQuery]);
 
   const showEmpty = !isLoading && accounts.length === 0;

@@ -76,7 +76,7 @@ export function UserList({
   }, [debouncedInput]);
 
   useEffect(() => {
-    if (inputValue === debouncedInput) setInputValue(searchQuery);
+    if (inputValue === debouncedInput && searchQuery === debouncedInput) setInputValue(searchQuery);
   }, [searchQuery]);
 
   const showEmpty = !isLoading && users.length === 0;

@@ -116,6 +116,34 @@ test("keeps newly typed input when a stale searchQuery prop arrives after the de
   expect(screen.getByRole("textbox", { name: "Search products" })).toHaveValue("ginger");
 });
 
+test("keeps latest input when an out-of-order stale searchQuery response arrives after debounce settled", async () => {
+  vi.useFakeTimers({ shouldAdvanceTime: true });
+  const debouncedUser = userEvent.setup({ advanceTimers: vi.advanceTimersByTime.bind(vi) });
+
+  const { rerender } = renderCatalog({ products: [], total: 0 });
+
+  const input = screen.getByRole("textbox", { name: "Search products" });
+  await debouncedUser.type(input, "ginger");
+
+  await act(async () => {
+    vi.runAllTimers();
+  });
+
+  rerender(
+    <ProductCatalog
+      products={[]}
+      total={0}
+      searchQuery="gin"
+      currentPage={1}
+      totalPages={1}
+      onSearchChange={onSearchChange}
+      onPageChange={onPageChange}
+    />,
+  );
+
+  expect(screen.getByRole("textbox", { name: "Search products" })).toHaveValue("ginger");
+});
+
 test("shows no-results empty state when empty with a search query", () => {
   renderCatalog({ products: [], total: 0, searchQuery: "xyz" });
 
