@@ -1,19 +1,23 @@
 import type { EmailOtpType } from "@supabase/supabase-js";
 import { parseJwtClaims } from "@/lib/auth/jwtClaims";
 import { log } from "@/lib/log/logger";
-import { createSupabaseServerClient } from "@/lib/supabaseServer";
+import {
+  createSupabaseServerClient,
+  getAuthenticatedUser,
+  getAuthSession,
+} from "@/lib/supabaseServer";
 
 export async function fetchSession() {
   const supabase = createSupabaseServerClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getAuthenticatedUser(supabase);
   if (!user) return null;
 
   // Decode user_role from the session JWT (custom claim set by Supabase RLS trigger)
   const {
     data: { session },
-  } = await supabase.auth.getSession();
+  } = await getAuthSession(supabase);
   const token = session?.access_token ?? "";
   const payloadSegment = token.split(".")[1];
   const userRole = payloadSegment
@@ -28,7 +32,7 @@ export async function fetchSessionOrThrow() {
   const {
     data: { user },
     error,
-  } = await supabase.auth.getUser();
+  } = await getAuthenticatedUser(supabase);
 
   if (error || !user) {
     throw new Error("Unauthorized");
@@ -48,7 +52,10 @@ export async function verifyResetTokenFromOtp(token_hash: string) {
     return { valid: true as const };
   }
 
-  // Token may already be consumed — check for an existing valid session
+  // Token may already be consumed — check for an existing valid session. This reads
+  // *this* client's state right after verifyOtp mutated it in-memory, so it must not go
+  // through the shared single-flight cache (which is keyed by the pre-verification
+  // request cookies and would risk handing this result to an unrelated concurrent request).
   const {
     data: { user },
   } = await supabase.auth.getUser();

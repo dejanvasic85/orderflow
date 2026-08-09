@@ -2,7 +2,7 @@ import { log } from "@/lib/log/logger";
 import { notifyPasswordChanged } from "@/lib/notifications/notifications.server";
 import { err, ok, type Result } from "@/lib/result";
 import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
-import { createSupabaseServerClient } from "@/lib/supabaseServer";
+import { createSupabaseServerClient, getAuthenticatedUser } from "@/lib/supabaseServer";
 
 export type ChangePasswordInput = {
   currentPassword: string;
@@ -16,7 +16,7 @@ export async function changePassword(
 
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getAuthenticatedUser(supabase);
 
   if (!user?.email) {
     return err({ message: "Unauthorized" });
@@ -72,7 +72,7 @@ export async function fetchPasswordChangedAt(): Promise<
 
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getAuthenticatedUser(supabase);
   if (!user) {
     return err({ message: "Unauthorized" });
   }
