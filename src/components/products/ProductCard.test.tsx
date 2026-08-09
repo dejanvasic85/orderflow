@@ -22,6 +22,28 @@ test("renders action slot content when provided", () => {
   expect(screen.getByRole("button", { name: "Add" })).toBeInTheDocument();
 });
 
+test("renders the full long product name including the trailing variant and size", () => {
+  const longName = makeProduct({
+    id: "prod-2",
+    name: "Gremillet Champagne Brut Rosé 750ml",
+  });
+
+  render(<ProductCard product={longName} />);
+
+  expect(screen.getByText("Gremillet Champagne Brut Rosé 750ml")).toBeInTheDocument();
+});
+
+test("exposes the full product name as a title attribute", () => {
+  const longName = makeProduct({
+    id: "prod-3",
+    name: "Gremillet Champagne Blanc de Noirs 750ml",
+  });
+
+  render(<ProductCard product={longName} />);
+
+  expect(screen.getByTitle("Gremillet Champagne Blanc de Noirs 750ml")).toBeInTheDocument();
+});
+
 test("renders without action prop without errors", () => {
   render(<ProductCard product={product} />);
 
