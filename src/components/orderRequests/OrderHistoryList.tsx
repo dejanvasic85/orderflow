@@ -35,7 +35,7 @@ export function OrderHistoryList({
   const debouncedInput = useDebounce(inputValue, 300);
 
   useEffect(() => {
-    setInputValue(searchQuery);
+    if (inputValue === debouncedInput) setInputValue(searchQuery);
   }, [searchQuery]);
 
   useEffect(() => {

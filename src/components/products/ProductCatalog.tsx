@@ -59,7 +59,7 @@ export function ProductCatalog({
   }, [debouncedInput]);
 
   useEffect(() => {
-    setInputValue(searchQuery);
+    if (inputValue === debouncedInput) setInputValue(searchQuery);
   }, [searchQuery]);
 
   const showEmpty = !isLoading && products.length === 0;
