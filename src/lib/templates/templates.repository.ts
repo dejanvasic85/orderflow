@@ -152,15 +152,21 @@ export function createTemplateRepository(): TemplateRepository {
     async saveTemplateItemBatch({ templateId, toRemove, toUpdate, toAdd }) {
       const supabase = createSupabaseServerClient();
 
-      const [deleteError, updateError, insertError] = await Promise.all([
+      // Removals must land before additions: a product can be removed and re-added
+      // in the same edit, and running both concurrently races the
+      // template_items_unique_product constraint when the insert lands first.
+      const deleteError =
         toRemove.length > 0
-          ? supabase
+          ? await supabase
               .from("template_items")
               .delete()
               .eq("template_id", templateId)
               .in("id", toRemove)
               .then((r) => r.error)
-          : Promise.resolve(null),
+          : null;
+      if (deleteError) return err({ message: deleteError.message });
+
+      const [updateError, insertError] = await Promise.all([
         toUpdate.length > 0
           ? Promise.all(
               toUpdate.map(({ id, boxCount, unitCount }) =>
@@ -188,7 +194,7 @@ export function createTemplateRepository(): TemplateRepository {
           : Promise.resolve(null),
       ]);
 
-      const firstError = [deleteError, updateError, insertError].find(Boolean);
+      const firstError = [updateError, insertError].find(Boolean);
       if (firstError) return err({ message: firstError.message });
       return ok();
     },
