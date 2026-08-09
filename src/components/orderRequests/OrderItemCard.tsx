@@ -48,7 +48,7 @@ export function OrderItemCard(props: OrderItemCardProps) {
             className={props.readOnly ? "size-11" : "size-14"}
           />
           <div className="min-w-0 flex-1">
-            <p className="truncate font-medium leading-snug">{name}</p>
+            <p className="line-clamp-2 font-medium leading-snug break-words">{name}</p>
             <p className="mt-0.5 text-xs text-muted-foreground">{qtyPerBox} per box</p>
           </div>
           {!props.readOnly && (
