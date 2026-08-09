@@ -1,6 +1,7 @@
 import * as Sentry from "@sentry/cloudflare";
 import { wrapFetchWithSentry } from "@sentry/tanstackstart-react";
 import tanstackEntry from "@tanstack/react-start/server-entry";
+import { sentryTracesSampleRate } from "@/lib/log/constants";
 import { log } from "@/lib/log/logger";
 import { prettyRequestPath } from "@/lib/log/requestPath";
 
@@ -41,6 +42,8 @@ const handler = {
 export default Sentry.withSentry(
   () => ({
     dsn: import.meta.env.VITE_SENTRY_DSN,
+    enableLogs: true,
+    tracesSampleRate: sentryTracesSampleRate,
   }),
   wrapFetchWithSentry(handler),
 );
