@@ -5,6 +5,7 @@ This file defines the baseline engineering conventions for agents working in thi
 ## Writing
 
 - **Never use em-dashes (`—`)** in any output: code, comments, docs, commit messages, PR descriptions, or drafted emails. Use a comma, a full stop, a colon, or parentheses instead, whichever fits the sentence.
+- **Talk in summary mode.** Keep chat responses short and to the point. No filler, no restating the question, no unnecessary elaboration.
 
 ## Project Context
 
