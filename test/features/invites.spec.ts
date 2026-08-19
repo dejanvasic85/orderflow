@@ -6,7 +6,7 @@ import { deleteAllMailpitMessages, getMessageText, waitForMessageTo } from "./ma
 async function getInviteLink(toEmail: string): Promise<string> {
   const message = await waitForMessageTo(toEmail);
   const text = await getMessageText(message.ID);
-  const match = text.match(/https?:\/\/\S+verify\S+/);
+  const match = text.match(/https?:\/\/\S+\/auth\/confirm\S+/);
   if (!match) throw new Error("Could not extract invite link from email");
   // Rewrite 127.0.0.1 to localhost so the browser can connect
   return match[0].replace("127.0.0.1", "localhost");
@@ -50,7 +50,8 @@ test.describe("Invite management", () => {
     const invitePage = await inviteContext.newPage();
     await goto(invitePage, inviteLink);
 
-    // Step 3 — should land on set-password after verifying
+    // Step 3 — confirm the click was made by a person, then land on set-password
+    await invitePage.getByRole("button", { name: "Continue" }).click();
     await expect(invitePage.getByRole("heading", { name: "Set your password" })).toBeVisible({
       timeout: 10000,
     });

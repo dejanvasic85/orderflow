@@ -1,11 +1,14 @@
 import { Link } from "@tanstack/react-router";
 import { AuthSplitLayout } from "@/components/auth/AuthSplitLayout";
+import { Button } from "@/components/ui/button";
 
 type Props = {
   error: string | null;
+  submitting: boolean;
+  onContinue: () => void;
 };
 
-export function AuthCallbackView({ error }: Props) {
+export function ConfirmView({ error, submitting, onContinue }: Props) {
   return (
     <AuthSplitLayout>
       {error ? (
@@ -21,8 +24,14 @@ export function AuthCallbackView({ error }: Props) {
         </>
       ) : (
         <>
-          <h1 className="mb-2 text-3xl font-semibold tracking-tight">Verifying…</h1>
-          <p className="text-muted-foreground">Please wait while we verify your link.</p>
+          <h1 className="mb-2 text-3xl font-semibold tracking-tight">Confirm it's you</h1>
+          <p className="mb-6 text-muted-foreground">
+            Click continue to finish verifying your link. We ask for a click here so that automated
+            email scanners can't use up the link before you do.
+          </p>
+          <Button onClick={onContinue} disabled={submitting}>
+            {submitting ? "Verifying…" : "Continue"}
+          </Button>
         </>
       )}
     </AuthSplitLayout>
