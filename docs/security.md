@@ -158,6 +158,32 @@ the logs actually changed. Use the `workflow_dispatch` trigger on `deploy-prod.y
 rather than editing worker secrets by hand, hand edits drift from the manifest and are
 not reproducible.
 
+## Auth email links must never auto-verify on GET
+
+**Symptom.** A user reports an invite/reset link as "invalid or expired" seconds
+after receiving it, well inside the token's expiry window. GoTrue logs
+(`get_logs`, `service: "auth"`) show the same one-time token consumed twice in
+quick succession from the same or a nearby IP, with the second attempt failing
+`error: "One-time token not found"`.
+
+**Cause.** Corporate email security (Microsoft Defender Safe Links and similar)
+issues an automated `GET` against every link in an inbound email, often within
+seconds of delivery. If that link points straight at Supabase's own `/verify`
+endpoint (the default `{{ .ConfirmationURL }}` email template), or at one of our
+own routes that calls `verifyOtp`/`exchangeCodeForSession` unconditionally in a
+route `loader`, the scanner's `GET` silently burns the single-use token before
+the real user ever clicks. The user's own click then correctly gets rejected.
+
+**Fix — the pattern this repo uses.** Point auth emails at our own domain with a
+custom template (`supabase/templates/*.html`, `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=...&next=...`,
+see `recovery.html` / `invite.html`), **and** gate the actual token-consuming
+call behind a real user action (a "Continue" button in `ConfirmView`/`confirm.tsx`)
+rather than firing it from a `loader` or a mount effect. A scanner loading the
+page harmlessly renders a static button; only a human click consumes the token.
+Any new auth email flow (magic link, email change, reauthentication) must follow
+this same pattern before going live — the templates for those still use the
+unsafe `{{ .ConfirmationURL }}` form today because nothing in the app sends them yet.
+
 ## Checklist when touching auth / data access
 
 - [ ] New table → `enable row level security` **and** policies in the **same migration**.
