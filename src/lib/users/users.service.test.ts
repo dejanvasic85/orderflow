@@ -37,6 +37,7 @@ function makeRepo(overrides: Partial<UserRepository> = {}): UserRepository {
     updateOwnProfile: vi.fn().mockResolvedValue(ok()),
     updateUser: vi.fn().mockResolvedValue(ok()),
     syncAuthBanStatus: vi.fn().mockResolvedValue(ok()),
+    markPasswordSet: vi.fn().mockResolvedValue(ok()),
     replaceUserAccounts: vi.fn().mockResolvedValue(ok()),
     addUserToAccounts: vi.fn().mockResolvedValue(ok()),
     removeUserFromAccounts: vi.fn().mockResolvedValue(ok()),

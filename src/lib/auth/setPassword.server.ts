@@ -3,6 +3,7 @@ import { log } from "@/lib/log/logger";
 import { err, ok } from "@/lib/result";
 import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
 import { createSupabaseServerClient, getAuthenticatedUser } from "@/lib/supabaseServer";
+import { createUserRepository } from "@/lib/users/users.repository";
 
 export async function updatePassword(password: string): Promise<SetPasswordResult> {
   const supabase = createSupabaseServerClient();
@@ -19,6 +20,19 @@ export async function updatePassword(password: string): Promise<SetPasswordResul
     return err({ message: error.message });
   }
 
+  // Mark this right after the password itself is confirmed changed, not after the
+  // metadata write below — the user already has a usable password at this point,
+  // and a later failure shouldn't leave the Users list status badge stuck on
+  // "Pending". Best-effort: distinct from invite_accepted_at (set when the invite
+  // token is verified), so don't fail the whole request if this secondary write fails.
+  const markResult = await createUserRepository().markPasswordSet(user.id);
+  if (!markResult.ok) {
+    log.error("auth.password", "failed to mark password_set_at", {
+      userId: user.id,
+      error: markResult.error.message,
+    });
+  }
+
   const admin = createSupabaseAdminClient();
   const { error: metaError } = await admin.auth.admin.updateUserById(user.id, {
     user_metadata: { must_change_password: false },
@@ -26,21 +40,6 @@ export async function updatePassword(password: string): Promise<SetPasswordResul
 
   if (metaError) {
     return err({ message: metaError.message });
-  }
-
-  // Best-effort: distinct from invite_accepted_at (set when the invite token is
-  // verified) so the Users list status badge reflects a usable password, not just
-  // a clicked link. Don't fail the whole request if this secondary write fails.
-  const { error: markError } = await supabase
-    .from("users")
-    .update({ password_set_at: new Date().toISOString() })
-    .eq("id", user.id)
-    .is("password_set_at", null);
-  if (markError) {
-    log.error("auth.password", "failed to mark password_set_at", {
-      userId: user.id,
-      error: markError.message,
-    });
   }
 
   return ok();

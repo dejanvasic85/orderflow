@@ -101,6 +101,7 @@ export type UserRepository = {
 
   updateUser(id: string, patch: UserFieldPatch): Promise<Result<void>>;
   syncAuthBanStatus(userId: string, active: boolean): Promise<Result<void>>;
+  markPasswordSet(userId: string): Promise<Result<void>>;
 
   replaceUserAccounts(userId: string, accountIds: string[]): Promise<Result<void>>;
   addUserToAccounts(userId: string, accountIds: string[]): Promise<Result<void>>;
@@ -199,6 +200,17 @@ export function createUserRepository(): UserRepository {
       const { error } = await admin.auth.admin.updateUserById(userId, {
         ban_duration: active ? "none" : "876600h",
       });
+      if (error) return err({ message: error.message });
+      return ok();
+    },
+
+    async markPasswordSet(userId) {
+      const supabase = createSupabaseServerClient();
+      const { error } = await supabase
+        .from("users")
+        .update({ password_set_at: new Date().toISOString() })
+        .eq("id", userId)
+        .is("password_set_at", null);
       if (error) return err({ message: error.message });
       return ok();
     },
