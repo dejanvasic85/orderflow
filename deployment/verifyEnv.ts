@@ -4,29 +4,21 @@
  * at once, with a GitHub `::error::` annotation.
  *
  * Usage:
- *   tsx deployment/verifyEnv.ts <context>              # reads SECRETS_JSON (deploy jobs)
- *   tsx deployment/verifyEnv.ts <context> --from-env   # reads process.env (e2e .env.local)
+ *   tsx deployment/verifyEnv.ts <context>
  *
- * <context> is one of the deploymentContexts in env.manifest.ts.
+ * <context> is one of the deploymentContexts in env.manifest.ts. Reads process.env, which
+ * the workflow step populates with explicit `NAME: ${{ secrets.NAME }}` entries (or, for
+ * e2e/smoke, an .env.local already loaded into the job).
  */
 
 import { deploymentContexts, requiredFor, type DeploymentContext } from "./env.manifest";
-import { readSecretsJson } from "./secretsJson";
 
 function isContext(value: string): value is DeploymentContext {
   return (deploymentContexts as readonly string[]).includes(value);
 }
 
-function resolveValues(fromEnv: boolean): Record<string, string | undefined> {
-  if (fromEnv) {
-    return process.env;
-  }
-  return readSecretsJson();
-}
-
 function main() {
-  const [contextArg, ...flags] = process.argv.slice(2);
-  const fromEnv = flags.includes("--from-env");
+  const [contextArg] = process.argv.slice(2);
 
   if (!contextArg || !isContext(contextArg)) {
     console.error(
@@ -35,11 +27,10 @@ function main() {
     process.exit(1);
   }
 
-  const values = resolveValues(fromEnv);
   const missing = requiredFor(contextArg)
     .map((spec) => spec.name)
     .filter((name) => {
-      const value = values[name];
+      const value = process.env[name];
       return value === undefined || value === "";
     });
 

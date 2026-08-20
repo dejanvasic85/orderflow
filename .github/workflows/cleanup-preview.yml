@@ -28,7 +28,8 @@ jobs:
       - name: Verify required secrets
         run: vp exec tsx deployment/verifyEnv.ts cleanup
         env:
-          SECRETS_JSON: ${{ toJSON(secrets) }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
       - name: Compute preview worker name
         id: meta

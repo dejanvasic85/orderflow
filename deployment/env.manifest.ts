@@ -4,10 +4,12 @@
  * derive everything from this — so adding a new secret is a one-line edit here instead of
  * touching every workflow file.
  *
- * NOTE: GitHub secrets can never be read at runtime by a script. The workflow must still
- * bind them into the job once (we use `${{ toJSON(secrets) }}` → SECRETS_JSON). This
- * manifest decides what we *expect* inside that blob and how to shape it — it cannot source
- * the values itself.
+ * NOTE: GitHub secrets can never be read at runtime by a script. Each workflow step binds
+ * the specific secrets that context needs into its own env block (`NAME: ${{ secrets.NAME }}`),
+ * one line per secret — GitHub flags a blanket `toJSON(secrets)` dump as a possible
+ * credential-exfiltration pattern, so we never pass the whole secret bag at once. This
+ * manifest is the source of truth for which names each context requires; keep each
+ * workflow's env block in sync with `requiredFor(context)` / `workerSecretSpecs()` by hand.
  *
  * The app's runtime env schema lives in src/lib/config.ts (serverEnvSchema). Keep the names
  * here aligned with that schema; this file adds the CI-only metadata Zod doesn't model.
