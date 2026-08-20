@@ -63,6 +63,7 @@ const blankUser: User = {
   active: true,
   inviteAcceptedAt: null,
   invitedAt: null,
+  passwordSetAt: null,
   role: "user",
   notificationPreferences: { email: true, sms: false },
   createdAt: "",
@@ -117,7 +118,7 @@ export function UserEditPanel(props: Props) {
   const headerTitle = isCreate ? "Invite new user" : user.name;
   const headerSubtitle = isCreate ? "They'll receive an email to set their password" : user.email;
   const submitLabel = isCreate ? "Send invite" : "Save changes";
-  const isPending = !isCreate && user.active && !user.inviteAcceptedAt;
+  const isPending = !isCreate && user.active && !user.passwordSetAt;
 
   return (
     <div className="flex flex-col gap-6 p-6">

@@ -10,6 +10,7 @@ const baseUser = makeUser({
   email: "alice@example.com",
   inviteAcceptedAt: "2024-01-02T00:00:00Z",
   invitedAt: "2024-01-01T00:00:00Z",
+  passwordSetAt: "2024-01-02T00:00:00Z",
   role: "staff",
 });
 

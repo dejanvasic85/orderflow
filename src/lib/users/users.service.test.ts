@@ -80,6 +80,7 @@ describe("mapUser", () => {
       active: null,
       invite_accepted_at: null,
       invited_at: null,
+      password_set_at: null,
       role: null,
       notification_preferences: null,
       created_at: null,

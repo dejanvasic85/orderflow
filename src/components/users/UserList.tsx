@@ -170,9 +170,7 @@ export function UserList({
                 </TableCell>
                 <TableCell>
                   <UserStatusBadge
-                    status={
-                      !user.active ? "inactive" : !user.inviteAcceptedAt ? "pending" : "active"
-                    }
+                    status={!user.active ? "inactive" : !user.passwordSetAt ? "pending" : "active"}
                   />
                 </TableCell>
                 <TableCell onClick={(e) => e.stopPropagation()}>
