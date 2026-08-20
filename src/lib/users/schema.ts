@@ -28,6 +28,7 @@ export type User = {
   active: boolean;
   inviteAcceptedAt: string | null;
   invitedAt: string | null;
+  passwordSetAt: string | null;
   role: UserRole;
   notificationPreferences: { email: boolean; sms: boolean };
   createdAt: string;

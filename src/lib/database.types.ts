@@ -369,6 +369,7 @@ export type Database = {
           name: string
           notification_preferences: Json
           password_changed_at: string | null
+          password_set_at: string | null
           phone: string | null
           role: Database["public"]["Enums"]["user_role"]
           updated_at: string
@@ -383,6 +384,7 @@ export type Database = {
           name: string
           notification_preferences?: Json
           password_changed_at?: string | null
+          password_set_at?: string | null
           phone?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string
@@ -397,6 +399,7 @@ export type Database = {
           name?: string
           notification_preferences?: Json
           password_changed_at?: string | null
+          password_set_at?: string | null
           phone?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string
@@ -415,6 +418,7 @@ export type Database = {
           invited_at: string | null
           name: string | null
           notification_preferences: Json | null
+          password_set_at: string | null
           phone: string | null
           role: Database["public"]["Enums"]["user_role"] | null
           updated_at: string | null

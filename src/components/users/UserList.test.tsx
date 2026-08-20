@@ -9,6 +9,7 @@ const adminUser = makeUser({
   email: "alice@example.com",
   inviteAcceptedAt: "2024-01-02T00:00:00Z",
   invitedAt: "2024-01-01T00:00:00Z",
+  passwordSetAt: "2024-01-02T00:00:00Z",
   role: "admin",
   accounts: [{ id: "acc-1", name: "Acme" }],
 });
@@ -20,6 +21,7 @@ const staffUser = makeUser({
   active: false,
   inviteAcceptedAt: "2024-01-02T00:00:00Z",
   invitedAt: "2024-01-01T00:00:00Z",
+  passwordSetAt: "2024-01-02T00:00:00Z",
   role: "staff",
   notificationPreferences: { email: false, sms: false },
 });
@@ -28,8 +30,9 @@ const pendingUser = makeUser({
   id: "3",
   name: "Carol Pending",
   email: "carol@example.com",
-  inviteAcceptedAt: null,
+  inviteAcceptedAt: "2024-01-02T00:00:00Z",
   invitedAt: "2024-01-01T00:00:00Z",
+  passwordSetAt: null,
   role: "user",
 });
 
@@ -128,7 +131,7 @@ test("shows Inactive badge for inactive users", () => {
   expect(screen.getByText("Inactive")).toBeInTheDocument();
 });
 
-test("shows Pending badge for active users who have not accepted their invite", () => {
+test("shows Pending badge for active users who have not set a password yet", () => {
   renderList({ users: [pendingUser] });
 
   expect(screen.getByText("Pending")).toBeInTheDocument();

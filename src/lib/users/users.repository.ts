@@ -26,7 +26,7 @@ function inviteErrorFields(email: string, error: AuthError) {
 }
 
 export const userListSelect = `
-  id, name, email, phone, active, invite_accepted_at, invited_at, role, notification_preferences, created_at, updated_at,
+  id, name, email, phone, active, invite_accepted_at, invited_at, password_set_at, role, notification_preferences, created_at, updated_at,
   account_users!user_id ( account:accounts ( id, name ) )
 ` as const;
 
@@ -38,6 +38,7 @@ export type ListedRow = {
   active: boolean | null;
   invite_accepted_at: string | null;
   invited_at: string | null;
+  password_set_at: string | null;
   role: UserRole | null;
   notification_preferences: unknown;
   created_at: string | null;
@@ -100,6 +101,7 @@ export type UserRepository = {
 
   updateUser(id: string, patch: UserFieldPatch): Promise<Result<void>>;
   syncAuthBanStatus(userId: string, active: boolean): Promise<Result<void>>;
+  markPasswordSet(userId: string): Promise<Result<void>>;
 
   replaceUserAccounts(userId: string, accountIds: string[]): Promise<Result<void>>;
   addUserToAccounts(userId: string, accountIds: string[]): Promise<Result<void>>;
@@ -198,6 +200,17 @@ export function createUserRepository(): UserRepository {
       const { error } = await admin.auth.admin.updateUserById(userId, {
         ban_duration: active ? "none" : "876600h",
       });
+      if (error) return err({ message: error.message });
+      return ok();
+    },
+
+    async markPasswordSet(userId) {
+      const supabase = createSupabaseServerClient();
+      const { error } = await supabase
+        .from("users")
+        .update({ password_set_at: new Date().toISOString() })
+        .eq("id", userId)
+        .is("password_set_at", null);
       if (error) return err({ message: error.message });
       return ok();
     },
@@ -326,6 +339,19 @@ export function createUserRepository(): UserRepository {
         user_metadata: { must_change_password: true },
       });
       if (error) return err({ message: error.message });
+
+      const { error: markError } = await admin
+        .from("users")
+        .update({ password_set_at: new Date().toISOString() })
+        .eq("id", userId)
+        .is("password_set_at", null);
+      if (markError) {
+        log.error("admin.password", "failed to mark password_set_at", {
+          userId,
+          error: markError.message,
+        });
+      }
+
       return ok();
     },
 
