@@ -10,6 +10,7 @@ vi.mock("@/lib/accounts/accounts.functions", () => ({
   assignUserToAccount: vi.fn(),
   unassignUserFromAccount: vi.fn(),
 }));
+
 vi.mock("@/lib/users/users.functions", () => ({
   listUsers: vi.fn().mockResolvedValue({ ok: true, value: [] }),
 }));
