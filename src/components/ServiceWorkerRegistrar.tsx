@@ -2,11 +2,7 @@ import { useEffect } from "react";
 
 const serviceWorkerPath = "/sw.js";
 
-/**
- * Registers the minimal service worker that makes the app installable on phones.
- * Renders nothing; runs once after hydration, browser-only. Registration failures
- * are non-fatal — the app works without it, you just lose the install prompt.
- */
+/** Registers the service worker that makes the app installable. Renders nothing. */
 export function ServiceWorkerRegistrar() {
   useEffect(() => {
     if (!("serviceWorker" in navigator)) {

@@ -74,12 +74,7 @@ export type PlanNotificationsInput = {
   baseInput: Omit<OrderEmailInput, "orderUrl">;
 };
 
-/**
- * Pure decision: given the recipients and order context, produce the list of
- * email/SMS intents to send. Decides per recipient which email template applies
- * (staff vs the placer vs a plain account member) and whether each channel fires
- * based on their preferences and available contact details.
- */
+/** Pure decision: which email/SMS intents to send per recipient, based on role and preferences. */
 export function planNotifications(input: PlanNotificationsInput): NotificationIntent[] {
   const intents: NotificationIntent[] = [];
 

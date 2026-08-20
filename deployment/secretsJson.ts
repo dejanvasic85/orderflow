@@ -1,10 +1,4 @@
-/**
- * Parses the `${{ toJSON(secrets) }}` blob the workflow passes in as SECRETS_JSON.
- *
- * This is the one unavoidable GitHub touchpoint: secrets cannot be read by a script at
- * runtime, so the workflow must hand the whole secret bag to us as a single env var. We
- * parse it here once and the deployment scripts work from the resulting record.
- */
+/** Parses the `${{ toJSON(secrets) }}` blob the workflow passes in as SECRETS_JSON. */
 
 const secretsEnvVar = "SECRETS_JSON";
 

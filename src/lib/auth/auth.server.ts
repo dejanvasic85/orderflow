@@ -52,10 +52,9 @@ export async function verifyResetTokenFromOtp(token_hash: string) {
     return { valid: true as const };
   }
 
-  // Token may already be consumed — check for an existing valid session. This reads
-  // *this* client's state right after verifyOtp mutated it in-memory, so it must not go
-  // through the shared single-flight cache (which is keyed by the pre-verification
-  // request cookies and would risk handing this result to an unrelated concurrent request).
+  // Token may already be consumed; check for a valid session on this client's
+  // in-memory state, bypassing the single-flight cache to avoid leaking it to
+  // an unrelated concurrent request keyed by the pre-verification cookies.
   const {
     data: { user },
   } = await supabase.auth.getUser();

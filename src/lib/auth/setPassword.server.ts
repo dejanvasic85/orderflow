@@ -20,11 +20,8 @@ export async function updatePassword(password: string): Promise<SetPasswordResul
     return err({ message: error.message });
   }
 
-  // Mark this right after the password itself is confirmed changed, not after the
-  // metadata write below — the user already has a usable password at this point,
-  // and a later failure shouldn't leave the Users list status badge stuck on
-  // "Pending". Best-effort: distinct from invite_accepted_at (set when the invite
-  // token is verified), so don't fail the whole request if this secondary write fails.
+  // Best-effort, distinct from invite_accepted_at: mark now so the Users list
+  // doesn't stay "Pending" even if the metadata write below fails.
   const markResult = await createUserRepository().markPasswordSet(user.id);
   if (!markResult.ok) {
     log.error("auth.password", "failed to mark password_set_at", {

@@ -1,14 +1,8 @@
 /**
- * Pushes the worker-role secrets to a Cloudflare Worker via `wrangler secret bulk`,
- * driven entirely by env.manifest.ts. Replaces the hand-maintained jq/bash payload that
- * previously lived in .github/actions/sync-worker-secrets.
+ * Pushes workerSecret-role secrets to a Cloudflare Worker via `wrangler secret bulk`,
+ * driven by env.manifest.ts. Reads values from SECRETS_JSON.
  *
- * Usage:
- *   tsx deployment/syncWorkerSecrets.ts [workerName]
- *
- * When workerName is given (preview deploys), it is passed as `--name`. Omit for prod.
- * Reads secret values from SECRETS_JSON (the `${{ toJSON(secrets) }}` blob); requires
- * CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID to already be in the process env for wrangler.
+ * Usage: tsx deployment/syncWorkerSecrets.ts [workerName]  (omit workerName for prod)
  */
 
 import { spawnSync } from "node:child_process";

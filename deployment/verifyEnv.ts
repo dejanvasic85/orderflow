@@ -1,13 +1,8 @@
 /**
- * Fail-fast verification that every variable the manifest marks required for a context is
- * present (non-empty), before the costly steps in a workflow run. Lists *all* missing names
- * at once, with a GitHub `::error::` annotation.
+ * Fails fast (with a GitHub ::error:: annotation) if any required var for a
+ * deploymentContext is missing, listing all missing names at once.
  *
- * Usage:
- *   tsx deployment/verifyEnv.ts <context>              # reads SECRETS_JSON (deploy jobs)
- *   tsx deployment/verifyEnv.ts <context> --from-env   # reads process.env (e2e .env.local)
- *
- * <context> is one of the deploymentContexts in env.manifest.ts.
+ * Usage: tsx deployment/verifyEnv.ts <context> [--from-env]
  */
 
 import { deploymentContexts, requiredFor, type DeploymentContext } from "./env.manifest";

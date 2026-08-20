@@ -112,11 +112,7 @@ export type AccountInfo = { name: string } | null;
 export type PlacedByInfo = { id: string; name: string; role: string } | null;
 export type ProductInfo = { id: string; name: string };
 
-/**
- * The only seam that talks to Supabase for order requests. Each method builds a
- * query, executes it, and returns a `Result` of raw rows — no business rules.
- * Services depend on this interface, never on the Supabase client directly.
- */
+/** The only seam that talks to Supabase for order requests; no business rules here. */
 export type OrderRequestRepository = {
   findOrderRequestsForAccount(accountId: string): Promise<Result<OrderRequestWithItems[]>>;
   findOrderRequestById(id: string): Promise<Result<OrderRequestWithItems>>;
@@ -206,12 +202,8 @@ export function createOrderRequestRepository(): OrderRequestRepository {
     },
 
     async createOrderWithItems(input, placedById) {
-      // TODO(atomicity): the order row and its items are inserted as two separate
-      // PostgREST calls, so a failed items insert leaves an orphaned order row.
-      // supabase-js cannot run a multi-statement transaction; making this atomic
-      // requires moving both inserts into a Postgres function called via .rpc().
-      // Keeping the two-step behaviour for now — this method is the single seam to
-      // change when we add the RPC.
+      // TODO(atomicity): two separate inserts, so a failed items insert orphans
+      // the order row. Needs a Postgres function via .rpc() to be atomic.
       const supabase = createSupabaseServerClient();
       const { items, ...orderData } = input;
 

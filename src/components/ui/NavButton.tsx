@@ -12,12 +12,7 @@ type NavButtonProps = Omit<LinkComponentProps, "children"> &
     children?: ReactNode;
   };
 
-/**
- * A navigation button — looks like a Button, behaves like a Link, and shows a
- * spinner the moment it's clicked while the destination route's loader/beforeLoad
- * runs. This closes the "nothing happens for a second" gap on route-changing CTAs
- * such as the homepage Login (whose target runs a session check before rendering).
- */
+/** Button-styled Link that shows a spinner while the destination route loads. */
 export function NavButton({ variant, size, className, children, to, ...props }: NavButtonProps) {
   const isNavPending = useNavPending();
   const pending = typeof to === "string" ? isNavPending(to) : false;

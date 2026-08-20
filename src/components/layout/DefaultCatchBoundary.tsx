@@ -13,14 +13,9 @@ import {
 import { log } from "@/lib/log/logger";
 
 /**
- * Friendly fallback rendered when a route's loader or component throws. Users see
- * a reassuring message and recovery actions — never the raw error.
- *
- * TanStack Start catches loader errors internally and renders this into a 200
- * response, so the error never reaches the worker.ts catch. We log server-side
- * here to close that gap (reaches Workers Logs). The log is guarded to the server
- * render only: on the client the error surfaces in the browser console anyway, and
- * logging in the render body would re-fire on every re-render / StrictMode pass.
+ * Fallback rendered when a route's loader or component throws.
+ * Logs server-side only, since TanStack Start swallows the error into a 200
+ * response before it reaches worker.ts, and the client already logs to console.
  */
 export function DefaultCatchBoundary({ error }: ErrorComponentProps) {
   const router = useRouter();

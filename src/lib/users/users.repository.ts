@@ -11,11 +11,7 @@ function maskEmail(email: string): string {
   return `${local[0]}***@${domain}`;
 }
 
-/**
- * GoTrue surfaces gateway-level rejections (bad/rotated API key) with the same generic
- * message shape as SMTP failures, so log status/code too. Otherwise an auth problem is
- * indistinguishable from an email-provider problem.
- */
+/** GoTrue gives gateway rejections the same generic shape as SMTP failures; log status/code too. */
 function inviteErrorFields(email: string, error: AuthError) {
   return {
     email: maskEmail(email),
