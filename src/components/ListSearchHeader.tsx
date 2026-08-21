@@ -9,12 +9,7 @@ type Props = {
   onChange: (value: string) => void;
 };
 
-/**
- * Shared search header for list screens (accounts, users, orders).
- * On mobile the input takes the full width and the count sits below it,
- * giving the field room to breathe; from `sm` up it collapses back to a
- * single inline row with the count to the right.
- */
+/** Shared search header for list screens; count wraps below input on mobile. */
 export function ListSearchHeader({ value, placeholder, ariaLabel, countLabel, onChange }: Props) {
   return (
     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">

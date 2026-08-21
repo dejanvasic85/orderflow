@@ -27,14 +27,9 @@ type SupabaseServerClient = ReturnType<typeof createSupabaseServerClient>;
 type GetUserResult = Awaited<ReturnType<SupabaseServerClient["auth"]["getUser"]>>;
 type GetSessionResult = Awaited<ReturnType<SupabaseServerClient["auth"]["getSession"]>>;
 
-// A single client-side navigation can trigger several server functions in parallel
-// (e.g. a route's own loader plus its ancestors' beforeLoad/loader), each building its
-// own Supabase client from the same request cookies. If the access token has expired,
-// each one independently asks Supabase to refresh it, but refresh tokens are single-use:
-// only the first redemption succeeds, and the rest fail with "already used", which
-// surfaces as an "Unauthorized" error and a brief DefaultCatchBoundary flash. Keying an
-// in-flight promise by the raw cookie string lets concurrent calls that carry the same
-// (possibly stale) session share one refresh instead of racing.
+// Parallel server functions sharing a request can each try to refresh the same
+// expired token; refresh tokens are single-use, so only the first wins and the
+// rest fail "already used". Dedupe concurrent refreshes by cookie string.
 export function singleFlight<T>(
   cache: Map<string, Promise<T>>,
   key: string,

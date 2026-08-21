@@ -45,7 +45,7 @@ const config = defineConfig({
     tsconfigPaths: true,
   },
   staged: {
-    "*": "vp check --fix",
+    "*": ["vp fmt", "vp lint --fix"],
   },
   fmt: {
     ignorePatterns: [".claude/**", "src/routeTree.gen.ts", "src/lib/database.types.ts"],

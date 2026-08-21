@@ -1,15 +1,7 @@
 import { useRouterState } from "@tanstack/react-router";
 import { useDelayedBoolean } from "@/hooks/use-delayed-boolean";
 
-/**
- * A thin, brand-coloured progress bar pinned to the top of the viewport that
- * animates while the router is resolving a navigation (running loaders). It is
- * the ambient counterpart to the per-link pending state: instant reassurance
- * that the app is working during the sub-second loader window.
- *
- * A short delay avoids flashing the bar on near-instant navigations, and a
- * minimum visible duration prevents a jarring flicker on fast ones.
- */
+/** Top-of-viewport progress bar shown while the router resolves a navigation. */
 export function RouteProgressBar() {
   const isLoading = useRouterState({ select: (s) => s.isLoading });
   const show = useDelayedBoolean(isLoading);
