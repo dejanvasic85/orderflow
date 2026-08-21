@@ -99,3 +99,12 @@ The app is deployed to Cloudflare Workers via `wrangler`. Every push to `main` d
 ---
 
 Built for BWOW. Feedback and contributions welcome.
+
+## License
+
+Copyright © 2026 Dejan Vasic. All rights reserved.
+
+Licensed under the [PolyForm Strict License 1.0.0](https://polyformproject.org/licenses/strict/1.0.0/).
+
+You may use this software for noncommercial purposes only.
+Modification and redistribution are not permitted.

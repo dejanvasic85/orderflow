@@ -1,20 +1,26 @@
 /**
- * Pushes workerSecret-role secrets to a Cloudflare Worker via `wrangler secret bulk`,
- * driven by env.manifest.ts. Reads values from SECRETS_JSON.
+ * Pushes the worker-role secrets to a Cloudflare Worker via `wrangler secret bulk`,
+ * driven entirely by env.manifest.ts. Replaces the hand-maintained jq/bash payload that
+ * previously lived in .github/actions/sync-worker-secrets.
  *
- * Usage: tsx deployment/syncWorkerSecrets.ts [workerName]  (omit workerName for prod)
+ * Usage:
+ *   tsx deployment/syncWorkerSecrets.ts [workerName]
+ *
+ * When workerName is given (preview deploys), it is passed as `--name`. Omit for prod.
+ * Reads each worker secret's value from process.env under its own name (the workflow step
+ * populates these with explicit `NAME: ${{ secrets.NAME }}` entries); requires
+ * CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID to already be in the process env for wrangler.
  */
 
 import { spawnSync } from "node:child_process";
 import { workerSecretSpecs } from "./env.manifest";
-import { readSecretsJson } from "./secretsJson";
 
-function buildPayload(secrets: Record<string, string>): Record<string, string> {
+function buildPayload(): Record<string, string> {
   const payload: Record<string, string> = {};
   for (const spec of workerSecretSpecs()) {
-    const value = secrets[spec.name];
+    const value = process.env[spec.name];
     if (value === undefined || value === "") {
-      throw new Error(`Cannot sync worker secret "${spec.name}": missing from SECRETS_JSON.`);
+      throw new Error(`Cannot sync worker secret "${spec.name}": missing from process env.`);
     }
     const targetKey = spec.workerAlias ?? spec.name;
     payload[targetKey] = value;
@@ -24,8 +30,7 @@ function buildPayload(secrets: Record<string, string>): Record<string, string> {
 
 function main() {
   const workerName = process.argv[2];
-  const secrets = readSecretsJson();
-  const payload = buildPayload(secrets);
+  const payload = buildPayload();
 
   const args = ["exec", "wrangler", "secret", "bulk"];
   if (workerName) {
