@@ -1,8 +1,8 @@
 # Todo list - MVP
 
 - [x] Infra | Must | Rename bww to bwow including admin email
-- [x] Infra | Must | Layout components — update agents.md instructions and skills for UI development
-- [x] Infra | Must | Form library and validation — replace all useState in UserEditPanel
+- [x] Infra | Must | Layout components: update agents.md instructions and skills for UI development
+- [x] Infra | Must | Form library and validation: replace all useState in UserEditPanel
 - [x] Infra | Must | Filename and module convention (incl. shadcn installation)
 - [x] Quality | Must | Unit tests
 - [x] Productionising | Must | Setup deployment to Cloudflare
@@ -12,7 +12,7 @@
 - [x] Quality | Should | End-to-end tests
 - [x] Quality | Must | GitHub checks for branch protection
 - [x] Feature | Must | Adding / inviting a new user
-- [x] Feature | Must | Auth callback route (`/auth/callback`) — invite/recovery via hash-token and code paths
+- [x] Feature | Must | Auth callback route (`/auth/callback`): invite/recovery via hash-token and code paths
 - [x] Feature | Must | "Set your password" screen for first-time invitees
 - [x] Feature | Must | Block inviting users with the same email
 - [x] Feature | Must | Resend invite from user list
@@ -21,16 +21,16 @@
 - [x] Quality | Must | Improve the error handling to use Result system - investigate neverthrow
 - [x] Quality | Must | Structure of server functions and loaders. Where should they live? We have inconsistency including testing.
 - [x] Infra | Must | Migration for `products`, `order_requests`, `order_request_items`
-- [x] Infra | Must | Seed data — sample product catalog in `supabase/seed.sql`
+- [x] Infra | Must | Seed data: sample product catalog in `supabase/seed.sql`
 - [x] Infra | Must | Supabase Storage bucket for product images + upload UI (sort out sourcing wine/beer/liquor images for dev seed)
-- [x] Infra | Must | RLS policies — users see only their assigned accounts; staff read-only across all order requests
+- [x] Infra | Must | RLS policies: users see only their assigned accounts; staff read-only across all order requests
 - [x] Infra | Must | `src/lib/products/` query layer (mirror `accounts/`, `users/`)
-- [x] Feature | Must | User homepage — account selection for users with multiple accounts
-- [x] Feature | Must | Submit order request — server function + RLS scoped to assigned accounts
+- [x] Feature | Must | User homepage: account selection for users with multiple accounts
+- [x] Feature | Must | Submit order request: server function + RLS scoped to assigned accounts
 - [x] Feature | Must | Account management for admin - basic details
 - [x] Feature | Must | Account management for admin - assigning and removing users
-- [x] Feature | Must | Real product catalog browse — replace mock data on account orders page
-- [x] Feature | Must | Order draft state — add items with box + extra bottle quantities
+- [x] Feature | Must | Real product catalog browse: replace mock data on account orders page
+- [x] Feature | Must | Order draft state: add items with box + extra bottle quantities
 - [x] Feature | Must | Order history view
 - [x] Feature | Must | Wire existing "New Order" button to the order flow
 - [x] Feature | Must | View order details - readonly page with details of the bottles, boxes, quantities date + who ordered
@@ -54,16 +54,16 @@
 - [x] Security | Must | Ensure that staff have most readonly access to admin dashboard and other admin functions
 - [x] Quality | Must | Unit testing the server functions
 - [x] Quality | Must | Playwright tests improved and working locally and CI
-- [x] Feature | Must | PWA — manifest, service worker, install prompt, offline app shell
-- [x] Feature | Must | Notification preferences UI — users edit their own email/SMS preferences
+- [x] Feature | Must | PWA: manifest, service worker, install prompt, offline app shell
+- [x] Feature | Must | Notification preferences UI: users edit their own email/SMS preferences
 - [x] Productionising | Must | Fix the publicly available view users_with_email - see email for warning from supabase
-- [x] Productionising | Must | Set up production domain (app.bwow.com) — confirm access with Sam or register new
-- [x] Productionising | Must | SMTP server (AWS SES) for email notifications — configure in Supabase, verify `vasic.com.au` for DKIM as interim
+- [x] Productionising | Must | Set up production domain (app.bwow.com): confirm access with Sam or register new
+- [x] Productionising | Must | SMTP server (AWS SES) for email notifications: configure in Supabase, verify `vasic.com.au` for DKIM as interim
 - [x] Productionising | Must | Email templates
 - [x] Productionising | Must | Configure production domain in Supabase (currently https://orderflow.team-manager.workers.dev)
 - [x] Productionising | Must | Configure production env vars in GitHub
-- [x] Productionising | Must | Logging and monitoring (Supabase + Cloudflare — consider unifying in Cloudflare logs) sender
-- [x] Feature | Nice | Homepage dashboard — reporting / summary tiles (Phase 4, quoted separately)
+- [x] Productionising | Must | Logging and monitoring (Supabase + Cloudflare, consider unifying in Cloudflare logs) sender
+- [x] Feature | Nice | Homepage dashboard: reporting / summary tiles (Phase 4, quoted separately)
 - [x] Feature | Must | Favicon for the browser and App on the phones
 - [x] Productionising | Must | Setup sms notifications
 - [x] Change all wording from bottles to units because sometimes it's not really bottles it's actually cans
@@ -83,7 +83,7 @@
 - [x] The .server.ts files have too much logic in them or all database operations should be somewhere else
 - [x] Audit all the variable naming so they are camelCased
 - [x] Cron job in github pipelines to login to the app every day and verify all pages are functional
-- [x] Feature | Should | Loaders/pending state when clicking between nav links — currently nothing happens for ~1s which feels broken
+- [x] Feature | Should | Loaders/pending state when clicking between nav links: currently nothing happens for ~1s which feels broken
 - [x] Feature | Should | Better error pages
 - [x] Redesign components to look better like the orders page and order component
 - [x] Create test fixtures to help with the unit tests instead of inline all the data

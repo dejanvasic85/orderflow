@@ -1,7 +1,7 @@
 <h1 align="center">OrderFlow</h1>
 
 <p align="center">
-  A progressive web app for managing order requests at a liquor wholesaler — replacing SMS/email with a centralised, role-based system.
+  A progressive web app for managing order requests at a liquor wholesaler. It replaces SMS and email with one centralised, role-based system.
 </p>
 
 <p align="center">
@@ -37,7 +37,7 @@
 
 ## Why We Built This
 
-BWOW (Boutique Wines of the World) manages ~400–500 accounts and was handling order requests entirely over SMS and email. OrderFlow gives the team a single place to receive, track, and review requests — with account templates making repeat orders fast for sales reps.
+BWOW (Boutique Wines of the World) manages about 400 to 500 accounts. Before OrderFlow, they handled order requests entirely over SMS and email. OrderFlow gives the team one place to receive, track, and review requests. Account templates make repeat orders fast for sales reps.
 
 ## Developing and Running Locally
 
