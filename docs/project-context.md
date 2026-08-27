@@ -1,14 +1,14 @@
-# OrderFlow — Project Notes
+# OrderFlow Project Notes
 
-**Client:** Boutique Wines of the World (BWOW — Sam)
-**Type:** Progressive Web App (PWA) — installable on mobile, web-first build
+**Client:** Boutique Wines of the World (BWOW, main contact: Sam)
+**Type:** Progressive Web App (PWA), installable on mobile, built web-first
 **Stack:** TanStack Start · Supabase (Postgres + Auth) · Tailwind + shadcn/ui · Cloudflare Pages · Vite
 
 ---
 
 ## Purpose
 
-Replaces SMS/email ordering with a centralised order request management system for a liquor wholesaler (~400–500 accounts). No payment processing. No stock management. Pricing is deferred — no prices stored or displayed for now.
+Replaces SMS/email ordering with a centralised order request management system for a liquor wholesaler (about 400 to 500 accounts). No payment processing. No stock management. Pricing is deferred: no prices are stored or displayed for now.
 
 ---
 
@@ -16,7 +16,7 @@ Replaces SMS/email ordering with a centralised order request management system f
 
 | Role      | What they can do                                                                                                                                                                        |
 | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Admin** | Full access — users, accounts, products, templates, order requests. Only admins can modify (remove items from) templates                                                                |
+| **Admin** | Full access: users, accounts, products, templates, order requests. Only admins can modify (remove items from) templates                                                                 |
 | **Staff** | View all order requests. Read-only otherwise                                                                                                                                            |
 | **User**  | Submit order requests and view history for their assigned accounts. Can browse catalog and add items to a request or template. A user assigned to multiple accounts acts as a sales rep |
 
@@ -43,42 +43,42 @@ Replaces SMS/email ordering with a centralised order request management system f
 
 ## Phases
 
-| Phase         | Scope                                                                                      | Timeline  |
-| ------------- | ------------------------------------------------------------------------------------------ | --------- |
-| 1 — Core MVP  | Auth, accounts, products (manual/CSV), templates, order requests, email notifications, PWA | 2–3 weeks |
-| 2 — Polish    | SMS notifications, notification prefs, account-specific pricing, bulk reassignment         | 1–2 weeks |
-| 3 — MYOB Sync | CSV export/import (API sync deferred — Sam is comfortable double-handling for now)         | 1–2 weeks |
-| 4 — Reporting | TBD — quoted separately                                                                    | —         |
+| Phase        | Scope                                                                                      | Timeline  |
+| ------------ | ------------------------------------------------------------------------------------------ | --------- |
+| 1: Core MVP  | Auth, accounts, products (manual/CSV), templates, order requests, email notifications, PWA | 2–3 weeks |
+| 2: Polish    | SMS notifications, notification prefs, account-specific pricing, bulk reassignment         | 1–2 weeks |
+| 3: MYOB Sync | CSV export/import (API sync deferred: Sam is comfortable double-handling for now)          | 1–2 weeks |
+| 4: Reporting | TBD, quoted separately                                                                     | n/a       |
 
 ---
 
 ## Data Model (entities only)
 
-- **users** — auth + role + notification prefs
-- **accounts** — business + contact details, delivery address + instructions
-- **account_users** — many-to-many join (user ↔ account)
-- **products** — name, description, image, qty per box (no prices for now)
-- **templates** — one per account; contain product lines with suggested quantities
-- **order_requests** — linked to account + placed-by user; has optional note + delivery override
-- **order_request_items** — products on a request with boxes + extra unit quantities
+- **users**: auth, role, notification prefs
+- **accounts**: business and contact details, delivery address and instructions
+- **account_users**: many-to-many join (user ↔ account)
+- **products**: name, description, image, qty per box (no prices for now)
+- **templates**: one per account; contain product lines with suggested quantities
+- **order_requests**: linked to account and placed-by user; has optional note and delivery override
+- **order_request_items**: products on a request with boxes and extra unit quantities
 
 ---
 
 ## Architecture
 
 ```text
-Cloudflare Workers  — serves TanStack Start app (SSR + API server functions)
-Cloudflare R2       — product image storage (bucket: orderflow-assets)
-Supabase            — Postgres, Auth, PostgREST
+Cloudflare Workers  : serves TanStack Start app (SSR + API server functions)
+Cloudflare R2       : product image storage (bucket: orderflow-assets)
+Supabase            : Postgres, Auth, PostgREST
 ```
 
 The browser calls Supabase directly via `@supabase/supabase-js`. Row Level Security (RLS) enforces per-user data access at the database layer, so the anon key is safe to ship in the browser bundle.
 
-TanStack server functions (`createServerFn`) are used for sensitive operations that require verified identity. They use `createSupabaseServerClient()` which reads cookies from the incoming request and calls `supabase.auth.getUser()` — a network-verified check, not a cookie read.
+TanStack server functions (`createServerFn`) handle sensitive operations that require verified identity. They use `createSupabaseServerClient()`, which reads cookies from the incoming request and calls `supabase.auth.getUser()`. This is a network-verified check, not a cookie read.
 
 ### Product image upload
 
-Admins upload product images directly from the browser to Cloudflare R2 — file bytes never pass through the Worker. Flow:
+Admins upload product images directly from the browser to Cloudflare R2. File bytes never pass through the Worker. Flow:
 
 1. Admin selects and optionally crops a file in `ProductEditPanel`
 2. Browser resizes to max 1200 px and converts to WebP (quality 0.82) via canvas
