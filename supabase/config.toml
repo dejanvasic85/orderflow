@@ -243,7 +243,11 @@ max_frequency = "1s"
 # Number of characters used in the email OTP.
 otp_length = 6
 # Number of seconds before the email OTP expires (defaults to 1 hour).
-otp_expiry = 3600
+# Raised to 3 days: customers weren't clicking invite links within the 1-hour default,
+# so signups failed with otp_expired. Applies to invite, magic link, and password
+# recovery alike (GoTrue has no per-template expiry), so this also widens the window
+# a leaked/forwarded password-reset email stays valid.
+otp_expiry = 259200
 
 # Use a production-ready SMTP server
 # [auth.email.smtp]
