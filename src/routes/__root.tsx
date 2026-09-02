@@ -4,6 +4,7 @@ import { HeadContent, Scripts, createRootRouteWithContext } from "@tanstack/reac
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { useEffect } from "react";
 import { Toaster } from "sonner";
+import { InstallPrompt } from "@/components/InstallPrompt";
 import { RouteProgressBar } from "@/components/layout/RouteProgressBar";
 import { ServiceWorkerRegistrar } from "@/components/ServiceWorkerRegistrar";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,6 +15,14 @@ import appCss from "../styles.css?url";
 interface MyRouterContext {
   queryClient: QueryClient;
 }
+
+/*
+ * Chromium fires beforeinstallprompt as soon as the install criteria are met,
+ * which can be before React hydrates. The event is the only way to open the
+ * real install prompt later, so park it on `window` for useInstallState to
+ * adopt: see src/lib/install/installState.ts.
+ */
+const installPromptCaptureScript = `(function(){window.__bwowInstallPrompt=null;window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__bwowInstallPrompt=e;});})();`;
 
 const themeInitScript = `(function(){try{var stored=window.localStorage.getItem('theme');var mode=(stored==='light'||stored==='dark'||stored==='auto')?stored:'auto';var prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;var resolved=mode==='auto'?(prefersDark?'dark':'light'):mode;var root=document.documentElement;root.classList.remove('light','dark');root.classList.add(resolved);root.style.colorScheme=resolved;}catch(e){}})();`;
 
@@ -91,6 +100,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     <html lang="en" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        <script dangerouslySetInnerHTML={{ __html: installPromptCaptureScript }} />
         <HeadContent />
       </head>
       <body className="flex min-h-dvh flex-col font-sans antialiased [overflow-wrap:anywhere]">
@@ -99,6 +109,8 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <ServiceWorkerRegistrar />
         <TooltipProvider>{children}</TooltipProvider>
         <Toaster richColors />
+        {/* After <Toaster />: sonner drops toasts published before it subscribes. */}
+        <InstallPrompt />
         <TanStackDevtools
           config={{
             position: "bottom-right",
