@@ -34,6 +34,13 @@ export async function waitForMessageTo(
   throw new Error(`No email found for ${toEmail} within ${timeoutMs}ms`);
 }
 
+/** Returns every message currently addressed to `toEmail`. Does not wait. */
+export async function listMessagesTo(toEmail: string): Promise<MailpitMessage[]> {
+  const res = await fetch(`${mailpitUrl}/api/v1/messages`);
+  const { messages } = (await res.json()) as { messages: MailpitMessage[] };
+  return messages.filter((m) => m.To.some((t) => t.Address === toEmail));
+}
+
 /** Returns the plain-text body of a Mailpit message by ID. */
 export async function getMessageText(id: string): Promise<string> {
   const res = await fetch(`${mailpitUrl}/api/v1/message/${id}`);

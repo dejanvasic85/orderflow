@@ -13,6 +13,15 @@ export const isUserRole = (value: string): value is UserRole =>
   // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- Array<UserRole>.includes requires a UserRole argument to check a plain string
   userRoles.includes(value as UserRole);
 
+/** Staff are provisioned deliberately, never through the new-user forms. */
+export const creatableUserRoles = ["admin", "user"] as const satisfies readonly UserRole[];
+
+export type CreatableUserRole = (typeof creatableUserRoles)[number];
+
+export const isCreatableUserRole = (value: string): value is CreatableUserRole =>
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- Array<CreatableUserRole>.includes requires a CreatableUserRole argument to check a plain string
+  creatableUserRoles.includes(value as CreatableUserRole);
+
 export const isAdmin = (role: UserRole): boolean => role === "admin";
 export const isStaff = (role: UserRole): boolean => role === "staff";
 export const isUser = (role: UserRole): boolean => role === "user";
@@ -58,12 +67,19 @@ export const createUserSchema = z.object({
   email: z.email(),
   name: z.string().min(1),
   phone: auPhoneSchema,
-  role: z.enum(userRoles),
+  // Narrower than updateUserSchema on purpose: neither create form offers staff.
+  role: z.enum(creatableUserRoles),
   notificationPreferences: z.object({ email: z.boolean(), sms: z.boolean() }),
   accountIds: z.array(z.uuid()),
 });
 
 export type CreateUserInput = z.infer<typeof createUserSchema>;
+
+export const createUserWithPasswordSchema = createUserSchema.extend({
+  password: passwordSchema,
+});
+
+export type CreateUserWithPasswordInput = z.infer<typeof createUserWithPasswordSchema>;
 
 export const updateUserAccountsSchema = z.object({
   userId: z.uuid(),

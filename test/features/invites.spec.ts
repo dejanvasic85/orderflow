@@ -27,7 +27,7 @@ test.describe("Invite management", () => {
     // Step 1 — login as admin and send invite
     await login(page, { user: "admin" });
     await goto(page, "/manage/users");
-    await page.getByRole("button", { name: "+ New user" }).click();
+    await page.getByRole("button", { name: "+ Invite user" }).click();
 
     const drawer = page.getByRole("dialog");
     await expect(drawer).toBeVisible();
