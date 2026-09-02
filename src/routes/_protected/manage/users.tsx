@@ -30,7 +30,7 @@ import type {
   UpdateUserAccountsInput,
   User,
 } from "@/lib/users/schema";
-import { listUsersSearchSchema, userPageSize } from "@/lib/users/schema";
+import { isCreatableUserRole, listUsersSearchSchema, userPageSize } from "@/lib/users/schema";
 import {
   checkEmailExists,
   createUserWithPassword,
@@ -178,6 +178,11 @@ function UsersPage() {
   }
 
   async function handleInvite(draft: User) {
+    if (!isCreatableUserRole(draft.role)) {
+      toast.error("Staff accounts cannot be created here");
+      return;
+    }
+
     const result = asResult<User>(
       await inviteUser({
         data: {

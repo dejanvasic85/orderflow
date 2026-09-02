@@ -451,13 +451,34 @@ describe("inviteUser", () => {
     }
   });
 
-  it("propagates a repo error from findAccountNames", async () => {
-    const findAccountNames = vi.fn().mockResolvedValue(err({ message: "accounts lookup failed" }));
-    const deps = makeDeps({ repo: makeRepo({ findAccountNames }) });
+  it("still returns the invited user when findAccountNames fails", async () => {
+    const deleteAuthUser = vi.fn().mockResolvedValue(ok());
+    const deps = makeDeps({
+      repo: makeRepo({
+        findAccountNames: vi.fn().mockResolvedValue(err({ message: "accounts lookup failed" })),
+        deleteAuthUser,
+      }),
+    });
 
     const result = await inviteUser(deps, inviteData);
 
-    expect(result).toEqual(err({ message: "accounts lookup failed" }));
+    expect(result.ok).toBe(true);
+    expect(deleteAuthUser).not.toHaveBeenCalled();
+  });
+
+  it("returns no account names when findAccountNames fails", async () => {
+    const deps = makeDeps({
+      repo: makeRepo({
+        findAccountNames: vi.fn().mockResolvedValue(err({ message: "accounts lookup failed" })),
+      }),
+    });
+
+    const result = await inviteUser(deps, inviteData);
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.value.accounts).toEqual([]);
+    }
   });
 });
 
@@ -575,6 +596,21 @@ describe("createUserWithPassword", () => {
 
     expect(result).toEqual(err({ message: "Unable to complete user creation" }));
     expect(deleteAuthUser).toHaveBeenCalledWith("u-new");
+  });
+
+  it("still returns the user when findAccountNames fails", async () => {
+    const deleteAuthUser = vi.fn().mockResolvedValue(ok());
+    const deps = makeDeps({
+      repo: makeRepo({
+        findAccountNames: vi.fn().mockResolvedValue(err({ message: "accounts lookup failed" })),
+        deleteAuthUser,
+      }),
+    });
+
+    const result = await createUserWithPassword(deps, createData);
+
+    expect(result.ok).toBe(true);
+    expect(deleteAuthUser).not.toHaveBeenCalled();
   });
 
   it("still returns the user when marking the password as set fails", async () => {

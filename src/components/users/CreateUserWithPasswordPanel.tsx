@@ -34,8 +34,7 @@ import type { Result } from "@/lib/result";
 import {
   creatableUserRoles,
   type CreateUserWithPasswordInput,
-  isUserRole,
-  userRoles,
+  isCreatableUserRole,
 } from "@/lib/users/schema";
 
 type Props = {
@@ -54,7 +53,7 @@ const createUserWithPasswordFormSchema = z.object({
       (v) => v === "" || /^04\d{8}$/.test(v),
       "Mobile number must be 10 digits starting with 04",
     ),
-  role: z.enum(userRoles),
+  role: z.enum(creatableUserRoles),
   password: passwordSchema,
   notifications: z.object({ email: z.boolean(), sms: z.boolean() }),
 });
@@ -255,7 +254,7 @@ export function CreateUserWithPasswordPanel({ onCreate, onCheckEmailExists, onCl
               <Select
                 value={field.state.value}
                 onValueChange={(v) => {
-                  if (isUserRole(v)) field.handleChange(v);
+                  if (isCreatableUserRole(v)) field.handleChange(v);
                 }}
               >
                 <SelectTrigger id="pw-role" className="w-full">

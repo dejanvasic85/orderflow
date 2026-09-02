@@ -190,7 +190,19 @@ async function finaliseNewUser(
     );
   }
 
-  return deps.repo.findAccountNames(data.accountIds);
+  // Enrichment only, and it runs after the account is already usable. Failing the
+  // whole call here would report failure for a user who exists, and the retry would
+  // then be rejected for a duplicate email.
+  const namesResult = await deps.repo.findAccountNames(data.accountIds);
+  if (!namesResult.ok) {
+    deps.log.error(failure.logEvent, "account name lookup failed, user was still created", {
+      userId,
+      error: namesResult.error.message,
+    });
+    return ok([]);
+  }
+
+  return namesResult;
 }
 
 type NewUserTimestamps = Pick<User, "invitedAt" | "inviteAcceptedAt" | "passwordSetAt">;

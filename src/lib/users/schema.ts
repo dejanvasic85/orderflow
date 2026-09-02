@@ -14,7 +14,13 @@ export const isUserRole = (value: string): value is UserRole =>
   userRoles.includes(value as UserRole);
 
 /** Staff are provisioned deliberately, never through the new-user forms. */
-export const creatableUserRoles = userRoles.filter((role) => role !== "staff");
+export const creatableUserRoles = ["admin", "user"] as const satisfies readonly UserRole[];
+
+export type CreatableUserRole = (typeof creatableUserRoles)[number];
+
+export const isCreatableUserRole = (value: string): value is CreatableUserRole =>
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- Array<CreatableUserRole>.includes requires a CreatableUserRole argument to check a plain string
+  creatableUserRoles.includes(value as CreatableUserRole);
 
 export const isAdmin = (role: UserRole): boolean => role === "admin";
 export const isStaff = (role: UserRole): boolean => role === "staff";
@@ -61,7 +67,8 @@ export const createUserSchema = z.object({
   email: z.email(),
   name: z.string().min(1),
   phone: auPhoneSchema,
-  role: z.enum(userRoles),
+  // Narrower than updateUserSchema on purpose: neither create form offers staff.
+  role: z.enum(creatableUserRoles),
   notificationPreferences: z.object({ email: z.boolean(), sms: z.boolean() }),
   accountIds: z.array(z.uuid()),
 });
