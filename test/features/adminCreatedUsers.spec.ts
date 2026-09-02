@@ -31,7 +31,7 @@ test.describe("Admin-created users", () => {
     await drawer.getByLabel("First name").fill(firstName);
     await drawer.getByLabel("Last name").fill(lastName);
     await drawer.getByRole("textbox", { name: "Email" }).fill(newEmail);
-    await drawer.getByLabel("Password").fill(password);
+    await drawer.getByLabel("Password", { exact: true }).fill(password);
     const createButton = drawer.getByRole("button", { name: "Create user" });
     await createButton.scrollIntoViewIfNeeded();
     await createButton.click();
@@ -40,7 +40,7 @@ test.describe("Admin-created users", () => {
     await expect(drawer.getByRole("heading", { name: "User created" })).toBeVisible({
       timeout: 10000,
     });
-    await expect(drawer.getByLabel("Password")).toHaveValue(password);
+    await expect(drawer.getByLabel("Password", { exact: true })).toHaveValue(password);
     await drawer.getByRole("button", { name: "Done" }).click();
 
     await expect(page.getByText(`${firstName} ${lastName}`)).toBeVisible();
