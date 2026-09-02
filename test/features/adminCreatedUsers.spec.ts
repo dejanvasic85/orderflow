@@ -43,7 +43,8 @@ test.describe("Admin-created users", () => {
     await expect(drawer.getByLabel("Password", { exact: true })).toHaveValue(password);
     await drawer.getByRole("button", { name: "Done" }).click();
 
-    // Exact match: the success toast also contains the name.
+    // The new user's row. Exact match so it does not also hit the success toast,
+    // whose text is "<name> can now sign in".
     await expect(page.getByText(`${firstName} ${lastName}`, { exact: true })).toBeVisible();
 
     // Step 3 — nothing was emailed
