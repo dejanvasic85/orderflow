@@ -13,6 +13,9 @@ export const isUserRole = (value: string): value is UserRole =>
   // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- Array<UserRole>.includes requires a UserRole argument to check a plain string
   userRoles.includes(value as UserRole);
 
+/** Staff are provisioned deliberately, never through the new-user forms. */
+export const creatableUserRoles = userRoles.filter((role) => role !== "staff");
+
 export const isAdmin = (role: UserRole): boolean => role === "admin";
 export const isStaff = (role: UserRole): boolean => role === "staff";
 export const isUser = (role: UserRole): boolean => role === "user";
@@ -64,6 +67,12 @@ export const createUserSchema = z.object({
 });
 
 export type CreateUserInput = z.infer<typeof createUserSchema>;
+
+export const createUserWithPasswordSchema = createUserSchema.extend({
+  password: passwordSchema,
+});
+
+export type CreateUserWithPasswordInput = z.infer<typeof createUserWithPasswordSchema>;
 
 export const updateUserAccountsSchema = z.object({
   userId: z.uuid(),

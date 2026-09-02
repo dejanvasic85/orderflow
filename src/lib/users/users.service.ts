@@ -3,6 +3,7 @@ import { combine, err, mapResult, ok, unwrapOr, type Result } from "@/lib/result
 import { parseNotificationPrefs } from "./notificationPrefs";
 import type {
   CreateUserInput,
+  CreateUserWithPasswordInput,
   UpdateOwnProfileInput,
   UpdateUserAccountsInput,
   UpdateUserInput,
@@ -134,6 +135,88 @@ export async function checkEmailExists(
   return deps.repo.findEmailExists(email);
 }
 
+/** How a failed step after auth-user creation is logged and surfaced. */
+type NewUserFailure = { logEvent: string; message: string };
+
+async function rollbackNewUser(
+  deps: UserServiceDeps,
+  userId: string,
+  failure: NewUserFailure,
+  reason: string,
+  error: string,
+): Promise<Result<never>> {
+  deps.log.error(failure.logEvent, reason, { error });
+  await deps.repo.deleteAuthUser(userId);
+  return err({ message: failure.message });
+}
+
+/**
+ * Applies profile fields and account membership to a freshly created auth user,
+ * deleting that auth user again if either step fails. Shared by both creation
+ * paths: invite by email, and admin-set password.
+ */
+async function finaliseNewUser(
+  deps: UserServiceDeps,
+  userId: string,
+  data: CreateUserInput,
+  failure: NewUserFailure,
+): Promise<Result<UserAccount[]>> {
+  const updateResult = await deps.repo.updateNewUserFields(userId, {
+    name: data.name,
+    phone: data.phone ?? null,
+    role: data.role,
+    notification_preferences: data.notificationPreferences,
+  });
+  if (!updateResult.ok) {
+    return rollbackNewUser(
+      deps,
+      userId,
+      failure,
+      "db update failed, rolled back auth user",
+      updateResult.error.message,
+    );
+  }
+
+  if (data.accountIds.length === 0) return ok([]);
+
+  const assignResult = await deps.repo.addUserToAccounts(userId, data.accountIds);
+  if (!assignResult.ok) {
+    return rollbackNewUser(
+      deps,
+      userId,
+      failure,
+      "account assignment failed, rolled back auth user",
+      assignResult.error.message,
+    );
+  }
+
+  return deps.repo.findAccountNames(data.accountIds);
+}
+
+type NewUserTimestamps = Pick<User, "invitedAt" | "inviteAcceptedAt" | "passwordSetAt">;
+
+function buildNewUser(
+  id: string,
+  data: CreateUserInput,
+  accounts: UserAccount[],
+  timestamps: NewUserTimestamps,
+): User {
+  const now = new Date().toISOString();
+  return {
+    id,
+    name: data.name,
+    email: data.email,
+    phone: data.phone ?? null,
+    active: true,
+    role: data.role,
+    notificationPreferences: data.notificationPreferences,
+    createdAt: now,
+    updatedAt: now,
+    accounts,
+    ...timestamps,
+  };
+}
+
 export async function inviteUser(
   deps: UserServiceDeps,
   data: CreateUserInput & { siteUrl: string },
@@ -147,54 +230,63 @@ export async function inviteUser(
   if (!inviteResult.ok) return inviteResult;
   const newUserId = inviteResult.value.userId;
 
-  const updateResult = await deps.repo.updateInvitedUserFields(newUserId, {
-    name: data.name,
-    phone: data.phone ?? null,
-    role: data.role,
-    notification_preferences: data.notificationPreferences,
+  const accountsResult = await finaliseNewUser(deps, newUserId, data, {
+    logEvent: "invite",
+    message: "Unable to complete user invitation",
   });
-  if (!updateResult.ok) {
-    deps.log.error("invite", "db update failed, rolled back auth user", {
-      error: updateResult.error.message,
+  if (!accountsResult.ok) return accountsResult;
+
+  return ok(
+    buildNewUser(newUserId, data, accountsResult.value, {
+      invitedAt: new Date().toISOString(),
+      inviteAcceptedAt: null,
+      passwordSetAt: null,
+    }),
+  );
+}
+
+/**
+ * Creates a user who can sign in straight away with a password the admin hands
+ * over out of band. No email is sent, so nothing here can expire or be consumed
+ * by an email scanner. This is the fallback when invite links fail.
+ */
+export async function createUserWithPassword(
+  deps: UserServiceDeps,
+  data: CreateUserWithPasswordInput,
+): Promise<Result<User>> {
+  await deps.authorize();
+
+  const createResult = await deps.repo.createUserWithPassword(data.email, data.password, {
+    name: data.name,
+  });
+  if (!createResult.ok) return createResult;
+  const newUserId = createResult.value.userId;
+
+  const failure = { logEvent: "user.create", message: "Unable to complete user creation" };
+
+  const accountsResult = await finaliseNewUser(deps, newUserId, data, failure);
+  if (!accountsResult.ok) return accountsResult;
+
+  // password_set_at only drives the "Pending" badge, so a failure here must not
+  // undo a working account.
+  const markResult = await deps.repo.markPasswordSet(newUserId);
+  if (!markResult.ok) {
+    deps.log.error("user.create", "failed to mark password_set_at", {
+      userId: newUserId,
+      error: markResult.error.message,
     });
-    await deps.repo.deleteAuthUser(newUserId);
-    return err({ message: "Unable to complete user invitation" });
-  }
-
-  if (data.accountIds.length > 0) {
-    const assignResult = await deps.repo.addUserToAccounts(newUserId, data.accountIds);
-    if (!assignResult.ok) {
-      deps.log.error("invite", "account assignment failed, rolled back auth user", {
-        error: assignResult.error.message,
-      });
-      await deps.repo.deleteAuthUser(newUserId);
-      return err({ message: "Unable to complete user invitation" });
-    }
-  }
-
-  let accounts: UserAccount[] = [];
-  if (data.accountIds.length > 0) {
-    const accountsResult = await deps.repo.findAccountNames(data.accountIds);
-    if (!accountsResult.ok) return accountsResult;
-    accounts = accountsResult.value;
   }
 
   const now = new Date().toISOString();
-  return ok({
-    id: newUserId,
-    name: data.name,
-    email: data.email,
-    phone: data.phone ?? null,
-    active: true,
-    inviteAcceptedAt: null,
-    invitedAt: now,
-    passwordSetAt: null,
-    role: data.role,
-    notificationPreferences: data.notificationPreferences,
-    createdAt: now,
-    updatedAt: now,
-    accounts,
-  });
+  deps.log.info("user.create", "user created with a password", { userId: newUserId });
+
+  return ok(
+    buildNewUser(newUserId, data, accountsResult.value, {
+      invitedAt: null,
+      inviteAcceptedAt: now,
+      passwordSetAt: now,
+    }),
+  );
 }
 
 export async function resendUserInvite(

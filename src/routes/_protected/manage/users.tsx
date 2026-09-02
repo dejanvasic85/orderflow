@@ -13,6 +13,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { CreateUserWithPasswordPanel } from "@/components/users/CreateUserWithPasswordPanel";
 import { SetUserPasswordPanel } from "@/components/users/SetUserPasswordPanel";
 import { UserEditPanel } from "@/components/users/UserEditPanel";
 import { UserList, type RoleFilter } from "@/components/users/UserList";
@@ -21,12 +22,18 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import { listAccounts } from "@/lib/accounts/accounts.functions";
 import type { Account, PagedAccountsResult } from "@/lib/accounts/schema";
 import { can, permissions } from "@/lib/permissions";
-import { asResult, type Result } from "@/lib/result";
+import { asResult, ok, type Result } from "@/lib/result";
 import { unwrapOrThrow } from "@/lib/resultLoader";
-import type { PagedUsersResult, UpdateUserAccountsInput, User } from "@/lib/users/schema";
+import type {
+  CreateUserWithPasswordInput,
+  PagedUsersResult,
+  UpdateUserAccountsInput,
+  User,
+} from "@/lib/users/schema";
 import { listUsersSearchSchema, userPageSize } from "@/lib/users/schema";
 import {
   checkEmailExists,
+  createUserWithPassword,
   inviteUser,
   listUsers,
   resendInvite,
@@ -73,6 +80,7 @@ function UsersPage() {
   const [users, setUsers] = useState<User[]>(loadedUsers);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
+  const [creatingWithPassword, setCreatingWithPassword] = useState(false);
   const [passwordUserId, setPasswordUserId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -120,7 +128,14 @@ function UsersPage() {
 
   function handleStartCreate() {
     setSelectedId(null);
+    setCreatingWithPassword(false);
     setCreating(true);
+  }
+
+  function handleStartCreateWithPassword() {
+    setSelectedId(null);
+    setCreating(false);
+    setCreatingWithPassword(true);
   }
 
   async function handleSave(updated: User, accountsPayload?: UpdateUserAccountsInput) {
@@ -184,6 +199,23 @@ function UsersPage() {
     toast.success(`Invite sent to ${result.value.email}`);
   }
 
+  async function handleCreateWithPassword(
+    input: CreateUserWithPasswordInput,
+  ): Promise<Result<void, { message: string }>> {
+    const result = asResult<User>(await createUserWithPassword({ data: input }));
+    if (!result.ok) {
+      toast.error(result.error.message);
+      return result;
+    }
+    setUsers((prev) => [result.value, ...prev]);
+    toast.success(`${result.value.name} can now sign in`);
+    return ok();
+  }
+
+  function handleCloseCreateWithPassword() {
+    setCreatingWithPassword(false);
+  }
+
   async function handleResendInvite(userId: string) {
     const result = asResult<{ invitedAt: string }>(await resendInvite({ data: userId }));
     if (!result.ok) {
@@ -203,6 +235,7 @@ function UsersPage() {
   function handleManagePassword(user: User) {
     setSelectedId(null);
     setCreating(false);
+    setCreatingWithPassword(false);
     setPasswordUserId(user.id);
   }
 
@@ -241,7 +274,12 @@ function UsersPage() {
         title="Users"
         actions={
           <WhenAllowed permission={permissions.users.invite}>
-            <Button onClick={handleStartCreate}>+ New user</Button>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" onClick={handleStartCreate}>
+                + Invite user
+              </Button>
+              <Button onClick={handleStartCreateWithPassword}>+ New user with password</Button>
+            </div>
           </WhenAllowed>
         }
       />
@@ -303,6 +341,34 @@ function UsersPage() {
                   const result = asResult<boolean>(await checkEmailExists({ data: email }));
                   return unwrapOrThrow(result);
                 }}
+              />
+            )}
+          </SheetContent>
+        </Sheet>
+
+        <Sheet
+          open={creatingWithPassword}
+          onOpenChange={(open) => !open && handleCloseCreateWithPassword()}
+        >
+          <SheetContent
+            side={panelSide}
+            className={panelClassName}
+            onInteractOutside={(e) => e.preventDefault()}
+          >
+            <SheetHeader className="sr-only">
+              <SheetTitle>New user with password</SheetTitle>
+              <SheetDescription>
+                Create a user and set their password without sending an email
+              </SheetDescription>
+            </SheetHeader>
+            {creatingWithPassword && (
+              <CreateUserWithPasswordPanel
+                onCreate={handleCreateWithPassword}
+                onCheckEmailExists={async (email) => {
+                  const result = asResult<boolean>(await checkEmailExists({ data: email }));
+                  return unwrapOrThrow(result);
+                }}
+                onClose={handleCloseCreateWithPassword}
               />
             )}
           </SheetContent>

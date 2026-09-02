@@ -12,7 +12,7 @@ function maskEmail(email: string): string {
 }
 
 /** GoTrue gives gateway rejections the same generic shape as SMTP failures; log status/code too. */
-function inviteErrorFields(email: string, error: AuthError) {
+function authErrorFields(email: string, error: AuthError) {
   return {
     email: maskEmail(email),
     error: error.message,
@@ -67,7 +67,7 @@ export type UserFieldPatch = {
   notification_preferences?: { email: boolean; sms: boolean };
 };
 
-export type InviteUserFields = {
+export type NewUserFields = {
   name: string;
   phone: string | null;
   role: UserRole;
@@ -111,7 +111,13 @@ export type UserRepository = {
     email: string,
     options: { name: string; redirectTo: string },
   ): Promise<Result<{ userId: string }>>;
-  updateInvitedUserFields(userId: string, fields: InviteUserFields): Promise<Result<void>>;
+  /** Creates a confirmed, ready-to-sign-in user without sending any email. */
+  createUserWithPassword(
+    email: string,
+    password: string,
+    options: { name: string },
+  ): Promise<Result<{ userId: string }>>;
+  updateNewUserFields(userId: string, fields: NewUserFields): Promise<Result<void>>;
   deleteAuthUser(userId: string): Promise<Result<void>>;
   resendInvite(email: string, redirectTo: string): Promise<Result<void>>;
   setPassword(userId: string, password: string): Promise<Result<void>>;
@@ -286,14 +292,36 @@ export function createUserRepository(): UserRepository {
         redirectTo: `${options.redirectTo}/auth/callback`,
       });
       if (error) {
-        log.error("invite", "failed to send invitation email", inviteErrorFields(email, error));
+        log.error("invite", "failed to send invitation email", authErrorFields(email, error));
         return err({ message: "Unable to send user invitation" });
       }
       log.info("invite", "invitation email sent", { email: maskEmail(email) });
       return ok({ userId: data.user.id });
     },
 
-    async updateInvitedUserFields(userId, fields) {
+    async createUserWithPassword(email, password, options) {
+      const admin = createSupabaseAdminClient();
+      const { data, error } = await admin.auth.admin.createUser({
+        email,
+        password,
+        // Skips the confirmation email entirely: the account is usable immediately.
+        email_confirm: true,
+        user_metadata: { name: options.name },
+      });
+      if (error) {
+        log.error("user.create", "failed to create user", authErrorFields(email, error));
+        return err({
+          message:
+            error.code === "email_exists"
+              ? "A user with this email already exists"
+              : "Unable to create this user",
+        });
+      }
+      log.info("user.create", "created with an admin-set password", { email: maskEmail(email) });
+      return ok({ userId: data.user.id });
+    },
+
+    async updateNewUserFields(userId, fields) {
       const supabase = createSupabaseServerClient();
       const { error } = await supabase
         .from("users")
@@ -321,7 +349,7 @@ export function createUserRepository(): UserRepository {
         redirectTo: `${redirectTo}/auth/callback`,
       });
       if (error) {
-        log.error("invite", "failed to resend invitation email", inviteErrorFields(email, error));
+        log.error("invite", "failed to resend invitation email", authErrorFields(email, error));
         return err({ message: "Unable to resend invitation" });
       }
       log.info("invite", "invitation email resent", { email: maskEmail(email) });
@@ -332,6 +360,9 @@ export function createUserRepository(): UserRepository {
       const admin = createSupabaseAdminClient();
       const { error } = await admin.auth.admin.updateUserById(userId, {
         password,
+        // A user who never opened their invite is still unconfirmed, and GoTrue
+        // rejects password sign-in for those. Confirm them so the new password works.
+        email_confirm: true,
         user_metadata: { must_change_password: true },
       });
       if (error) return err({ message: error.message });

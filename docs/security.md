@@ -184,6 +184,37 @@ Any new auth email flow (magic link, email change, reauthentication) must follow
 this same pattern before going live. The templates for those still use the
 unsafe `{{ .ConfirmationURL }}` form today because nothing in the app sends them yet.
 
+## The email-free way in: admin-created users
+
+Invite and reset emails are the fragile part of this system. They can fail to send,
+be consumed by a link scanner, or expire before the user gets to them. Two admin-only
+paths exist so a user can always be let in without any email:
+
+1. **Create a user with a password** (`createUserWithPassword` in `users.functions.ts`).
+   Calls `admin.auth.admin.createUser` with `email_confirm: true`, so the account is
+   confirmed and usable the moment it is created. No email is sent at any point. The
+   admin hands the password over out of band; the panel shows it once with a copy button
+   and never stores it. The user keeps that password until they change it themselves,
+   so this path does **not** set `must_change_password`. If it did, a user who cannot
+   receive email would still be able to sign in but would be trapped on the
+   set-password screen if that step ever failed.
+2. **Set a password on an existing user** (`setUserPassword`). Also sets
+   `email_confirm: true`, which matters for a user who was invited but never opened the
+   link: GoTrue refuses password sign-in while `email_confirmed_at` is null, so without
+   this the new password would appear to do nothing. This path **does** set
+   `must_change_password`, so the user is sent through `/auth/set-password` (an in-app
+   route, no token, nothing to expire) on next sign-in.
+
+Both are gated by `assertAdmin` in the app layer and by admin-only RLS on `public.users`.
+They use the service key through `createSupabaseAdminClient()`, which bypasses RLS, so
+the `authorize()` call in the service is the only thing standing in front of them: never
+add a repository method that uses the admin client without an `authorize()` in the
+service method that calls it.
+
+Password rules for admin-set passwords are the same `passwordSchema` used everywhere
+else. Generated passwords come from `src/lib/auth/generatePassword.ts` and avoid
+look-alike characters so they can be read out over the phone.
+
 ## Checklist when touching auth / data access
 
 - [ ] New table → `enable row level security` **and** policies in the **same migration**.
