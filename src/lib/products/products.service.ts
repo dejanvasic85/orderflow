@@ -2,6 +2,7 @@ import type { Result } from "@/lib/result";
 import type { ProductRepository } from "./products.repository";
 import type {
   CreateProductInput,
+  DeleteProductInput,
   ListProductsFilters,
   Product,
   UpdateProductInput,
@@ -43,4 +44,12 @@ export async function updateProduct(
 ): Promise<Result<Product>> {
   await deps.authorizeAdmin();
   return deps.repo.updateProduct(data);
+}
+
+export async function deleteProduct(
+  deps: ProductServiceDeps,
+  data: DeleteProductInput,
+): Promise<Result<Product>> {
+  await deps.authorizeAdmin();
+  return deps.repo.softDeleteProduct(data.id);
 }

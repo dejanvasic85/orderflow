@@ -2,7 +2,6 @@ import { Package, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { ListSearchHeader } from "@/components/ListSearchHeader";
 import { Paging } from "@/components/Paging";
-import { Badge } from "@/components/ui/badge";
 import {
   Empty,
   EmptyDescription,
@@ -104,13 +103,8 @@ export function ProductCatalog({
         )
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 items-stretch">
-          {products.map((product) => {
-            const action = !product.active ? (
-              <Badge variant="outline" className="w-fit">
-                Inactive
-              </Badge>
-            ) : undefined;
-            return onSelectProduct ? (
+          {products.map((product) =>
+            onSelectProduct ? (
               <button
                 key={product.id}
                 type="button"
@@ -118,12 +112,12 @@ export function ProductCatalog({
                 className="h-full cursor-pointer text-left"
                 onClick={() => onSelectProduct(product)}
               >
-                <ProductCard product={product} action={action} />
+                <ProductCard product={product} />
               </button>
             ) : (
-              <ProductCard key={product.id} product={product} action={action} />
-            );
-          })}
+              <ProductCard key={product.id} product={product} />
+            ),
+          )}
         </div>
       )}
 

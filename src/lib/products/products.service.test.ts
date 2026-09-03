@@ -2,6 +2,7 @@ import { err, ok } from "@/lib/result";
 import type { ProductRepository } from "./products.repository";
 import {
   createProduct,
+  deleteProduct,
   getProduct,
   listActiveProducts,
   listPagedProducts,
@@ -16,6 +17,7 @@ function makeRepo(overrides: Partial<ProductRepository> = {}): ProductRepository
     findProductById: vi.fn().mockResolvedValue(ok({ id: "p-1", name: "Wine" })),
     createProduct: vi.fn().mockResolvedValue(ok({ id: "p-new", name: "New Wine" })),
     updateProduct: vi.fn().mockResolvedValue(ok({ id: "p-1", name: "Updated Wine" })),
+    softDeleteProduct: vi.fn().mockResolvedValue(ok({ id: "p-1", name: "Wine" })),
     ...overrides,
   };
 }
@@ -179,5 +181,40 @@ describe("updateProduct", () => {
       "Forbidden",
     );
     expect(updateProductFn).not.toHaveBeenCalled();
+  });
+});
+
+describe("deleteProduct", () => {
+  it("calls authorizeAdmin then delegates to repo.softDeleteProduct", async () => {
+    const deleted = { id: "p-1", name: "Shiraz", deletedAt: "2026-09-03T00:00:00Z" } as never;
+    const softDeleteProduct = vi.fn().mockResolvedValue(ok(deleted));
+    const authorizeAdmin = vi.fn().mockResolvedValue(undefined);
+    const deps = makeDeps({ repo: makeRepo({ softDeleteProduct }), authorizeAdmin });
+
+    const result = await deleteProduct(deps, { id: "p-1" });
+
+    expect(authorizeAdmin).toHaveBeenCalledTimes(1);
+    expect(result).toEqual(ok(deleted));
+    expect(softDeleteProduct).toHaveBeenCalledWith("p-1");
+  });
+
+  it("throws without calling repo when authorizeAdmin rejects", async () => {
+    const softDeleteProduct = vi.fn();
+    const deps = makeDeps({
+      repo: makeRepo({ softDeleteProduct }),
+      authorizeAdmin: vi.fn().mockRejectedValue(new Error("Forbidden")),
+    });
+
+    await expect(deleteProduct(deps, { id: "p-1" })).rejects.toThrow("Forbidden");
+    expect(softDeleteProduct).not.toHaveBeenCalled();
+  });
+
+  it("propagates a repo error", async () => {
+    const softDeleteProduct = vi.fn().mockResolvedValue(err({ message: "not found" }));
+    const deps = makeDeps({ repo: makeRepo({ softDeleteProduct }) });
+
+    const result = await deleteProduct(deps, { id: "p-1" });
+
+    expect(result).toEqual(err({ message: "not found" }));
   });
 });

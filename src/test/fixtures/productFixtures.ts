@@ -9,6 +9,7 @@ export function makeProduct(overrides: Partial<Product> = {}): Product {
     qtyPerBox: 6,
     active: true,
     externalId: null,
+    deletedAt: null,
     createdAt: "2024-01-01T00:00:00Z",
     updatedAt: "2024-01-01T00:00:00Z",
     ...overrides,

@@ -4,6 +4,7 @@ import { makeUserRow } from "@/test/fixtures/userFixtures";
 import type { UserRepository } from "./users.repository";
 import {
   checkEmailExists,
+  createUserWithPassword,
   getOwnProfile,
   getUser,
   inviteUser,
@@ -45,7 +46,8 @@ function makeRepo(overrides: Partial<UserRepository> = {}): UserRepository {
     findUserName: vi.fn().mockResolvedValue(ok("Admin User")),
     findEmailExists: vi.fn().mockResolvedValue(ok(false)),
     inviteUserByEmail: vi.fn().mockResolvedValue(ok({ userId: "u-new" })),
-    updateInvitedUserFields: vi.fn().mockResolvedValue(ok()),
+    createUserWithPassword: vi.fn().mockResolvedValue(ok({ userId: "u-new" })),
+    updateNewUserFields: vi.fn().mockResolvedValue(ok()),
     deleteAuthUser: vi.fn().mockResolvedValue(ok()),
     resendInvite: vi.fn().mockResolvedValue(ok()),
     setPassword: vi.fn().mockResolvedValue(ok()),
@@ -397,7 +399,7 @@ describe("inviteUser", () => {
     const deleteAuthUser = vi.fn().mockResolvedValue(ok());
     const deps = makeDeps({
       repo: makeRepo({
-        updateInvitedUserFields: vi.fn().mockResolvedValue(err({ message: "db error" })),
+        updateNewUserFields: vi.fn().mockResolvedValue(err({ message: "db error" })),
         deleteAuthUser,
       }),
     });
@@ -449,13 +451,181 @@ describe("inviteUser", () => {
     }
   });
 
-  it("propagates a repo error from findAccountNames", async () => {
-    const findAccountNames = vi.fn().mockResolvedValue(err({ message: "accounts lookup failed" }));
-    const deps = makeDeps({ repo: makeRepo({ findAccountNames }) });
+  it("still returns the invited user when findAccountNames fails", async () => {
+    const deleteAuthUser = vi.fn().mockResolvedValue(ok());
+    const deps = makeDeps({
+      repo: makeRepo({
+        findAccountNames: vi.fn().mockResolvedValue(err({ message: "accounts lookup failed" })),
+        deleteAuthUser,
+      }),
+    });
 
     const result = await inviteUser(deps, inviteData);
 
-    expect(result).toEqual(err({ message: "accounts lookup failed" }));
+    expect(result.ok).toBe(true);
+    expect(deleteAuthUser).not.toHaveBeenCalled();
+  });
+
+  it("returns no account names when findAccountNames fails", async () => {
+    const deps = makeDeps({
+      repo: makeRepo({
+        findAccountNames: vi.fn().mockResolvedValue(err({ message: "accounts lookup failed" })),
+      }),
+    });
+
+    const result = await inviteUser(deps, inviteData);
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.value.accounts).toEqual([]);
+    }
+  });
+});
+
+describe("createUserWithPassword", () => {
+  const createData = {
+    email: "new@example.com",
+    name: "New User",
+    phone: null,
+    role: "user" as const,
+    notificationPreferences: { email: true, sms: false },
+    accountIds: ["acc-1"],
+    password: "Sup3rSecret",
+  };
+
+  it("calls authorize before any repo operations", async () => {
+    const authorize = vi.fn().mockResolvedValue(undefined);
+    const repoCreate = vi.fn().mockResolvedValue(ok({ userId: "u-new" }));
+    const deps = makeDeps({
+      repo: makeRepo({ createUserWithPassword: repoCreate }),
+      authorize,
+    });
+
+    await createUserWithPassword(deps, createData);
+
+    expect(authorize).toHaveBeenCalledTimes(1);
+    expect(authorize.mock.invocationCallOrder[0]).toBeLessThan(
+      repoCreate.mock.invocationCallOrder[0],
+    );
+  });
+
+  it("passes the email, password and name to the repository", async () => {
+    const repoCreate = vi.fn().mockResolvedValue(ok({ userId: "u-new" }));
+    const deps = makeDeps({ repo: makeRepo({ createUserWithPassword: repoCreate }) });
+
+    await createUserWithPassword(deps, createData);
+
+    expect(repoCreate).toHaveBeenCalledWith("new@example.com", "Sup3rSecret", {
+      name: "New User",
+    });
+  });
+
+  it("never sends an invite email", async () => {
+    const inviteUserByEmail = vi.fn();
+    const deps = makeDeps({ repo: makeRepo({ inviteUserByEmail }) });
+
+    await createUserWithPassword(deps, createData);
+
+    expect(inviteUserByEmail).not.toHaveBeenCalled();
+  });
+
+  it("marks the password as set", async () => {
+    const markPasswordSet = vi.fn().mockResolvedValue(ok());
+    const deps = makeDeps({ repo: makeRepo({ markPasswordSet }) });
+
+    await createUserWithPassword(deps, createData);
+
+    expect(markPasswordSet).toHaveBeenCalledWith("u-new");
+  });
+
+  it("returns a user who is active with a password already set", async () => {
+    const findAccountNames = vi.fn().mockResolvedValue(ok([{ id: "acc-1", name: "Wines Co" }]));
+    const deps = makeDeps({ repo: makeRepo({ findAccountNames }) });
+
+    const result = await createUserWithPassword(deps, createData);
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.value.email).toBe("new@example.com");
+      expect(result.value.name).toBe("New User");
+      expect(result.value.active).toBe(true);
+      expect(result.value.invitedAt).toBeNull();
+      expect(result.value.passwordSetAt).not.toBeNull();
+      expect(result.value.inviteAcceptedAt).not.toBeNull();
+      expect(result.value.accounts).toEqual([{ id: "acc-1", name: "Wines Co" }]);
+    }
+  });
+
+  it("propagates the repo error when auth user creation fails", async () => {
+    const deps = makeDeps({
+      repo: makeRepo({
+        createUserWithPassword: vi.fn().mockResolvedValue(err({ message: "email taken" })),
+      }),
+    });
+
+    const result = await createUserWithPassword(deps, createData);
+
+    expect(result).toEqual(err({ message: "email taken" }));
+  });
+
+  it("calls deleteAuthUser when the profile update fails (rollback)", async () => {
+    const deleteAuthUser = vi.fn().mockResolvedValue(ok());
+    const deps = makeDeps({
+      repo: makeRepo({
+        updateNewUserFields: vi.fn().mockResolvedValue(err({ message: "db error" })),
+        deleteAuthUser,
+      }),
+    });
+
+    const result = await createUserWithPassword(deps, createData);
+
+    expect(result).toEqual(err({ message: "Unable to complete user creation" }));
+    expect(deleteAuthUser).toHaveBeenCalledWith("u-new");
+  });
+
+  it("calls deleteAuthUser when account assignment fails (rollback)", async () => {
+    const deleteAuthUser = vi.fn().mockResolvedValue(ok());
+    const deps = makeDeps({
+      repo: makeRepo({
+        addUserToAccounts: vi.fn().mockResolvedValue(err({ message: "assign error" })),
+        deleteAuthUser,
+      }),
+    });
+
+    const result = await createUserWithPassword(deps, createData);
+
+    expect(result).toEqual(err({ message: "Unable to complete user creation" }));
+    expect(deleteAuthUser).toHaveBeenCalledWith("u-new");
+  });
+
+  it("still returns the user when findAccountNames fails", async () => {
+    const deleteAuthUser = vi.fn().mockResolvedValue(ok());
+    const deps = makeDeps({
+      repo: makeRepo({
+        findAccountNames: vi.fn().mockResolvedValue(err({ message: "accounts lookup failed" })),
+        deleteAuthUser,
+      }),
+    });
+
+    const result = await createUserWithPassword(deps, createData);
+
+    expect(result.ok).toBe(true);
+    expect(deleteAuthUser).not.toHaveBeenCalled();
+  });
+
+  it("still returns the user when marking the password as set fails", async () => {
+    const deleteAuthUser = vi.fn().mockResolvedValue(ok());
+    const deps = makeDeps({
+      repo: makeRepo({
+        markPasswordSet: vi.fn().mockResolvedValue(err({ message: "mark error" })),
+        deleteAuthUser,
+      }),
+    });
+
+    const result = await createUserWithPassword(deps, createData);
+
+    expect(result.ok).toBe(true);
+    expect(deleteAuthUser).not.toHaveBeenCalled();
   });
 });
 

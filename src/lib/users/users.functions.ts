@@ -12,6 +12,7 @@ import { notifyAdminPasswordSet } from "@/lib/notifications/notifications.server
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import {
   createUserSchema,
+  createUserWithPasswordSchema,
   listUsersSearchSchema,
   type ListUsersSearch,
   setUserPasswordSchema,
@@ -22,6 +23,7 @@ import {
 import { createUserRepository } from "./users.repository";
 import {
   checkEmailExists as checkEmailExistsSvc,
+  createUserWithPassword as createUserWithPasswordSvc,
   getOwnProfile as getOwnProfileSvc,
   getUser as getUserSvc,
   inviteUser as inviteUserSvc,
@@ -69,6 +71,10 @@ export const inviteUser = createServerFn({ method: "POST", strict: { output: fal
     const { SITE_URL } = getServerConfig();
     return inviteUserSvc(deps, { ...data, siteUrl: SITE_URL });
   });
+
+export const createUserWithPassword = createServerFn({ method: "POST", strict: { output: false } })
+  .validator(createUserWithPasswordSchema)
+  .handler(async ({ data }) => createUserWithPasswordSvc(deps, data));
 
 export const resendInvite = createServerFn({ method: "POST", strict: { output: false } })
   .validator((id: string) => z.string().uuid().parse(id))

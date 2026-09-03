@@ -23,7 +23,13 @@ import { roleInfoValue } from "@/components/users/roleInfo";
 import { RoleInfoDisclosure } from "@/components/users/RoleInfoDisclosure";
 import { UserAccountsSection } from "@/components/users/UserAccountsSection";
 import { toFieldErrors } from "@/lib/forms";
-import { isUserRole, type UpdateUserAccountsInput, type User, userRoles } from "@/lib/users/schema";
+import {
+  creatableUserRoles,
+  isUserRole,
+  type UpdateUserAccountsInput,
+  type User,
+  userRoles,
+} from "@/lib/users/schema";
 
 type BaseProps = {
   onSave: (updated: User, accountsPayload?: UpdateUserAccountsInput) => void | Promise<void>;
@@ -52,8 +58,6 @@ const userEditSchema = z.object({
   notifications: z.object({ email: z.boolean(), sms: z.boolean() }),
   active: z.boolean(),
 });
-
-const creatableUserRoles = userRoles.filter((role) => role !== "staff");
 
 const blankUser: User = {
   id: "",

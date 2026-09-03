@@ -9,7 +9,7 @@ import type {
 } from "./schema";
 
 const productSelect =
-  "id, name, image_url, qty_per_box, active, external_id, created_at, updated_at" as const;
+  "id, name, image_url, qty_per_box, active, external_id, deleted_at, created_at, updated_at" as const;
 
 function toProduct(row: ProductRow): Product {
   return {
@@ -19,6 +19,7 @@ function toProduct(row: ProductRow): Product {
     qtyPerBox: row.qty_per_box,
     active: row.active,
     externalId: row.external_id,
+    deletedAt: row.deleted_at,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -50,6 +51,7 @@ export type ProductRepository = {
   findProductById(id: string): Promise<Result<Product>>;
   createProduct(data: CreateProductInput): Promise<Result<Product>>;
   updateProduct(data: UpdateProductInput): Promise<Result<Product>>;
+  softDeleteProduct(id: string): Promise<Result<Product>>;
 };
 
 export function createProductRepository(): ProductRepository {
@@ -60,6 +62,7 @@ export function createProductRepository(): ProductRepository {
         .from("products")
         .select(productSelect)
         .eq("active", true)
+        .is("deleted_at", null)
         .order("name", { ascending: true });
       if (error) return err({ message: error.message });
       return ok((data ?? []).map(toProduct));
@@ -70,6 +73,7 @@ export function createProductRepository(): ProductRepository {
       let query = supabase
         .from("products")
         .select(productSelect, { count: "exact" })
+        .is("deleted_at", null)
         .order("name", { ascending: true });
 
       if (!filters.includeInactive) query = query.eq("active", true);
@@ -96,6 +100,7 @@ export function createProductRepository(): ProductRepository {
         .from("products")
         .select(productSelect)
         .eq("id", id)
+        .is("deleted_at", null)
         .single();
       if (error) return err({ message: error.message });
       return ok(toProduct(data));
@@ -119,6 +124,20 @@ export function createProductRepository(): ProductRepository {
         .from("products")
         .update(toProductUpdate(rest))
         .eq("id", id)
+        .is("deleted_at", null)
+        .select(productSelect)
+        .single();
+      if (error) return err({ message: error.message });
+      return ok(toProduct(row));
+    },
+
+    async softDeleteProduct(id) {
+      const supabase = createSupabaseServerClient();
+      const { data: row, error } = await supabase
+        .from("products")
+        .update({ deleted_at: new Date().toISOString(), active: false })
+        .eq("id", id)
+        .is("deleted_at", null)
         .select(productSelect)
         .single();
       if (error) return err({ message: error.message });

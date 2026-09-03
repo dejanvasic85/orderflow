@@ -4,6 +4,7 @@ import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import { createProductRepository } from "./products.repository";
 import {
   createProduct as createProductSvc,
+  deleteProduct as deleteProductSvc,
   getProduct as getProductSvc,
   listActiveProducts as listActiveProductsSvc,
   listPagedProducts as listPagedProductsSvc,
@@ -12,6 +13,7 @@ import {
 } from "./products.service";
 import {
   createProductSchema,
+  deleteProductSchema,
   type ListProductsFilters,
   listProductsFiltersSchema,
   updateProductSchema,
@@ -42,3 +44,7 @@ export const createProduct = createServerFn({ method: "POST", strict: { output: 
 export const updateProduct = createServerFn({ method: "POST", strict: { output: false } })
   .validator(updateProductSchema)
   .handler(async ({ data }) => updateProductSvc(deps, data));
+
+export const deleteProduct = createServerFn({ method: "POST", strict: { output: false } })
+  .validator(deleteProductSchema)
+  .handler(async ({ data }) => deleteProductSvc(deps, data));
