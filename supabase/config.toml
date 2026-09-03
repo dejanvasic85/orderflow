@@ -247,6 +247,8 @@ otp_length = 6
 # so signups failed with otp_expired. Applies to invite, magic link, and password
 # recovery alike (GoTrue has no per-template expiry), so this also widens the window
 # a leaked/forwarded password-reset email stays valid.
+# The email templates in ./supabase/templates state "expires in 3 days": update them if you
+# change this value.
 otp_expiry = 259200
 
 # Use a production-ready SMTP server
