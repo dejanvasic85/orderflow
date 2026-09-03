@@ -66,7 +66,7 @@ test.describe("Product management (admin)", () => {
     await confirm.getByRole("button", { name: "Delete product" }).click();
 
     await expect(page.getByText('Product "Pilsner To Be Deleted" deleted')).toBeVisible();
-    await expect(page.getByText("Pilsner To Be Deleted")).not.toBeVisible();
+    await expect(page.getByRole("button", { name: "Edit Pilsner To Be Deleted" })).toHaveCount(0);
   });
 });
 
