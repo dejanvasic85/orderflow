@@ -1,12 +1,22 @@
 import { useForm } from "@tanstack/react-form";
+import { useState } from "react";
 import { z } from "zod";
 import { ImageUpload } from "@/components/products/ImageUpload";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Switch } from "@/components/ui/switch";
 import { toFieldErrors } from "@/lib/forms";
 import type { CreateProductInput, Product, UpdateProductInput } from "@/lib/products/schema";
 
@@ -19,11 +29,13 @@ type Props =
       mode: "create";
       product?: Product;
       onSave: (payload: CreateProductInput) => void | Promise<void>;
+      onDelete?: never;
     })
   | (BaseProps & {
       mode?: "edit";
       product: Product;
       onSave: (payload: UpdateProductInput) => void | Promise<void>;
+      onDelete: (id: string) => void | Promise<void>;
     });
 
 const productEditSchema = z.object({
@@ -35,19 +47,19 @@ const productEditSchema = z.object({
     .number("Must be a whole number")
     .int("Must be a whole number")
     .min(1, "Must be at least 1"),
-  active: z.boolean(),
 });
 
 export function ProductEditPanel(props: Props) {
   const { onDiscard, product } = props;
   const isCreate = (props.mode ?? "edit") === "create";
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const form = useForm({
     defaultValues: {
       name: product?.name ?? "",
       imageUrl: product?.imageUrl ?? "",
       qtyPerBox: product?.qtyPerBox ?? 1,
-      active: product?.active ?? true,
     },
     validators: { onSubmit: productEditSchema },
     onSubmit: async ({ value }) => {
@@ -55,7 +67,6 @@ export function ProductEditPanel(props: Props) {
         name: value.name,
         imageUrl: value.imageUrl || null,
         qtyPerBox: value.qtyPerBox,
-        active: value.active,
       };
       if (props.mode === "create") {
         await props.onSave(payload);
@@ -64,6 +75,17 @@ export function ProductEditPanel(props: Props) {
       await props.onSave({ ...payload, id: props.product.id });
     },
   });
+
+  async function handleDelete() {
+    if (props.mode === "create" || !props.onDelete) return;
+    setDeleting(true);
+    try {
+      await props.onDelete(props.product.id);
+      setConfirmingDelete(false);
+    } finally {
+      setDeleting(false);
+    }
+  }
 
   const headerTitle = isCreate ? "New product" : (product?.name ?? "");
   const headerSubtitle = isCreate
@@ -134,29 +156,6 @@ export function ProductEditPanel(props: Props) {
 
         <Separator />
 
-        <form.Field name="active">
-          {(field) => (
-            <div className="flex flex-col gap-3">
-              <Label>Availability</Label>
-              <div className="flex items-center gap-3">
-                <Switch
-                  id="product-active"
-                  checked={field.state.value}
-                  onCheckedChange={(v) => field.handleChange(v)}
-                />
-                <Label htmlFor="product-active" className="font-normal">
-                  Active
-                </Label>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Inactive products are hidden from the customer catalog.
-              </p>
-            </div>
-          )}
-        </form.Field>
-
-        <Separator />
-
         <div className="flex items-center gap-2">
           <form.Subscribe selector={(s) => s.isSubmitting}>
             {(isSubmitting) => (
@@ -177,6 +176,47 @@ export function ProductEditPanel(props: Props) {
           </Button>
         </div>
       </form>
+
+      {!isCreate && props.onDelete && (
+        <>
+          <Separator />
+
+          <div className="flex flex-col gap-3 rounded-lg border border-destructive/40 p-4">
+            <h3 className="text-sm font-semibold text-destructive">Delete product</h3>
+            <p className="text-sm text-muted-foreground">
+              This removes the product from the catalog for everyone. You cannot undo this.
+            </p>
+            <AlertDialog open={confirmingDelete} onOpenChange={setConfirmingDelete}>
+              <AlertDialogTrigger asChild>
+                <Button type="button" variant="destructive" className="w-fit">
+                  Delete product
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete "{props.product.name}"?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Nobody will be able to order it or see it in the catalog. You cannot undo this.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    variant="destructive"
+                    disabled={deleting}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      void handleDelete();
+                    }}
+                  >
+                    {deleting ? "Deleting…" : "Delete product"}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        </>
+      )}
     </div>
   );
 }

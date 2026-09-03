@@ -156,21 +156,6 @@ test("shows no-products empty state when empty without a search query", () => {
   expect(screen.getByText("No products available")).toBeInTheDocument();
 });
 
-test("shows Inactive badge for inactive products", () => {
-  renderCatalog({
-    products: [makeProduct({ id: "prod-1", name: "Sparkling Water", active: false })],
-    total: 1,
-  });
-
-  expect(screen.getByText("Inactive")).toBeInTheDocument();
-});
-
-test("does not show Inactive badge for active products", () => {
-  renderCatalog();
-
-  expect(screen.queryByText("Inactive")).not.toBeInTheDocument();
-});
-
 test("calls onSelectProduct with the product when a card is clicked", async () => {
   renderCatalog({ onSelectProduct });
 

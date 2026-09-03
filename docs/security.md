@@ -72,7 +72,7 @@ revoked from `users`, `accounts`, `account_users`, and `users_with_email`.
 |                         | user  |            ✅ own memberships            |                   -                   |     -      |     -     |
 | **products**            | admin |                    ✅                    |                  ✅                   |     ✅     |    ✅     |
 |                         | staff |                  ✅ all                  |                   -                   |     -      |     -     |
-|                         | user  |              ✅ active only              |                   -                   |     -      |     -     |
+|                         | user  |         ✅ active + not deleted          |                   -                   |     -      |     -     |
 | **templates**           | admin |                    ✅                    |                  ✅                   |     ✅     |    ✅     |
 |                         | staff |                  ✅ all                  |                   -                   |     -      |     -     |
 |                         | user  |                ✅ member                 |                   -                   |     -      |     -     |
@@ -118,6 +118,15 @@ a tight `with check`:
   `order_request_items` scoped by `is_account_member()` through the parent order.
 - **Staff are read-only outside placing orders.** No staff write policies on `users`,
   `accounts`, `products`, `templates`. Intentional.
+- **Deleting a product is a soft delete, and only the `user` role is blocked by RLS.**
+  `products.deleted_at` is set instead of removing the row, because order request items and
+  template items reference it. Staff keep full read access on purpose: they fulfil orders
+  placed before the deletion and need the real product name. Staff and admins are kept out of
+  the _catalog_ by a `deleted_at is null` filter in `products.repository.ts`, which is UX, not
+  a boundary. For the `user` role the embed comes back `null`, so every reader of a joined
+  product must handle that: `templates.repository.ts` drops the item,
+  `orderRequests.repository.ts` and `dashboard.repository.ts` fall back to a label. An admin
+  can restore a product by clearing `deleted_at` in SQL; there is no UI for it.
 
 ## Troubleshooting: `"Unregistered API key"` on invite / auth email
 

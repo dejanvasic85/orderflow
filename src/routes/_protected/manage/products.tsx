@@ -23,7 +23,12 @@ import {
 import { useDelayedBoolean } from "@/hooks/use-delayed-boolean";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { can, permissions } from "@/lib/permissions";
-import { createProduct, listPagedProducts, updateProduct } from "@/lib/products/products.functions";
+import {
+  createProduct,
+  deleteProduct,
+  listPagedProducts,
+  updateProduct,
+} from "@/lib/products/products.functions";
 import type {
   CreateProductInput,
   PagedProductsResult,
@@ -116,6 +121,17 @@ function ProductsPage() {
     void router.invalidate();
   }
 
+  async function handleDelete(id: string) {
+    const result = asResult<Product>(await deleteProduct({ data: { id } }));
+    if (!result.ok) {
+      toast.error(result.error.message);
+      return;
+    }
+    setSelectedId(null);
+    toast.success(`Product "${result.value.name}" deleted`);
+    void router.invalidate();
+  }
+
   async function handleCreate(payload: CreateProductInput) {
     const result = asResult<Product>(await createProduct({ data: payload }));
     if (!result.ok) {
@@ -161,6 +177,7 @@ function ProductsPage() {
                 key={selectedProduct.id}
                 product={selectedProduct}
                 onSave={handleSave}
+                onDelete={handleDelete}
                 onDiscard={handleDiscard}
               />
             )}

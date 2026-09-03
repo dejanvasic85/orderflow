@@ -45,6 +45,29 @@ test.describe("Product management (admin)", () => {
     await expect(sheet).not.toBeVisible();
     await expect(page.getByText("Changes saved")).toBeVisible();
   });
+
+  test("admin can delete a product and it leaves the catalog", async ({ page }) => {
+    await goto(page, "/manage/products");
+
+    await page.getByRole("button", { name: "+ New product" }).click();
+    const createSheet = page.getByRole("dialog");
+    await createSheet.getByLabel("Name").fill("Pilsner To Be Deleted");
+    await createSheet.getByLabel("Quantity per box").fill("24");
+    await createSheet.getByRole("button", { name: "Create product" }).click();
+
+    await page.getByLabel("Search products").fill("Pilsner");
+    await page.getByRole("button", { name: "Edit Pilsner To Be Deleted" }).click();
+
+    const editSheet = page.getByRole("dialog");
+    await editSheet.getByRole("button", { name: "Delete product" }).click();
+
+    const confirm = page.getByRole("alertdialog");
+    await expect(confirm.getByText("You cannot undo this.")).toBeVisible();
+    await confirm.getByRole("button", { name: "Delete product" }).click();
+
+    await expect(page.getByText('Product "Pilsner To Be Deleted" deleted')).toBeVisible();
+    await expect(page.getByText("Pilsner To Be Deleted")).not.toBeVisible();
+  });
 });
 
 test.describe("Product management (staff)", () => {
