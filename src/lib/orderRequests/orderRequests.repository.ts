@@ -18,9 +18,14 @@ const orderHistorySelect =
 const allOrderHistorySelect =
   "id, order_number, placed_by, created_at, order_request_items(boxes, extra_units), users!order_requests_placed_by_fkey(id, name, role), accounts(id, name)" as const;
 
+// A deleted product is hidden from the `user` role by RLS, so the embed comes
+// back null on an order placed before the deletion. The line item is still part
+// of the order's history, so keep it and label the product instead of dropping it.
 type OrderRequestItemJoinRow = OrderRequestItemRow & {
-  products: { id: string; name: string; qty_per_box: number; image_url: string | null };
+  products: { id: string; name: string; qty_per_box: number; image_url: string | null } | null;
 };
+
+const unavailableProductName = "Product no longer available";
 
 type OrderRequestWithItemsRow = OrderRequestRow & {
   order_request_items: OrderRequestItemJoinRow[];
@@ -57,10 +62,10 @@ function toOrderRequestWithItems(row: OrderRequestWithItemsRow): OrderRequestWit
       extraUnits: item.extra_units,
       createdAt: item.created_at,
       product: {
-        id: item.products.id,
-        name: item.products.name,
-        qtyPerBox: item.products.qty_per_box,
-        imageUrl: item.products.image_url,
+        id: item.products?.id ?? item.product_id,
+        name: item.products?.name ?? unavailableProductName,
+        qtyPerBox: item.products?.qty_per_box ?? 1,
+        imageUrl: item.products?.image_url ?? null,
       },
     })),
     template: row.templates,

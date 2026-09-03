@@ -12,6 +12,7 @@ export type Product = {
   qtyPerBox: number;
   active: boolean;
   externalId: string | null;
+  deletedAt: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -25,8 +26,11 @@ export const createProductSchema = z.object({
 
 export const updateProductSchema = createProductSchema.partial().extend({ id: z.uuid() });
 
+export const deleteProductSchema = z.object({ id: z.uuid() });
+
 export type CreateProductInput = z.infer<typeof createProductSchema>;
 export type UpdateProductInput = z.infer<typeof updateProductSchema>;
+export type DeleteProductInput = z.infer<typeof deleteProductSchema>;
 
 export const productPageSize = 12;
 

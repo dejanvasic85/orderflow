@@ -17,12 +17,22 @@ const templateWithItemsSelect =
   "id, account_id, name, created_by, created_at, updated_at, template_items(id, product_id, box_count, unit_count, created_by, created_at, products(id, name, qty_per_box))" as const;
 
 type TemplateItemJoinRow = TemplateItemRow & {
-  products: { id: string; name: string; qty_per_box: number };
+  products: { id: string; name: string; qty_per_box: number } | null;
 };
 
 type TemplateWithItemsRow = TemplateRow & { template_items: TemplateItemJoinRow[] };
 
-function toTemplateItem(row: TemplateItemJoinRow): TemplateItem {
+// A deleted product is hidden by RLS, so the embed comes back null. The item row
+// is kept so history stays intact, but there is nothing to show for it.
+type VisibleTemplateItemJoinRow = TemplateItemJoinRow & {
+  products: NonNullable<TemplateItemJoinRow["products"]>;
+};
+
+function hasVisibleProduct(row: TemplateItemJoinRow): row is VisibleTemplateItemJoinRow {
+  return row.products !== null;
+}
+
+function toTemplateItem(row: VisibleTemplateItemJoinRow): TemplateItem {
   return {
     id: row.id,
     templateId: row.template_id,
@@ -47,7 +57,7 @@ function toTemplateWithItems(row: TemplateWithItemsRow): TemplateWithItems {
     createdBy: row.created_by,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
-    templateItems: row.template_items.map(toTemplateItem),
+    templateItems: row.template_items.filter(hasVisibleProduct).map(toTemplateItem),
   };
 }
 

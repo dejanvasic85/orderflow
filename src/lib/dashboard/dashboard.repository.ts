@@ -77,7 +77,8 @@ export function createDashboardRepository(): DashboardRepository {
       const { count, error } = await supabase
         .from("products")
         .select("*", { count: "exact", head: true })
-        .eq("active", true);
+        .eq("active", true)
+        .is("deleted_at", null);
       if (error) return err({ message: error.message });
       return ok(count ?? 0);
     },
