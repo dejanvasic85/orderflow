@@ -88,9 +88,7 @@ export function ProductEditPanel(props: Props) {
   }
 
   const headerTitle = isCreate ? "New product" : (product?.name ?? "");
-  const headerSubtitle = isCreate
-    ? "Add a product to the catalog"
-    : "Update product details and availability";
+  const headerSubtitle = isCreate ? "Add a product to the catalog" : "Update product details";
   const submitLabel = isCreate ? "Create product" : "Save changes";
 
   return (
