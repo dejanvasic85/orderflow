@@ -429,7 +429,8 @@ export function UserEditPanel(props: Props) {
             <h3 className="text-sm font-semibold text-destructive">Delete user</h3>
             <p className="text-sm text-muted-foreground">
               This removes {props.user.name} from the list and revokes their sign-in straight away.
-              Orders they placed are kept. You cannot undo this.
+              Orders they placed are kept. Inviting the same email address later brings this account
+              back.
             </p>
             <AlertDialog open={confirmingDelete} onOpenChange={setConfirmingDelete}>
               <AlertDialogTrigger asChild>
@@ -442,7 +443,8 @@ export function UserEditPanel(props: Props) {
                   <AlertDialogTitle>Delete {props.user.name}?</AlertDialogTitle>
                   <AlertDialogDescription>
                     They will not be able to sign in, and they disappear from the users list. Their
-                    past orders stay on record. You cannot undo this.
+                    past orders stay on record. Inviting the same email address later brings this
+                    account back.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>

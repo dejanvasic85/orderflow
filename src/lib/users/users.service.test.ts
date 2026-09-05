@@ -886,6 +886,25 @@ describe("deleteUser", () => {
     expect(restoreUser).toHaveBeenCalledWith("u-1", true);
   });
 
+  it("refuses to delete an admin when the only other admin is suspended", async () => {
+    const softDeleteUser = vi.fn();
+    const deps = makeDeps({
+      repo: makeRepo({
+        findUserById: vi.fn().mockResolvedValue(ok({ id: "u-1", name: "Jane", role: "admin" })),
+        // countOtherActiveAdmins excludes suspended admins, so this returns 0.
+        countOtherActiveAdmins: vi.fn().mockResolvedValue(ok(0)),
+        softDeleteUser,
+      }),
+    });
+
+    const result = await deleteUser(deps, { id: "u-1" });
+
+    expect(result).toEqual(
+      err({ message: "Make someone else an admin before deleting the last one" }),
+    );
+    expect(softDeleteUser).not.toHaveBeenCalled();
+  });
+
   it("restores a previously suspended user as suspended when the auth ban fails", async () => {
     const restoreUser = vi.fn().mockResolvedValue(ok());
     const deps = makeDeps({
@@ -974,6 +993,38 @@ describe("inviteUser restoring a deleted account", () => {
 
     expect(result).toEqual(err({ message: "Failed to restore the user's access" }));
     expect(softDeleteUser).toHaveBeenCalledWith("u-deleted");
+  });
+
+  it("leaves the account deleted when the profile update fails", async () => {
+    const restoreUser = vi.fn().mockResolvedValue(ok());
+    const deps = makeDeps({
+      repo: makeRepo({
+        findDeletedUserIdByEmail: vi.fn().mockResolvedValue(ok("u-deleted")),
+        updateNewUserFields: vi.fn().mockResolvedValue(err({ message: "db down" })),
+        restoreUser,
+      }),
+    });
+
+    const result = await inviteUser(deps, inviteData);
+
+    expect(result).toEqual(err({ message: "db down" }));
+    expect(restoreUser).not.toHaveBeenCalled();
+  });
+
+  it("leaves the account deleted when the account assignment fails", async () => {
+    const restoreUser = vi.fn().mockResolvedValue(ok());
+    const deps = makeDeps({
+      repo: makeRepo({
+        findDeletedUserIdByEmail: vi.fn().mockResolvedValue(ok("u-deleted")),
+        replaceUserAccounts: vi.fn().mockResolvedValue(err({ message: "accounts down" })),
+        restoreUser,
+      }),
+    });
+
+    const result = await inviteUser(deps, inviteData);
+
+    expect(result).toEqual(err({ message: "accounts down" }));
+    expect(restoreUser).not.toHaveBeenCalled();
   });
 
   it("sends a normal invite when no deleted account matches the email", async () => {

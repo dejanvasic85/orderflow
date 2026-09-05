@@ -1,4 +1,4 @@
-import { useNavigate, useRouteContext, useRouterState } from "@tanstack/react-router";
+import { useNavigate, useRouteContext, useRouter, useRouterState } from "@tanstack/react-router";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -76,6 +76,7 @@ function UsersPage() {
   const canChangePassword = can(currentUser.user_role, permissions.users.changePassword);
   const search = Route.useSearch();
   const navigate = useNavigate();
+  const router = useRouter();
   const routerLoading = useRouterState({ select: (s) => s.isLoading });
   const isLoading = useDelayedBoolean(routerLoading);
 
@@ -209,6 +210,7 @@ function UsersPage() {
         ? `${user.email} was deleted before, so their account was restored with its order history`
         : `Invite sent to ${user.email}`,
     );
+    void router.invalidate();
   }
 
   async function handleDelete(user: User) {
@@ -220,6 +222,23 @@ function UsersPage() {
     setUsers((prev) => prev.filter((u) => u.id !== user.id));
     setSelectedId(null);
     toast.success(`${user.name} deleted`);
+
+    // Deleting the only row on a later page would strand the admin on an empty
+    // page, so step back one. Otherwise just refetch so the total and the page
+    // controls stop reflecting the deleted user.
+    if (users.length === 1 && currentPage > 1) {
+      void navigate({
+        to: "/manage/users",
+        search: {
+          q: search.q,
+          role: search.role,
+          page: currentPage === 2 ? undefined : currentPage - 1,
+        },
+        replace: true,
+      });
+      return;
+    }
+    void router.invalidate();
   }
 
   async function handleCreateWithPassword(

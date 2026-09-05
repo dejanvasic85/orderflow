@@ -126,7 +126,9 @@ a tight `with check`:
   flag uses, so losing access is an auth-layer fact, not an RLS one. A hard delete is not
   possible anyway: `order_requests.placed_by` is `on delete restrict`. Staff and admins keep
   RLS read access so past orders stay attributable; the users list hides deleted rows with a
-  `deleted_at is null` filter in `users.repository.ts` and in the `users_with_email` view.
+  `deleted_at is null` filter in `users.repository.ts`. The `users_with_email` view only
+  projects the column, it does not filter on it, so historical reads still resolve a deleted
+  user.
   `active` keeps its own meaning: suspend, reversible from the UI. Deleting sets both.
   Inviting a deleted user's email restores the original account rather than creating a second
   one, because the GoTrue user still owns that address. Two guards live in the service, not

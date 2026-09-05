@@ -288,6 +288,21 @@ async function restoreDeletedUser(
   userId: string,
   data: CreateUserInput,
 ): Promise<Result<InvitedUser>> {
+  // Every write happens while the account is still deleted and banned. A failure
+  // here therefore leaves it deleted, so the admin can simply invite again and
+  // land back on this same path. Restoring first would strand a half-configured
+  // live account that the retry would reject as a duplicate email.
+  const updateResult = await deps.repo.updateNewUserFields(userId, {
+    name: data.name,
+    phone: data.phone ?? null,
+    role: data.role,
+    notification_preferences: data.notificationPreferences,
+  });
+  if (!updateResult.ok) return updateResult;
+
+  const accountsResult = await deps.repo.replaceUserAccounts(userId, data.accountIds);
+  if (!accountsResult.ok) return accountsResult;
+
   const restoreResult = await deps.repo.restoreUser(userId, true);
   if (!restoreResult.ok) return restoreResult;
 
@@ -300,17 +315,6 @@ async function restoreDeletedUser(
     await deps.repo.softDeleteUser(userId);
     return err({ message: "Failed to restore the user's access" });
   }
-
-  const updateResult = await deps.repo.updateNewUserFields(userId, {
-    name: data.name,
-    phone: data.phone ?? null,
-    role: data.role,
-    notification_preferences: data.notificationPreferences,
-  });
-  if (!updateResult.ok) return updateResult;
-
-  const accountsResult = await deps.repo.replaceUserAccounts(userId, data.accountIds);
-  if (!accountsResult.ok) return accountsResult;
 
   const namesResult = await deps.repo.findAccountNames(data.accountIds);
   const accounts = unwrapOr(namesResult, []) ?? [];

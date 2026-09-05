@@ -43,7 +43,7 @@ test.describe("Deleting users", () => {
     await deleteButton.click();
 
     const confirm = page.getByRole("alertdialog");
-    await expect(confirm.getByText("You cannot undo this.")).toBeVisible();
+    await expect(confirm.getByText(/Inviting the same email address later/)).toBeVisible();
     await confirm.getByRole("button", { name: "Delete user" }).click();
 
     await expect(page.getByText(`${firstName} ${lastName} deleted`)).toBeVisible();

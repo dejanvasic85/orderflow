@@ -263,6 +263,7 @@ export function createUserRepository(): UserRepository {
         .from("users")
         .select("id", { count: "exact", head: true })
         .eq("role", "admin")
+        .eq("active", true)
         .is("deleted_at", null)
         .neq("id", excludingId);
       if (error) return err({ message: error.message });

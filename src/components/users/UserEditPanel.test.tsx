@@ -412,7 +412,7 @@ test("does not offer delete when the panel is read only", () => {
   expect(screen.queryByRole("button", { name: "Delete user" })).not.toBeInTheDocument();
 });
 
-test("explains that orders are kept and the delete cannot be undone", () => {
+test("explains that orders are kept and the account can be brought back", () => {
   const onDelete = vi.fn();
   render(
     <UserEditPanel user={baseUser} onSave={onSave} onDelete={onDelete} onDiscard={onDiscard} />,
@@ -420,7 +420,7 @@ test("explains that orders are kept and the delete cannot be undone", () => {
 
   expect(
     screen.getByText(
-      "This removes Alice Smith from the list and revokes their sign-in straight away. Orders they placed are kept. You cannot undo this.",
+      "This removes Alice Smith from the list and revokes their sign-in straight away. Orders they placed are kept. Inviting the same email address later brings this account back.",
     ),
   ).toBeInTheDocument();
 });
