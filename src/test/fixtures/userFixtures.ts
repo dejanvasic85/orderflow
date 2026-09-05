@@ -32,6 +32,7 @@ export function makeUserRow(overrides: Partial<ListedRow> = {}): ListedRow {
     invite_accepted_at: null,
     invited_at: null,
     password_set_at: null,
+    deleted_at: null,
     role: "user",
     notification_preferences: { email: true, sms: false },
     created_at: "2024-01-01T00:00:00Z",

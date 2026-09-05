@@ -7,6 +7,7 @@ import {
   RefreshCw,
   User2,
 } from "lucide-react";
+import { PlacedByName } from "@/components/orderRequests/PlacedByName";
 import { buttonVariants } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { formatShortDate } from "@/lib/dates";
@@ -43,12 +44,12 @@ export function OrderHistoryCard({ order, viewHref, reorderHref }: OrderHistoryC
           {order.placedByOrgName ? (
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className="cursor-default truncate">{order.placedByName}</span>
+                <PlacedByName name={order.placedByName} className="cursor-default" />
               </TooltipTrigger>
               <TooltipContent>{order.placedByOrgName}</TooltipContent>
             </Tooltip>
           ) : (
-            <span className="truncate">{order.placedByName}</span>
+            <PlacedByName name={order.placedByName} deleted={order.placedByDeleted} />
           )}
         </MetaItem>
 

@@ -186,14 +186,20 @@ export function buildRecentActivity(
   return orders.slice(0, limit).map((order) => {
     const user =
       order.user && isUserRole(order.user.role)
-        ? { id: order.user.id, name: order.user.name, role: order.user.role }
+        ? {
+            id: order.user.id,
+            name: order.user.name,
+            role: order.user.role,
+            deletedAt: order.user.deletedAt,
+          }
         : null;
-    const { placedByName } = resolvePlacedByName(user);
+    const { placedByName, placedByDeleted } = resolvePlacedByName(user);
     return {
       id: order.id,
       orderRef: formatOrderRef(order.orderNumber),
       accountName: order.account?.name ?? "Unknown",
       placedByName,
+      ...(placedByDeleted ? { placedByDeleted } : {}),
       volume: orderUnitVolume(order),
       createdAt: order.createdAt,
     };

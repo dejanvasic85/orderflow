@@ -17,7 +17,7 @@ export type DashboardOrder = {
   placedBy: string;
   items: DashboardOrderItem[];
   account: { id: string; name: string } | null;
-  user: { id: string; name: string; role: string } | null;
+  user: { id: string; name: string; role: string; deletedAt: string | null } | null;
 };
 
 export type KpiDelta = { changePct: number; direction: "up" | "down" | "flat" };
@@ -48,6 +48,7 @@ export type RecentActivityItem = {
   orderRef: string;
   accountName: string;
   placedByName: string;
+  placedByDeleted?: boolean;
   volume: number;
   createdAt: string;
 };

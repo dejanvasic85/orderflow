@@ -3,6 +3,7 @@ import { log } from "@/lib/log/logger";
 import { err, ok, type Result } from "@/lib/result";
 import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
+import { isUserRole } from "@/lib/users/schema";
 import type { CreateOrderRequestInput, OrderHistoryRow, OrderRequestWithItems } from "./schema";
 import { orderPageSize } from "./schema";
 
@@ -10,13 +11,13 @@ type OrderRequestRow = Database["public"]["Tables"]["order_requests"]["Row"];
 type OrderRequestItemRow = Database["public"]["Tables"]["order_request_items"]["Row"];
 
 const orderRequestWithItemsSelect =
-  "id, order_number, account_id, placed_by, template_id, delivery_address, delivery_instructions, created_at, updated_at, order_request_items(id, product_id, boxes, extra_units, created_at, products(id, name, qty_per_box, image_url)), templates(id, name), users!order_requests_placed_by_fkey(id, name), accounts(id, name)" as const;
+  "id, order_number, account_id, placed_by, template_id, delivery_address, delivery_instructions, created_at, updated_at, order_request_items(id, product_id, boxes, extra_units, created_at, products(id, name, qty_per_box, image_url)), templates(id, name), users!order_requests_placed_by_fkey(id, name, deleted_at), accounts(id, name)" as const;
 
 const orderHistorySelect =
-  "id, order_number, placed_by, created_at, order_request_items(boxes, extra_units), users!order_requests_placed_by_fkey(id, name, role)" as const;
+  "id, order_number, placed_by, created_at, order_request_items(boxes, extra_units), users!order_requests_placed_by_fkey(id, name, role, deleted_at)" as const;
 
 const allOrderHistorySelect =
-  "id, order_number, placed_by, created_at, order_request_items(boxes, extra_units), users!order_requests_placed_by_fkey(id, name, role), accounts(id, name)" as const;
+  "id, order_number, placed_by, created_at, order_request_items(boxes, extra_units), users!order_requests_placed_by_fkey(id, name, role, deleted_at), accounts(id, name)" as const;
 
 // A deleted product is hidden from the `user` role by RLS, so the embed comes
 // back null on an order placed before the deletion. The line item is still part
@@ -30,7 +31,7 @@ const unavailableProductName = "Product no longer available";
 type OrderRequestWithItemsRow = OrderRequestRow & {
   order_request_items: OrderRequestItemJoinRow[];
   templates: { id: string; name: string } | null;
-  users: { id: string; name: string } | null;
+  users: { id: string; name: string; deleted_at: string | null } | null;
   accounts: { id: string; name: string } | null;
 };
 
@@ -40,7 +41,7 @@ type OrderHistoryJoinRow = {
   placed_by: string;
   created_at: string;
   order_request_items: { boxes: number | null; extra_units: number | null }[];
-  users: { id: string; name: string; role: string } | null;
+  users: { id: string; name: string; role: string; deleted_at: string | null } | null;
   accounts?: { id: string; name: string } | null;
 };
 
@@ -69,7 +70,11 @@ function toOrderRequestWithItems(row: OrderRequestWithItemsRow): OrderRequestWit
       },
     })),
     template: row.templates,
-    user: row.users,
+    user: row.users && {
+      id: row.users.id,
+      name: row.users.name,
+      deletedAt: row.users.deleted_at,
+    },
     account: row.accounts,
   };
 }
@@ -81,8 +86,12 @@ function toOrderHistoryRow(row: OrderHistoryJoinRow): OrderHistoryRow {
     placedBy: row.placed_by,
     createdAt: row.created_at,
     items: row.order_request_items.map((i) => ({ boxes: i.boxes, extraUnits: i.extra_units })),
-    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- supabase-js doesn't narrow a joined .select() string to this row shape
-    user: row.users as OrderHistoryRow["user"],
+    user: row.users && {
+      id: row.users.id,
+      name: row.users.name,
+      role: isUserRole(row.users.role) ? row.users.role : "user",
+      deletedAt: row.users.deleted_at,
+    },
     account: row.accounts,
   };
 }

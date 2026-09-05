@@ -9,6 +9,7 @@ import {
   User2,
 } from "lucide-react";
 import { OrderItemCard } from "@/components/orderRequests/OrderItemCard";
+import { PlacedByName } from "@/components/orderRequests/PlacedByName";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { formatDate, formatTime } from "@/lib/dates";
@@ -18,6 +19,7 @@ import { formatOrderRef } from "@/lib/orderRequests/schema";
 type OrderDetailsViewProps = {
   order: OrderRequestWithItems;
   placedByName: string;
+  placedByDeleted?: boolean;
   onBack: () => void;
   onReorder?: () => void;
 };
@@ -25,6 +27,7 @@ type OrderDetailsViewProps = {
 export function OrderDetailsView({
   order,
   placedByName,
+  placedByDeleted,
   onBack,
   onReorder,
 }: OrderDetailsViewProps) {
@@ -62,7 +65,11 @@ export function OrderDetailsView({
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <MetaTile icon={<User2 className="h-4 w-4" />} label="Placed by" value={placedByName} />
+        <MetaTile
+          icon={<User2 className="h-4 w-4" />}
+          label="Placed by"
+          value={<PlacedByName name={placedByName} deleted={placedByDeleted} />}
+        />
         <MetaTile
           icon={<Box className="h-4 w-4" />}
           label="Total boxes"
@@ -131,7 +138,7 @@ export function OrderDetailsView({
 type MetaTileProps = {
   icon: React.ReactNode;
   label: string;
-  value: string;
+  value: React.ReactNode;
 };
 
 function MetaTile({ icon, label, value }: MetaTileProps) {
