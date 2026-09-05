@@ -4,6 +4,7 @@ import { parseNotificationPrefs } from "./notificationPrefs";
 import type {
   CreateUserInput,
   CreateUserWithPasswordInput,
+  DeleteUserInput,
   UpdateOwnProfileInput,
   UpdateUserAccountsInput,
   UpdateUserInput,
@@ -127,6 +128,51 @@ export async function updateUser(
   return ok();
 }
 
+/**
+ * Soft delete. The row survives because order_requests.placed_by is
+ * `on delete restrict` and history has to stay attributable. Access is revoked
+ * by the same GoTrue ban the `active` flag already uses.
+ */
+export async function deleteUser(
+  deps: UserServiceDeps,
+  data: DeleteUserInput,
+): Promise<Result<void>> {
+  await deps.authorize();
+
+  const sessionUser = await deps.session();
+  if (data.id === sessionUser.id) {
+    return err({ message: "You cannot delete your own account" });
+  }
+
+  const userResult = await deps.repo.findUserById(data.id);
+  if (!userResult.ok) return userResult;
+  const wasActive = userResult.value.active ?? true;
+
+  if (userResult.value.role === "admin") {
+    const othersResult = await deps.repo.countOtherActiveAdmins(data.id);
+    if (!othersResult.ok) return othersResult;
+    if (othersResult.value === 0) {
+      return err({ message: "Make someone else an admin before deleting the last one" });
+    }
+  }
+
+  const deleteResult = await deps.repo.softDeleteUser(data.id);
+  if (!deleteResult.ok) return deleteResult;
+
+  const banResult = await deps.repo.syncAuthBanStatus(data.id, false);
+  if (!banResult.ok) {
+    deps.log.error("user.delete", "ban sync failed, rolled back the delete", {
+      userId: data.id,
+      error: banResult.error.message,
+    });
+    await deps.repo.restoreUser(data.id, wasActive);
+    return err({ message: "Failed to revoke the user's access" });
+  }
+
+  deps.log.info("user.delete", "user deleted", { userId: data.id, actorId: sessionUser.id });
+  return ok();
+}
+
 export async function checkEmailExists(
   deps: UserServiceDeps,
   email: string,
@@ -207,6 +253,9 @@ async function finaliseNewUser(
 
 type NewUserTimestamps = Pick<User, "invitedAt" | "inviteAcceptedAt" | "passwordSetAt">;
 
+/** `restored` tells the caller this address belonged to a deleted account we brought back. */
+export type InvitedUser = { user: User; restored: boolean };
+
 function buildNewUser(
   id: string,
   data: CreateUserInput,
@@ -229,11 +278,66 @@ function buildNewUser(
   };
 }
 
+/**
+ * Turns an invite to a deleted user's address back into a restore of the
+ * original account, so their order history stays attached. The auth user was
+ * never removed, so a fresh invite to that email would collide anyway.
+ */
+async function restoreDeletedUser(
+  deps: UserServiceDeps,
+  userId: string,
+  data: CreateUserInput,
+): Promise<Result<InvitedUser>> {
+  const restoreResult = await deps.repo.restoreUser(userId, true);
+  if (!restoreResult.ok) return restoreResult;
+
+  const banResult = await deps.repo.syncAuthBanStatus(userId, true);
+  if (!banResult.ok) {
+    deps.log.error("user.restore", "unban failed, rolled back the restore", {
+      userId,
+      error: banResult.error.message,
+    });
+    await deps.repo.softDeleteUser(userId);
+    return err({ message: "Failed to restore the user's access" });
+  }
+
+  const updateResult = await deps.repo.updateNewUserFields(userId, {
+    name: data.name,
+    phone: data.phone ?? null,
+    role: data.role,
+    notification_preferences: data.notificationPreferences,
+  });
+  if (!updateResult.ok) return updateResult;
+
+  const accountsResult = await deps.repo.replaceUserAccounts(userId, data.accountIds);
+  if (!accountsResult.ok) return accountsResult;
+
+  const namesResult = await deps.repo.findAccountNames(data.accountIds);
+  const accounts = unwrapOr(namesResult, []) ?? [];
+
+  deps.log.info("user.restore", "restored a deleted user instead of inviting", { userId });
+
+  return ok({
+    user: buildNewUser(userId, data, accounts, {
+      invitedAt: null,
+      inviteAcceptedAt: null,
+      passwordSetAt: null,
+    }),
+    restored: true,
+  });
+}
+
 export async function inviteUser(
   deps: UserServiceDeps,
   data: CreateUserInput & { siteUrl: string },
-): Promise<Result<User>> {
+): Promise<Result<InvitedUser>> {
   await deps.authorize();
+
+  const deletedResult = await deps.repo.findDeletedUserIdByEmail(data.email);
+  if (!deletedResult.ok) return deletedResult;
+  if (deletedResult.value) {
+    return restoreDeletedUser(deps, deletedResult.value, data);
+  }
 
   const inviteResult = await deps.repo.inviteUserByEmail(data.email, {
     name: data.name,
@@ -248,13 +352,14 @@ export async function inviteUser(
   });
   if (!accountsResult.ok) return accountsResult;
 
-  return ok(
-    buildNewUser(newUserId, data, accountsResult.value, {
+  return ok({
+    user: buildNewUser(newUserId, data, accountsResult.value, {
       invitedAt: new Date().toISOString(),
       inviteAcceptedAt: null,
       passwordSetAt: null,
     }),
-  );
+    restored: false,
+  });
 }
 
 /**

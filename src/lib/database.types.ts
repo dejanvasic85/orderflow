@@ -365,6 +365,7 @@ export type Database = {
         Row: {
           active: boolean
           created_at: string
+          deleted_at: string | null
           email: string | null
           id: string
           invite_accepted_at: string | null
@@ -380,6 +381,7 @@ export type Database = {
         Insert: {
           active?: boolean
           created_at?: string
+          deleted_at?: string | null
           email?: string | null
           id: string
           invite_accepted_at?: string | null
@@ -395,6 +397,7 @@ export type Database = {
         Update: {
           active?: boolean
           created_at?: string
+          deleted_at?: string | null
           email?: string | null
           id?: string
           invite_accepted_at?: string | null
@@ -415,6 +418,7 @@ export type Database = {
         Row: {
           active: boolean | null
           created_at: string | null
+          deleted_at: string | null
           email: string | null
           id: string | null
           invite_accepted_at: string | null

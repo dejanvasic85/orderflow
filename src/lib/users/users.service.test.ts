@@ -4,6 +4,7 @@ import { makeUserRow } from "@/test/fixtures/userFixtures";
 import type { UserRepository } from "./users.repository";
 import {
   checkEmailExists,
+  deleteUser,
   createUserWithPassword,
   getOwnProfile,
   getUser,
@@ -39,6 +40,10 @@ function makeRepo(overrides: Partial<UserRepository> = {}): UserRepository {
     updateUser: vi.fn().mockResolvedValue(ok()),
     syncAuthBanStatus: vi.fn().mockResolvedValue(ok()),
     markPasswordSet: vi.fn().mockResolvedValue(ok()),
+    softDeleteUser: vi.fn().mockResolvedValue(ok()),
+    restoreUser: vi.fn().mockResolvedValue(ok()),
+    findDeletedUserIdByEmail: vi.fn().mockResolvedValue(ok(null)),
+    countOtherActiveAdmins: vi.fn().mockResolvedValue(ok(1)),
     replaceUserAccounts: vi.fn().mockResolvedValue(ok()),
     addUserToAccounts: vi.fn().mockResolvedValue(ok()),
     removeUserFromAccounts: vi.fn().mockResolvedValue(ok()),
@@ -84,6 +89,7 @@ describe("mapUser", () => {
       invite_accepted_at: null,
       invited_at: null,
       password_set_at: null,
+      deleted_at: null,
       role: null,
       notification_preferences: null,
       created_at: null,
@@ -443,11 +449,12 @@ describe("inviteUser", () => {
 
     expect(result.ok).toBe(true);
     if (result.ok) {
-      expect(result.value.email).toBe("new@example.com");
-      expect(result.value.name).toBe("New User");
-      expect(result.value.role).toBe("user");
-      expect(result.value.accounts).toEqual([{ id: "acc-1", name: "Wines Co" }]);
-      expect(result.value.active).toBe(true);
+      expect(result.value.user.email).toBe("new@example.com");
+      expect(result.value.user.name).toBe("New User");
+      expect(result.value.user.role).toBe("user");
+      expect(result.value.user.accounts).toEqual([{ id: "acc-1", name: "Wines Co" }]);
+      expect(result.value.user.active).toBe(true);
+      expect(result.value.restored).toBe(false);
     }
   });
 
@@ -477,7 +484,7 @@ describe("inviteUser", () => {
 
     expect(result.ok).toBe(true);
     if (result.ok) {
-      expect(result.value.accounts).toEqual([]);
+      expect(result.value.user.accounts).toEqual([]);
     }
   });
 });
@@ -801,5 +808,186 @@ describe("sendUserPasswordReset", () => {
     const result = await sendUserPasswordReset(deps, "u-1", "https://app.example.com");
 
     expect(result).toEqual(err({ message: "email provider down" }));
+  });
+});
+
+describe("deleteUser", () => {
+  it("soft deletes the user and bans them in auth", async () => {
+    const softDeleteUser = vi.fn().mockResolvedValue(ok());
+    const syncAuthBanStatus = vi.fn().mockResolvedValue(ok());
+    const deps = makeDeps({ repo: makeRepo({ softDeleteUser, syncAuthBanStatus }) });
+
+    const result = await deleteUser(deps, { id: "u-1" });
+
+    expect(result).toEqual(ok());
+    expect(softDeleteUser).toHaveBeenCalledWith("u-1");
+    expect(syncAuthBanStatus).toHaveBeenCalledWith("u-1", false);
+  });
+
+  it("refuses to delete the signed-in admin's own account", async () => {
+    const softDeleteUser = vi.fn();
+    const deps = makeDeps({ repo: makeRepo({ softDeleteUser }) });
+
+    const result = await deleteUser(deps, { id: "session-user" });
+
+    expect(result).toEqual(err({ message: "You cannot delete your own account" }));
+    expect(softDeleteUser).not.toHaveBeenCalled();
+  });
+
+  it("refuses to delete the last remaining admin", async () => {
+    const softDeleteUser = vi.fn();
+    const deps = makeDeps({
+      repo: makeRepo({
+        findUserById: vi.fn().mockResolvedValue(ok({ id: "u-1", name: "Jane", role: "admin" })),
+        countOtherActiveAdmins: vi.fn().mockResolvedValue(ok(0)),
+        softDeleteUser,
+      }),
+    });
+
+    const result = await deleteUser(deps, { id: "u-1" });
+
+    expect(result).toEqual(
+      err({ message: "Make someone else an admin before deleting the last one" }),
+    );
+    expect(softDeleteUser).not.toHaveBeenCalled();
+  });
+
+  it("deletes an admin when another admin remains", async () => {
+    const softDeleteUser = vi.fn().mockResolvedValue(ok());
+    const deps = makeDeps({
+      repo: makeRepo({
+        findUserById: vi.fn().mockResolvedValue(ok({ id: "u-1", name: "Jane", role: "admin" })),
+        countOtherActiveAdmins: vi.fn().mockResolvedValue(ok(1)),
+        softDeleteUser,
+      }),
+    });
+
+    const result = await deleteUser(deps, { id: "u-1" });
+
+    expect(result).toEqual(ok());
+    expect(softDeleteUser).toHaveBeenCalledWith("u-1");
+  });
+
+  it("restores the row when the auth ban fails", async () => {
+    const restoreUser = vi.fn().mockResolvedValue(ok());
+    const deps = makeDeps({
+      repo: makeRepo({
+        findUserById: vi
+          .fn()
+          .mockResolvedValue(ok({ id: "u-1", name: "Jane", role: "user", active: true })),
+        syncAuthBanStatus: vi.fn().mockResolvedValue(err({ message: "gotrue down" })),
+        restoreUser,
+      }),
+    });
+
+    const result = await deleteUser(deps, { id: "u-1" });
+
+    expect(result).toEqual(err({ message: "Failed to revoke the user's access" }));
+    expect(restoreUser).toHaveBeenCalledWith("u-1", true);
+  });
+
+  it("restores a previously suspended user as suspended when the auth ban fails", async () => {
+    const restoreUser = vi.fn().mockResolvedValue(ok());
+    const deps = makeDeps({
+      repo: makeRepo({
+        findUserById: vi
+          .fn()
+          .mockResolvedValue(ok({ id: "u-1", name: "Jane", role: "user", active: false })),
+        syncAuthBanStatus: vi.fn().mockResolvedValue(err({ message: "gotrue down" })),
+        restoreUser,
+      }),
+    });
+
+    await deleteUser(deps, { id: "u-1" });
+
+    expect(restoreUser).toHaveBeenCalledWith("u-1", false);
+  });
+});
+
+describe("inviteUser restoring a deleted account", () => {
+  const inviteData = {
+    email: "back@example.com",
+    name: "Returning User",
+    phone: null,
+    role: "user" as const,
+    notificationPreferences: { email: true, sms: false },
+    accountIds: [],
+    siteUrl: "https://bwow.app",
+  };
+
+  it("restores the deleted account instead of sending a new invite", async () => {
+    const restoreUser = vi.fn().mockResolvedValue(ok());
+    const inviteUserByEmail = vi.fn();
+    const deps = makeDeps({
+      repo: makeRepo({
+        findDeletedUserIdByEmail: vi.fn().mockResolvedValue(ok("u-deleted")),
+        restoreUser,
+        inviteUserByEmail,
+      }),
+    });
+
+    const result = await inviteUser(deps, inviteData);
+
+    expect(result.ok).toBe(true);
+    expect(restoreUser).toHaveBeenCalledWith("u-deleted", true);
+    expect(inviteUserByEmail).not.toHaveBeenCalled();
+  });
+
+  it("reports the account as restored so the caller can say so", async () => {
+    const deps = makeDeps({
+      repo: makeRepo({ findDeletedUserIdByEmail: vi.fn().mockResolvedValue(ok("u-deleted")) }),
+    });
+
+    const result = await inviteUser(deps, inviteData);
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.value.restored).toBe(true);
+    }
+  });
+
+  it("unbans the restored user", async () => {
+    const syncAuthBanStatus = vi.fn().mockResolvedValue(ok());
+    const deps = makeDeps({
+      repo: makeRepo({
+        findDeletedUserIdByEmail: vi.fn().mockResolvedValue(ok("u-deleted")),
+        syncAuthBanStatus,
+      }),
+    });
+
+    await inviteUser(deps, inviteData);
+
+    expect(syncAuthBanStatus).toHaveBeenCalledWith("u-deleted", true);
+  });
+
+  it("re-deletes the account when the unban fails", async () => {
+    const softDeleteUser = vi.fn().mockResolvedValue(ok());
+    const deps = makeDeps({
+      repo: makeRepo({
+        findDeletedUserIdByEmail: vi.fn().mockResolvedValue(ok("u-deleted")),
+        syncAuthBanStatus: vi.fn().mockResolvedValue(err({ message: "gotrue down" })),
+        softDeleteUser,
+      }),
+    });
+
+    const result = await inviteUser(deps, inviteData);
+
+    expect(result).toEqual(err({ message: "Failed to restore the user's access" }));
+    expect(softDeleteUser).toHaveBeenCalledWith("u-deleted");
+  });
+
+  it("sends a normal invite when no deleted account matches the email", async () => {
+    const inviteUserByEmail = vi.fn().mockResolvedValue(ok({ userId: "u-new" }));
+    const deps = makeDeps({
+      repo: makeRepo({
+        findDeletedUserIdByEmail: vi.fn().mockResolvedValue(ok(null)),
+        inviteUserByEmail,
+      }),
+    });
+
+    const result = await inviteUser(deps, inviteData);
+
+    expect(result.ok).toBe(true);
+    expect(inviteUserByEmail).toHaveBeenCalledTimes(1);
   });
 });

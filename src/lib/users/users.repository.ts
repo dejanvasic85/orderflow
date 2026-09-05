@@ -22,7 +22,7 @@ function authErrorFields(email: string, error: AuthError) {
 }
 
 export const userListSelect = `
-  id, name, email, phone, active, invite_accepted_at, invited_at, password_set_at, role, notification_preferences, created_at, updated_at,
+  id, name, email, phone, active, invite_accepted_at, invited_at, password_set_at, deleted_at, role, notification_preferences, created_at, updated_at,
   account_users!user_id ( account:accounts ( id, name ) )
 ` as const;
 
@@ -35,6 +35,7 @@ export type ListedRow = {
   invite_accepted_at: string | null;
   invited_at: string | null;
   password_set_at: string | null;
+  deleted_at: string | null;
   role: UserRole | null;
   notification_preferences: unknown;
   created_at: string | null;
@@ -99,6 +100,11 @@ export type UserRepository = {
   syncAuthBanStatus(userId: string, active: boolean): Promise<Result<void>>;
   markPasswordSet(userId: string): Promise<Result<void>>;
 
+  softDeleteUser(id: string): Promise<Result<void>>;
+  restoreUser(id: string, active: boolean): Promise<Result<void>>;
+  findDeletedUserIdByEmail(email: string): Promise<Result<string | null>>;
+  countOtherActiveAdmins(excludingId: string): Promise<Result<number>>;
+
   replaceUserAccounts(userId: string, accountIds: string[]): Promise<Result<void>>;
   addUserToAccounts(userId: string, accountIds: string[]): Promise<Result<void>>;
   removeUserFromAccounts(userId: string, accountIds: string[]): Promise<Result<void>>;
@@ -134,6 +140,7 @@ export function createUserRepository(): UserRepository {
       let query = supabase
         .from("users_with_email")
         .select(userListSelect, isSubsetQuery ? undefined : { count: "exact" })
+        .is("deleted_at", null)
         .order("name", { ascending: true });
 
       if (filters.q) {
@@ -217,6 +224,51 @@ export function createUserRepository(): UserRepository {
       return ok();
     },
 
+    async softDeleteUser(id) {
+      const supabase = createSupabaseServerClient();
+      const { error } = await supabase
+        .from("users")
+        .update({ deleted_at: new Date().toISOString(), active: false })
+        .eq("id", id)
+        .is("deleted_at", null);
+      if (error) return err({ message: error.message });
+      return ok();
+    },
+
+    async restoreUser(id, active) {
+      const supabase = createSupabaseServerClient();
+      const { error } = await supabase
+        .from("users")
+        .update({ deleted_at: null, active })
+        .eq("id", id);
+      if (error) return err({ message: error.message });
+      return ok();
+    },
+
+    async findDeletedUserIdByEmail(email) {
+      const supabase = createSupabaseServerClient();
+      const { data, error } = await supabase
+        .from("users_with_email")
+        .select("id")
+        .eq("email", email)
+        .not("deleted_at", "is", null)
+        .maybeSingle();
+      if (error) return err({ message: error.message });
+      return ok(data?.id ?? null);
+    },
+
+    async countOtherActiveAdmins(excludingId) {
+      const supabase = createSupabaseServerClient();
+      const { count, error } = await supabase
+        .from("users")
+        .select("id", { count: "exact", head: true })
+        .eq("role", "admin")
+        .is("deleted_at", null)
+        .neq("id", excludingId);
+      if (error) return err({ message: error.message });
+      return ok(count ?? 0);
+    },
+
     async replaceUserAccounts(userId, accountIds) {
       const supabase = createSupabaseServerClient();
       const { error: deleteError } = await supabase
@@ -274,12 +326,15 @@ export function createUserRepository(): UserRepository {
       return ok(data?.name ?? null);
     },
 
+    // A deleted user's email is deliberately reported as free: inviteUser turns
+    // that address back into a restore of the original account.
     async findEmailExists(email) {
       const supabase = createSupabaseServerClient();
       const { data, error } = await supabase
         .from("users_with_email")
         .select("id")
         .eq("email", email)
+        .is("deleted_at", null)
         .maybeSingle();
       if (error) return err({ message: error.message });
       return ok(data !== null);

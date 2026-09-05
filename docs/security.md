@@ -62,7 +62,7 @@ revoked from `users`, `accounts`, `account_users`, and `users_with_email`.
 | Table                   | Role  |                  SELECT                  |                INSERT                 |   UPDATE   |  DELETE   |
 | ----------------------- | ----- | :--------------------------------------: | :-----------------------------------: | :--------: | :-------: |
 | **users**               | admin |                    ✅                    |                  ✅                   |     ✅     |    ✅     |
-|                         | staff |                  ✅ all                  |                   -                   |     -      |     -     |
+|                         | staff |                 ✅ all⁶                  |                   -                   |     -      |     -     |
 |                         | user  | ✅ self + order-placers for own accounts |                   -                   |  ✅ self¹  |     -     |
 | **accounts**            | admin |                    ✅                    |                  ✅                   |     ✅     |    ✅     |
 |                         | staff |                  ✅ all                  |                   -                   |     -      |     -     |
@@ -103,6 +103,9 @@ Notes:
    `is_account_member()`; `with check` also pins `placed_by = auth.uid()` so a user can't
    reassign authorship while editing. DELETE is scoped by `is_account_member()`. See
    `20260623085116_user_update_delete_own_order_requests.sql`.
+6. Staff still read deleted users, on purpose, so past orders stay attributable. Deleted
+   users are hidden from the list by a query filter, not a policy. See the note on user
+   deletion below.
 
 ## Known gaps (intentional, verify before "fixing")
 
@@ -118,6 +121,16 @@ a tight `with check`:
   `order_request_items` scoped by `is_account_member()` through the parent order.
 - **Staff are read-only outside placing orders.** No staff write policies on `users`,
   `accounts`, `products`, `templates`. Intentional.
+- **Deleting a user is a soft delete, and RLS is not what enforces it.** `users.deleted_at`
+  is set and the account is banned in GoTrue by the same `syncAuthBanStatus` the `active`
+  flag uses, so losing access is an auth-layer fact, not an RLS one. A hard delete is not
+  possible anyway: `order_requests.placed_by` is `on delete restrict`. Staff and admins keep
+  RLS read access so past orders stay attributable; the users list hides deleted rows with a
+  `deleted_at is null` filter in `users.repository.ts` and in the `users_with_email` view.
+  `active` keeps its own meaning: suspend, reversible from the UI. Deleting sets both.
+  Inviting a deleted user's email restores the original account rather than creating a second
+  one, because the GoTrue user still owns that address. Two guards live in the service, not
+  the database: an admin cannot delete themselves, and cannot delete the last active admin.
 - **Deleting a product is a soft delete, and only the `user` role is blocked by RLS.**
   `products.deleted_at` is set instead of removing the row, because order request items and
   template items reference it. Staff keep full read access on purpose: they fulfil orders

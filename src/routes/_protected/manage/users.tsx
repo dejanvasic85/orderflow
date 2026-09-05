@@ -34,6 +34,7 @@ import { isCreatableUserRole, listUsersSearchSchema, userPageSize } from "@/lib/
 import {
   checkEmailExists,
   createUserWithPassword,
+  deleteUser,
   inviteUser,
   listUsers,
   resendInvite,
@@ -42,6 +43,7 @@ import {
   updateUser,
   updateUserAccounts,
 } from "@/lib/users/users.functions";
+import type { InvitedUser } from "@/lib/users/users.service";
 
 export const Route = createFileRoute("/_protected/manage/users")({
   validateSearch: listUsersSearchSchema,
@@ -183,7 +185,7 @@ function UsersPage() {
       return;
     }
 
-    const result = asResult<User>(
+    const result = asResult<InvitedUser>(
       await inviteUser({
         data: {
           email: draft.email,
@@ -199,9 +201,25 @@ function UsersPage() {
       toast.error(result.error.message);
       return;
     }
-    setUsers((prev) => [result.value, ...prev]);
+    const { user, restored } = result.value;
+    setUsers((prev) => [user, ...prev]);
     setCreating(false);
-    toast.success(`Invite sent to ${result.value.email}`);
+    toast.success(
+      restored
+        ? `${user.email} was deleted before, so their account was restored with its order history`
+        : `Invite sent to ${user.email}`,
+    );
+  }
+
+  async function handleDelete(user: User) {
+    const result = asResult<void>(await deleteUser({ data: { id: user.id } }));
+    if (!result.ok) {
+      toast.error(result.error.message);
+      return;
+    }
+    setUsers((prev) => prev.filter((u) => u.id !== user.id));
+    setSelectedId(null);
+    toast.success(`${user.name} deleted`);
   }
 
   async function handleCreateWithPassword(
@@ -325,6 +343,7 @@ function UsersPage() {
                 onSave={handleSave}
                 onDiscard={handleDiscard}
                 onResendInvite={() => handleResendInvite(selectedUser.id)}
+                onDelete={selectedUser.id === currentUser.id ? undefined : handleDelete}
                 allAccounts={accounts}
               />
             )}
