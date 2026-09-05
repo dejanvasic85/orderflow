@@ -22,7 +22,7 @@ export type OrderRequestWithItems = {
   updatedAt: string;
   orderRequestItems: OrderRequestItem[];
   template: { id: string; name: string } | null;
-  user: { id: string; name: string } | null;
+  user: { id: string; name: string; deletedAt: string | null } | null;
   account: { id: string; name: string } | null;
 };
 
@@ -49,6 +49,8 @@ export type OrderHistoryItem = {
   placedBy: string;
   placedByName: string;
   placedByOrgName?: string;
+  /** The person who placed it has since been deleted. Never set for the org label. */
+  placedByDeleted?: boolean;
   createdAt: string;
   totalUnits: number;
   totalBoxes: number;
@@ -56,7 +58,12 @@ export type OrderHistoryItem = {
   accountId?: string;
 };
 
-export type PlacedByUser = { id: string; name: string; role: UserRole } | null;
+export type PlacedByUser = {
+  id: string;
+  name: string;
+  role: UserRole;
+  deletedAt: string | null;
+} | null;
 
 export type OrderHistoryRow = {
   id: string;

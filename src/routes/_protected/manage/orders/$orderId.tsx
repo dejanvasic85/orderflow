@@ -30,6 +30,7 @@ function AdminOrderDetailsPage() {
   }
 
   const placedByName = order.user?.name ?? "Unknown";
+  const placedByDeleted = Boolean(order.user?.deletedAt);
   const accountName = order.account?.name ?? "Order";
 
   return (
@@ -39,6 +40,7 @@ function AdminOrderDetailsPage() {
         <OrderDetailsView
           order={order}
           placedByName={placedByName}
+          placedByDeleted={placedByDeleted}
           onBack={handleBack}
           onReorder={order.accountId ? handleReorder : undefined}
         />
