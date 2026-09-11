@@ -9,7 +9,7 @@ export function makeDashboardOrder(overrides: Partial<DashboardOrder> = {}): Das
     placedBy: "user-1",
     items: [],
     account: { id: "acc-1", name: "Acme Wines" },
-    user: { id: "user-1", name: "Tom Reynolds", role: "user" },
+    user: { id: "user-1", name: "Tom Reynolds", role: "user", deletedAt: null },
     ...overrides,
   };
 }

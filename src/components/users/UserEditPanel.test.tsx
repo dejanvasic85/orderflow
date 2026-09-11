@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent, { type UserEvent } from "@testing-library/user-event";
 import { makeUser } from "@/test/fixtures/userFixtures";
 import { UserEditPanel } from "./UserEditPanel";
@@ -383,4 +383,82 @@ test("calls onSave with active: true when switch is not changed", async () => {
   await vi.waitFor(() => {
     expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ active: true }), undefined);
   });
+});
+
+test("does not offer delete when no onDelete is given", () => {
+  render(<UserEditPanel user={baseUser} onSave={onSave} onDiscard={onDiscard} />);
+
+  expect(screen.queryByRole("button", { name: "Delete user" })).not.toBeInTheDocument();
+});
+
+test("does not offer delete in create mode", () => {
+  render(<UserEditPanel mode="create" onSave={onSave} onDiscard={onDiscard} />);
+
+  expect(screen.queryByRole("button", { name: "Delete user" })).not.toBeInTheDocument();
+});
+
+test("does not offer delete when the panel is read only", () => {
+  const onDelete = vi.fn();
+  render(
+    <UserEditPanel
+      user={baseUser}
+      readOnly
+      onSave={onSave}
+      onDelete={onDelete}
+      onDiscard={onDiscard}
+    />,
+  );
+
+  expect(screen.queryByRole("button", { name: "Delete user" })).not.toBeInTheDocument();
+});
+
+test("explains that orders are kept and the account can be brought back", () => {
+  const onDelete = vi.fn();
+  render(
+    <UserEditPanel user={baseUser} onSave={onSave} onDelete={onDelete} onDiscard={onDiscard} />,
+  );
+
+  expect(
+    screen.getByText(
+      "This removes Alice Smith from the list and revokes their sign-in straight away. Orders they placed are kept. Inviting the same email address later brings this account back.",
+    ),
+  ).toBeInTheDocument();
+});
+
+test("asks for confirmation before calling onDelete", async () => {
+  const onDelete = vi.fn();
+  render(
+    <UserEditPanel user={baseUser} onSave={onSave} onDelete={onDelete} onDiscard={onDiscard} />,
+  );
+
+  await user.click(screen.getByRole("button", { name: "Delete user" }));
+
+  expect(await screen.findByRole("alertdialog")).toBeInTheDocument();
+  expect(onDelete).not.toHaveBeenCalled();
+});
+
+test("calls onDelete with the user once confirmed", async () => {
+  const onDelete = vi.fn();
+  render(
+    <UserEditPanel user={baseUser} onSave={onSave} onDelete={onDelete} onDiscard={onDiscard} />,
+  );
+
+  await user.click(screen.getByRole("button", { name: "Delete user" }));
+  const dialog = await screen.findByRole("alertdialog");
+  await user.click(within(dialog).getByRole("button", { name: "Delete user" }));
+
+  expect(onDelete).toHaveBeenCalledWith(baseUser);
+});
+
+test("does not call onDelete when the confirmation is cancelled", async () => {
+  const onDelete = vi.fn();
+  render(
+    <UserEditPanel user={baseUser} onSave={onSave} onDelete={onDelete} onDiscard={onDiscard} />,
+  );
+
+  await user.click(screen.getByRole("button", { name: "Delete user" }));
+  const dialog = await screen.findByRole("alertdialog");
+  await user.click(within(dialog).getByRole("button", { name: "Cancel" }));
+
+  expect(onDelete).not.toHaveBeenCalled();
 });

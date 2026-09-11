@@ -1,3 +1,4 @@
+import { PlacedByName } from "@/components/orderRequests/PlacedByName";
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
 import type { RecentActivityItem } from "@/lib/dashboard/schema";
 import { formatRelativeTime } from "@/lib/dates";
@@ -48,7 +49,7 @@ export function RecentActivityList({ items }: RecentActivityListProps) {
                   <span className="truncate">{item.accountName}</span>
                 </td>
                 <td className="hidden py-3 text-muted-foreground md:table-cell">
-                  {item.placedByName}
+                  <PlacedByName name={item.placedByName} deleted={item.placedByDeleted} />
                 </td>
                 <td className="py-3 text-right tabular-nums">{item.volume.toLocaleString()}</td>
                 <td className="py-3 text-right text-xs text-muted-foreground">

@@ -19,21 +19,28 @@ const unknownPlacedByValue = { placedByName: "Unknown" } as const;
 export function resolvePlacedByName(user: PlacedByUser): {
   placedByName: string;
   placedByOrgName?: string;
+  placedByDeleted?: boolean;
 } {
   if (!user) return unknownPlacedByValue;
+  // Staff and admin orders show the org, not the person, so there is no one to
+  // mark as deleted.
   if (isStaffOrAdmin(user.role)) return bwowLabel;
-  return { placedByName: user.name || "Unknown" };
+  return {
+    placedByName: user.name || "Unknown",
+    ...(user.deletedAt ? { placedByDeleted: true } : {}),
+  };
 }
 
 export function mapOrderHistoryRow(row: OrderHistoryRow): OrderHistoryItem {
   const rowItems = row.items ?? [];
-  const { placedByName, placedByOrgName } = resolvePlacedByName(row.user);
+  const { placedByName, placedByOrgName, placedByDeleted } = resolvePlacedByName(row.user);
   return {
     id: row.id,
     orderNumber: row.orderNumber,
     placedBy: row.placedBy,
     placedByName,
     ...(placedByOrgName ? { placedByOrgName } : {}),
+    ...(placedByDeleted ? { placedByDeleted } : {}),
     createdAt: row.createdAt,
     totalBoxes: rowItems.reduce((sum, i) => sum + (i.boxes ?? 0), 0),
     totalUnits: rowItems.reduce((sum, i) => sum + (i.extraUnits ?? 0), 0),
@@ -163,7 +170,7 @@ async function fireOrderNotification(
   const accountName = account?.name ?? input.accountId;
   const placedByUser: PlacedByUser =
     placedBy && isUserRole(placedBy.role)
-      ? { id: placedBy.id, name: placedBy.name, role: placedBy.role }
+      ? { id: placedBy.id, name: placedBy.name, role: placedBy.role, deletedAt: null }
       : null;
   const { placedByName } = resolvePlacedByName(placedByUser);
   const productMap = new Map(products.map((p) => [p.id, p.name]));

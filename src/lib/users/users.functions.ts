@@ -17,6 +17,7 @@ import {
   type ListUsersSearch,
   setUserPasswordSchema,
   updateOwnProfileSchema,
+  deleteUserSchema,
   updateUserAccountsSchema,
   updateUserSchema,
 } from "./schema";
@@ -24,6 +25,7 @@ import { createUserRepository } from "./users.repository";
 import {
   checkEmailExists as checkEmailExistsSvc,
   createUserWithPassword as createUserWithPasswordSvc,
+  deleteUser as deleteUserSvc,
   getOwnProfile as getOwnProfileSvc,
   getUser as getUserSvc,
   inviteUser as inviteUserSvc,
@@ -60,6 +62,10 @@ export const getUser = createServerFn({ method: "GET", strict: { output: false }
 export const updateUser = createServerFn({ method: "POST", strict: { output: false } })
   .validator(updateUserSchema)
   .handler(async ({ data }) => updateUserSvc(deps, data));
+
+export const deleteUser = createServerFn({ method: "POST", strict: { output: false } })
+  .validator(deleteUserSchema)
+  .handler(async ({ data }) => deleteUserSvc(deps, data));
 
 export const checkEmailExists = createServerFn({ method: "GET", strict: { output: false } })
   .validator((email: string) => z.string().email().parse(email))

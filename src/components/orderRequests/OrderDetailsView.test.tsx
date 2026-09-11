@@ -24,7 +24,7 @@ const baseOrder = makeOrderRequestWithItems({
       },
     }),
   ],
-  user: { id: "33333333-3333-4333-8333-333333333333", name: "Jane Placer" },
+  user: { id: "33333333-3333-4333-8333-333333333333", name: "Jane Placer", deletedAt: null },
   account: { id: "22222222-2222-4222-8222-222222222222", name: "The Winery Bistro" },
 });
 

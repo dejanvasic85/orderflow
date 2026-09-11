@@ -3,6 +3,17 @@ import { Check, Copy } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
@@ -41,8 +52,13 @@ type BaseProps = {
 };
 
 type Props =
-  | (BaseProps & { mode: "create"; user?: User })
-  | (BaseProps & { mode?: "edit"; user: User });
+  | (BaseProps & { mode: "create"; user?: User; onDelete?: never })
+  | (BaseProps & {
+      mode?: "edit";
+      user: User;
+      /** Omitted when the panel must not offer deletion, e.g. viewing yourself. */
+      onDelete?: (user: User) => void | Promise<void>;
+    });
 
 const userEditSchema = z.object({
   email: z.email("Valid email is required"),
@@ -83,9 +99,22 @@ export function UserEditPanel(props: Props) {
   const nameParts = user.name.split(" ");
   const accountsPayloadRef = useRef<UpdateUserAccountsInput | null>(null);
   const [emailCopied, setEmailCopied] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const handleAccountsChange = useCallback((payload: UpdateUserAccountsInput) => {
     accountsPayloadRef.current = payload;
   }, []);
+
+  async function handleDelete() {
+    if (props.mode === "create" || !props.onDelete) return;
+    setDeleting(true);
+    try {
+      await props.onDelete(props.user);
+      setConfirmingDelete(false);
+    } finally {
+      setDeleting(false);
+    }
+  }
   const form = useForm({
     defaultValues: {
       email: user.email,
@@ -391,6 +420,51 @@ export function UserEditPanel(props: Props) {
           </Button>
         </div>
       </form>
+
+      {!isCreate && !readOnly && props.onDelete && (
+        <>
+          <Separator />
+
+          <div className="flex flex-col gap-3 rounded-lg border border-destructive/40 p-4">
+            <h3 className="text-sm font-semibold text-destructive">Delete user</h3>
+            <p className="text-sm text-muted-foreground">
+              This removes {props.user.name} from the list and revokes their sign-in straight away.
+              Orders they placed are kept. Inviting the same email address later brings this account
+              back.
+            </p>
+            <AlertDialog open={confirmingDelete} onOpenChange={setConfirmingDelete}>
+              <AlertDialogTrigger asChild>
+                <Button type="button" variant="destructive" className="w-fit">
+                  Delete user
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete {props.user.name}?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    They will not be able to sign in, and they disappear from the users list. Their
+                    past orders stay on record. Inviting the same email address later brings this
+                    account back.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    variant="destructive"
+                    disabled={deleting}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      void handleDelete();
+                    }}
+                  >
+                    {deleting ? "Deleting…" : "Delete user"}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        </>
+      )}
     </div>
   );
 }

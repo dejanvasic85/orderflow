@@ -63,6 +63,10 @@ export const updateUserSchema = z.object({
 
 export type UpdateUserInput = z.infer<typeof updateUserSchema>;
 
+export const deleteUserSchema = z.object({ id: z.uuid() });
+
+export type DeleteUserInput = z.infer<typeof deleteUserSchema>;
+
 export const createUserSchema = z.object({
   email: z.email(),
   name: z.string().min(1),

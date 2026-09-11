@@ -357,7 +357,7 @@ describe("buildRecentActivity", () => {
       orderNumber: 7,
       createdAt: "2026-06-15T10:00:00Z",
       account: { id: "acc-1", name: "Acme Wines" },
-      user: { id: "u-1", name: "Tom Reynolds", role: "user" },
+      user: { id: "u-1", name: "Tom Reynolds", role: "user", deletedAt: null },
       items: [
         {
           productId: "p-1",
@@ -378,10 +378,12 @@ describe("buildRecentActivity", () => {
   });
 
   it("masks admin and staff placed-by as bwow", () => {
-    const adminOrder = makeDashboardOrder({ user: { id: "u-1", name: "Jane Doe", role: "admin" } });
+    const adminOrder = makeDashboardOrder({
+      user: { id: "u-1", name: "Jane Doe", role: "admin", deletedAt: null },
+    });
     const staffOrder = makeDashboardOrder({
       id: "order-2",
-      user: { id: "u-2", name: "Sarah", role: "staff" },
+      user: { id: "u-2", name: "Sarah", role: "staff", deletedAt: null },
     });
 
     const [adminItem] = buildRecentActivity([adminOrder]);

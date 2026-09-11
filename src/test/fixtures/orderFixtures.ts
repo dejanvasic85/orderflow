@@ -34,7 +34,7 @@ export function makeOrderRequestWithItems(
     updatedAt: "2024-01-01T00:00:00Z",
     orderRequestItems: [makeOrderRequestItem()],
     template: null,
-    user: { id: "u-1", name: "Alice Smith" },
+    user: { id: "u-1", name: "Alice Smith", deletedAt: null },
     account: { id: "acc-1", name: "Acme Wines" },
     ...overrides,
   };
@@ -60,7 +60,7 @@ export function makeOrderHistoryRow(overrides: Partial<OrderHistoryRow> = {}): O
     placedBy: "u-1",
     createdAt: "2024-01-01T00:00:00Z",
     items: [],
-    user: { id: "u-1", name: "Alice Smith", role: "user" },
+    user: { id: "u-1", name: "Alice Smith", role: "user", deletedAt: null },
     ...overrides,
   };
 }

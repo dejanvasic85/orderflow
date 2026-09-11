@@ -18,27 +18,67 @@ describe("resolvePlacedByName", () => {
   });
 
   it("masks admins behind the bwow label", () => {
-    expect(resolvePlacedByName({ id: "u-1", name: "Real Name", role: "admin" })).toEqual({
+    expect(
+      resolvePlacedByName({ id: "u-1", name: "Real Name", role: "admin", deletedAt: null }),
+    ).toEqual({
       placedByName: "bwow",
       placedByOrgName: "Boutique Wines of the World",
     });
   });
 
   it("masks staff behind the bwow label", () => {
-    expect(resolvePlacedByName({ id: "u-1", name: "Real Name", role: "staff" })).toEqual({
+    expect(
+      resolvePlacedByName({ id: "u-1", name: "Real Name", role: "staff", deletedAt: null }),
+    ).toEqual({
       placedByName: "bwow",
       placedByOrgName: "Boutique Wines of the World",
     });
   });
 
   it("uses the real name for regular users", () => {
-    expect(resolvePlacedByName({ id: "u-1", name: "Jane Smith", role: "user" })).toEqual({
+    expect(
+      resolvePlacedByName({ id: "u-1", name: "Jane Smith", role: "user", deletedAt: null }),
+    ).toEqual({
       placedByName: "Jane Smith",
     });
   });
 
+  it("keeps the name but marks the placer as deleted", () => {
+    expect(
+      resolvePlacedByName({
+        id: "u-1",
+        name: "Jane Smith",
+        role: "user",
+        deletedAt: "2026-09-05T00:00:00Z",
+      }),
+    ).toEqual({
+      placedByName: "Jane Smith",
+      placedByDeleted: true,
+    });
+  });
+
+  it("does not mark a deleted staff placer, since the org label hides the person", () => {
+    expect(
+      resolvePlacedByName({
+        id: "u-1",
+        name: "Real Name",
+        role: "staff",
+        deletedAt: "2026-09-05T00:00:00Z",
+      }),
+    ).toEqual({
+      placedByName: "bwow",
+      placedByOrgName: "Boutique Wines of the World",
+    });
+  });
+
+  it("does not mark a suspended placer as deleted", () => {
+    expect(
+      resolvePlacedByName({ id: "u-1", name: "Jane Smith", role: "user", deletedAt: null }),
+    ).not.toHaveProperty("placedByDeleted");
+  });
+
   it("falls back to Unknown when a user has an empty name", () => {
-    expect(resolvePlacedByName({ id: "u-1", name: "", role: "user" })).toEqual({
+    expect(resolvePlacedByName({ id: "u-1", name: "", role: "user", deletedAt: null })).toEqual({
       placedByName: "Unknown",
     });
   });
@@ -53,7 +93,7 @@ describe("mapOrderHistoryRow", () => {
           { boxes: 2, extraUnits: 1 },
           { boxes: 3, extraUnits: 4 },
         ],
-        user: { id: "u-1", name: "Jane Smith", role: "user" },
+        user: { id: "u-1", name: "Jane Smith", role: "user", deletedAt: null },
       }),
     );
 
@@ -72,7 +112,7 @@ describe("mapOrderHistoryRow", () => {
     const result = mapOrderHistoryRow(
       makeOrderHistoryRow({
         orderNumber: 7,
-        user: { id: "u-1", name: "Jane Smith", role: "user" },
+        user: { id: "u-1", name: "Jane Smith", role: "user", deletedAt: null },
         account: { id: "acc-1", name: "Acme Wines" },
       }),
     );
@@ -121,7 +161,9 @@ function makeRepo(overrides: Partial<OrderRequestRepository> = {}): OrderRequest
     findAllOrderHistory: vi.fn(),
     createOrderWithItems: vi.fn(),
     findAccountName: vi.fn().mockResolvedValue({ name: "Acme Wines" }),
-    findPlacedByUser: vi.fn().mockResolvedValue({ id: "u-1", name: "Jane Smith", role: "user" }),
+    findPlacedByUser: vi
+      .fn()
+      .mockResolvedValue({ id: "u-1", name: "Jane Smith", role: "user", deletedAt: null }),
     findProductsByIds: vi.fn().mockResolvedValue([{ id: "p-1", name: "Shiraz" }]),
     ...overrides,
   };
@@ -296,7 +338,7 @@ describe("listAllOrderHistory", () => {
             makeOrderHistoryRow({
               orderNumber: 7,
               items: [{ boxes: 2, extraUnits: 1 }],
-              user: { id: "u-1", name: "Jane Smith", role: "user" },
+              user: { id: "u-1", name: "Jane Smith", role: "user", deletedAt: null },
             }),
           ],
           total: 1,
@@ -346,5 +388,31 @@ describe("listAllOrderHistory", () => {
     const result = await listAllOrderHistory(deps, {});
 
     expect(result).toEqual(err({ message: "db down" }));
+  });
+});
+
+describe("mapOrderHistoryRow marking deleted placers", () => {
+  it("marks the row when the placer has been deleted", () => {
+    const row = makeOrderHistoryRow({
+      user: { id: "u-1", name: "Jane Smith", role: "user", deletedAt: "2026-09-05T00:00:00Z" },
+    });
+
+    expect(mapOrderHistoryRow(row).placedByDeleted).toBe(true);
+  });
+
+  it("leaves the row unmarked when the placer is still active", () => {
+    const row = makeOrderHistoryRow({
+      user: { id: "u-1", name: "Jane Smith", role: "user", deletedAt: null },
+    });
+
+    expect(mapOrderHistoryRow(row).placedByDeleted).toBeUndefined();
+  });
+
+  it("still shows the deleted placer's name so the order stays attributable", () => {
+    const row = makeOrderHistoryRow({
+      user: { id: "u-1", name: "Jane Smith", role: "user", deletedAt: "2026-09-05T00:00:00Z" },
+    });
+
+    expect(mapOrderHistoryRow(row).placedByName).toBe("Jane Smith");
   });
 });
