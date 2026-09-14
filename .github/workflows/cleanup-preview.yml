@@ -46,7 +46,7 @@ jobs:
           echo "worker_name=$worker_name" >> "$GITHUB_OUTPUT"
 
       - name: Delete preview worker
-        run: vp dlx wrangler delete "${{ steps.meta.outputs.worker_name }}" --force
+        run: vp exec wrangler delete "${{ steps.meta.outputs.worker_name }}" --force
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
