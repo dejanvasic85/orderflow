@@ -21,3 +21,4 @@ playwright-test-results/
 
 # One-off data import scripts + generated SQL (contain customer PII); local-only
 scripts/import/
+.vitest/
