@@ -18,12 +18,12 @@
     "db:gentypes": "supabase gen types typescript --local > src/lib/database.types.ts"
   },
   "dependencies": {
-    "@cloudflare/vite-plugin": "1.62.3",
+    "@cloudflare/vite-plugin": "1.62.4",
     "@fontsource-variable/fraunces": "5.3.0",
     "@fontsource-variable/outfit": "5.3.0",
-    "@sentry/cloudflare": "11.1.0",
-    "@sentry/core": "11.1.0",
-    "@sentry/tanstackstart-react": "11.1.0",
+    "@sentry/cloudflare": "11.2.0",
+    "@sentry/core": "11.2.0",
+    "@sentry/tanstackstart-react": "11.2.0",
     "@supabase/ssr": "0.12.7",
     "@supabase/supabase-js": "2.117.2",
     "@tailwindcss/vite": "4.3.3",
@@ -41,7 +41,7 @@
     "clsx": "2.1.1",
     "cmdk": "1.1.1",
     "dotenv-cli": "11.0.0",
-    "framer-motion": "13.4.6",
+    "framer-motion": "13.5.0",
     "lucide-react": "1.49.0",
     "playwright": "1.63.0",
     "radix-ui": "1.6.7",
@@ -51,7 +51,7 @@
     "react-easy-crop": "6.2.3",
     "react-email": "6.11.0",
     "recharts": "3.10.1",
-    "shadcn": "4.21.0",
+    "shadcn": "4.21.1",
     "sonner": "2.0.8",
     "tailwind-merge": "3.7.0",
     "tailwindcss": "4.3.3",
@@ -81,7 +81,7 @@
     "vite": "catalog:",
     "vite-plus": "catalog:",
     "vitest": "catalog:",
-    "wrangler": "4.145.0"
+    "wrangler": "4.146.0"
   },
   "devEngines": {
     "runtime": {
