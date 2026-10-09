@@ -42,7 +42,6 @@ const handler = {
 export default Sentry.withSentry(
   () => ({
     dsn: import.meta.env.VITE_SENTRY_DSN,
-    enableLogs: true,
     tracesSampleRate: sentryTracesSampleRate,
   }),
   wrapFetchWithSentry(handler),
