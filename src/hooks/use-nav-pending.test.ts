@@ -57,3 +57,27 @@ test("with siblings, an unrelated sibling is not pending", () => {
 
   expect(result.current("/accounts/abc/browse", siblings)).toBe(false);
 });
+
+test("a path that only shares a text prefix with the target is not pending", () => {
+  mockNavigatingTo("/accounts-archive");
+
+  const { result } = renderHook(() => useNavPending());
+
+  expect(result.current("/accounts")).toBe(false);
+});
+
+test("the root path is not pending while navigating to another page", () => {
+  mockNavigatingTo("/login");
+
+  const { result } = renderHook(() => useNavPending());
+
+  expect(result.current("/")).toBe(false);
+});
+
+test("the root path is pending while navigating to the root", () => {
+  mockNavigatingTo("/");
+
+  const { result } = renderHook(() => useNavPending());
+
+  expect(result.current("/")).toBe(true);
+});
