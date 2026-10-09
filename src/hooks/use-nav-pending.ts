@@ -3,9 +3,15 @@ import { useEffect, useRef, useState } from "react";
 
 const noTargets: readonly string[] = [];
 
+const rootPath = "/";
+
+// Match whole path segments, so "/accounts" does not match "/accounts-archive".
+const matchesTarget = (target: string, to: string): boolean =>
+  to === rootPath ? target === rootPath : target === to || target.startsWith(`${to}/`);
+
 const bestSibling = (target: string, siblings: readonly string[]): string =>
   siblings
-    .filter((s) => target.startsWith(s))
+    .filter((s) => matchesTarget(target, s))
     .reduce((longest, s) => (s.length > longest.length ? s : longest), "");
 
 /**
@@ -53,6 +59,6 @@ export function useNavPending(
 
   return (to: string, siblings?: readonly string[]) =>
     targets.some(
-      (target) => target.startsWith(to) && (!siblings || to === bestSibling(target, siblings)),
+      (target) => matchesTarget(target, to) && (!siblings || to === bestSibling(target, siblings)),
     );
 }
