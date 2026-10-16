@@ -105,6 +105,9 @@ const config = defineConfig({
         org: process.env.VITE_SENTRY_ORG,
         project: process.env.VITE_SENTRY_PROJECT,
         authToken: process.env.SENTRY_AUTH_TOKEN,
+        // Keep dist/server/*.map: wrangler's upload_source_maps needs them at deploy
+        // time to map Cloudflare observability traces. Only delete the public client maps.
+        sourcemaps: { filesToDeleteAfterUpload: ["dist/client/**/*.map"] },
       }),
   ].filter(Boolean),
 });
