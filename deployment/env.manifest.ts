@@ -15,14 +15,7 @@
  * here aligned with that schema; this file adds the CI-only metadata Zod doesn't model.
  */
 
-export const deploymentContexts = [
-  "e2e",
-  "preview",
-  "prod",
-  "migrate",
-  "cleanup",
-  "smoke",
-] as const;
+export const deploymentContexts = ["e2e", "preview", "prod", "migrate", "smoke"] as const;
 
 export type DeploymentContext = (typeof deploymentContexts)[number];
 
@@ -123,12 +116,12 @@ export const envManifest = [
   },
   {
     name: "CLOUDFLARE_API_TOKEN",
-    requiredIn: ["preview", "prod", "cleanup"],
+    requiredIn: ["preview", "prod"],
     roles: ["cli"],
   },
   {
     name: "CLOUDFLARE_ACCOUNT_ID",
-    requiredIn: ["preview", "prod", "cleanup"],
+    requiredIn: ["preview", "prod"],
     roles: ["cli", "workerSecret"],
     // The worker's R2 binding reuses the Cloudflare account id under this name.
     workerAlias: "R2_ACCOUNT_ID",

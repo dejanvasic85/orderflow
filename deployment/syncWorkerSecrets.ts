@@ -4,16 +4,26 @@
  * previously lived in .github/actions/sync-worker-secrets.
  *
  * Usage:
- *   tsx deployment/syncWorkerSecrets.ts [workerName]
+ *   tsx deployment/syncWorkerSecrets.ts
+ *   tsx deployment/syncWorkerSecrets.ts --preview <previewName> [--worker <workerName>]
  *
- * When workerName is given (preview deploys), it is passed as `--name`. Omit for prod.
+ * Without `--preview` this writes to the Worker's production environment. With it,
+ * `wrangler preview secret bulk --name` writes to that Preview instead, and `--worker`
+ * names the Worker the Preview belongs to.
+ *
  * Reads each worker secret's value from process.env under its own name (the workflow step
  * populates these with explicit `NAME: ${{ secrets.NAME }}` entries); requires
  * CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID to already be in the process env for wrangler.
  */
 
 import { spawnSync } from "node:child_process";
+import { parseArgs } from "node:util";
 import { workerSecretSpecs } from "./env.manifest";
+
+type SyncTarget = {
+  previewName?: string;
+  workerName?: string;
+};
 
 function buildPayload(): Record<string, string> {
   const payload: Record<string, string> = {};
@@ -28,20 +38,41 @@ function buildPayload(): Record<string, string> {
   return payload;
 }
 
-function main() {
-  const workerName = process.argv[2];
-  const payload = buildPayload();
-
-  const args = ["exec", "wrangler", "secret", "bulk"];
-  if (workerName) {
-    args.push("--name", workerName);
+function buildArgs({ previewName, workerName }: SyncTarget): string[] {
+  if (previewName) {
+    return [
+      "exec",
+      "wrangler",
+      "preview",
+      "secret",
+      "bulk",
+      "--name",
+      previewName,
+      ...(workerName ? ["--worker-name", workerName] : []),
+    ];
   }
 
-  const result = spawnSync("vp", args, {
-    input: JSON.stringify(payload),
-    stdio: ["pipe", "inherit", "inherit"],
-    encoding: "utf-8",
+  return ["exec", "wrangler", "secret", "bulk", ...(workerName ? ["--name", workerName] : [])];
+}
+
+function main() {
+  const { values } = parseArgs({
+    options: {
+      preview: { type: "string" },
+      worker: { type: "string" },
+    },
   });
+  const payload = buildPayload();
+
+  const result = spawnSync(
+    "vp",
+    buildArgs({ previewName: values.preview, workerName: values.worker }),
+    {
+      input: JSON.stringify(payload),
+      stdio: ["pipe", "inherit", "inherit"],
+      encoding: "utf-8",
+    },
+  );
 
   if (result.error) {
     console.error(`::error::Failed to spawn wrangler: ${result.error.message}`);
