@@ -96,6 +96,10 @@ vp run test:features
 
 The app is deployed to Cloudflare Workers via `wrangler`. Every push to `main` deploys to production at [https://bwow.app](https://bwow.app).
 
+Each pull request deploys a Cloudflare Worker Preview under the `orderflow` Worker, named `pr-<number>-<branch>` and served at `<preview>-orderflow.<account>.workers.dev`. The deploy workflow comments the URL on the pull request and deletes the Preview when it closes.
+
+Previews inherit no vars or bindings, so `wrangler.jsonc` repeats them in its `previews` block. Add a var or binding to one and you must add it to the other, or the Preview runs without it. `preview_urls` gives each Preview a URL and defaults to off, so the deploy workflow enables it on the Worker before it deploys. Route and webhook settings stay on production, so a Preview never answers on a custom domain.
+
 ---
 
 Built for BWOW. Feedback and contributions welcome.

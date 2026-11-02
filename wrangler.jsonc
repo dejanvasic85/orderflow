@@ -4,6 +4,8 @@
   "compatibility_date": "2025-09-02",
   "compatibility_flags": ["nodejs_compat"],
   "main": "src/worker.ts",
+  // A Worker Preview gets a workers.dev URL only with this on; it defaults to off.
+  "preview_urls": true,
   "observability": {
     "enabled": true,
     "head_sampling_rate": 1,
@@ -21,17 +23,27 @@
       "head_sampling_rate": 1,
     },
   },
-  // Top-level config is the default used by preview deploys (deployed via `--name`,
-  // without `CLOUDFLARE_ENV`). It intentionally has NO custom-domain route so previews
-  // resolve to their dynamic *.workers.dev URL instead of stealing the production domain.
-  // SITE_URL here is only a fallback — the deploy-preview workflow overrides it per-PR
-  // with the preview's own workers.dev URL via `--var`.
+  // Top-level config is the default used by `wrangler preview` (deployed without
+  // `CLOUDFLARE_ENV`). It intentionally has NO custom-domain route so previews resolve to
+  // their own workers.dev URL instead of stealing the production domain. SITE_URL here is
+  // only a fallback: the deploy-preview workflow overrides it per-PR with the Preview's own
+  // workers.dev URL via `--var`.
   "vars": {
     "AWS_REGION": "ap-southeast-2",
     "SES_FROM_ADDRESS": "noreply@bwow.au",
     "SITE_URL": "https://orderflow.vasic-studio.workers.dev",
     "R2_BUCKET_NAME": "orderflow-assets",
     "R2_PUBLIC_BASE_URL": "https://pub-8ed295401d494d38a2bf577dd8b8d502.r2.dev",
+  },
+  // A Preview reads this level, not env.production, and inherits no vars or bindings.
+  // SITE_URL is left out because the deploy-preview workflow injects the Preview's own URL.
+  "previews": {
+    "vars": {
+      "AWS_REGION": "ap-southeast-2",
+      "SES_FROM_ADDRESS": "noreply@bwow.au",
+      "R2_BUCKET_NAME": "orderflow-assets",
+      "R2_PUBLIC_BASE_URL": "https://pub-8ed295401d494d38a2bf577dd8b8d502.r2.dev",
+    },
   },
   // Production is selected with `CLOUDFLARE_ENV=production` at build + deploy time.
   // The custom domain lives here only, so it can never leak into preview deploys.
