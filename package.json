@@ -18,7 +18,7 @@
     "db:gentypes": "supabase gen types typescript --local > src/lib/database.types.ts"
   },
   "dependencies": {
-    "@cloudflare/vite-plugin": "1.66.0",
+    "@cloudflare/vite-plugin": "1.67.0",
     "@fontsource-variable/fraunces": "5.3.0",
     "@fontsource-variable/outfit": "5.3.0",
     "@sentry/cloudflare": "11.10.0",
@@ -29,8 +29,8 @@
     "@tailwindcss/vite": "4.3.3",
     "@tanstack/react-devtools": "0.10.14",
     "@tanstack/react-form": "1.33.5",
-    "@tanstack/react-query": "5.105.0",
-    "@tanstack/react-query-devtools": "5.105.0",
+    "@tanstack/react-query": "5.105.1",
+    "@tanstack/react-query-devtools": "5.105.1",
     "@tanstack/react-router": "1.170.46",
     "@tanstack/react-router-devtools": "1.167.2",
     "@tanstack/react-router-ssr-query": "1.167.3",
@@ -81,7 +81,7 @@
     "vite": "catalog:",
     "vite-plus": "catalog:",
     "vitest": "catalog:",
-    "wrangler": "4.156.0"
+    "wrangler": "4.156.1"
   },
   "devEngines": {
     "runtime": {
