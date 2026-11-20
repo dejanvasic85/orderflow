@@ -25,7 +25,7 @@
     "@sentry/core": "11.14.0",
     "@sentry/tanstackstart-react": "11.14.0",
     "@supabase/ssr": "0.12.7",
-    "@supabase/supabase-js": "2.119.0",
+    "@supabase/supabase-js": "2.119.1",
     "@tailwindcss/vite": "4.3.5",
     "@tanstack/react-devtools": "0.10.14",
     "@tanstack/react-form": "1.33.5",
@@ -42,12 +42,12 @@
     "cmdk": "1.1.1",
     "dotenv-cli": "11.1.0",
     "framer-motion": "14.14.0",
-    "lucide-react": "1.74.0",
+    "lucide-react": "1.75.0",
     "playwright": "1.65.1",
     "radix-ui": "1.8.1",
     "react": "19.3.1",
     "react-dom": "19.3.1",
-    "react-dropzone": "20.2.0",
+    "react-dropzone": "20.2.1",
     "react-easy-crop": "6.2.5",
     "react-email": "6.11.16",
     "recharts": "3.11.0",
@@ -66,7 +66,7 @@
     "@testing-library/dom": "10.4.2",
     "@testing-library/jest-dom": "7.0.1",
     "@testing-library/react": "16.3.3",
-    "@testing-library/user-event": "14.6.12",
+    "@testing-library/user-event": "14.6.13",
     "@types/node": "26.6.6",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
@@ -81,7 +81,7 @@
     "vite": "catalog:",
     "vite-plus": "catalog:",
     "vitest": "catalog:",
-    "wrangler": "4.164.0"
+    "wrangler": "4.165.0"
   },
   "devEngines": {
     "runtime": {
